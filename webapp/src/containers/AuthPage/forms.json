@@ -1,0 +1,48 @@
+{
+    "views": {
+      "forgot-password": [
+        {
+          "customBootstrapClass": "col-md-12",
+          "label": "Enter your email",
+          "name": "email",
+          "type": "email",
+          "placeholder": "johndoe@gmail.com",
+          "validations":{ "required": {"value":"true", "message":"Email field required"} }
+        }
+      ],
+      "login": [
+        {
+          "customBootstrapClass": "col-md-12",
+          "label": "Username",
+          "name": "identifier",
+          "type": "text",
+          "placeholder": "johndoe@gmail.com",
+          "validations":{ "required": {"value":"true", "message":"Username field required"} }
+        },
+        {
+          "customBootstrapClass": "col-md-12",
+          "label": "Password",
+          "name": "password",
+          "type": "password",
+          "validations":{ "required": {"value":"true", "message":"Password field required"} }
+        }
+
+      ],
+      "reset-password": [
+        {
+          "customBootstrapClass": "col-md-12",
+          "name": "password",
+          "type": "password",
+          "label": "Password",
+          "validations":{ "required": {"value":"true", "message":"Password field required"} }
+        },
+        {
+          "customBootstrapClass": "col-md-12",
+          "name": "passwordConfirmation",
+          "type": "password",
+          "label": "Confirm Password",
+          "validations":{ "required": {"value":"true", "message":"Confirm password field required"} }
+        }
+      ]
+    }
+  }

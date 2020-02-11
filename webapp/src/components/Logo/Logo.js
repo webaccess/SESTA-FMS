@@ -6,7 +6,7 @@ import styles from "./Logo.module.css";
 const logo = props => {
   return (
     <div className={styles.Logo}>
-      <img src={siteLogo} alt="UPSTC-Logo" />
+      <a href="/"><img src={siteLogo} alt="UPSTC-Logo" /></a>
     </div>
   );
 };

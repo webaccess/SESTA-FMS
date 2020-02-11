@@ -2,6 +2,8 @@ import React from "react";
 
 import styles from "./NavigationItems.module.css";
 import NavigationItem from "./NavigationItem/NavigationItem";
+import auth from '../../Auth/Auth';
+import { withRouter} from 'react-router-dom';
 
 const navigationItems = props => {
   return (
@@ -9,9 +11,12 @@ const navigationItems = props => {
       <NavigationItem link="/" active>
         Dashboard
       </NavigationItem>
-      <NavigationItem link="/">Logout</NavigationItem>
+      <NavigationItem clicked={() => {
+                        auth.clearAppStorage();
+                        props.history.push('/login');
+                    }}>Logout</NavigationItem>
     </ul>
   );
 };
 
-export default navigationItems;
+export default withRouter(navigationItems);
