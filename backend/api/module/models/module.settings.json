@@ -1,0 +1,41 @@
+{
+  "connection": "default",
+  "collectionName": "modules",
+  "info": {
+    "name": "module"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "icon_class": {
+      "type": "string"
+    },
+    "user_roles": {
+      "collection": "user-role",
+      "via": "modules"
+    },
+    "modules": {
+      "collection": "module",
+      "via": "module"
+    },
+    "module": {
+      "model": "module",
+      "via": "modules"
+    },
+    "url": {
+      "type": "string",
+      "required": false
+    }
+  }
+}
