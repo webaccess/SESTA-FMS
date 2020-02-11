@@ -1,0 +1,27 @@
+{
+  "connection": "default",
+  "collectionName": "user_roles",
+  "info": {
+    "name": "user role"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "modules": {
+      "via": "user_roles",
+      "collection": "module",
+      "dominant": true
+    }
+  }
+}
