@@ -17,7 +17,6 @@ const authRoute = ({ component: Component, ...rest }) => (
     {...rest}
     render={props =>
       
-      // console.log(props.match.params.authType+"==="+(props.match.params.authType in ["login","reset-password","forgot-password"]))
       (["login","reset-password","forgot-password"].indexOf(props.match.params.authType) > -1)?
       ((auth.getToken() !== null) ? (
         <Redirect
