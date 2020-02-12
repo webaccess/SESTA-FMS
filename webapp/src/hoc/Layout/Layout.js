@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 
-import Aux from "../Aux/Aux";
+import Aux from "../Auxiliary/Auxiliary";
 import styles from "./Layout.module.css";
 import Toolbar from "../../components/Navigation/Toolbar/Toolbar";
 import SideDrawer from "../../components/Navigation/SideDrawer/SideDrawer";
+import Dashlet from "../../components/Dashlet/Dashlet";
 
 class Layout extends Component {
   state = {
@@ -29,7 +30,11 @@ class Layout extends Component {
           open={this.state.showSideDrawer}
           closed={this.sideDrawerClosedHandler}
         />
-        <main className={styles.Content}>{this.props.children}</main>
+        <main className={styles.Content}>
+          <Dashlet >
+            {this.props.children}
+          </Dashlet>
+        </main>
       </Aux>
     );
   }
