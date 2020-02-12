@@ -7,10 +7,10 @@
  * Wrap your protected routes to secure your container
  */
 
-import React from 'react';
-import { Redirect, Route } from 'react-router-dom';
+import React from "react";
+import { Redirect, Route } from "react-router-dom";
 
-import auth from '../Auth/Auth';
+import auth from "../Auth/Auth";
 
 const privateRoute = ({ component: Component, ...rest }) => (
   <Route
@@ -21,8 +21,8 @@ const privateRoute = ({ component: Component, ...rest }) => (
       ) : (
         <Redirect
           to={{
-            pathname: 'login',
-            state: { from: props.location },
+            pathname: "login",
+            state: { from: props.location }
           }}
         />
       )

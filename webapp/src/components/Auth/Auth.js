@@ -1,7 +1,7 @@
-import { isEmpty } from 'lodash';
+import { isEmpty } from "lodash";
 
-const TOKEN_KEY = 'jwtToken';
-const USER_INFO = 'userInfo';
+const TOKEN_KEY = "jwtToken";
+const USER_INFO = "userInfo";
 
 const parse = JSON.parse;
 const stringify = JSON.stringify;
@@ -91,13 +91,13 @@ const auth = {
     return null;
   },
 
-  setToken(value = '', isLocalStorage = false, tokenKey = TOKEN_KEY) {
+  setToken(value = "", isLocalStorage = false, tokenKey = TOKEN_KEY) {
     return auth.set(value, tokenKey, isLocalStorage);
   },
 
-  setUserInfo(value = '', isLocalStorage = false, userInfo = USER_INFO) {
+  setUserInfo(value = "", isLocalStorage = false, userInfo = USER_INFO) {
     return auth.set(value, userInfo, isLocalStorage);
-  },
+  }
 };
 
 export default auth;
