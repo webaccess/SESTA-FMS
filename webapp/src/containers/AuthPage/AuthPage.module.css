@@ -57,7 +57,7 @@
 
   @media (max-width: 499px) {
     .formContainer {
-      width: 90%;
+      width: 80%;
     }
   
   }
@@ -74,6 +74,8 @@
   
   .buttonContainer {
     padding-top: 3px;
+    display: flex;
+    justify-content: center;
   }
   
   .linkContainer {
@@ -112,4 +114,5 @@
     margin-bottom: 5px;
     line-height: 13px;
     font-size: 13px;
+    color:red;
   }

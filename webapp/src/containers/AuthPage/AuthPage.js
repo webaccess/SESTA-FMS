@@ -6,9 +6,12 @@ import styles from './AuthPage.module.css';
 // Utils
 import validateInput from '../../components/Validation/ValidateInput/ValidateInput';
 import auth from '../../components/Auth/Auth';
+import {Container} from '@material-ui/core';
+import Button from "../../components/UI/Button/Button";
+import Input from "../../components/UI/Input/Input";
 
 class AuthPage extends PureComponent {
-    
+
     constructor(props){
         super(props);
         this.state = { value: {}, errors: {}, fieldErrors: {}, formErrors: [] , formSubmitted: false , showSuccessMsg:false };
@@ -113,6 +116,7 @@ class AuthPage extends PureComponent {
         if(Object.keys(this.state.errors).length>0)
             return;
 
+        
         fetch(requestURL, {
             method: 'POST',
             body: JSON.stringify(this.state.value),
@@ -215,71 +219,59 @@ class AuthPage extends PureComponent {
         
         console.log(this.state.errors)
         return (
-            <div className={styles.authPage}>
+            <div className={styles.authPage} >
             <div className={styles.wrapper}>
                 <div className={styles.formContainer} style={{ marginTop: '.9rem' }}>
-                <div className="container-fluid">
+                
+                <Container >
                     <form onSubmit={this.handleSubmit} method="post">
                     <div className="row" style={{ textAlign: 'start' }}>
                         { map(inputs, (input, key) => {
-                        let renderFieldErrors;
+                        
+                        let fieldErrorVal='';
                         let formSubmitted = this.state.formSubmitted
                         if(formSubmitted) {
-                            renderFieldErrors = (map(this.state.fieldErrors, (error, keyval) => {
-                                
-                                let nameval= get(input, 'name')
-                                console.log("key==",keyval)
-                                console.log("nameval==",nameval)
-                                if(nameval == keyval && error.length>0)
-                                {
-                                    console.log("renderFieldErrorBlock===")
-                                    return (<div className={`form-control-feedback invalid-feedback ${styles.errorContainer} d-block`} key={keyval}>{error[0]}</div>);
-                                }
-                                else{
-                                    return ;
-                                }
-                            }))
-
+                            let nameval=get(input, 'name')
+                            if(Object.keys(this.state.fieldErrors).indexOf(nameval)>-1){
+                                fieldErrorVal=this.state.fieldErrors[nameval][0]
+                            }
                             
-                    }
+                        }
                         let validationData=JSON.parse(JSON.stringify(get(input, 'validations')))
                         console.log("validationData==")
                         console.log(validationData)
-                        return (<div className="form-group" key={'field' + key}>
-                        <label
-                        htmlFor={get(input, 'name')}
-                        message={get(input, 'label')}
-                        style={{ marginTop: '3px' }}
-                        className={`${ (get(input, 'name') in this.state.fieldErrors)? 'text-danger' : ''}`}
-                        >
-                        {get(input, 'label')} { (Object.keys(validationData).indexOf("required") > -1 &&  validationData["required"]["value"] == "true")?<span>*</span>:'' }
-                        </label>
-                        <input
+                        return (<div key={'field' + key} style={{ margin: "8px"}}>
+                                             
+                        <Input
                         autoFocus={key === 0}
-                        className={`form-control ${ (get(input, 'name') in this.state.fieldErrors)? 'is-invalid' : ''}`}
+                        className={`${ (get(input, 'name') in this.state.fieldErrors)? 'is-invalid' : ''}`}
                         id={get(input, 'name')}
-                        label={get(input, 'label')}
+                        label={(Object.keys(validationData).indexOf("required") > -1 &&  validationData["required"]["value"] == "true")?(get(input, 'label')+'*'):get(input, 'label') }
                         name={get(input, 'name')}
                         onChange={this.handleChange}
                         value={ (Object.keys(this.state.value).indexOf(get(input, 'name')) > -1)?this.state.value[get(input, 'name')]:''}
-                        
+                        error={ get(input, 'name') in this.state.fieldErrors? true : false}
                         placeholder={get(input, 'placeholder')}
                         type={get(input, 'type')}
-                        validations={`${JSON.stringify(get(input, 'validations'))}`}
-                    />{renderFieldErrors}
+                        helperText={fieldErrorVal}
+                        inputProps={{"validations":`${JSON.stringify(get(input, 'validations'))}`}}
+                    />
                         </div>);
                             
                 })} 
                 {map(this.state.formErrors, (error, keyval) => {                               
-                        return (<div className={`form-control-feedback invalid-feedback ${styles.errorContainer} d-block`} key={keyval}>{error}</div>);
+                        return (<div className={` ${styles.errorContainer} `} key={keyval}>{error}</div>);
                     })}
                     { (this.state.showSuccessMsg)?this.renderSuccessMsg():'' }
                         <div className={`col-md-12 ${styles.buttonContainer}`}>
-                        <input className="btn btn-primary" type="submit" value="Submit" style={{ width: '100%' }}/>
+                        <Button type="submit">
+                            Submit
+                            </Button>
                         </div>
                     </div>
                     </form>
-                </div>
+                    </Container>
+               
                 </div>
                 <div className={styles.linkContainer}>{this.renderLink()}</div>
             </div>
