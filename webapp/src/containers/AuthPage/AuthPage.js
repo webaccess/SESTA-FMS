@@ -118,7 +118,7 @@ class AuthPage extends PureComponent {
     this.setState({ formErrors: [] });
     // This line is required for the callback url to redirect your user to app
     if (this.props.match.params.authType === "forgot-password") {
-      set(body, "url", "http://localhost:3000/reset-password");
+      set(body, "url", process.env.REACT_APP_CLIENT_URL + "reset-password");
     }
 
     if (Object.keys(this.state.errors).length > 0) return;
