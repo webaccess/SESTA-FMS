@@ -10,53 +10,22 @@ footerHref:(text) for setting link to button,
 displayClose/displaySave:(property) for passing css property to show button or not.}
 
 **Sample code for using modal**
-import Modal from './components/Modal/Modal';
-import Button from '@material-ui/core/Button';
-class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-      isShowing: false,
-    }
-  }
-  openModalHandler = () => {
-    this.setState({
-      isShowing: true,
-    });
-  }
-  closeModalHandler = () => {
-    this.setState({
-      isShowing: false,
-    });
-  }
-  saveFile() {
-    console.log("File saved");
-  }
-  render() {
-    return (
-      <div>
-        <Button variant="outlined" color="primary" onClick={this.openModalHandler}>
-          Modal
-        </Button>
+
         <Modal
           className="modal"
-          show={this.state.isShowing}
-          close={this.closeModalHandler}
+          show={BOOLEAN FUNCTION}
+          close={BOOLEAN FUNCTION}
           header="SESTA FMS"
-          event={this.saveFile}
+          event={EVENT FUNCTION}
           footer={{
             footerSaveName: "OKAY", footerCloseName: "CLOSE",
-            footerHref: "http://192.168.2.61:3000",
+            footerHref: "#LINK",
             displayClose: { display: "true" }, displaySave: { display: "true" }
           }}
         >
           Maybe aircrafts fly very high because they don't want to be seen in plane sight?
         </Modal>
-      </div>
-    );
-  }
-}
-export default App;
+      
 **/
 
 import React from 'react';
