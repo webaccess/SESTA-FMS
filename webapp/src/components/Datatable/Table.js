@@ -47,7 +47,14 @@
     data={data} "Using Api"
     column={Usercolumns}
   />
-      
+
+|*****************************************************************************|
+|*** Example for CallBack Function for delete data modal on Parent Component**| 
+*******************************************************************************
+  DeleteData = (cellid) => {
+    **Delete Data Function 
+    console.log("Data to be Deleted!!!", cellid);
+  }
 **/
 
 import React from "react";
@@ -75,11 +82,8 @@ const Table = (props) => {
     setSelectedRows(state.selectedRows);
   }, []);
   const editData = (event) => {
-
-    console.log('Edit Rows ID: ', event.target.id);
+    /*Function for onClick Edit data  */
   }
-  // let abc = props.modalHandle(Result);
-  // console.log('sdfsddsf', abc)
   const deleteDataModal = (event) => {
     setisDeleteShowing(!isDeleteShowing);
     setcellId(event.target.id);
@@ -107,9 +111,7 @@ const Table = (props) => {
       cell: (cell) => <i className="material-icons" id={cell.id} onClick={deleteDataModal}>delete_outline</i>,
       button: true,
     },
-
   ];
-
 
   const makeColumns = (columns) => {
     for (let i in column) {
@@ -169,7 +171,6 @@ const Table = (props) => {
   if (props.column.length > 0) {
     columns = makeColumns(props.column);
   }
-  // console.log('asdfsadfsadfsadf', props.handleEventChange);
 
   return (
     <>
