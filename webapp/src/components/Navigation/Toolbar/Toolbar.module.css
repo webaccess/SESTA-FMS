@@ -18,11 +18,28 @@
 }
 
 .Logo {
-  height: 80%;
+  height: 75%;
 }
 
 @media (max-width: 499px) {
   .DesktopOnly {
     display: none;
   }
+  .Logo {
+    flex-flow: row-reverse;
+    margin-left: -20px;
+  }
+}
+
+@media (min-width: 500px) {
+  .DesktopOnly {
+    display: flex !important;
+  }
+}
+
+.grow {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0px;
 }

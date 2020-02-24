@@ -44,3 +44,7 @@
     color: white;
   }
 }
+
+.nested {
+  padding-left: 32px !important;
+}
