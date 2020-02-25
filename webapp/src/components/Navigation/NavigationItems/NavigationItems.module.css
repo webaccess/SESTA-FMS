@@ -12,4 +12,18 @@
   .NavigationItems {
     flex-flow: row;
   }
+
+  .MobileOnly {
+    display: none;
+  }
+
+  .DesktopOnly {
+    display: flex !important;
+  }
+}
+
+@media (max-width: 499px) {
+  .DesktopOnly {
+    display: none;
+  }
 }
