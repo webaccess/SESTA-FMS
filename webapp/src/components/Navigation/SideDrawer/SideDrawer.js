@@ -3,45 +3,73 @@ import React from "react";
 import Logo from "../../Logo/Logo";
 import NavigationItems from "../NavigationItems/NavigationItems";
 import styles from "./SideDrawer.module.css";
-import Backdrop from "../../../components/UI/Backdrop/Backdrop";
-import Aux from "../../../hoc/Auxiliary/Auxiliary";
 import Drawer from "@material-ui/core/Drawer";
-import List from "@material-ui/core/List";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import InboxIcon from "@material-ui/icons/MoveToInbox";
-import MailIcon from "@material-ui/icons/Mail";
-import IconButton from "@material-ui/core/IconButton";
-import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 import Divider from "@material-ui/core/Divider";
+import { makeStyles, useTheme } from "@material-ui/styles";
+import { useMediaQuery } from "@material-ui/core";
+import PropTypes from "prop-types";
+import clsx from "clsx";
 
-const sideDrawer = props => {
-  let attachedClasses = [styles.SideDrawer, styles.Close];
-
-  if (props.open) {
-    attachedClasses = [styles.SideDrawer, styles.Open];
+const useStyles = makeStyles(theme => ({
+  drawer: {
+    width: 240,
+    [theme.breakpoints.up("lg")]: {
+      marginTop: 64,
+      height: "calc(100% - 64px)"
+    }
+  },
+  root: {
+    backgroundColor: theme.palette.white,
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
+    padding: theme.spacing(2)
+  },
+  divider: {
+    margin: theme.spacing(2, 0)
+  },
+  nav: {
+    marginBottom: theme.spacing(2)
   }
+}));
+
+const SideDrawer = props => {
+  const { className, ...rest } = props;
+  const classes = useStyles();
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("lg"), {
+    defaultMatches: true
+  });
 
   return (
     <Drawer
-      className={attachedClasses.join(" ")}
+      anchor="left"
+      classes={{ paper: classes.drawer }}
+      onClose={props.closed}
       open={props.open}
-      ModalProps={{ onBackdropClick: props.closed }}
+      variant={props.variant}
     >
-      <div className={attachedClasses.join(" ")}>
-        <div className={styles.Logo}>
-          <Logo />
-        </div>
-        <Divider />
+      <div className={clsx(classes.root, className)}>
+        {!isDesktop ? (
+          <div className={styles.Logo}>
+            <Logo />
+          </div>
+        ) : (
+          ""
+        )}
+        {!isDesktop ? <Divider className={classes.divider} /> : ""}
         <nav>
-          <NavigationItems />
+          <NavigationItems className={classes.nav} />
         </nav>
       </div>
     </Drawer>
   );
 };
 
-export default sideDrawer;
+SideDrawer.propTypes = {
+  className: PropTypes.string,
+  open: PropTypes.bool.isRequired,
+  variant: PropTypes.string.isRequired
+};
+
+export default SideDrawer;

@@ -4,16 +4,17 @@ import styles from "./NavigationItems.module.css";
 import NavigationItem from "./NavigationItem/NavigationItem";
 import auth from "../../Auth/Auth";
 import { withRouter } from "react-router-dom";
-import List from "@material-ui/core/List";
+import { List, colors } from "@material-ui/core";
 import Collapse from "@material-ui/core/Collapse";
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 import Aux from "../../../hoc/Auxiliary/Auxiliary";
 import { withStyles } from "@material-ui/core/styles";
-import Button from "../../UI/Button/Button";
 import axios from "axios";
 import { map } from "lodash";
-import Icon from "@material-ui/core/Icon";
+import clsx from "clsx";
+import { makeStyles, useTheme } from "@material-ui/styles";
+import { useMediaQuery } from "@material-ui/core";
 
 const StyledMenu = withStyles({
   paper: {
@@ -35,6 +36,39 @@ const StyledMenu = withStyles({
   />
 ));
 
+const useStyles = makeStyles(theme => ({
+  root: {},
+  item: {
+    display: "flex",
+    paddingTop: 0,
+    paddingBottom: 0
+  },
+  button: {
+    color: colors.blueGrey[800],
+    padding: "10px 8px",
+    justifyContent: "flex-start",
+    textTransform: "none",
+    letterSpacing: 0,
+    width: "100%",
+    fontWeight: theme.typography.fontWeightMedium
+  },
+  icon: {
+    color: theme.palette.icon,
+    width: 24,
+    height: 24,
+    display: "flex",
+    alignItems: "center",
+    marginRight: theme.spacing(1)
+  },
+  active: {
+    color: theme.palette.primary.main,
+    fontWeight: theme.typography.fontWeightMedium,
+    "& $icon": {
+      color: theme.palette.primary.main
+    }
+  }
+}));
+
 const StyledMenuItem = withStyles(theme => ({
   root: {
     "&:selected": {
@@ -55,10 +89,15 @@ function NavigationItems(props) {
   const [moduleStates, setModuleStates] = React.useState({});
   const [modules, setModules] = React.useState([]);
   const isMobile = window.innerWidth < 500;
-  console.log(isMobile);
+  const { className, ...rest } = props;
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("lg"), {
+    defaultMatches: true
+  });
+
+  const classes = useStyles();
 
   const handleClick = (event, moduleId) => {
-    console.log(Boolean(event.currentTarget));
     setAnchorEl(event.currentTarget);
     updateMenuItemState(moduleId);
   };
@@ -79,13 +118,10 @@ function NavigationItems(props) {
         moduleStatesArr[module.id]["open"] = !moduleStates[module.id]["open"];
     });
     setModuleStates(moduleStatesArr);
-    console.log(moduleStatesArr);
   };
 
   const renderSideMenu = () => {
     let nav = map(modules, (module, key) => {
-      console.log(module);
-
       if (module.modules.length <= 0) {
         return (
           <NavigationItem
@@ -111,8 +147,6 @@ function NavigationItems(props) {
             >
               <List component="div" disablePadding>
                 {map(module.modules, (submodule, subkey) => {
-                  console.log("submodule==");
-                  console.log(submodule);
                   return (
                     <NavigationItem
                       link={submodule.url}
@@ -124,68 +158,6 @@ function NavigationItems(props) {
                 })}
               </List>
             </Collapse>
-          </div>
-        );
-      }
-    });
-    return nav;
-  };
-
-  const renderTopMenu = () => {
-    let nav = map(modules, (module, key) => {
-      console.log(module);
-
-      if (module.modules.length <= 0) {
-        return (
-          <div>
-            <Button
-              variant="contained"
-              startIcon={<Icon>{module.icon_class}</Icon>}
-              clicked={() => {
-                props.history.push(module.url);
-              }}
-            >
-              {module.name}
-            </Button>
-          </div>
-        );
-      } else {
-        return (
-          <div>
-            <Button
-              aria-controls={`menu_${module.id}`}
-              aria-haspopup="true"
-              variant="contained"
-              startIcon={
-                module.icon_class ? <Icon>{module.icon_class}</Icon> : ""
-              }
-              clicked={e => {
-                handleClick(e, module.id);
-              }}
-            >
-              {module.name}
-            </Button>
-            <StyledMenu
-              id={`menu_${module.id}`}
-              anchorEl={anchorEl}
-              keepMounted
-              open={moduleStates[module["id"]].open && isMobile === false}
-              onClose={() => handleClose(module.id)}
-            >
-              {map(module.modules, (submodule, subkey) => {
-                console.log("submodule==");
-                console.log(submodule);
-                return (
-                  <StyledMenuItem>
-                    <NavigationItem
-                      link={submodule.link}
-                      text={submodule.name}
-                      icon={submodule.icon_class}
-                    />
-                  </StyledMenuItem>
-                );
-              })}
-            </StyledMenu>
           </div>
         );
       }
@@ -206,19 +178,13 @@ function NavigationItems(props) {
           }
         }
       )
-      // .then(res => res.json())
       .then(res => {
         let moduleStatesArr = {};
         map(res.data, (module, key) => {
-          console.log(module);
-          // if(module.modules.length>0){
           if (module.id in moduleStatesArr === false)
             moduleStatesArr[module.id] = {};
           moduleStatesArr[module.id] = { open: false };
-          // }
         });
-        console.log("moduleStates==");
-        console.log(moduleStatesArr);
         setModuleStates(moduleStatesArr);
         setModules(res.data);
       });
@@ -226,40 +192,30 @@ function NavigationItems(props) {
 
   return (
     <Aux>
-      <List component="nav" className={styles.MobileOnly}>
+      <List component="nav" className={clsx(classes.root, className)}>
         {renderSideMenu()}
-        {/* <NavigationItem link="/" text="Dashboard" icon="dashboard" /> */}
-        {/* <NavigationItem
-          text="Menu1"
-          icon="dashboard"
-          showopen="true"
-          open={open}
-          clicked={handleSubMenuOpen}
-        />
-        <Collapse in={open} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            <NavigationItem text="Submenu1" icon="dashboard" nested="true" />
-          </List>
-        </Collapse> */}
-        <NavigationItem
-          link="/my-account"
-          text="My account"
-          icon="account_circle"
-        />
-        <NavigationItem
-          clicked={() => {
-            auth.clearAppStorage();
-            props.history.push("/login");
-          }}
-          text="Logout"
-          icon="exit_to_app"
-        />
+        {!isDesktop ? (
+          <Aux>
+            <NavigationItem
+              link="/my-account"
+              text="My account"
+              icon="account_circle"
+            />
+            <NavigationItem
+              clicked={() => {
+                auth.clearAppStorage();
+                props.history.push("/login");
+              }}
+              text="Logout"
+              icon="exit_to_app"
+            />
+          </Aux>
+        ) : (
+          ""
+        )}
       </List>
-
-      <div className={styles.DesktopOnly}>{renderTopMenu()}</div>
     </Aux>
   );
-  // }
 }
 
 export default withRouter(NavigationItems);
