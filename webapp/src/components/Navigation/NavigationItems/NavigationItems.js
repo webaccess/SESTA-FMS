@@ -170,7 +170,7 @@ function NavigationItems(props) {
     axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-          "modules?module_null=true&user_roles.id_in=" +
+          "modules?module_null=true&is_active=true&user_roles.id_in=" +
           userInfo.user_role.id,
         {
           headers: {
