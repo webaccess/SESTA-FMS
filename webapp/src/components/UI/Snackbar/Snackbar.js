@@ -8,15 +8,15 @@ severity="info"
 severity="success"
 
 **Sample code for using Snackbar**
-  <Snackbar open={BOOLEAN}  severity="error" autoHideDuration={6000} onClose={EVENT}> 
+  <Snackbar severity="error"> 
     This is a success message!
   </Snackbar>
 **/
 
-import React, { useState } from 'react';
-import Snackbar from '@material-ui/core/Snackbar';
-import style from './Snackbar.module.css'
-import MuiAlert from '@material-ui/lab/Alert';
+import React, { useState } from "react";
+import Snackbar from "@material-ui/core/Snackbar";
+import style from "./Snackbar.module.css";
+import MuiAlert from "@material-ui/lab/Alert";
 import { useTheme } from "@material-ui/styles";
 import { useMediaQuery } from "@material-ui/core";
 import Aux from "../../../hoc/Auxiliary/Auxiliary.js";
@@ -32,20 +32,21 @@ export default function CustomizedSnackbars(props) {
     setshowMobileSnackbar(false);
   };
 
-
   const openDesktopSnackbar = isDesktop ? false : showMobileSnackbar;
 
   function Alert(props) {
-    return <MuiAlert elevation={6}  {...props} />;
+    return <MuiAlert elevation={6} {...props} />;
   }
 
   return (
     <Aux>
-      <div >
-        <Snackbar open={openDesktopSnackbar} autoHideDuration={6000} onClose={closeMobileSnackbar}>
-          <Alert severity={props.severity}>
-            {props.children}
-          </Alert>
+      <div>
+        <Snackbar
+          open={openDesktopSnackbar}
+          autoHideDuration={6000}
+          onClose={closeMobileSnackbar}
+        >
+          <Alert severity={props.severity}>{props.children}</Alert>
         </Snackbar>
       </div>
       <div className={isDesktop ? "" : style.Hidden}>
