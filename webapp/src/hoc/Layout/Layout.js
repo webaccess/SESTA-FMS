@@ -7,6 +7,7 @@ import SideDrawer from "../../components/Navigation/SideDrawer/SideDrawer";
 import Dashlet from "../../components/Dashlet/Dashlet";
 import { useMediaQuery } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/styles";
+import clsx from "clsx";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -44,17 +45,22 @@ const Layout = props => {
   const shouldOpenSidebar = isDesktop ? true : showSideDrawer;
 
   return (
-    <Aux>
+    <div
+      className={clsx({
+        [classes.root]: true,
+        [classes.shiftContent]: isDesktop
+      })}
+    >
       <Toolbar drawerToggleClicked={sideDrawerToggleHandler} />
       <SideDrawer
         open={shouldOpenSidebar}
         variant={isDesktop ? "persistent" : "temporary"}
         closed={sideDrawerClosedHandler}
       />
-      <main className={styles.Content}>
-        <Dashlet>{props.children}</Dashlet>
+      <main>
+        <Dashlet container={props.container}>{props.children}</Dashlet>
       </main>
-    </Aux>
+    </div>
   );
 };
 
