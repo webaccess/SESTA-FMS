@@ -9,6 +9,8 @@ Sesta uses a technology solution to track the following:
 ### Frontend
 - Technology used: ReactJS
 - Steps for project setup:
+  - Create a file .env
+  - Copy contents of file .env.txt to file .env
   - In terminal use commands below:
   
     ``` cd webapp ```
@@ -24,3 +26,10 @@ Sesta uses a technology solution to track the following:
     ``` cd backend ```
     
     ``` yarn install ```
+    
+  - Configure Database settings in /backend/strapi/config/environments/development/database.json 
+  - In terminal use commands below:
+  
+    ``` yarn build ```
+    
+    ``` yarn develop ```
