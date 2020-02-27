@@ -13,6 +13,9 @@ const validateInput = (value, inputValidations = {}, type = "text") => {
   const emailRegex = new RegExp(
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
   );
+
+  const passRegx = new RegExp("^(?=.*[a-zA-Z])(?=.*[0-9])(?=.{8,})");
+
   // handle i18n
   const requiredError = { id: "components.Input.error.validation.required" };
   mapKeys(inputValidations, (validationValue, validationKey) => {
@@ -44,6 +47,11 @@ const validateInput = (value, inputValidations = {}, type = "text") => {
         break;
       case "regex":
         if (!new RegExp(validationValue.value).test(value)) {
+          errors.push(validationValue.message);
+        }
+        break;
+      case "validatePasswordRegex":
+        if (value.length !== 0 && !passRegx.test(value)) {
           errors.push(validationValue.message);
         }
         break;
