@@ -9,35 +9,13 @@
  * Actions:(function) for passing actions,
  * Pagination:(BOOLEAN FUNCTION)
  * Sortable:(BOOLEAN FUNCTION)
-
 **Sample code for using Datatable**
-
   const Usercolumns = [
     {
-      name: 'Id',
-      selector: 'id',
-      sortable: true,
-      width: '56px'
-    },
-    {
-      name: 'Username',
-      selector: 'username',
-      sortable: true,
-    },
-    {
-      name: 'Email',
-      selector: 'email',
-      sortable: true,
-    },
-    {
-      name: 'first_name',
-      selector: 'first_name',
-      sortable: true,
-    },
-    {
-      name: 'last_name',
-      selector: 'last_name',
-      sortable: true,
+      name: 'Table Head Name',
+      selector: 'row Name',
+      sortable: BOOLEAN FUNCTION,
+      width: '""Styling""'
     },
   ];
   <Table
@@ -47,7 +25,6 @@
     data={data} "Using Api"
     column={Usercolumns}
   />
-
 |*****************************************************************************|
 |*** Example for CallBack Function for delete data modal on Parent Component**| 
 *******************************************************************************
@@ -55,35 +32,39 @@
     **Delete Data Function 
     console.log("Data to be Deleted!!!", cellid);
   }
+
+  ****** For Examples 
+  https://www.npmjs.com/package/react-data-table-component
+
 **/
 
 import React from "react";
-import DataTable from 'react-data-table-component';
-import Checkbox from '@material-ui/core/Checkbox';
+import DataTable, { TableHeader } from 'react-data-table-component';
 import Button from '@material-ui/core/Button';
-import { TextField } from '@material-ui/core';
 import Modal from '../UI/Modal/Modal.js';
 import differenceBy from 'lodash/differenceBy';
-import styles from './Datatable.module.css';
+import style from './Datatable.module.css';
+import SearchInput from '../SearchInput';
+import {
+  Card,
+  Checkbox,
+} from '@material-ui/core';
 
-const FilterComponent = ({ filterText, onFilter, onClear }) => (
-  <>
-    <TextField id="search" type="text" placeholder={"Search By Name"} value={filterText} onChange={onFilter} />
-    <button onClick={onClear} className={styles.ClearButton, styles.btn}> Clear</button>
-  </>
-);
 const Table = (props) => {
-
   const [selectedRows, setSelectedRows] = React.useState([]);
   const row = selectedRows.map(r => r.id);
   const [cellId, setcellId] = React.useState([]);
-
   const handleChange = React.useCallback(state => {
     setSelectedRows(state.selectedRows);
   }, []);
   const editData = (event) => {
     /*Function for onClick Edit data  */
   }
+  const DeleteAllData = (event) => {
+    /*Function for onClick DeleteAllData  */
+  }
+  console.log("ALL SELECTED ROWS", selectedRows);
+
   const deleteDataModal = (event) => {
     setisDeleteShowing(!isDeleteShowing);
     setcellId(event.target.id);
@@ -144,17 +125,9 @@ const Table = (props) => {
 
   const [resetPaginationToggle, setResetPaginationToggle] = React.useState(false);
   const [toggleCleared, setToggleCleared] = React.useState(false);
-  const subHeaderComponentMemo = React.useMemo(() => {
-    const handleClear = () => {
-      if (filterText) {
-        setResetPaginationToggle(!resetPaginationToggle);
-        setFilterText('');
-      }
-    };
 
-    return <FilterComponent onFilter={e => setFilterText(e.target.value)} onClear={handleClear} filterText={filterText} />;
-  }, [filterText, resetPaginationToggle]);
 
+  const onFilter = e => setFilterText(e.target.value);
 
   const contextActions = React.useMemo(() => {
     const handleDelete = () => {
@@ -171,40 +144,52 @@ const Table = (props) => {
   if (props.column.length > 0) {
     columns = makeColumns(props.column);
   }
-
+  const [noHeader, setNoHeader] = React.useState(true);
   return (
     <>
-      <DataTable
-        data={filteredData}
-        title={props.title}
-        columns={props.column}
-        pagination
-        paginationResetDefaultPage={resetPaginationToggle}
-        subHeader
-        subHeaderComponent={subHeaderComponentMemo}
-        selectableRowsComponent={Checkbox}
-        actions={props.actions}
-        contextActions={contextActions}
-        onSelectedRowsChange={handleChange}
-        selectableRows
-        highlightOnHover
-        persistTableHead
-      />
-      <Modal
-        className="modal"
-        show={isDeleteShowing}
-        close={closeDeleteModalHandler}
-        header="SESTA FMS"
-        displayCross={{ display: "none" }}
-        handleEventChange={true}
-        event={handleLangChange}
-        footer={{
-          footerSaveName: "OKAY", footerCloseName: "CLOSE",
-          displayClose: { display: "true" }, displaySave: { display: "true" }
-        }}
-      >
-        Delete Data?
-      </Modal>
+      <div>
+        <div className={style.row}>
+          <SearchInput
+            placeholder="Search user"
+            value={filterText}
+            onChange={onFilter}
+            type="search"
+          />
+        </div>
+        <Card>
+          <DataTable
+            data={filteredData}
+            title={props.title}
+            columns={props.column}
+            pagination
+            paginationResetDefaultPage={resetPaginationToggle}
+            selectableRowsComponent={Checkbox}
+            actions={props.actions}
+            contextActions={contextActions}
+            onSelectedRowsChange={handleChange}
+            selectableRows
+            highlightOnHover
+            persistTableHead
+            noHeader={noHeader}
+          />
+        </Card>
+        <Modal
+          className="modal"
+          show={isDeleteShowing}
+          close={closeDeleteModalHandler}
+          header="SESTA FMS"
+          displayCross={{ display: "none" }}
+          handleEventChange={true}
+          event={handleLangChange}
+          footer={{
+            footerSaveName: "OKAY", footerCloseName: "CLOSE",
+            displayClose: { display: "true" }, displaySave: { display: "true" }
+          }}
+        >
+          Delete Data?
+          </Modal>
+
+      </div>
     </>
   );
 };

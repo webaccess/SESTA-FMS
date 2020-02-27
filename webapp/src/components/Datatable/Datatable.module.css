@@ -1,4 +1,4 @@
-.ClearButton {
+ClearButton {
   border-top-left-radius: 0;
   color: white;
   border-bottom-left-radius: 0;
@@ -26,4 +26,31 @@
   border-radius: 0.25rem;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
     border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.SearchBar {
+  float: left;
+}
+
+.row {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  /* margin-left: -100px; */
+}
+
+:global(.rdt_TableCol) {
+  background-color: #fafafa;
+}
+
+:global(.rdt_TableCell) {
+  padding: 25px;
+}
+
+:global(.MuiCard-root) {
+  margin-top: 25px;
+}
+
+:global(.rdt_Pagination) {
+  color: #263238 !important;
 }
