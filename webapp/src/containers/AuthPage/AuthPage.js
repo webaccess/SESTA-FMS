@@ -21,8 +21,7 @@ class AuthPage extends PureComponent {
       formErrors: {},
       formSubmitted: false,
       showSuccessMsg: false,
-      buttonView: false,
-      matchPassword : false,
+      buttonView: false
     };
   }
 
@@ -93,7 +92,6 @@ class AuthPage extends PureComponent {
   validate = () => {
     const body = this.state.value;
     const inputs = get(form, ["views", this.props.match.params.authType], []);
-
     map(inputs, (input, key) => {
       let nameval = get(input, "name");
       let fieldValue = nameval in body ? body[nameval] : "";
@@ -101,34 +99,17 @@ class AuthPage extends PureComponent {
         fieldValue,
         JSON.parse(JSON.stringify(get(input, "validations")))
       );
-      // console.log("objecyt", Object.keys(this.state.fieldErrors));
+
       let errorset = this.state.errors;
       if (errors.length > 0) errorset[nameval] = errors;
       else delete errorset[nameval];
       this.setState({ errors: errorset });
     });
-    if (this.props.match.params.authType === "reset-password") {
-      if (
-        JSON.stringify(Object(this.state.value.password)) ===
-        JSON.stringify(Object(this.state.value.passwordConfirmation))
-      ) {
-        console.log("password matched");
-      } else {
-      //  this.setState({ formErrors: { password: ["Invalid passwords"] } });
-        // this.setState({
-        //   errors: [ ...this.state.errors, { password: ["Invalid passwords"] } ]
-        // });
-        this.setState({matchPassword : true})
-        console.log("invalid password", this.state.formErrors);
-      }
-    }
   };
 
   handleSubmit = e => {
-
     e.preventDefault();
     const body = this.state.value;
-    this.setState({matchPassword:false});
     this.setState({ buttonView: true });
     this.validate();
     const requestURL = this.getRequestURL();
@@ -188,7 +169,7 @@ class AuthPage extends PureComponent {
             erroset = { email: errors };
           } else if (this.props.match.params.authType === "reset-password")
             erroset = { password: errors };
-          // this.setState({ formErrors: erroset });
+          this.setState({ formErrors: erroset });
         } else {
           if (this.props.match.params.authType === "login")
             this.setState({ formErrors: { identifier: [error.message] } });
@@ -198,7 +179,6 @@ class AuthPage extends PureComponent {
             this.setState({ formErrors: { password: [error.message] } });
         }
       });
-    
   };
 
   redirectUser = () => {
@@ -233,14 +213,12 @@ class AuthPage extends PureComponent {
     map(inputs, (input, key) => {
       let renderFormErrors = map(this.state.formErrors, (error, keyval) => {
         let nameval = get(input, "name");
-
         if (nameval == keyval && error.length > 0) {
           return (
             <div
               className={`form-control-feedback invalid-feedback ${styles.errorContainer} d-block`}
               key={keyval}
             >
-              {}
               {error[0]}
             </div>
           );
@@ -269,8 +247,6 @@ class AuthPage extends PureComponent {
     const errorArr = Object.keys(this.state.errors).map(
       i => this.state.errors[i]
     );
-    console.log("render error", this.state.formErrors);
-    
 
     return (
       <div className={styles.authPage}>
@@ -286,13 +262,9 @@ class AuthPage extends PureComponent {
                       let nameval = get(input, "name");
                       if (
                         Object.keys(this.state.fieldErrors).indexOf(nameval) >
-                        -1 &&
-                        this.state.matchPassword === false
+                        -1
                       ) {
                         fieldErrorVal = this.state.fieldErrors[nameval][0];
-                        {console.log("fff",fieldErrorVal)}
-                      }else if(this.state.matchPassword === true && nameval === "passwordConfirmation" && this.props.match.params.authType === "reset-password"){
-                        fieldErrorVal = "Password Match Failed"; 
                       }
                     }
                     let validationData = JSON.parse(
@@ -326,8 +298,7 @@ class AuthPage extends PureComponent {
                           }
                           error={
                             get(input, "name") in this.state.fieldErrors ||
-                            get(input, "name") in this.state.formErrors ||
-                            this.state.matchPassword === true 
+                            get(input, "name") in this.state.formErrors
                               ? true
                               : false
                           }
