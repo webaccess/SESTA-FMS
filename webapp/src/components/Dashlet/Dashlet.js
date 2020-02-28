@@ -13,7 +13,7 @@ const useStyles = makeStyles(theme => ({
 const Dashlet = props => {
   const classes = useStyles();
   return (
-    <div className={props.container == "listing" ? classes.pad4 : classes.pad3}>
+    <div className={props.container == "listing" ? classes.pad3 : classes.pad4}>
       {props.children}
     </div>
   );
