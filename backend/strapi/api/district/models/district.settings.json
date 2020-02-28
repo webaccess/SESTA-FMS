@@ -1,0 +1,24 @@
+{
+  "connection": "default",
+  "collectionName": "districts",
+  "info": {
+    "name": "master district"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "village": {
+      "via": "master_district",
+      "model": "village"
+    }
+  }
+}
