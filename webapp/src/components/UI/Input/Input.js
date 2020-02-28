@@ -1,22 +1,17 @@
 import React from "react";
-import {TextField} from '@material-ui/core';
+import { TextField } from "@material-ui/core";
 
-const input = props => (
+const input = props => {
+  const { autoFocus, variant, error, ...rest } = props;
+
+  return (
     <TextField
-    autoFocus={props.autoFocus?props.autoFocus:false}
-    className={props.className}
-    id={props.id}
-    label={props.label}
-    name={props.name}
-    onChange={props.onChange}
-    value={props.value}
-    variant={props.variant?props.variant:"standard"}
-    error={props.error?props.error:false}
-    placeholder={props.placeholder}
-    type={props.type}
-    helperText={props.helperText}
-    inputProps={props.inputProps}
-/>
-);
+      autoFocus={autoFocus ? autoFocus : false}
+      variant={variant ? variant : "standard"}
+      error={error ? error : false}
+      {...rest}
+    />
+  );
+};
 
 export default input;

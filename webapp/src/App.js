@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import AuthPage from "./containers/AuthPage/AuthPage";
 import PrivateRoute from "./hoc/PrivateRoute/PrivateRoute";
