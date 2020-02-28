@@ -8,6 +8,7 @@ import Dashboard from "./containers/Dashboard/Dashboard";
 import NotFoundPage from "./containers/NotFoundPage/NotFoundPage";
 import { ThemeProvider } from "@material-ui/styles";
 import theme from "./theme";
+import Users from "./containers/Users/Users";
 
 class App extends Component {
   render() {
@@ -17,6 +18,7 @@ class App extends Component {
           <div>
             <Switch>
               <PrivateRoute path="/" component={Dashboard} exact />
+              <PrivateRoute path="/users/add" component={Users} exact />
               <Route path="/404" component={NotFoundPage} />
               <AuthRoute path="/:authType/:id?" component={AuthPage} />
             </Switch>
