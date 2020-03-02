@@ -13,8 +13,8 @@
       "type": "string"
     },
     "master_district": {
-      "model": "district",
-      "via": "village"
+      "via": "villages",
+      "model": "district"
     }
   }
 }

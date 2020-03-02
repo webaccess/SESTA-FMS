@@ -16,9 +16,13 @@
       "type": "boolean",
       "default": true
     },
-    "village": {
-      "via": "master_district",
-      "model": "village"
+    "villages": {
+      "collection": "village",
+      "via": "master_district"
+    },
+    "master_state": {
+      "via": "master_districts",
+      "model": "state"
     }
   }
 }

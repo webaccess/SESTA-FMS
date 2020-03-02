@@ -17,7 +17,8 @@
       "default": true
     },
     "master_districts": {
-      "collection": "district"
+      "collection": "district",
+      "via": "master_state"
     }
   }
 }

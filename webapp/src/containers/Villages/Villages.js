@@ -140,7 +140,6 @@ import {
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
 
-
 class Villages extends Component {
   constructor(props) {
     super(props);
@@ -150,10 +149,14 @@ class Villages extends Component {
       getDistrict: [],
       validations: {
         addVillage: {
-          required: { value: "true", message: "addVillage field required" }
+          required: { value: "true", message: "Village field required" }
         },
-        addState: {},
-        addDistrict: {}
+        addState: {
+          required: { value: "true", message: "State field required" }
+        },
+        addDistrict: {
+          required: { value: "true", message: "District field required" }
+        }
       },
       errors: {
         addVillage: [],
@@ -166,6 +169,7 @@ class Villages extends Component {
   }
 
   componentDidMount() {
+    console.log("auth", auth.getToken());
     axios
       .get(process.env.REACT_APP_SERVER_URL + "states/", {
         headers: {
@@ -179,35 +183,24 @@ class Villages extends Component {
       .catch(error => {
         console.log(error);
       });
-
-   
   }
 
   handleChange = ({ target }) => {
     this.setState({
       values: { ...this.state.values, [target.name]: target.value }
     });
-  }
-  
+  };
 
-  handleStateChange(target) {
+  handleStateChange = ({ target }) => {
+    console.log("target", target.value, target.name);
     this.setState({
       values: { ...this.state.values, [target.name]: target.value }
     });
-        axios
-        .get(process.env.REACT_APP_SERVER_URL + "districts/", {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
-        })
-        .then(res => {
-          console.log("district data", res.data);
-          this.setState({ getDistrict: res.data });
-        })
-        .catch(error => {
-          console.log(error);
-        });
-      }
+    // var stateId = target.value;
+    this.setState({
+      getDistrict: target.value.master_districts
+    });
+  };
 
   validate = () => {
     const values = this.state.values;
@@ -232,7 +225,7 @@ class Villages extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    console.log("valkues",this.state.values)
+    console.log("valkues", this.state.values);
     this.validate();
 
     if (Object.keys(this.state.errors).length > 0) return;
@@ -284,20 +277,23 @@ class Villages extends Component {
                   <Input
                     fullWidth
                     label="Select State"
-                    helperText="Please select the state first"
                     margin="dense"
                     name="addState"
                     onChange={this.handleStateChange}
                     required
                     select
-                    // eslint-disable-next-line react/jsx-sort-props
+                    error={this.hasError("addState")}
+                    helperText={
+                      this.hasError("addState")
+                        ? this.state.errors.addState[0]
+                        : null
+                    }
                     value={this.state.values.addState || ""}
                     variant="outlined"
                   >
                     {this.state.getState.map(states => (
-                      <option value={states.name} key={states.id}>
-                        {" "}
-                        {states.name}{" "}
+                      <option value={states} key={states.id}>
+                        {states.name}
                       </option>
                     ))}
                   </Input>
@@ -306,20 +302,23 @@ class Villages extends Component {
                   <Input
                     fullWidth
                     label="Select District"
-                    helperText="Please select the state first"
                     margin="dense"
                     name="addDistrict"
-                    onChange={this.handleDistrictChange}
+                    onChange={this.handleChange}
                     required
                     select
-                    // eslint-disable-next-line react/jsx-sort-props
-                    value={this.state.values.addDistrict|| ""}
+                    error={this.hasError("addDistrict")}
+                    helperText={
+                      this.hasError("addDistrict")
+                        ? this.state.errors.addVillage[0]
+                        : "Please select the state first"
+                    }
+                    value={this.state.values.addDistrict || ""}
                     variant="outlined"
                   >
                     {this.state.getDistrict.map(district => (
                       <option value={district.name} key={district.id}>
-                        {" "}
-                        {district.name}{" "}
+                        {district.name}
                       </option>
                     ))}
                   </Input>
