@@ -20,6 +20,9 @@ import MuiAlert from "@material-ui/lab/Alert";
 import { useTheme } from "@material-ui/styles";
 import { useMediaQuery } from "@material-ui/core";
 import Aux from "../../../hoc/Auxiliary/Auxiliary.js";
+import CloseIcon from '@material-ui/icons/Close';
+import Collapse from '@material-ui/core/Collapse';
+import IconButton from '@material-ui/core/IconButton';
 
 export default function CustomizedSnackbars(props) {
   const theme = useTheme();
@@ -32,16 +35,26 @@ export default function CustomizedSnackbars(props) {
     setshowMobileSnackbar(false);
   };
 
+  const [open, setOpen] = React.useState(true);
+
   const openDesktopSnackbar = isDesktop ? false : showMobileSnackbar;
 
   function Alert(props) {
     return <MuiAlert elevation={6} {...props} />;
   }
+  const [state, setState] = React.useState({
+
+    vertical: 'top',
+    horizontal: 'center',
+  });
+
+  const { vertical, horizontal } = state;
 
   return (
     <Aux>
       <div>
         <Snackbar
+          anchorOrigin={{ vertical, horizontal }}
           open={openDesktopSnackbar}
           autoHideDuration={6000}
           onClose={closeMobileSnackbar}
@@ -50,9 +63,25 @@ export default function CustomizedSnackbars(props) {
         </Snackbar>
       </div>
       <div className={isDesktop ? "" : style.Hidden}>
-        <Alert style={{ width: "500px" }} severity={props.severity}>
-          {props.children}
-        </Alert>
+        <Collapse in={open}>
+          <Alert
+            severity={props.severity}
+            action={
+              <IconButton
+                aria-label="close"
+                color="inherit"
+                size="small"
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                <CloseIcon fontSize="inherit" />
+              </IconButton>
+            }
+          >
+            {props.children}
+          </Alert>
+        </Collapse>
       </div>
     </Aux>
   );
