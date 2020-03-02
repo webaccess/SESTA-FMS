@@ -53,8 +53,7 @@ class Users extends Component {
         phone: [],
         state: []
       },
-      serverErrors: {},
-      formSubmitted: false
+      serverErrors: {}
     };
   }
 
