@@ -1,27 +1,79 @@
-import React from "react";
+import React, { useEffect } from "react";
+import BreadcrumbsElem from "@material-ui/core/Breadcrumbs";
+import BreadcrumbItem from "./BreadcrumbItem/BreadcrumbItem";
+import auth from "../../Auth/Auth";
+import axios from "axios";
+import { map } from "lodash";
 
 function Breadcrumbs(props) {
+  var mount = false;
+  const [modules, setModules] = React.useState([]);
 
-    return(
-        <Breadcrumbs aria-label="breadcrumb">
-          <Link color="inherit" href="/" onClick={handleClick}>
-            Material-UI
-          </Link>
-          <Link color="inherit" href="/getting-started/installation/" onClick={handleClick}>
-            Core
-          </Link>
-          <Link
-            color="textPrimary"
-            href="/components/breadcrumbs/"
-            onClick={handleClick}
-            aria-current="page"
-          >
-            Breadcrumb
-          </Link>
-          
+  useEffect(() => {
+    console.log(auth.getToken());
+    let userInfo = auth.getUserInfo();
+    mount = true;
+    const fetchData = async () => {
+      let modules = Object.keys(props.modules);
+      let moduleStr = "";
+      map(props.modules, (module, slug) => {
+        moduleStr = moduleStr + "&slug_in=" + slug;
+      });
+      await axios
+        .get(
+          process.env.REACT_APP_SERVER_URL +
+            "modules?is_active=true&user_roles.id_in=" +
+            userInfo.user_role.id +
+            "&slug_in=" +
+            moduleStr,
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken()
+            }
+          }
+        )
+        .then(res => {
+          console.log(res.data);
+          // let moduleStatesArr = {};
+          // map(res.data, (module, key) => {
+          //   if (module.id in moduleStatesArr === false)
+          //     moduleStatesArr[module.id] = {};
+          //   moduleStatesArr[module.id] = { open: false };
+          // });
+          // if (mount) setModuleStates(moduleStatesArr);
+          if (mount) setModules(res.data);
+        });
+    };
+    fetchData();
+    return () => {
+      mount = false;
+    };
+  }, []);
 
-        </Breadcrumbs>
-    );
+  console.log(props.modules);
+  return (
+    <BreadcrumbsElem aria-label="breadcrumb">
+      {map(modules, (module, key) => {
+        if (key === modules.length - 1)
+          return (
+            <BreadcrumbItem
+              last="true"
+              color="textPrimary"
+              href={module.url}
+              aria-current="page"
+            >
+              {props.modules[module.slug]}
+            </BreadcrumbItem>
+          );
+        else
+          return (
+            <BreadcrumbItem color="inherit" href={module.url}>
+              {props.modules[module.slug]}
+            </BreadcrumbItem>
+          );
+      })}
+    </BreadcrumbsElem>
+  );
 }
 
 export default Breadcrumbs;
