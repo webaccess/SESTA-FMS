@@ -40,6 +40,10 @@
         "type": "password",
         "label": "Password",
         "validations": {
+          "validatePasswordRegex": {
+            "value": "true",
+            "message": "Use 8 or more characters with a mix of letters & numbers"
+          },
           "required": { "value": "true", "message": "Password field required" }
         }
       },
