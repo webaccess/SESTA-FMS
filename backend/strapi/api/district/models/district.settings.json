@@ -17,8 +17,8 @@
       "default": true
     },
     "villages": {
-      "collection": "village",
-      "via": "master_district"
+      "via": "master_district",
+      "collection": "village"
     },
     "master_state": {
       "via": "master_districts",

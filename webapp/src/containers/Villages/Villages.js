@@ -129,6 +129,7 @@ import axios from "axios";
 import auth from "../../components/Auth/Auth";
 import Button from "../../components/UI/Button/Button";
 import Input from "../../components/UI/Input/Input";
+import Snackbar from "../../components/UI/Snackbar/Snackbar.js";
 import {
   Card,
   CardHeader,
@@ -143,6 +144,7 @@ import validateInput from "../../components/Validation/ValidateInput/ValidateInp
 class Villages extends Component {
   constructor(props) {
     super(props);
+    console.log("super", props);
     this.state = {
       values: {},
       getState: [],
@@ -164,7 +166,7 @@ class Villages extends Component {
         addDistrict: []
       },
       serverErrors: {},
-      formSubmitted: false
+      formSubmitted: ""
     };
   }
 
@@ -192,11 +194,10 @@ class Villages extends Component {
   };
 
   handleStateChange = ({ target }) => {
-    console.log("target", target.value, target.name);
+    console.log("target", target.value.name, target.name);
     this.setState({
       values: { ...this.state.values, [target.name]: target.value }
     });
-    // var stateId = target.value;
     this.setState({
       getDistrict: target.value.master_districts
     });
@@ -213,23 +214,42 @@ class Villages extends Component {
       if (errors.length > 0) errorset[key] = errors;
       else delete errorset[key];
       this.setState({ errors: errorset });
+      console.log("valid", errors);
     });
   };
 
   hasError = field => {
+    
     return Object.keys(this.state.errors).length > 0 &&
       this.state.errors[field].length > 0
       ? true
       : false;
+    
   };
 
   handleSubmit = e => {
     e.preventDefault();
-    console.log("valkues", this.state.values);
     this.validate();
 
     if (Object.keys(this.state.errors).length > 0) return;
-    //ajax call
+    var villageName = this.state.values.addVillage;
+    var districtId = this.state.values.addDistrict.id;
+    axios
+      .post(process.env.REACT_APP_SERVER_URL + "villages", {
+        name: villageName,
+        master_district: {
+          id: districtId
+        }
+      })
+      .then(res => {
+        console.log("result", res);
+        this.setState({ formSubmitted: true });
+      })
+      .catch(error => {
+        this.setState({ formSubmitted: false });
+        console.log(error.response);
+      });
+    console.log("values", this.state.values);
   };
 
   resetForm = () => {
@@ -250,11 +270,22 @@ class Villages extends Component {
           >
             <CardHeader
               subheader="The information can be edited"
-              title="add/edit village"
+              title={this.props.header ? this.props.header : "Add village"}
             />
             <Divider />
             <CardContent>
               <Grid container spacing={3}>
+                
+                <Grid item md={12} xs={12}>
+                  {this.state.formSubmitted === true ? (
+                    <Snackbar severity="success">
+                      Village added successfully.
+                    </Snackbar>
+                  ) : null}
+                  {this.state.formSubmitted === false ? (
+                    <Snackbar severity="error">An error occured.</Snackbar>
+                  ) : null}
+                </Grid>
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
@@ -280,7 +311,6 @@ class Villages extends Component {
                     margin="dense"
                     name="addState"
                     onChange={this.handleStateChange}
-                    required
                     select
                     error={this.hasError("addState")}
                     helperText={
@@ -305,7 +335,6 @@ class Villages extends Component {
                     margin="dense"
                     name="addDistrict"
                     onChange={this.handleChange}
-                    required
                     select
                     error={this.hasError("addDistrict")}
                     helperText={
@@ -317,7 +346,7 @@ class Villages extends Component {
                     variant="outlined"
                   >
                     {this.state.getDistrict.map(district => (
-                      <option value={district.name} key={district.id}>
+                      <option value={district} key={district.id}>
                         {district.name}
                       </option>
                     ))}
