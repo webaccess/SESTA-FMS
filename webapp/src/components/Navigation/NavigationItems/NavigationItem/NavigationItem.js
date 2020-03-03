@@ -69,7 +69,6 @@ class NavigationItem extends Component {
         onClick={this.props.clicked}
       >
         <Button
-          activeClassName={classes.active}
           className={
             isActive ? clsx(classes.button, classes.active) : classes.button
           }

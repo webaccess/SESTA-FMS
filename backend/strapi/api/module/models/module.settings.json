@@ -36,6 +36,16 @@
     "url": {
       "type": "string",
       "required": false
+    },
+    "slug": {
+      "type": "string",
+      "unique": true,
+      "required": true
+    },
+    "displayNavigation": {
+      "type": "boolean",
+      "default": true,
+      "required": true
     }
   }
 }

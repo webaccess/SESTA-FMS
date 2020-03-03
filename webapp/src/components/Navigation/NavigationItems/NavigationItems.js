@@ -1,4 +1,4 @@
-import React, { Component, useEffect } from "react";
+import React, { useEffect } from "react";
 
 import styles from "./NavigationItems.module.css";
 import NavigationItem from "./NavigationItem/NavigationItem";
@@ -84,6 +84,7 @@ const StyledMenuItem = withStyles(theme => ({
 }))(MenuItem);
 
 function NavigationItems(props) {
+  var mount = false;
   const [open, setOpen] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [moduleStates, setModuleStates] = React.useState({});
@@ -167,27 +168,34 @@ function NavigationItems(props) {
 
   useEffect(() => {
     let userInfo = auth.getUserInfo();
-    axios
-      .get(
-        process.env.REACT_APP_SERVER_URL +
-          "modules?module_null=true&is_active=true&user_roles.id_in=" +
-          userInfo.user_role.id,
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken()
+    mount = true;
+    const fetchData = async () => {
+      await axios
+        .get(
+          process.env.REACT_APP_SERVER_URL +
+            "modules?module_null=true&displayNavigation=true&is_active=true&user_roles.id_in=" +
+            userInfo.user_role.id,
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken()
+            }
           }
-        }
-      )
-      .then(res => {
-        let moduleStatesArr = {};
-        map(res.data, (module, key) => {
-          if (module.id in moduleStatesArr === false)
-            moduleStatesArr[module.id] = {};
-          moduleStatesArr[module.id] = { open: false };
+        )
+        .then(res => {
+          let moduleStatesArr = {};
+          map(res.data, (module, key) => {
+            if (module.id in moduleStatesArr === false)
+              moduleStatesArr[module.id] = {};
+            moduleStatesArr[module.id] = { open: false };
+          });
+          if (mount) setModuleStates(moduleStatesArr);
+          if (mount) setModules(res.data);
         });
-        setModuleStates(moduleStatesArr);
-        setModules(res.data);
-      });
+    };
+    fetchData();
+    return () => {
+      mount = false;
+    };
   }, []);
 
   return (
@@ -206,6 +214,7 @@ function NavigationItems(props) {
                 auth.clearAppStorage();
                 props.history.push("/login");
               }}
+              link="javascript:void(0);"
               text="Logout"
               icon="exit_to_app"
             />

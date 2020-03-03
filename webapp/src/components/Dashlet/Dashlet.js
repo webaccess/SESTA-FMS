@@ -1,5 +1,6 @@
 import React from "react";
 import { makeStyles } from "@material-ui/styles";
+import Breadcrumbs from "../Navigation/Breadcrumbs/Breadcrumbs";
 
 const useStyles = makeStyles(theme => ({
   pad3: {
@@ -14,6 +15,11 @@ const Dashlet = props => {
   const classes = useStyles();
   return (
     <div className={props.container == "listing" ? classes.pad3 : classes.pad4}>
+      {props.breadcrumbs ? (
+        <Breadcrumbs modules={props.breadcrumbs}></Breadcrumbs>
+      ) : (
+        ""
+      )}
       {props.children}
     </div>
   );
