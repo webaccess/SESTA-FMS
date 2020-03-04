@@ -20,7 +20,8 @@ class AuthPage extends PureComponent {
       fieldErrors: {},
       formErrors: {},
       formSubmitted: false,
-      showSuccessMsg: false
+      showSuccessMsg: false,
+      buttonView: false
     };
   }
 
@@ -109,9 +110,8 @@ class AuthPage extends PureComponent {
   handleSubmit = e => {
     e.preventDefault();
     const body = this.state.value;
-
+    this.setState({ buttonView: true });
     this.validate();
-
     const requestURL = this.getRequestURL();
     this.setState({ formSubmitted: true });
     this.setState({ fieldErrors: { ...this.state.errors } });
@@ -121,7 +121,10 @@ class AuthPage extends PureComponent {
       set(body, "url", process.env.REACT_APP_CLIENT_URL + "reset-password");
     }
 
-    if (Object.keys(this.state.errors).length > 0) return;
+    if (Object.keys(this.state.errors).length > 0) {
+      this.setState({ buttonView: false });
+      return;
+    }
 
     axios({
       method: "post",
@@ -138,10 +141,11 @@ class AuthPage extends PureComponent {
           auth.setToken(response.data.jwt);
           auth.setUserInfo(response.data.user);
         }
-
+        this.setState({ buttonView: false });
         this.redirectUser();
       })
       .catch(error => {
+        this.setState({ buttonView: false });
         if (error.response) {
           let errors =
             this.props.match.params.authType === "login" &&
@@ -249,7 +253,7 @@ class AuthPage extends PureComponent {
         <div className={styles.wrapper}>
           <div className={styles.formContainer} style={{ marginTop: ".9rem" }}>
             <Container>
-              <form onSubmit={this.handleSubmit} method="post">
+              <form onSubmit={this.handleSubmit} method="post" noValidate>
                 <div className="row" style={{ textAlign: "start" }}>
                   {map(inputs, (input, key) => {
                     let fieldErrorVal = "";
@@ -333,7 +337,9 @@ class AuthPage extends PureComponent {
                   })}
                   {this.state.showSuccessMsg ? this.renderSuccessMsg() : ""}
                   <div className={`col-md-12 ${styles.buttonContainer}`}>
-                    <Button type="submit">Submit</Button>
+                    <Button type="submit" disabled={this.state.buttonView}>
+                      Submit
+                    </Button>
                   </div>
                 </div>
               </form>

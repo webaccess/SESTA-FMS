@@ -58,7 +58,9 @@ const Layout = props => {
         closed={sideDrawerClosedHandler}
       />
       <main>
-        <Dashlet container={props.container}>{props.children}</Dashlet>
+        <Dashlet container={props.container} breadcrumbs={props.breadcrumbs}>
+          {props.children}
+        </Dashlet>
       </main>
     </div>
   );
