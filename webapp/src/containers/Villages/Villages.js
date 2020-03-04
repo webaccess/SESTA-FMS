@@ -1,128 +1,3 @@
-// import React, { Component } from "react";
-// import Input from "../../components/UI/Input/Input";
-// import axios from "axios";
-// import Button from "../../components/UI/Button/Button";
-// import Select from "@material-ui/core/Select";
-// import Layout from "../../hoc/Layout/Layout";
-// import auth from "../../components/Auth/Auth";
-// import InputLabel from "@material-ui/core/InputLabel";
-// import FormControl from "@material-ui/core/FormControl";
-// import MenuItem from '@material-ui/core/MenuItem';
-
-// class Village extends Component {
-//   constructor() {
-//     super();
-//     this.state = {
-//       getState: [],
-//       getDistrict: [],
-//       addVillage: "",
-//       addState: "",
-//       addDistrict: ""
-//     };
-//   }
-//   componentDidMount() {
-//     axios
-//       .get(process.env.REACT_APP_SERVER_URL + "states/", {
-//         headers: {
-//           Authorization: "Bearer " + auth.getToken() + ""
-//         }
-//       })
-//       .then(res => {
-//         console.log("fulll data", res.data);
-//         this.setState({ getState: res.data });
-//       })
-//       .catch(error => {
-//         console.log(error);
-//       });
-//   }
-//   handleChange(event) {}
-//   handleStateChange(event) {
-//     this.setState({ addState: event.target.value });
-//   }
-//   handleDistrictChange(event) {
-//     this.setState({ addDistrict: event.target.value });
-//   }
-
-//   handleSubmit(event) {
-//     console.log("hello", this.state.addState, this.state.addDistrict);
-//     event.preventDefault();
-//   }
-//   render() {
-//     return (
-//       <div>
-//         <Layout>
-//           <form onSubmit={this.handleSubmit.bind(this)}>
-//             <Input
-//               name="addVillage"
-//               placeholder="Add Village Name"
-//               autoFocus={true}
-//               className="addVillage"
-//               id="addVillage"
-//               label="Add Village"
-//               value={this.state.addVillage}
-//               variant="outlined"
-//               type="text"
-//               onChange={this.handleChange.bind(this)}
-//             />
-//             <br></br>
-//             <br></br>
-//             <FormControl variant="outlined">
-//               <InputLabel ref={InputLabel} htmlFor="demo-simple-select-outlined-label">
-//                 State
-//               </InputLabel>
-//               <Select
-//                 name="addState"
-//                 labelId="demo-simple-select-outlined-label"
-//                 id="demo-simple-select-outlined"
-//                 value={this.state.addState}
-//                 fullWidth
-//                 variant = "outlined"
-//                 onChange={this.handleStateChange.bind(this)}
-//                 // labelWidth={0}
-//               >
-//                 {this.state.getState.map(states => (
-//                   <MenuItem value={states.name} key={states.id}>
-//                     {" "}
-//                     {states.name}{" "}
-//                   </MenuItem>
-//                 ))}
-//               </Select>
-//             </FormControl>
-//             {/* <Select
-//               placeholder="Add State"
-//               onChange={this.handleStateChange.bind(this)}
-//             >
-//               {this.state.getstates.map(states => (
-//                 <option value={states.name} key={states.id}>
-//                   {" "}
-//                   {states.name}{" "}
-//                 </option>
-//               ))}
-//             </Select>
-//             <Select
-//               placeholder="Add Zone"
-//               onChange={this.handleZoneChange.bind(this)}
-//             >
-//               {this.state.getzone.map(zone => (
-//                 <option value={zone.id} key={zone.id}>
-//                   {" "}
-//                   {zone.name}{" "}
-//                 </option>
-//               ))}
-//             </Select> */}
-//             <br></br>
-//             <br></br>
-//             <Button type="submit" value="submit">
-//               Save
-//             </Button>
-//           </form>
-//         </Layout>
-//       </div>
-//     );
-//   }
-// }
-// export default Village;
-
 import React, { Component } from "react";
 import Layout from "../../hoc/Layout/Layout";
 import axios from "axios";
@@ -144,7 +19,6 @@ import validateInput from "../../components/Validation/ValidateInput/ValidateInp
 class Villages extends Component {
   constructor(props) {
     super(props);
-    console.log("super", props);
     this.state = {
       values: {},
       getState: [],
@@ -166,20 +40,66 @@ class Villages extends Component {
         addDistrict: []
       },
       serverErrors: {},
-      formSubmitted: ""
+      formSubmitted: "",
+      editPage: [
+        this.props.match.params.id !== undefined ? true : false,
+        this.props.match.params.id
+      ]
     };
   }
 
-  componentDidMount() {
-    console.log("auth", auth.getToken());
-    axios
+  async componentDidMount() {
+    console.log("token", auth.getToken());
+    if (this.state.editPage[0]) {
+      await axios
+        .get(
+          process.env.REACT_APP_SERVER_URL +
+            "villages?id=" +
+            this.state.editPage[1],
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + ""
+            }
+          }
+        )
+        .then(res => {
+          this.setState({
+            values: {
+              addVillage: res.data[0].name,
+              addDistrict: res.data[0].master_district.id,
+              addState: res.data[0].master_state.id
+            }
+          });
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      this.stateIds = this.state.values.addState;
+      await axios
+        .get(
+          process.env.REACT_APP_SERVER_URL +
+            "districts?master_state.id=" +
+            this.state.values.addState,
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + ""
+            }
+          }
+        )
+        .then(res => {
+          this.setState({ getDistrict: res.data });
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
+    await axios
       .get(process.env.REACT_APP_SERVER_URL + "states/", {
         headers: {
           Authorization: "Bearer " + auth.getToken() + ""
         }
       })
       .then(res => {
-        console.log("state data", res.data);
         this.setState({ getState: res.data });
       })
       .catch(error => {
@@ -194,13 +114,27 @@ class Villages extends Component {
   };
 
   handleStateChange = ({ target }) => {
-    console.log("target", target.value.name, target.name);
     this.setState({
       values: { ...this.state.values, [target.name]: target.value }
     });
-    this.setState({
-      getDistrict: target.value.master_districts
-    });
+    let stateId = target.value;
+    axios
+      .get(
+        process.env.REACT_APP_SERVER_URL +
+          "districts?master_state.id=" +
+          stateId,
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + ""
+          }
+        }
+      )
+      .then(res => {
+        this.setState({ getDistrict: res.data });
+      })
+      .catch(error => {
+        console.log(error);
+      });
   };
 
   validate = () => {
@@ -214,17 +148,16 @@ class Villages extends Component {
       if (errors.length > 0) errorset[key] = errors;
       else delete errorset[key];
       this.setState({ errors: errorset });
-      console.log("valid", errors);
     });
   };
 
   hasError = field => {
-    
-    return Object.keys(this.state.errors).length > 0 &&
-      this.state.errors[field].length > 0
-      ? true
-      : false;
-    
+    if (this.state.errors[field] !== undefined) {
+      return Object.keys(this.state.errors).length > 0 &&
+        this.state.errors[field].length > 0
+        ? true
+        : false;
+    }
   };
 
   handleSubmit = e => {
@@ -232,24 +165,77 @@ class Villages extends Component {
     this.validate();
 
     if (Object.keys(this.state.errors).length > 0) return;
-    var villageName = this.state.values.addVillage;
-    var districtId = this.state.values.addDistrict.id;
-    axios
-      .post(process.env.REACT_APP_SERVER_URL + "villages", {
-        name: villageName,
-        master_district: {
-          id: districtId
-        }
-      })
-      .then(res => {
-        console.log("result", res);
-        this.setState({ formSubmitted: true });
-      })
-      .catch(error => {
-        this.setState({ formSubmitted: false });
-        console.log(error.response);
-      });
-    console.log("values", this.state.values);
+    let villageName = this.state.values.addVillage;
+    let districtId = this.state.values.addDistrict;
+    let stateId = this.state.values.addState;
+    let body = {
+      name: villageName,
+      master_district: {
+        id: districtId
+      },
+      master_state: {
+        id: stateId
+      }
+    };
+    if (this.state.editPage[0]) {
+      console.log("bodu", body);
+
+      axios
+        .put(
+          process.env.REACT_APP_SERVER_URL +
+            "villages/" +
+            this.state.editPage[1],
+          {
+            name: villageName,
+            master_district: {
+              id: districtId
+            },
+            master_state: {
+              id: stateId
+            }
+          },
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + ""
+            }
+          }
+        )
+        .then(res => {
+          console.log("res", res);
+          this.setState({ formSubmitted: true });
+        })
+        .catch(error => {
+          this.setState({ formSubmitted: false });
+          console.log(error.response);
+        });
+    } else {
+      axios
+        .post(
+          process.env.REACT_APP_SERVER_URL + "villages",
+
+          {
+            name: villageName,
+            master_district: {
+              id: districtId
+            },
+            master_state: {
+              id: stateId
+            }
+          },
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + ""
+            }
+          }
+        )
+        .then(res => {
+          this.setState({ formSubmitted: true });
+        })
+        .catch(error => {
+          this.setState({ formSubmitted: false });
+          console.log(error.response);
+        });
+    }
   };
 
   resetForm = () => {
@@ -269,13 +255,16 @@ class Villages extends Component {
             method="post"
           >
             <CardHeader
-              subheader="The information can be edited"
-              title={this.props.header ? this.props.header : "Add village"}
+              title={this.state.editPage[0] ? "Edit village" : "Add village"}
+              subheader={
+                this.state.editPage[0]
+                  ? "Edit village data"
+                  : "Add village data"
+              }
             />
             <Divider />
             <CardContent>
               <Grid container spacing={3}>
-                
                 <Grid item md={12} xs={12}>
                   {this.state.formSubmitted === true ? (
                     <Snackbar severity="success">
@@ -322,7 +311,7 @@ class Villages extends Component {
                     variant="outlined"
                   >
                     {this.state.getState.map(states => (
-                      <option value={states} key={states.id}>
+                      <option value={states.id} key={states.id}>
                         {states.name}
                       </option>
                     ))}
@@ -339,14 +328,14 @@ class Villages extends Component {
                     error={this.hasError("addDistrict")}
                     helperText={
                       this.hasError("addDistrict")
-                        ? this.state.errors.addVillage[0]
+                        ? this.state.errors.addDistrict[0]
                         : "Please select the state first"
                     }
                     value={this.state.values.addDistrict || ""}
                     variant="outlined"
                   >
                     {this.state.getDistrict.map(district => (
-                      <option value={district} key={district.id}>
+                      <option value={district.id} key={district.id}>
                         {district.name}
                       </option>
                     ))}
