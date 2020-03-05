@@ -1,65 +1,74 @@
-/**
- * SnackBar
- * Snackbars provide brief messages about app processes.
- * The component is also known as a toast.
-severity="error"
-severity="warning"
-severity="info"
-severity="success"
+// /**
+//  * SnackBar
+//  * Snackbars provide brief messages about app processes.
+//  * The component is also known as a toast.
+// severity="error"
+// severity="warning"
+// severity="info"
+// severity="success"
 
-**Sample code for using Snackbar**
-  <Snackbar severity="error"> 
-    This is a success message!
-  </Snackbar>
-**/
+// **Sample code for using Snackbar**
+// <Snackbar severity="error"> 
+//   This is a success message!
+// </Snackbar>
+// **/
 
-import React, { useState } from "react";
-import Snackbar from "@material-ui/core/Snackbar";
-import style from "./Snackbar.module.css";
-import MuiAlert from "@material-ui/lab/Alert";
+import React from 'react';
+import Button from '@material-ui/core/Button';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+import { makeStyles } from '@material-ui/core/styles';
 import { useTheme } from "@material-ui/styles";
 import { useMediaQuery } from "@material-ui/core";
-import Aux from "../../../hoc/Auxiliary/Auxiliary.js";
+import style from "./Snackbar.module.css";
+import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Collapse from '@material-ui/core/Collapse';
-import IconButton from '@material-ui/core/IconButton';
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="standard" {...props} />;
+}
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    width: '100%',
+    '& > * + *': {
+      marginTop: theme.spacing(2),
+    },
+  },
+}));
 
 export default function CustomizedSnackbars(props) {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("lg"), {
     defaultMatches: true
   });
-  const [showMobileSnackbar, setshowMobileSnackbar] = useState(true);
-
-  const closeMobileSnackbar = () => {
-    setshowMobileSnackbar(false);
+  const classes = useStyles();
+  const [open, setOpen] = React.useState(true);
+  const [showMobileSnackbar, setshowMobileSnackbar] = React.useState(true);
+  const openMobileSnackbar = isDesktop ? false : showMobileSnackbar;
+  const handleClick = () => {
+    setOpen(true);
   };
 
-  const [open, setOpen] = React.useState(true);
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
 
-  const openDesktopSnackbar = isDesktop ? false : showMobileSnackbar;
-
-  function Alert(props) {
-    return <MuiAlert elevation={6} {...props} />;
-  }
-  const [state, setState] = React.useState({
-
-    vertical: 'top',
-    horizontal: 'center',
-  });
-
-  const { vertical, horizontal } = state;
+    setOpen(false);
+  };
 
   return (
-    <Aux>
-      <div>
-        <Snackbar
-          anchorOrigin={{ vertical, horizontal }}
-          open={openDesktopSnackbar}
-          autoHideDuration={6000}
-          onClose={closeMobileSnackbar}
-        >
-          <Alert severity={props.severity}>{props.children}</Alert>
+    <div className={classes.root}>
+      <Button variant="outlined" onClick={handleClick}>
+        {props.buttonMessage}
+      </Button>
+      <div className={!isDesktop ? "" : style.Hidden}>
+        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity={props.severity}>
+            {props.children}
+          </Alert>
         </Snackbar>
       </div>
       <div className={isDesktop ? "" : style.Hidden}>
@@ -83,6 +92,6 @@ export default function CustomizedSnackbars(props) {
           </Alert>
         </Collapse>
       </div>
-    </Aux>
+    </div>
   );
 }

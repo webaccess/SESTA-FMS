@@ -33,63 +33,77 @@
     console.log("Data to be Deleted!!!", cellid);
   }
 
-  ****** For Examples 
+  ****** For More Examples 
   https://www.npmjs.com/package/react-data-table-component
-
 **/
 
 import React from "react";
-import DataTable, { TableHeader } from 'react-data-table-component';
+import DataTable from 'react-data-table-component';
 import Button from '@material-ui/core/Button';
 import Modal from '../UI/Modal/Modal.js';
-import differenceBy from 'lodash/differenceBy';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import style from './Datatable.module.css';
 import SearchInput from '../SearchInput';
+
 import {
   Card,
   Checkbox,
 } from '@material-ui/core';
 
 const Table = (props) => {
+
   const [selectedRows, setSelectedRows] = React.useState([]);
   const row = selectedRows.map(r => r.id);
   const [cellId, setcellId] = React.useState([]);
+  const [cellName, setcellName] = React.useState([]);
   const handleChange = React.useCallback(state => {
     setSelectedRows(state.selectedRows);
   }, []);
+
   const editData = (event) => {
+    // component = { Link } to = "/Villages" >
     /*Function for onClick Edit data  */
   }
-  const DeleteAllData = (event) => {
-    /*Function for onClick DeleteAllData  */
+
+  const handleDeleteAll = (event) => {
+    setisDeleteAllShowing(!isDeleteAllShowing);
+    props.DeleteData(DataID);
   }
-  console.log("ALL SELECTED ROWS", selectedRows);
 
   const deleteDataModal = (event) => {
     setisDeleteShowing(!isDeleteShowing);
     setcellId(event.target.id);
+    setcellName(event.target.value);
   }
 
+  let selected = selectedRows;
+  let dataName = cellName;
   let DataID = cellId;
 
   const handleLangChange = () => {
     setisDeleteShowing(!isDeleteShowing);
-    props.DeleteData(DataID);
+    props.DeleteData(DataID, selected);
   }
 
   const closeDeleteModalHandler = () => {
     setisDeleteShowing(!isDeleteShowing);
   }
 
-  const [isDeleteShowing, setisDeleteShowing] = React.useState(false);
+  const closeDeleteAllModalHandler = () => {
+    setisDeleteAllShowing(!isDeleteAllShowing);
+  }
 
+  let valueforodal = props.columnsvalue;
+
+  const [isDeleteShowing, setisDeleteShowing] = React.useState(false);
+  const [isDeleteAllShowing, setisDeleteAllShowing] = React.useState(false);
   const column = [
     {
-      cell: (cell) => <i className="material-icons" id={cell.id} onClick={editData}>edit</i>,
+      cell: (cell) => <i className="material-icons" id={cell.id} value={cell[valueforodal]} onClick={editData}>edit</i>,
       button: true,
     },
     {
-      cell: (cell) => <i className="material-icons" id={cell.id} onClick={deleteDataModal}>delete_outline</i>,
+      cell: (cell) => <button class="material-icons" className={style.deleteButton} id={cell.id} value={cell[valueforodal]} onClick={deleteDataModal}>delete</button>,
       button: true,
     },
   ];
@@ -101,7 +115,7 @@ const Table = (props) => {
   }
 
   const [filterText, setFilterText] = React.useState('');
-
+  const [noHeader, setNoHeader] = React.useState(true);
   let filteredItems = [];
   let filteredData = [];
   const [data, setData] = React.useState(props.filterBy);
@@ -122,40 +136,41 @@ const Table = (props) => {
   } else {
     filteredData = props.data;
   }
+  // if (selected.length > 2) {
+  //   alert("dsasadsdasda")
 
-  const [resetPaginationToggle, setResetPaginationToggle] = React.useState(false);
-  const [toggleCleared, setToggleCleared] = React.useState(false);
-
+  // }
+  const [resetPaginationToggle, setResetPaginationToggle] = React.useState();
 
   const onFilter = e => setFilterText(e.target.value);
 
   const contextActions = React.useMemo(() => {
-    const handleDelete = () => {
-
-      if (window.confirm(`Are you sure you want to delete:\r ${row}?`)) {
-        setToggleCleared(!toggleCleared);
-        setData(differenceBy(data, selectedRows, 'name'));
-      }
+    const handledelete = () => {
+      setisDeleteAllShowing(!isDeleteAllShowing);
+      props.DeleteData(selected);
+      console.log("Deleted data's", selectedRows)
     };
-    return <Button key="delete" onClick={handleDelete} style={{ backgroundColor: 'red' }}>Delete</Button>;
-  }, [data, selectedRows, toggleCleared]);
+    console.log("sdahhjhjhsjsdhash")
+    return <Button key="delete" onClick={handledelete} style={{ backgroundColor: '#d63447', color: 'white' }} >Delete</Button>;
+  }, [data, selectedRows]);
 
+  let dataLength = props.data.length;
   let columns = [];
   if (props.column.length > 0) {
     columns = makeColumns(props.column);
   }
-  const [noHeader, setNoHeader] = React.useState(true);
   return (
     <>
       <div>
         <div className={style.row}>
           <SearchInput
-            placeholder="Search user"
+            placeholder={props.Searchplaceholder}
             value={filterText}
             onChange={onFilter}
             type="search"
           />
         </div>
+
         <Card>
           <DataTable
             data={filteredData}
@@ -164,20 +179,19 @@ const Table = (props) => {
             pagination
             paginationResetDefaultPage={resetPaginationToggle}
             selectableRowsComponent={Checkbox}
+            contextActions={selected.length > 1 ? contextActions : <style className={style.dNoAIX} />}
             actions={props.actions}
-            contextActions={contextActions}
             onSelectedRowsChange={handleChange}
             selectableRows
             highlightOnHover
             persistTableHead
-            noHeader={noHeader}
+            noHeader={selected.length === 0 || selected.length < 2}
           />
         </Card>
         <Modal
           className="modal"
           show={isDeleteShowing}
           close={closeDeleteModalHandler}
-          header="SESTA FMS"
           displayCross={{ display: "none" }}
           handleEventChange={true}
           event={handleLangChange}
@@ -186,9 +200,21 @@ const Table = (props) => {
             displayClose: { display: "true" }, displaySave: { display: "true" }
           }}
         >
-          Delete Data?
-          </Modal>
-
+          {props.DeleteMessage} <b>"{dataName}"</b> ?
+        </Modal>
+        <Modal
+          className="modal"
+          show={isDeleteAllShowing}
+          close={closeDeleteAllModalHandler}
+          displayCross={{ display: "none" }}
+          handleEventChange={true}
+          event={handleDeleteAll}
+          footer={{
+            footerSaveName: "OKAY", footerCloseName: "CLOSE",
+            displayClose: { display: "true" }, displaySave: { display: "true" }
+          }}
+        >{selectedRows.length >= 2 ? <p> Do you want to delete selected <b>"{props.title}"</b></p> : <p>  {props.DeleteMessage} <b>"{dataName}"</b> ?</p>}
+        </Modal>
       </div>
     </>
   );
