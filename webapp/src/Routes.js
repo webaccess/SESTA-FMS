@@ -13,7 +13,7 @@ import AuthRoute from "./hoc/AuthRoute/AuthRoute";
 import Dashboard from "./containers/Dashboard/Dashboard";
 import NotFoundPage from "./containers/NotFoundPage/NotFoundPage";
 import AuthPage from "./containers/AuthPage/AuthPage";
-import Villages from "./containers/Villages/Villages.js";
+import Villages from "./containers/Villages/VillagePage";
 
 function Routes() {
   return (
