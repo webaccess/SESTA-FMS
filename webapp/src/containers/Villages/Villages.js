@@ -15,7 +15,7 @@ import {
 } from "@material-ui/core";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
-
+import { ADD_VILLAGE_BREADCRUMBS } from "./config";
 class Villages extends Component {
   constructor(props) {
     super(props);
@@ -41,6 +41,7 @@ class Villages extends Component {
       },
       serverErrors: {},
       formSubmitted: "",
+      stateSelected: false,
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id
@@ -105,6 +106,9 @@ class Villages extends Component {
       .catch(error => {
         console.log(error);
       });
+    if (this.state.values.addState) {
+      this.setState({ stateSelected: true });
+    }
   }
 
   handleChange = ({ target }) => {
@@ -113,12 +117,12 @@ class Villages extends Component {
     });
   };
 
-  handleStateChange = ({ target }) => {
+  handleStateChange = async ({ target }) => {
     this.setState({
       values: { ...this.state.values, [target.name]: target.value }
     });
     let stateId = target.value;
-    axios
+    await axios
       .get(
         process.env.REACT_APP_SERVER_URL +
           "districts?master_state.id=" +
@@ -135,6 +139,9 @@ class Villages extends Component {
       .catch(error => {
         console.log(error);
       });
+    if (this.state.values.addState) {
+      this.setState({ stateSelected: true });
+    }
   };
 
   validate = () => {
@@ -160,7 +167,7 @@ class Villages extends Component {
     }
   };
 
-  handleSubmit = e => {
+  handleSubmit = async e => {
     e.preventDefault();
     this.validate();
 
@@ -180,7 +187,7 @@ class Villages extends Component {
     if (this.state.editPage[0]) {
       console.log("bodu", body);
 
-      axios
+      await axios
         .put(
           process.env.REACT_APP_SERVER_URL +
             "villages/" +
@@ -209,7 +216,7 @@ class Villages extends Component {
           console.log(error.response);
         });
     } else {
-      axios
+      await axios
         .post(
           process.env.REACT_APP_SERVER_URL + "villages",
 
@@ -238,15 +245,16 @@ class Villages extends Component {
     }
   };
 
-  resetForm = () => {
+  cancelForm = () => {
     this.setState({
       values: {}
     });
+    //routing code #route to village table page
   };
 
   render() {
     return (
-      <Layout>
+      <Layout breadcrumbs={ADD_VILLAGE_BREADCRUMBS}>
         <Card>
           <form
             autoComplete="off"
@@ -258,14 +266,14 @@ class Villages extends Component {
               title={this.state.editPage[0] ? "Edit village" : "Add village"}
               subheader={
                 this.state.editPage[0]
-                  ? "Edit village data"
-                  : "Add village data"
+                  ? "You can edit village data here!"
+                  : "You can add new village data here!"
               }
             />
             <Divider />
             <CardContent>
               <Grid container spacing={3}>
-                <Grid item md={12} xs={12}>
+                {/* <Grid item md={12} xs={12}>
                   {this.state.formSubmitted === true ? (
                     <Snackbar severity="success">
                       Village added successfully.
@@ -274,7 +282,7 @@ class Villages extends Component {
                   {this.state.formSubmitted === false ? (
                     <Snackbar severity="error">An error occured.</Snackbar>
                   ) : null}
-                </Grid>
+                </Grid> */}
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
@@ -329,6 +337,8 @@ class Villages extends Component {
                     helperText={
                       this.hasError("addDistrict")
                         ? this.state.errors.addDistrict[0]
+                        : this.state.stateSelected
+                        ? null
                         : "Please select the state first"
                     }
                     value={this.state.values.addDistrict || ""}
@@ -346,8 +356,8 @@ class Villages extends Component {
             <Divider />
             <CardActions>
               <Button type="submit">Save</Button>
-              <Button color="default" clicked={this.resetForm}>
-                Reset
+              <Button color="default" clicked={this.cancelForm}>
+                cancel
               </Button>
             </CardActions>
           </form>

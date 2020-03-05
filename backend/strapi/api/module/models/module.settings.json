@@ -39,13 +39,13 @@
     },
     "slug": {
       "type": "string",
-      "unique": true,
-      "required": true
+      "unique": true
+      
     },
     "displayNavigation": {
       "type": "boolean",
-      "default": true,
-      "required": true
+      "default": true
+      
     }
   }
 }
