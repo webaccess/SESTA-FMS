@@ -249,7 +249,7 @@ class Villages extends Component {
     this.setState({
       values: {}
     });
-    //routing code #route to village table page
+    //routing code #route to village_list page
   };
 
   render() {
