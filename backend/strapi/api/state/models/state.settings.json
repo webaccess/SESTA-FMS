@@ -19,10 +19,6 @@
     "master_districts": {
       "collection": "district",
       "via": "master_state"
-    },
-    "villages": {
-      "via": "master_state",
-      "collection": "village"
     }
   }
 }

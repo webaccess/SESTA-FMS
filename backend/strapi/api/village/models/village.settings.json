@@ -10,15 +10,13 @@
   },
   "attributes": {
     "name": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
-    "master_district": {
-      "model": "district",
-      "via": "villages"
-    },
-    "master_state": {
-      "model": "state",
-      "via": "villages"
+    "shgs": {
+      "collection": "shg",
+      "via": "villages",
+      "dominant": true
     }
   }
 }

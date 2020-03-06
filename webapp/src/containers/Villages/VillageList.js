@@ -119,16 +119,8 @@ export class VillageList extends React.Component {
         selector: "name",
         sortable: true
       },
-      {
-        name: "District Name",
-        selector: "master_district.name",
-        sortable: true
-      },
-      {
-        name: "State Name",
-        selector: "master_state.name",
-        sortable: true
-      },
+     
+    
       {
         cell: row => <Button>Loans</Button>,
         button: true

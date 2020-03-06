@@ -194,12 +194,12 @@ class Villages extends Component {
             this.state.editPage[1],
           {
             name: villageName,
-            master_district: {
-              id: districtId
-            },
-            master_state: {
-              id: stateId
-            }
+            // master_district: {
+            //   id: districtId
+            // },
+            // master_state: {
+            //   id: stateId
+            // }
           },
           {
             headers: {
@@ -224,12 +224,12 @@ class Villages extends Component {
 
           {
             name: villageName,
-            master_district: {
-              id: districtId
-            },
-            master_state: {
-              id: stateId
-            }
+            // master_district: {
+            //   id: districtId
+            // },
+            // master_state: {
+            //   id: stateId
+            // }
           },
           {
             headers: {

@@ -1,0 +1,52 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/village-organizations",
+      "handler": "village-organization.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/village-organizations/count",
+      "handler": "village-organization.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/village-organizations/:id",
+      "handler": "village-organization.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/village-organizations",
+      "handler": "village-organization.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/village-organizations/:id",
+      "handler": "village-organization.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/village-organizations/:id",
+      "handler": "village-organization.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}
