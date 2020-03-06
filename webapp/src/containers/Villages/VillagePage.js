@@ -4,7 +4,6 @@ import axios from "axios";
 import auth from "../../components/Auth/Auth";
 import Button from "../../components/UI/Button/Button";
 import Input from "../../components/UI/Input/Input";
-import Snackbar from "../../components/UI/Snackbar/Snackbar.js";
 import {
   Card,
   CardHeader,
@@ -15,7 +14,9 @@ import {
 } from "@material-ui/core";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
-import { ADD_VILLAGE_BREADCRUMBS } from "./config";
+import { ADD_VILLAGE_BREADCRUMBS, EDIT_VILLAGE_BREADCRUMBS } from "./config";
+import { Link } from "react-router-dom";
+
 class Villages extends Component {
   constructor(props) {
     super(props);
@@ -185,8 +186,7 @@ class Villages extends Component {
       }
     };
     if (this.state.editPage[0]) {
-      console.log("bodu", body);
-
+      // for edit data page
       await axios
         .put(
           process.env.REACT_APP_SERVER_URL +
@@ -210,12 +210,14 @@ class Villages extends Component {
         .then(res => {
           console.log("res", res);
           this.setState({ formSubmitted: true });
+          this.props.history.push("/villages");
         })
         .catch(error => {
           this.setState({ formSubmitted: false });
           console.log(error.response);
         });
     } else {
+      //for add data page
       await axios
         .post(
           process.env.REACT_APP_SERVER_URL + "villages",
@@ -237,6 +239,7 @@ class Villages extends Component {
         )
         .then(res => {
           this.setState({ formSubmitted: true });
+          this.props.history.push("/villages");
         })
         .catch(error => {
           this.setState({ formSubmitted: false });
@@ -247,14 +250,21 @@ class Villages extends Component {
 
   cancelForm = () => {
     this.setState({
-      values: {}
+      values: {}, formSubmitted: "",
+      stateSelected: false,
     });
     //routing code #route to village_list page
   };
 
   render() {
     return (
-      <Layout breadcrumbs={ADD_VILLAGE_BREADCRUMBS}>
+      <Layout
+        breadcrumbs={
+          this.state.editPage[0]
+            ? EDIT_VILLAGE_BREADCRUMBS
+            : ADD_VILLAGE_BREADCRUMBS
+        }
+      >
         <Card>
           <form
             autoComplete="off"
@@ -273,16 +283,6 @@ class Villages extends Component {
             <Divider />
             <CardContent>
               <Grid container spacing={3}>
-                {/* <Grid item md={12} xs={12}>
-                  {this.state.formSubmitted === true ? (
-                    <Snackbar severity="success">
-                      Village added successfully.
-                    </Snackbar>
-                  ) : null}
-                  {this.state.formSubmitted === false ? (
-                    <Snackbar severity="error">An error occured.</Snackbar>
-                  ) : null}
-                </Grid> */}
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
@@ -356,7 +356,7 @@ class Villages extends Component {
             <Divider />
             <CardActions>
               <Button type="submit">Save</Button>
-              <Button color="default" clicked={this.cancelForm}>
+              <Button color="default" clicked={this.cancelForm} component={Link} to="/Villages">
                 cancel
               </Button>
             </CardActions>

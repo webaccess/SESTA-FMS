@@ -14,6 +14,8 @@ import Dashboard from "./containers/Dashboard/Dashboard";
 import NotFoundPage from "./containers/NotFoundPage/NotFoundPage";
 import AuthPage from "./containers/AuthPage/AuthPage";
 import Villages from "./containers/Villages/VillagePage";
+import VillageList from "./containers/Villages/VillageList";
+import villagePage from "./containers/Villages/VillagePage";
 
 function Routes() {
   return (
@@ -22,12 +24,14 @@ function Routes() {
         <div>
           <Switch>
             <PrivateRoute path="/" component={Dashboard} exact />
+            <PrivateRoute path="/villages" component={VillageList} exact />
+            {console.log("yogesh")}
             <PrivateRoute
               path="/villages/edit/:id"
-              component={Villages}
+              component={villagePage}
               exact
             />
-            <PrivateRoute path="/villages/add" component={Villages} exact />
+            <PrivateRoute path="/villages/add" component={villagePage} exact />
             <Route path="/404" component={NotFoundPage} />
             <AuthRoute path="/:authType/:id?" component={AuthPage} />
           </Switch>

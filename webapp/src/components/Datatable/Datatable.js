@@ -55,19 +55,16 @@ const Table = (props) => {
   const [selectedRows, setSelectedRows] = React.useState([]);
   const row = selectedRows.map(r => r.id);
   const [cellId, setcellId] = React.useState([]);
+  const [EditcellId, setEditcellId] = React.useState([]);
   const [cellName, setcellName] = React.useState([]);
   const handleChange = React.useCallback(state => {
     setSelectedRows(state.selectedRows);
   }, []);
 
-  const editData = (event) => {
-    // component = { Link } to = "/Villages" >
-    /*Function for onClick Edit data  */
-  }
+
 
   const handleDeleteAll = (event) => {
     setisDeleteAllShowing(!isDeleteAllShowing);
-    props.DeleteData(DataID);
   }
 
   const deleteDataModal = (event) => {
@@ -79,10 +76,24 @@ const Table = (props) => {
   let selected = selectedRows;
   let dataName = cellName;
   let DataID = cellId;
+  let editId = EditcellId;
 
-  const handleLangChange = () => {
+  const editData = (event) => {
+    // component = { Link } to = "/Villages" >
+    /*Function for onClick Edit data  */
+    props.editData(event.target.id);
+  }
+
+  const handleDeleteEvent = () => {
     setisDeleteShowing(!isDeleteShowing);
-    props.DeleteData(DataID, selected);
+    props.DeleteData(DataID, selectedId);
+    console.log("dsadssda", DataID)
+  }
+
+  const handleEditEvent = () => {
+    setisDeleteShowing(!isDeleteShowing);
+    props.editData(DataID, selectedId);
+    console.log("dsadssda", DataID, selectedId)
   }
 
   const closeDeleteModalHandler = () => {
@@ -99,7 +110,7 @@ const Table = (props) => {
   const [isDeleteAllShowing, setisDeleteAllShowing] = React.useState(false);
   const column = [
     {
-      cell: (cell) => <i className="material-icons" id={cell.id} value={cell[valueforodal]} onClick={editData}>edit</i>,
+      cell: (cell) => <button class="material-icons" className={style.editButton} id={cell.id} value={cell[valueforodal]} onClick={editData}>edit</button>,
       button: true,
     },
     {
@@ -136,18 +147,21 @@ const Table = (props) => {
   } else {
     filteredData = props.data;
   }
-  // if (selected.length > 2) {
-  //   alert("dsasadsdasda")
-
-  // }
   const [resetPaginationToggle, setResetPaginationToggle] = React.useState();
 
+  let selectedId = [];
+  for (let i in selected) {
+    selectedId.push("id_in=" + selected[i]["id"] + "&")
+  }
+  let SelectedId = (selectedId.join(""));
+  let SelectedIds = SelectedId.substring(0, SelectedId.length - 1);
   const onFilter = e => setFilterText(e.target.value);
-
+  const [toggleCleared, setToggleCleared] = React.useState(false);
   const contextActions = React.useMemo(() => {
     const handledelete = () => {
       setisDeleteAllShowing(!isDeleteAllShowing);
-      props.DeleteData(selected);
+      props.DeleteAll(SelectedIds);
+      setToggleCleared(!toggleCleared);
       console.log("Deleted data's", selectedRows)
     };
     console.log("sdahhjhjhsjsdhash")
@@ -180,7 +194,7 @@ const Table = (props) => {
             paginationResetDefaultPage={resetPaginationToggle}
             selectableRowsComponent={Checkbox}
             contextActions={selected.length > 1 ? contextActions : <style className={style.dNoAIX} />}
-            actions={props.actions}
+            actions={handleEditEvent}
             onSelectedRowsChange={handleChange}
             selectableRows
             highlightOnHover
@@ -194,7 +208,7 @@ const Table = (props) => {
           close={closeDeleteModalHandler}
           displayCross={{ display: "none" }}
           handleEventChange={true}
-          event={handleLangChange}
+          event={handleDeleteEvent}
           footer={{
             footerSaveName: "OKAY", footerCloseName: "CLOSE",
             displayClose: { display: "true" }, displaySave: { display: "true" }
@@ -213,7 +227,7 @@ const Table = (props) => {
             footerSaveName: "OKAY", footerCloseName: "CLOSE",
             displayClose: { display: "true" }, displaySave: { display: "true" }
           }}
-        >{selectedRows.length >= 2 ? <p> Do you want to delete selected <b>"{props.title}"</b></p> : <p>  {props.DeleteMessage} <b>"{dataName}"</b> ?</p>}
+        >{selectedRows.length > 1 ? <p> Do you want to delete selected <b>"{props.title}"</b></p> : <p>  {props.DeleteMessage} <b>"{dataName}"</b> ?</p>}
         </Modal>
       </div>
     </>

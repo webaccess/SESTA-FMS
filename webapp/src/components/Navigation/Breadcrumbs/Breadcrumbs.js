@@ -10,7 +10,6 @@ function Breadcrumbs(props) {
   const [modules, setModules] = React.useState([]);
 
   useEffect(() => {
-    console.log(auth.getToken());
     let userInfo = auth.getUserInfo();
     mount = true;
     const fetchData = async () => {
@@ -41,7 +40,6 @@ function Breadcrumbs(props) {
     };
   }, []);
 
-  console.log(props.modules);
   return (
     <BreadcrumbsElem aria-label="breadcrumb">
       {map(modules, (module, key) => {
