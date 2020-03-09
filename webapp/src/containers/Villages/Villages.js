@@ -87,41 +87,41 @@ export class VillageList extends React.Component {
   };
 
   DeleteData = (cellid, selectedId) => {
-    if(cellid){
-    axios
-      .delete(process.env.REACT_APP_SERVER_URL + "villages/" + cellid, {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
-      })
-      .then(res => {
-        console.log("deleted data res", res.data);
-        console.log("deleted data res", selectedId);
-
-        this.componentDidMount();
-      })
-      .catch(error => {
-        console.log(error.response);
-      });
-    }
-    console.log("deleted 2", selectedId);
-
-    if(selectedId){
-      for(let i in selectedId){
-        console.log("ids",selectedId[i])
-        axios
-        .delete(process.env.REACT_APP_SERVER_URL + "villages/" + selectedId[i], {
+    if (cellid) {
+      axios
+        .delete(process.env.REACT_APP_SERVER_URL + "villages/" + cellid, {
           headers: {
             Authorization: "Bearer " + auth.getToken() + ""
           }
         })
         .then(res => {
           console.log("deleted data res", res.data);
+          console.log("deleted data res", selectedId);
+
+          this.componentDidMount();
         })
         .catch(error => {
           console.log(error.response);
-          console.log(selectedId);
         });
+    }
+    console.log("deleted 2", selectedId);
+
+    if (selectedId) {
+      for (let i in selectedId) {
+        console.log("ids", selectedId[i])
+        axios
+          .delete(process.env.REACT_APP_SERVER_URL + "villages/" + selectedId[i], {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + ""
+            }
+          })
+          .then(res => {
+            console.log("deleted data res", res.data);
+          })
+          .catch(error => {
+            console.log(error.response);
+            console.log(selectedId);
+          });
       }
     }
   };
@@ -155,18 +155,13 @@ export class VillageList extends React.Component {
         selector: "state.name",
         sortable: true
       },
-
-      {
-        cell: row => <Button>Loans</Button>,
-        button: true
-      }
     ];
 
     let selectors = [];
     for (let i in Usercolumns) {
       selectors.push(Usercolumns[i]["selector"]);
     }
-
+    console.log("psdpds", this.props.location)
     let columnsvalue = selectors[0];
     const { classes } = this.props;
     return (
@@ -208,12 +203,12 @@ export class VillageList extends React.Component {
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (
-            <div className={style.Progess}>
-              <center>
-                <Spinner />
-              </center>
-            </div>
-          )}
+              <div className={style.Progess}>
+                <center>
+                  <Spinner />
+                </center>
+              </div>
+            )}
         </div>
       </Layout>
     );
