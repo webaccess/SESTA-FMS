@@ -17,6 +17,14 @@
       "collection": "shg",
       "via": "villages",
       "dominant": true
+    },
+    "district": {
+      "model": "district",
+      "via": "villages"
+    },
+    "state": {
+      "model": "state",
+      "via": "villages"
     }
   }
 }
