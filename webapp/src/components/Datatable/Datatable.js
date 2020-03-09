@@ -39,7 +39,7 @@
 
 import React from "react";
 import DataTable from 'react-data-table-component';
-import Button from '@material-ui/core/Button';
+import Button from '../UI/Button/Button.js';
 import Modal from '../UI/Modal/Modal.js';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import style from './Datatable.module.css';
@@ -86,7 +86,7 @@ const Table = (props) => {
 
   const handleDeleteEvent = () => {
     setisDeleteShowing(!isDeleteShowing);
-    props.DeleteData(DataID, selectedId);
+    props.DeleteData(DataID, row);
     console.log("dsadssda", DataID)
   }
 
@@ -151,7 +151,7 @@ const Table = (props) => {
 
   let selectedId = [];
   for (let i in selected) {
-    selectedId.push("id_in=" + selected[i]["id"] + "&")
+    selectedId.push(selected[i]["id"])
   }
   let SelectedId = (selectedId.join(""));
   let SelectedIds = SelectedId.substring(0, SelectedId.length - 1);
@@ -160,11 +160,9 @@ const Table = (props) => {
   const contextActions = React.useMemo(() => {
     const handledelete = () => {
       setisDeleteAllShowing(!isDeleteAllShowing);
-      props.DeleteAll(SelectedIds);
+      props.DeleteAll(row);
       setToggleCleared(!toggleCleared);
-      console.log("Deleted data's", selectedRows)
     };
-    console.log("sdahhjhjhsjsdhash")
     return <Button key="delete" onClick={handledelete} style={{ backgroundColor: '#d63447', color: 'white' }} >Delete</Button>;
   }, [data, selectedRows]);
 
@@ -196,10 +194,11 @@ const Table = (props) => {
             contextActions={selected.length > 1 ? contextActions : <style className={style.dNoAIX} />}
             actions={handleEditEvent}
             onSelectedRowsChange={handleChange}
-            selectableRows
+            // selectableRows
             highlightOnHover
             persistTableHead
-            noHeader={selected.length === 0 || selected.length < 2}
+            // noHeader={selected.length === 0 || selected.length < 2}
+            noHeader={noHeader}
           />
         </Card>
         <Modal
