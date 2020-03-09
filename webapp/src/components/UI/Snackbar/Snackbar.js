@@ -61,9 +61,7 @@ export default function CustomizedSnackbars(props) {
 
   return (
     <div className={classes.root}>
-      <Button variant="outlined" onClick={handleClick}>
-        {props.buttonMessage}
-      </Button>
+      {(props.Showbutton) ? <Button variant="outlined" onClick={handleClick}>{props.buttonMessage}</Button> : <p></p>}
       <div className={!isDesktop ? "" : style.Hidden}>
         <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
           <Alert onClose={handleClose} severity={props.severity}>
