@@ -295,7 +295,6 @@ class Villages extends Component {
                   <Input
                     fullWidth
                     label="Village Name"
-                    margin="dense"
                     name="addVillage"
                     error={this.hasError("addVillage")}
                     helperText={
@@ -313,7 +312,6 @@ class Villages extends Component {
                   <Input
                     fullWidth
                     label="Select State"
-                    margin="dense"
                     name="addState"
                     onChange={this.handleStateChange}
                     select
@@ -337,7 +335,6 @@ class Villages extends Component {
                   <Input
                     fullWidth
                     label="Select District"
-                    margin="dense"
                     name="addDistrict"
                     onChange={this.handleChange}
                     select
