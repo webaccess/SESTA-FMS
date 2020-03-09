@@ -25,7 +25,6 @@ function Routes() {
           <Switch>
             <PrivateRoute path="/" component={Dashboard} exact />
             <PrivateRoute path="/villages" component={VillageList} exact />
-            {console.log("yogesh")}
             <PrivateRoute
               path="/villages/edit/:id"
               component={villagePage}
