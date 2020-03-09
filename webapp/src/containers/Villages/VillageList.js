@@ -50,8 +50,6 @@ export class VillageList extends React.Component {
       DeleteData: false,
       properties: props
     };
-    console.log("yovishal", props);
-    let history = props;
   }
   componentDidMount() {
     axios
@@ -61,6 +59,7 @@ export class VillageList extends React.Component {
         }
       })
       .then(res => {
+        console.log("api result village",res.data)
         this.setState({ data: res.data });
       });
   }
@@ -101,7 +100,6 @@ export class VillageList extends React.Component {
 
   render() {
     let data = this.state.data;
-    console.log("hhddd", this.history);
 
     let villageName = [];
     if (data) {
@@ -117,6 +115,16 @@ export class VillageList extends React.Component {
       {
         name: "Village Name",
         selector: "name",
+        sortable: true
+      },
+      {
+        name: "District Name",
+        selector: "district.name",
+        sortable: true
+      },
+      {
+        name: "State Name",
+        selector: "state.name",
         sortable: true
       },
      

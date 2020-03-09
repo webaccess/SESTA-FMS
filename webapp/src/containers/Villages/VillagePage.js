@@ -68,8 +68,8 @@ class Villages extends Component {
           this.setState({
             values: {
               addVillage: res.data[0].name,
-              addDistrict: res.data[0].master_district.id,
-              addState: res.data[0].master_state.id
+              addDistrict: res.data[0].district.id,
+              addState: res.data[0].state.id
             }
           });
         })
@@ -194,12 +194,12 @@ class Villages extends Component {
             this.state.editPage[1],
           {
             name: villageName,
-            // master_district: {
-            //   id: districtId
-            // },
-            // master_state: {
-            //   id: stateId
-            // }
+            master_district: {
+              id: districtId
+            },
+            master_state: {
+              id: stateId
+            }
           },
           {
             headers: {
@@ -224,12 +224,12 @@ class Villages extends Component {
 
           {
             name: villageName,
-            // master_district: {
-            //   id: districtId
-            // },
-            // master_state: {
-            //   id: stateId
-            // }
+            master_district: {
+              id: districtId
+            },
+            master_state: {
+              id: stateId
+            }
           },
           {
             headers: {
@@ -250,8 +250,9 @@ class Villages extends Component {
 
   cancelForm = () => {
     this.setState({
-      values: {}, formSubmitted: "",
-      stateSelected: false,
+      values: {},
+      formSubmitted: "",
+      stateSelected: false
     });
     //routing code #route to village_list page
   };
@@ -351,12 +352,41 @@ class Villages extends Component {
                     ))}
                   </Input>
                 </Grid>
+                {/* <Grid item md={6} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Select FPO"
+                    margin="dense"
+                    name="addFpo"
+                    onChange={this.handleStateChange}
+                    select
+                    error={this.hasError("addFpo")}
+                    helperText={
+                      this.hasError("addFpo")
+                        ? this.state.errors.addState[0]
+                        : null
+                    }
+                    value={this.state.values.addState || ""}
+                    variant="outlined"
+                  >
+                    {this.state.getState.map(states => (
+                      <option value={states.id} key={states.id}>
+                        {states.name}
+                      </option>
+                    ))}
+                  </Input>
+                </Grid> */}
               </Grid>
             </CardContent>
             <Divider />
             <CardActions>
               <Button type="submit">Save</Button>
-              <Button color="default" clicked={this.cancelForm} component={Link} to="/Villages">
+              <Button
+                color="default"
+                clicked={this.cancelForm}
+                component={Link}
+                to="/Villages"
+              >
                 cancel
               </Button>
             </CardActions>
