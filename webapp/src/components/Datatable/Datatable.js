@@ -61,8 +61,6 @@ const Table = (props) => {
     setSelectedRows(state.selectedRows);
   }, []);
 
-
-
   const handleDeleteAll = (event) => {
     setisDeleteAllShowing(!isDeleteAllShowing);
   }
@@ -72,11 +70,12 @@ const Table = (props) => {
     setcellId(event.target.id);
     setcellName(event.target.value);
   }
-
+  let searchFilter = props.filters;
   let selected = selectedRows;
   let dataName = cellName;
   let DataID = cellId;
-  let editId = EditcellId;
+
+  console.log("DataId", DataID)
 
   const editData = (event) => {
     // component = { Link } to = "/Villages" >
@@ -86,7 +85,7 @@ const Table = (props) => {
 
   const handleDeleteEvent = () => {
     setisDeleteShowing(!isDeleteShowing);
-    props.DeleteData(DataID, row);
+    props.DeleteData(DataID);
     console.log("dsadssda", DataID)
   }
 
@@ -104,17 +103,17 @@ const Table = (props) => {
     setisDeleteAllShowing(!isDeleteAllShowing);
   }
 
-  let valueforodal = props.columnsvalue;
+  let valueformodal = props.columnsvalue;
 
   const [isDeleteShowing, setisDeleteShowing] = React.useState(false);
   const [isDeleteAllShowing, setisDeleteAllShowing] = React.useState(false);
   const column = [
     {
-      cell: (cell) => <button class="material-icons" className={style.editButton} id={cell.id} value={cell[valueforodal]} onClick={editData}>edit</button>,
+      cell: (cell) => <button class="material-icons" className={style.editButton} id={cell.id} value={cell[valueformodal]} onClick={editData}>edit</button>,
       button: true,
     },
     {
-      cell: (cell) => <button class="material-icons" className={style.deleteButton} id={cell.id} value={cell[valueforodal]} onClick={deleteDataModal}>delete</button>,
+      cell: (cell) => <button class="material-icons" className={style.deleteButton} id={cell.id} value={cell[valueformodal]} onClick={deleteDataModal}>delete</button>,
       button: true,
     },
   ];
@@ -126,13 +125,20 @@ const Table = (props) => {
   }
 
   const [filterText, setFilterText] = React.useState('');
+  const [Text, setText] = React.useState('');
   const [noHeader, setNoHeader] = React.useState(true);
   let filteredItems = [];
   let filteredData = [];
+
+  // console.log("New Filter to search in Data ", props.filters)
+
+  let datafilter = searchFilter;
+  console.log("ddssdsd", datafilter)
   const [data, setData] = React.useState(props.filterBy);
   if (props.filterData) {
     for (let i in data) {
-      filteredItems.push(props.data.filter(item => item[data[i]] && (item[data[i]].toLowerCase()).includes(filterText.toLowerCase())));
+      filteredItems.push(props.data.filter(item => item[data[i]] && (item[data[i]].toLowerCase()).includes(filterText.toLowerCase() && searchFilter.stateFilter)
+      ));
     }
     for (let i in filteredItems) {
       filteredData = filteredData.concat(filteredItems[i])
@@ -155,7 +161,23 @@ const Table = (props) => {
   }
   let SelectedId = (selectedId.join(""));
   let SelectedIds = SelectedId.substring(0, SelectedId.length - 1);
-  const onFilter = e => setFilterText(e.target.value);
+
+
+  console.log("dsads", searchFilter)
+  // const searchFilter = () => {
+  //   console.log("Duja cha glass", props.filter);
+  // }
+  // setFilterText(e.target.value)
+  const onFilter = (e) => {
+    console.log("sddsdssda", e.target.value)
+    let textValue = e.target.value
+    setFilterText(e.target.value)
+    // setFilterText(e.target.value)
+
+  };
+  console.log("fdsfdsfdsdfsdfsfdsd", searchFilter.stateFilter, searchFilter.districtFilter);
+
+  console.log("onFilter", filterText);
   const [toggleCleared, setToggleCleared] = React.useState(false);
   const contextActions = React.useMemo(() => {
     const handledelete = () => {
@@ -179,6 +201,7 @@ const Table = (props) => {
             placeholder={props.Searchplaceholder}
             value={filterText}
             onChange={onFilter}
+            onSubmit={props.onSubmit}
             type="search"
           />
         </div>
@@ -194,11 +217,13 @@ const Table = (props) => {
             contextActions={selected.length > 1 ? contextActions : <style className={style.dNoAIX} />}
             actions={handleEditEvent}
             onSelectedRowsChange={handleChange}
-            // selectableRows
+            selectableRows
+            searchFilter={searchFilter}
             highlightOnHover
             persistTableHead
-            // noHeader={selected.length === 0 || selected.length < 2}
-            noHeader={noHeader}
+            noDataComponent={props.noDataComponent ? props.noDataComponent : <p>There are no records to display in {props.title}</p>}
+            noHeader={selected.length === 0 || selected.length < 2}
+          // noHeader={noHeader}
           />
         </Card>
         <Modal
@@ -226,7 +251,7 @@ const Table = (props) => {
             footerSaveName: "OKAY", footerCloseName: "CLOSE",
             displayClose: { display: "true" }, displaySave: { display: "true" }
           }}
-        >{selectedRows.length > 1 ? <p> Do you want to delete selected <b>"{props.title}"</b></p> : <p>  {props.DeleteMessage} <b>"{dataName}"</b> ?</p>}
+        >{selectedRows.length > 1 ? <p> Do you want to delete selected <b>{props.title}</b></p> : <p>  {props.DeleteMessage} <b>{dataName}</b> ?</p>}
         </Modal>
       </div>
     </>
