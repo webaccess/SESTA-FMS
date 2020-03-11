@@ -127,7 +127,7 @@ class Vo extends Component {
       person_incharge: person
     };
     if (this.state.editPage[0]) {
-      // for edit data page
+      // for edit Vo page
       await axios
         .put(
           process.env.REACT_APP_SERVER_URL +
@@ -157,7 +157,7 @@ class Vo extends Component {
           console.log(error.response);
         });
     } else {
-      //for add data page
+      //for add Vo page
       await axios
         .post(
           process.env.REACT_APP_SERVER_URL + "village-organizations",

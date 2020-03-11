@@ -36,12 +36,12 @@ function Routes() {
               component={Vopage}
               exact
             />
-            <PrivateRoute path="/village-organizations" component={Vos} exact />
             <PrivateRoute
               path="/village-organizations/edit/:id"
               component={Vopage}
               exact
             />
+            <PrivateRoute path="/village-organizations" component={Vos} exact />
             <PrivateRoute path="/villages" component={Villages} exact />
 
             <Route path="/404" component={NotFoundPage} />

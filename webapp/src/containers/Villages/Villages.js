@@ -108,13 +108,16 @@ export class VillageList extends React.Component {
 
     if (selectedId) {
       for (let i in selectedId) {
-        console.log("ids", selectedId[i])
+        console.log("ids", selectedId[i]);
         axios
-          .delete(process.env.REACT_APP_SERVER_URL + "villages/" + selectedId[i], {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
+          .delete(
+            process.env.REACT_APP_SERVER_URL + "villages/" + selectedId[i],
+            {
+              headers: {
+                Authorization: "Bearer " + auth.getToken() + ""
+              }
             }
-          })
+          )
           .then(res => {
             console.log("deleted data res", res.data);
           })
@@ -154,14 +157,14 @@ export class VillageList extends React.Component {
         name: "State Name",
         selector: "state.name",
         sortable: true
-      },
+      }
     ];
 
     let selectors = [];
     for (let i in Usercolumns) {
       selectors.push(Usercolumns[i]["selector"]);
     }
-    console.log("psdpds", this.props.location)
+    console.log("psdpds", this.props.location);
     let columnsvalue = selectors[0];
     const { classes } = this.props;
     return (
@@ -186,29 +189,22 @@ export class VillageList extends React.Component {
             <Snackbar severity="success">Village edited successfully.</Snackbar>
           ) : null}
           <br></br>
-          {data.length ? (
-            <Table
-              title={"Villages"}
-              filterData={true}
-              Searchplaceholder={"Seacrh by Village Name"}
-              filterBy={["name"]}
-              data={data}
-              column={Usercolumns}
-              editData={this.editData}
-              DeleteData={this.DeleteData}
-              DeleteAll={this.DeleteData}
-              rowsSelected={this.rowsSelect}
-              modalHandle={this.modalHandle}
-              columnsvalue={columnsvalue}
-              DeleteMessage={"Are you Sure you want to Delete"}
-            />
-          ) : (
-              <div className={style.Progess}>
-                <center>
-                  <Spinner />
-                </center>
-              </div>
-            )}
+
+          <Table
+            title={"Villages"}
+            filterData={true}
+            Searchplaceholder={"Seacrh by Village Name"}
+            filterBy={["name"]}
+            data={data}
+            column={Usercolumns}
+            editData={this.editData}
+            DeleteData={this.DeleteData}
+            DeleteAll={this.DeleteData}
+            rowsSelected={this.rowsSelect}
+            modalHandle={this.modalHandle}
+            columnsvalue={columnsvalue}
+            DeleteMessage={"Are you Sure you want to Delete"}
+          />
         </div>
       </Layout>
     );
