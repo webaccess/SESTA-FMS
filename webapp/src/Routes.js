@@ -13,8 +13,7 @@ import AuthRoute from "./hoc/AuthRoute/AuthRoute";
 import Dashboard from "./containers/Dashboard/Dashboard";
 import NotFoundPage from "./containers/NotFoundPage/NotFoundPage";
 import AuthPage from "./containers/AuthPage/AuthPage";
-import Villages from "./containers/Villages/VillagePage";
-import VillageList from "./containers/Villages/VillageList";
+import Villages from "./containers/Villages/Villages";
 import villagePage from "./containers/Villages/VillagePage";
 import Vopage from "./containers/Vo/Vopage";
 import Vos from "./containers/Vo/Vos";
@@ -27,7 +26,6 @@ function Routes() {
           <Switch>
             <PrivateRoute path="/" component={Dashboard} exact />
             <PrivateRoute path="/villages/add" component={villagePage} exact />
-            <PrivateRoute path="/villages" component={VillageList} exact />
             <PrivateRoute
               path="/villages/edit/:id"
               component={villagePage}
@@ -44,6 +42,8 @@ function Routes() {
               component={Vopage}
               exact
             />
+            <PrivateRoute path="/villages" component={Villages} exact />
+
             <Route path="/404" component={NotFoundPage} />
             <AuthRoute path="/:authType/:id?" component={AuthPage} />
           </Switch>

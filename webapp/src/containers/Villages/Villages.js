@@ -2,17 +2,14 @@ import React from "react";
 import axios from "axios";
 import Table from "../../components/Datatable/Datatable.js";
 import Layout from "../../hoc/Layout/Layout";
-import Button from "@material-ui/core/Button";
+import Button from "../../components/UI/Button/Button";
 import { withStyles } from "@material-ui/core/styles";
 import style from "./VillageList.module.css";
 import { Redirect, Route } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Spinner from "../../components/Spinner";
 import auth from "../../components/Auth/Auth.js";
-import PrivateRoute from "../../hoc/PrivateRoute/PrivateRoute";
-import villagePage from "./VillagePage";
-
-import { createBrowserHistory } from "history";
+import Snackbar from "../../components/UI/Snackbar/Snackbar";
 
 const useStyles = theme => ({
   root: {},
@@ -40,6 +37,8 @@ const useStyles = theme => ({
 export class VillageList extends React.Component {
   constructor(props) {
     super(props);
+
+    console.log("heyaaa", this.props.location);
     this.state = {
       Result: [],
       TestData: [],
@@ -59,43 +58,72 @@ export class VillageList extends React.Component {
         }
       })
       .then(res => {
-        console.log("api result village",res.data)
+        console.log("api result village", res.data);
         this.setState({ data: res.data });
       });
   }
   editData = cellid => {
     this.props.history.push("/villages/edit/" + cellid);
   };
+
   DeleteAll = selectedId => {
-    axios
-      .delete(process.env.REACT_APP_SERVER_URL + "villages/?" + selectedId, {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
-      })
-      .then(res => {
-        console.log("deleted data res", res.data);
-      })
-      .catch(error => {
-        console.log(error.response);
-        console.log(selectedId);
-      });
+    console.log("hiii", selectedId);
+
+    // for(let i in selectedId){
+    //   axios
+    //   .delete(process.env.REACT_APP_SERVER_URL + "villages/?" + selectedId[i], {
+    //     headers: {
+    //       Authorization: "Bearer " + auth.getToken() + ""
+    //     }
+    //   })
+    //   .then(res => {
+    //     console.log("deleted data res", res.data);
+    //   })
+    //   .catch(error => {
+    //     console.log(error.response);
+    //     console.log(selectedId);
+    //   });
+    // }
   };
 
-  DeleteData = cellid => {
-    axios
-      .delete(process.env.REACT_APP_SERVER_URL + "villages/" + cellid, {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
-      })
-      .then(res => {
-        console.log("deleted data res", res.data);
-        this.componentDidMount();
-      })
-      .catch(error => {
-        console.log(error.response);
-      });
+  DeleteData = (cellid, selectedId) => {
+    if (cellid) {
+      axios
+        .delete(process.env.REACT_APP_SERVER_URL + "villages/" + cellid, {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + ""
+          }
+        })
+        .then(res => {
+          console.log("deleted data res", res.data);
+          console.log("deleted data res", selectedId);
+
+          this.componentDidMount();
+        })
+        .catch(error => {
+          console.log(error.response);
+        });
+    }
+    console.log("deleted 2", selectedId);
+
+    if (selectedId) {
+      for (let i in selectedId) {
+        console.log("ids", selectedId[i])
+        axios
+          .delete(process.env.REACT_APP_SERVER_URL + "villages/" + selectedId[i], {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + ""
+            }
+          })
+          .then(res => {
+            console.log("deleted data res", res.data);
+          })
+          .catch(error => {
+            console.log(error.response);
+            console.log(selectedId);
+          });
+      }
+    }
   };
 
   render() {
@@ -118,7 +146,7 @@ export class VillageList extends React.Component {
         sortable: true
       },
       {
-        name: "District Name",
+        name: "State Name",
         selector: "district.name",
         sortable: true
       },
@@ -127,19 +155,13 @@ export class VillageList extends React.Component {
         selector: "state.name",
         sortable: true
       },
-     
-    
-      {
-        cell: row => <Button>Loans</Button>,
-        button: true
-      }
     ];
 
     let selectors = [];
     for (let i in Usercolumns) {
       selectors.push(Usercolumns[i]["selector"]);
     }
-
+    console.log("psdpds", this.props.location)
     let columnsvalue = selectors[0];
     const { classes } = this.props;
     return (
@@ -158,6 +180,12 @@ export class VillageList extends React.Component {
               </Button>
             </div>
           </div>
+          {this.props.location.addData ? (
+            <Snackbar severity="success">Village added successfully.</Snackbar>
+          ) : this.props.location.editData ? (
+            <Snackbar severity="success">Village edited successfully.</Snackbar>
+          ) : null}
+          <br></br>
           {data.length ? (
             <Table
               title={"Villages"}
@@ -168,19 +196,19 @@ export class VillageList extends React.Component {
               column={Usercolumns}
               editData={this.editData}
               DeleteData={this.DeleteData}
-              DeleteAll={this.DeleteAll}
+              DeleteAll={this.DeleteData}
               rowsSelected={this.rowsSelect}
               modalHandle={this.modalHandle}
               columnsvalue={columnsvalue}
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (
-            <div className={style.Progess}>
-              <center>
-                <Spinner />
-              </center>
-            </div>
-          )}
+              <div className={style.Progess}>
+                <center>
+                  <Spinner />
+                </center>
+              </div>
+            )}
         </div>
       </Layout>
     );
