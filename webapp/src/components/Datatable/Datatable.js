@@ -175,7 +175,6 @@ const Table = (props) => {
     // setFilterText(e.target.value)
 
   };
-  console.log("fdsfdsfdsdfsdfsfdsd", searchFilter.stateFilter, searchFilter.districtFilter);
 
   console.log("onFilter", filterText);
   const [toggleCleared, setToggleCleared] = React.useState(false);

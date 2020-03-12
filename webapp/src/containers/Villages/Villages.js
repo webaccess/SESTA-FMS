@@ -86,7 +86,7 @@ export class VillageList extends React.Component {
     // }
   };
 
-  DeleteData = (cellid, selectedId) => {
+  DeleteData = cellid => {
     if (cellid) {
       axios
         .delete(process.env.REACT_APP_SERVER_URL + "villages/" + cellid, {
@@ -96,33 +96,32 @@ export class VillageList extends React.Component {
         })
         .then(res => {
           console.log("deleted data res", res.data);
-          console.log("deleted data res", selectedId);
-
           this.componentDidMount();
         })
         .catch(error => {
           console.log(error.response);
         });
     }
-    console.log("deleted 2", selectedId);
-
-    if (selectedId) {
-      for (let i in selectedId) {
-        console.log("ids", selectedId[i])
-        axios
-          .delete(process.env.REACT_APP_SERVER_URL + "villages/" + selectedId[i], {
+  };
+  DeleteAll = selectedId => {
+    for (let i in selectedId) {
+      console.log("ids", selectedId[i]);
+      axios
+        .delete(
+          process.env.REACT_APP_SERVER_URL + "villages/" + selectedId[i],
+          {
             headers: {
               Authorization: "Bearer " + auth.getToken() + ""
             }
-          })
-          .then(res => {
-            console.log("deleted data res", res.data);
-          })
-          .catch(error => {
-            console.log(error.response);
-            console.log(selectedId);
-          });
-      }
+          }
+        )
+        .then(res => {
+          console.log("deleted data res", res.data);
+          this.componentDidMount();
+        })
+        .catch(error => {
+          console.log("err", error.response);
+        });
     }
   };
 
@@ -146,7 +145,7 @@ export class VillageList extends React.Component {
         sortable: true
       },
       {
-        name: "State Name",
+        name: "District Name",
         selector: "district.name",
         sortable: true
       },
@@ -154,14 +153,14 @@ export class VillageList extends React.Component {
         name: "State Name",
         selector: "state.name",
         sortable: true
-      },
+      }
     ];
 
     let selectors = [];
     for (let i in Usercolumns) {
       selectors.push(Usercolumns[i]["selector"]);
     }
-    console.log("psdpds", this.props.location)
+
     let columnsvalue = selectors[0];
     const { classes } = this.props;
     return (
@@ -196,19 +195,19 @@ export class VillageList extends React.Component {
               column={Usercolumns}
               editData={this.editData}
               DeleteData={this.DeleteData}
-              DeleteAll={this.DeleteData}
+              DeleteAll={this.DeleteAll}
               rowsSelected={this.rowsSelect}
               modalHandle={this.modalHandle}
               columnsvalue={columnsvalue}
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (
-              <div className={style.Progess}>
-                <center>
-                  <Spinner />
-                </center>
-              </div>
-            )}
+            <div className={style.Progess}>
+              <center>
+                <Spinner />
+              </center>
+            </div>
+          )}
         </div>
       </Layout>
     );
