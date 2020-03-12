@@ -66,25 +66,7 @@ export class VillageList extends React.Component {
     this.props.history.push("/villages/edit/" + cellid);
   };
 
-  DeleteAll = selectedId => {
-    console.log("hiii", selectedId);
 
-    // for(let i in selectedId){
-    //   axios
-    //   .delete(process.env.REACT_APP_SERVER_URL + "villages/?" + selectedId[i], {
-    //     headers: {
-    //       Authorization: "Bearer " + auth.getToken() + ""
-    //     }
-    //   })
-    //   .then(res => {
-    //     console.log("deleted data res", res.data);
-    //   })
-    //   .catch(error => {
-    //     console.log(error.response);
-    //     console.log(selectedId);
-    //   });
-    // }
-  };
 
   DeleteData = cellid => {
     if (cellid) {
