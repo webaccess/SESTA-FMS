@@ -120,14 +120,11 @@ class Villages extends Component {
   };
 
   handleStateChange = async (event, value) => {
-    console.log("hi",event,value)
     if (value !== null) {
     this.setState({
       values: { ...this.state.values, addState: value.id }
     });
-    console.log("hhh",value)
     let stateId = value.id;
-    console.log("stateId",stateId)
     await axios
       .get(
         process.env.REACT_APP_SERVER_URL +
@@ -152,7 +149,6 @@ class Villages extends Component {
     this.setState({
       values: { ...this.state.values, addState:'',addDistrict:'' }
     });
-    console.log("jjjj",this.state.values)
   }
   };
 
@@ -263,7 +259,6 @@ class Villages extends Component {
         .catch(error => {
           this.setState({ formSubmitted: false });
           console.log(error);
-          console.log("formsubmitted",this.state.formSubmitted)
 
         });
     }
@@ -310,11 +305,6 @@ class Villages extends Component {
             <CardContent>
               <Grid container spacing={3}>
                  <Grid item md={12} xs={12}>
-                  {/* {this.state.formSubmitted === true ? (
-                    <Snackbar severity="success">
-                      Village added successfully.
-                    </Snackbar>
-                  ) : null} */}
                   {this.state.formSubmitted === false ? (
                     <Snackbar severity="error"  Showbutton={false}>Network Error - Please try again!</Snackbar>
                   ) : null}
@@ -343,7 +333,6 @@ class Villages extends Component {
                   options={states}
                   name="addState"
                   getOptionLabel={option => option.name}
-                  // onChange={this.handleStateChange}
                   onChange={(event, value) => {
                     this.handleStateChange( event, value);
                   }}
@@ -373,27 +362,6 @@ class Villages extends Component {
                     />
                   )}
                 />
-                  {/* <Inputdelhi
-                    fullWidth
-                    label="Select State"
-                    name="addState"
-                    onChange={this.handleStateChange}
-                    select
-                    error={this.hasError("addState")}
-                    helperText={
-                      this.hasError("addState")
-                        ? this.state.errors.addState[0]
-                        : null
-                    }
-                    value={this.state.values.addState || ""}
-                    variant="outlined"
-                  >
-                    {this.state.getState.map(states => (
-                      <option value={states.id} key={states.id}>
-                        {states.name}
-                      </option>
-                    ))}
-                  </Input> */}
                 </Grid>
                 <Grid item md={6} xs={12}>
                 <Autocomplete
@@ -432,30 +400,7 @@ class Villages extends Component {
                     />
                   )}
                 />
-                  {/* <Input
-                    fullWidth
-                    label="Select District"
-                    margin="dense"
-                    name="addDistrict"
-                    onChange={this.handleChange}
-                    select
-                    error={this.hasError("addDistrict")}
-                    helperText={
-                      this.hasError("addDistrict")
-                        ? this.state.errors.addDistrict[0]
-                        : this.state.stateSelected
-                        ? null
-                        : "Please select the state first"
-                    }
-                    value={this.state.values.addDistrict || ""}
-                    variant="outlined"
-                  >
-                    {this.state.getDistrict.map(district => (
-                      <option value={district.id} key={district.id}>
-                        {district.name}
-                      </option>
-                    ))}
-                  </Input> */}
+                 
                 </Grid>
                 {/* <Grid item md={6} xs={12}>
                   <Input
