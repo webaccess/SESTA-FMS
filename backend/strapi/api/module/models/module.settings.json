@@ -46,6 +46,11 @@
       "type": "boolean",
       "default": true,
       "required": true
+    },
+    "roles": {
+      "via": "modules",
+      "plugin": "users-permissions",
+      "collection": "role"
     }
   }
 }
