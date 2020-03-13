@@ -59,7 +59,6 @@ const Table = (props) => {
   const handleChange = React.useCallback(state => {
     setSelectedRows(state.selectedRows);
   }, []);
-
   const deleteDataModal = (event) => {
     setisDeleteAllShowing(!isDeleteAllShowing);
     setcellId(event.target.id);
@@ -84,7 +83,8 @@ const Table = (props) => {
   const handleDeleteAllEvent = () => {
     setisDeleteShowing(!isDeleteShowing);
     props.DeleteAll(row);
-    props.DeleteData(DataID);
+    props.DeleteData(DataID, setToggleCleared(!toggleCleared));
+
   }
 
   const handleEditEvent = () => {
@@ -122,16 +122,13 @@ const Table = (props) => {
   }
 
   const [filterText, setFilterText] = React.useState('');
-  const [Text, setText] = React.useState('');
   const [noHeader, setNoHeader] = React.useState(true);
   let filteredItems = [];
   let filteredData = [];
-
-  // console.log("New Filter to search in Data ", props.filters)
   const [data, setData] = React.useState(props.filterBy);
   if (props.filterData) {
     for (let i in data) {
-      filteredItems.push(props.data.filter(item => item[data[i]] && (item[data[i]].toLowerCase()).includes(filterText.toLowerCase() && searchFilter.stateFilter)
+      filteredItems.push(props.data.filter(item => item[data[i]] && (item[data[i]].toLowerCase()).includes(filterText.toLowerCase())
       ));
     }
     for (let i in filteredItems) {
@@ -159,11 +156,12 @@ const Table = (props) => {
   const onFilter = (e) => {
     setFilterText(e.target.value)
   };
+
+
   const [toggleCleared, setToggleCleared] = React.useState(false);
   const contextActions = React.useMemo(() => {
     const handledelete = () => {
       setisDeleteAllShowing(!isDeleteAllShowing)
-      setToggleCleared(!toggleCleared);
       setData(differenceBy(data, selectedRows, 'name'));
     };
     return <Button key="delete" onClick={handledelete} style={{ backgroundColor: '#d63447', color: 'white' }} >Delete</Button>;
@@ -198,8 +196,10 @@ const Table = (props) => {
             selectableRows
             searchFilter={searchFilter}
             highlightOnHover
+            clearSelectedRows={toggleCleared}
             persistTableHead
-            noDataComponent={props.noDataComponent ? props.noDataComponent : <p>There are no records to display in {props.title}</p>}
+            DeleteAllSucccess={props.DeleteAllSucccess}
+            noDataComponent={props.noDataComponent ? props.noDataComponent : <p>There are no records to display in <b>{props.title}</b></p>}
             noHeader={selected.length === 0 || selected.length < 2}
           />
         </Card>
@@ -209,7 +209,6 @@ const Table = (props) => {
           close={closeDeleteAllModalHandler}
           displayCross={{ display: "none" }}
           handleEventChange={true}
-          // event={handleDeleteEvent}
           event={handleDeleteAllEvent}
           handleDeleteAllEvent={handleDeleteAllEvent}
           footer={{
