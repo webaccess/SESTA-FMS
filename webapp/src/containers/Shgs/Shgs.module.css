@@ -1,0 +1,10 @@
+.title {
+  color: #263238;
+}
+.addButton {
+  float: right;
+  /* padding-bottom: px; */
+}
+.Progess {
+  font-size: 50px;
+}
