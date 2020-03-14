@@ -14,7 +14,9 @@ const useStyles = makeStyles(theme => ({
 const Dashlet = props => {
   const classes = useStyles();
   return (
-    <div className={props.container == "listing" ? classes.pad3 : classes.pad4}>
+    <div
+      className={props.container === "listing" ? classes.pad3 : classes.pad4}
+    >
       {props.breadcrumbs ? (
         <Breadcrumbs modules={props.breadcrumbs}></Breadcrumbs>
       ) : (
