@@ -16,6 +16,13 @@ async function allRoles() {
     .then(res => res.toJSON());
 }
 
+async function allModules() {
+  return await bookshelf
+    .model("module")
+    .fetchAll()
+    .then(res => res.toJSON());
+}
+
 module.exports = strapi => {
   // console.log(strapi);
   const hook = {
@@ -34,6 +41,7 @@ module.exports = strapi => {
     async initialize() {
       const roles = _data.roles;
       var _allRoles = await allRoles();
+      var _allModules = await allModules();
       console.log("allroles", _allRoles);
       Object.keys(roles).forEach(role => {
         console.log("role", role);
@@ -75,29 +83,43 @@ module.exports = strapi => {
           .model("module")
           .fetchAll()
           .then(model => {
+            console.log("in---", module)
             const response = model.toJSON();
+            console.log("res=+", response)
             const isModulePresent = response.find(r => r.name === module);
             if (!isModulePresent) {
-              const _roles = _allRoles.find(
+              console.log("fdsfsdf===")
+              const _roles = _allRoles.filter(
                 r => modules[module]["roles"].indexOf(r.name) > -1
               );
+              // const _modules = _allModules.filter(
+              //   m => modules[module]["modules"].indexOf(m.name) > -1
+              // );
+              const _module = _allModules.find(
+                m => modules[module]["module"] === m.name
+              );
+              // var _modules_arr = _modules.map(value => value.id);
+              var _roles_arr = _roles.map(value => value.id);
+              // console.log("_modules", _modules_arr);
+              console.log("_module", _module);
               console.log("_roles", _roles);
               // Creating module
-              // bookshelf
-              //   .model("module")
-              //   .forge({
-              //     name: module,
-              //     is_active: modules[module]["is_active"],
-              //     slug: modules[module]["slug"],
-              //     icon_class: modules[module]["icon_class"],
-              //     url: modules[module]["url"],
-              //     displayNavigation: modules[module]["displayNavigation"],
-              //     roles:
-              //   })
-              //   .save()
-              //   .catch(error => {
-              //     console.log(error);
-              //   });
+              bookshelf
+                .model("module")
+                .forge({
+                  name: module,
+                  is_active: modules[module]["is_active"],
+                  slug: modules[module]["slug"],
+                  icon_class: modules[module]["icon_class"],
+                  url: modules[module]["url"],
+                  displayNavigation: modules[module]["displayNavigation"],
+                  roles: _roles_arr,
+                  module: _module ? _module.id : null
+                })
+                .save()
+                .catch(error => {
+                  console.log(error);
+                });
             }
           })
           .catch(failed => {

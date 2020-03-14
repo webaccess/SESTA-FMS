@@ -13,7 +13,6 @@ const modules = {
     url: "/",
     slug: "dsfds",
     displayNavigation: true,
-    modules: [], // array of slugs
     module: "", //slug
     roles: ["Admin", "Authenticated"]
   }
