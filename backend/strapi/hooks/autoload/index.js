@@ -23,6 +23,16 @@ async function allModules() {
     .then(res => res.toJSON());
 }
 
+async function getRoleModules(roles, module) {
+  return await bookshelf
+    .model("roleModule")
+    .query(function (qb) {
+      qb.where('role_id', 'in', roles).andWhere('module_id', '=', module);
+    })
+    .fetchAll()
+    .then(res => res.toJSON());
+}
+
 module.exports = strapi => {
   // console.log(strapi);
   const hook = {
@@ -82,7 +92,7 @@ module.exports = strapi => {
         bookshelf
           .model("module")
           .fetchAll()
-          .then(model => {
+          .then(async function getAllModules(model) {
             console.log("in---", module)
             const response = model.toJSON();
             console.log("res=+", response)
@@ -100,9 +110,18 @@ module.exports = strapi => {
               );
               // var _modules_arr = _modules.map(value => value.id);
               var _roles_arr = _roles.map(value => value.id);
+              if (_module) {
+                var roleModules = await getRoleModules(_roles_arr, _module.id)
+                console.log("rolmmm===", roleModules)
+              }
+
               // console.log("_modules", _modules_arr);
               console.log("_module", _module);
               console.log("_roles", _roles);
+
+
+
+
               // Creating module
               bookshelf
                 .model("module")
@@ -113,7 +132,7 @@ module.exports = strapi => {
                   icon_class: modules[module]["icon_class"],
                   url: modules[module]["url"],
                   displayNavigation: modules[module]["displayNavigation"],
-                  roles: _roles_arr,
+                  // roles: _roles_arr,
                   module: _module ? _module.id : null
                 })
                 .save()

@@ -40,12 +40,12 @@
     "slug": {
       "type": "string",
       "unique": true,
-      "required": true
+      "required": false
     },
     "displayNavigation": {
       "type": "boolean",
       "default": true,
-      "required": true
+      "required": false
     },
     "roles": {
       "via": "modules",

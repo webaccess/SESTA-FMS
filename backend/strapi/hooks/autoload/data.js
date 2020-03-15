@@ -13,7 +13,7 @@ const modules = {
     url: "/",
     slug: "dsfds",
     displayNavigation: true,
-    module: "", //slug
+    module: "tedfsf", //slug
     roles: ["Admin", "Authenticated"]
   }
 };
