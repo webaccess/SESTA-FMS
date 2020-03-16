@@ -97,8 +97,10 @@ export class Shgs extends React.Component {
       for (let j in result[i].villages) {
         villages.push(result[i].villages[j].name + " ");
       }
+
       result[i]["villages"] = villages;
     }
+    console.log("hi ", result);
     return result;
   }
   handleStateChange = async (event, value) => {
@@ -219,7 +221,7 @@ export class Shgs extends React.Component {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
-     
+
       isCancel: true
     });
     this.componentDidMount();
@@ -417,6 +419,7 @@ export class Shgs extends React.Component {
                   fullWidth
                   label="Select Village"
                   margin="dense"
+                  // value={filterVillage}
                   name="filterVillage"
                   variant="outlined"
                 />
