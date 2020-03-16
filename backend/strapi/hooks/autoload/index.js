@@ -26,8 +26,8 @@ async function allModules() {
 async function getRoleModules(roles, module) {
   return await bookshelf
     .model("roleModule")
-    .query(function (qb) {
-      qb.where('role_id', 'in', roles).andWhere('module_id', '=', module);
+    .query(function(qb) {
+      qb.where("role_id", "in", roles).andWhere("module_id", "=", module);
     })
     .fetchAll()
     .then(res => res.toJSON());
@@ -93,12 +93,12 @@ module.exports = strapi => {
           .model("module")
           .fetchAll()
           .then(async function getAllModules(model) {
-            console.log("in---", module)
+            console.log("in---", module);
             const response = model.toJSON();
-            console.log("res=+", response)
+            console.log("res=+", response);
             const isModulePresent = response.find(r => r.name === module);
             if (!isModulePresent) {
-              console.log("fdsfsdf===")
+              console.log("fdsfsdf===");
               const _roles = _allRoles.filter(
                 r => modules[module]["roles"].indexOf(r.name) > -1
               );
@@ -109,21 +109,19 @@ module.exports = strapi => {
                 m => modules[module]["module"] === m.name
               );
               // var _modules_arr = _modules.map(value => value.id);
-              var _roles_arr = _roles.map(value => value.id);
-              if (_module) {
-                var roleModules = await getRoleModules(_roles_arr, _module.id)
-                console.log("rolmmm===", roleModules)
-              }
+              // var _roles_arr = _roles.map(value => value.id);
+              var roleModules = [];
+              // if (_module) {
+              //   roleModules = await getRoleModules(_roles_arr, _module.id);
+              //   console.log("rolmmm===", roleModules);
+              // }
 
               // console.log("_modules", _modules_arr);
               console.log("_module", _module);
               console.log("_roles", _roles);
 
-
-
-
               // Creating module
-              bookshelf
+              var moduleInsert = bookshelf
                 .model("module")
                 .forge({
                   name: module,
@@ -136,9 +134,30 @@ module.exports = strapi => {
                   module: _module ? _module.id : null
                 })
                 .save()
+                .then(m => {
+                  const moduleItem = m.toJSON();
+                  _roles.map(role => {
+                    bookshelf
+                      .model("roleModule")
+                      .forge({
+                        role_id: role.id,
+                        module_id: moduleItem.id
+                      })
+                      .save()
+                      .catch(error => {
+                        console.log(error);
+                      });
+                  });
+                })
                 .catch(error => {
                   console.log(error);
                 });
+
+              console.log("moduleInsert==", moduleInsert);
+
+              // if(roleModules.length<=0){
+
+              // }
             }
           })
           .catch(failed => {
