@@ -96,11 +96,9 @@ export class Shgs extends React.Component {
       let villages = [];
       for (let j in result[i].villages) {
         villages.push(result[i].villages[j].name + " ");
-        console.log("push");
       }
       result[i]["villages"] = villages;
     }
-    console.log("final data", result);
     return result;
   }
   handleStateChange = async (event, value) => {
@@ -221,9 +219,7 @@ export class Shgs extends React.Component {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
-      getState: "",
-      getDistrict: "",
-      getVillage: "",
+     
       isCancel: true
     });
     this.componentDidMount();
@@ -251,12 +247,22 @@ export class Shgs extends React.Component {
       })
       .then(res => {
         console.log("api 222222", res.data);
-        this.setState({ data: this.getData(res.data) });
+        if (res.data.length) {
+          this.setState({ data: this.getData(res.data) });
+        } else {
+          this.setState({
+            data: {
+              name: "no data",
+              state: { name: "no data" },
+              district: { name: "no data" },
+              villages: "no data"
+            }
+          });
+        }
       })
       .catch(err => {
         console.log("err", err);
       });
-    this.setState({ filterState: "", filterVillage: "", filterDistrict: "" });
   }
 
   render() {
@@ -322,11 +328,6 @@ export class Shgs extends React.Component {
             <Snackbar severity="success">SHG edited successfully.</Snackbar>
           ) : null}
           <br></br>
-          {/* <form
-            autoComplete="off"
-            noValidate
-            onSubmit={this.handleSearch}
-          > */}
           <Grid item md={2} xs={12}>
             <Autocomplete
               id="combo-box-demo"
@@ -335,14 +336,16 @@ export class Shgs extends React.Component {
               onChange={(event, value) => {
                 this.handleStateChange(event, value);
               }}
-              value={filterState?
-                this.state.isCancel === true
-                  ? null
-                  : statesFilter[
-                      statesFilter.findIndex(function(item, i) {
-                        return item.id === filterState;
-                      })
-                    ] ||null:null
+              value={
+                filterState
+                  ? this.state.isCancel === true
+                    ? null
+                    : statesFilter[
+                        statesFilter.findIndex(function(item, i) {
+                          return item.id === filterState;
+                        })
+                      ] || null
+                  : null
               }
               renderInput={params => (
                 <Input
@@ -351,7 +354,6 @@ export class Shgs extends React.Component {
                   label="Select State"
                   margin="dense"
                   name="addState"
-                  // value={this.state.isCancel === true?null:this.state.filterState || ""}
                   variant="outlined"
                 />
               )}
@@ -366,14 +368,16 @@ export class Shgs extends React.Component {
               onChange={(event, value) => {
                 this.handleDistrictChange(event, value);
               }}
-              value={filterDistrict?
-                this.state.isCancel === true
-                  ? null
-                  : districtsFilter[
-                      districtsFilter.findIndex(function(item, i) {
-                        return item.id === filterDistrict;
-                      })
-                    ] ||null:null
+              value={
+                filterDistrict
+                  ? this.state.isCancel === true
+                    ? null
+                    : districtsFilter[
+                        districtsFilter.findIndex(function(item, i) {
+                          return item.id === filterDistrict;
+                        })
+                      ] || null
+                  : null
               }
               renderInput={params => (
                 <Input
@@ -382,7 +386,6 @@ export class Shgs extends React.Component {
                   label="Select District"
                   margin="dense"
                   name="filterDistrict"
-                  // value={this.state.filterDistrict || ""}
                   variant="outlined"
                 />
               )}
@@ -393,19 +396,20 @@ export class Shgs extends React.Component {
               id="combo-box-demo"
               options={villagesFilter}
               name="filterVillage"
-              
               getOptionLabel={option => option.name}
               onChange={(event, value) => {
                 this.handleVillageChange(event, value);
               }}
-              value={filterVillage?
-                this.state.isCancel === true
-                  ? null
-                  : villagesFilter[
-                      villagesFilter.findIndex(function(item, i) {
-                        return item.id === filterVillage;
-                      })
-                    ] ||null:null
+              value={
+                filterVillage
+                  ? this.state.isCancel === true
+                    ? null
+                    : villagesFilter[
+                        villagesFilter.findIndex(function(item, i) {
+                          return item.id === filterVillage;
+                        })
+                      ] || null
+                  : null
               }
               renderInput={params => (
                 <Input
@@ -414,7 +418,6 @@ export class Shgs extends React.Component {
                   label="Select Village"
                   margin="dense"
                   name="filterVillage"
-                  // value={this.state.filterVillage || ""}
                   variant="outlined"
                 />
               )}
@@ -426,7 +429,6 @@ export class Shgs extends React.Component {
           <Button color="default" clicked={this.cancelForm}>
             cancel
           </Button>
-          {/* </form> */}
           {data.length ? (
             <Table
               title={"Shgs"}
@@ -442,6 +444,7 @@ export class Shgs extends React.Component {
               modalHandle={this.modalHandle}
               columnsvalue={columnsvalue}
               DeleteMessage={"Are you Sure you want to Delete"}
+              noDataComponent={true}
             />
           ) : (
             <div className={style.Progess}>
