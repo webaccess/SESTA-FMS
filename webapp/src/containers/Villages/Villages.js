@@ -6,9 +6,7 @@ import Button from "../../components/UI/Button/Button";
 import { withStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
 import style from "./Villages.module.css";
-import {
-  Grid
-} from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
@@ -16,14 +14,14 @@ import Snackbar from "../../components/UI/Snackbar/Snackbar";
 const useStyles = theme => ({
   root: {},
   row: {
-    height: '42px',
-    display: 'flex',
-    alignItems: 'center',
-    marginTop: theme.spacing(1),
+    height: "42px",
+    display: "flex",
+    alignItems: "center",
+    marginTop: theme.spacing(1)
   },
   buttonRow: {
-    height: '42px',
-    marginTop: theme.spacing(1),
+    height: "42px",
+    marginTop: theme.spacing(1)
   },
   spacer: {
     flexGrow: 1
@@ -46,7 +44,7 @@ const useStyles = theme => ({
   },
   Cancel: {
     marginRight: theme.spacing(1)
-  },
+  }
 });
 
 export class villages extends React.Component {
@@ -108,7 +106,8 @@ export class villages extends React.Component {
   }
   handleStateChange = async (event, value) => {
     if (value !== null) {
-      this.state.filterState = value.id;
+      this.setState({ filterState: value.id });
+
       this.setState({
         isCancel: false
       });
@@ -117,8 +116,8 @@ export class villages extends React.Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-          "districts?master_state.id=" +
-          stateId,
+            "districts?master_state.id=" +
+            stateId,
           {
             headers: {
               Authorization: "Bearer " + auth.getToken() + ""
@@ -142,7 +141,8 @@ export class villages extends React.Component {
   };
   handleDistrictChange(event, value) {
     if (value !== null) {
-      this.state.filterDistrict = value.id;
+      this.setState({ filterDistrict: value.id });
+
       let distId = value.id;
       axios
         .get(process.env.REACT_APP_SERVER_URL + "districts/" + distId, {
@@ -161,13 +161,14 @@ export class villages extends React.Component {
         filterDistrict: "",
         filterVillage: ""
       });
-
     }
   }
   handleVillageChange(event, value) {
     if (value !== null) {
-      this.state.filterVillage = value.id;
+      this.setState({ filterVillage: value.id });
+      console.log("value", this.state.filterVillage);
     } else {
+      console.log("hi", this.state.filterVillage);
       this.setState({
         filterVillage: ""
       });
@@ -196,11 +197,14 @@ export class villages extends React.Component {
   DeleteAll = selectedId => {
     for (let i in selectedId) {
       axios
-        .delete(process.env.REACT_APP_SERVER_URL + "villages/" + selectedId[i], {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
+        .delete(
+          process.env.REACT_APP_SERVER_URL + "villages/" + selectedId[i],
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + ""
+            }
           }
-        })
+        )
         .then(res => {
           console.log("deleted data res", res.data);
           this.componentDidMount();
@@ -223,7 +227,6 @@ export class villages extends React.Component {
   };
 
   handleSearch() {
-    console.log("kkk", this.state);
     let searchData = "";
     if (this.state.filterState) {
       searchData += "state.id=" + this.state.filterState + "&&";
@@ -235,13 +238,18 @@ export class villages extends React.Component {
       searchData += "id=" + this.state.filterVillage;
     }
     axios
-      .get(process.env.REACT_APP_SERVER_URL + "villages?" + searchData + "&&_sort=name:ASC", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
+      .get(
+        process.env.REACT_APP_SERVER_URL +
+          "villages?" +
+          searchData +
+          "&&_sort=name:ASC",
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + ""
+          }
         }
-      })
+      )
       .then(res => {
-        console.log("api 222222", res.data);
         this.setState({ data: this.getData(res.data) });
       })
       .catch(err => {
@@ -260,13 +268,13 @@ export class villages extends React.Component {
       {
         name: "District Name",
         selector: "district.name",
-        sortable: true,
+        sortable: true
       },
       {
         name: "State Name",
         selector: "state.name",
         sortable: true
-      },
+      }
     ];
 
     let selectors = [];
@@ -283,10 +291,9 @@ export class villages extends React.Component {
     let villagesFilter = this.state.getVillage;
     let filterVillage = this.state.filterVillage;
     let filters = this.state.values;
-    let isCancel = this.state.isCancel;
     return (
       <Layout>
-        <Grid >
+        <Grid>
           <div className="App">
             <h1 className={style.title}>Villages</h1>
             <div className={classes.row}>
@@ -298,7 +305,7 @@ export class villages extends React.Component {
                   to="/Villages/add"
                 >
                   Add Village
-              </Button>
+                </Button>
               </div>
             </div>
             {this.props.location.addData ? (
@@ -318,14 +325,16 @@ export class villages extends React.Component {
                       onChange={(event, value) => {
                         this.handleStateChange(event, value);
                       }}
-                      value={filterState ?
-                        this.state.isCancel === true
-                          ? null
-                          : statesFilter[
-                          statesFilter.findIndex(function (item, i) {
-                            return item.id === filterState;
-                          })
-                          ] || null : null
+                      value={
+                        filterState
+                          ? this.state.isCancel === true
+                            ? null
+                            : statesFilter[
+                                statesFilter.findIndex(function(item, i) {
+                                  return item.id === filterState;
+                                })
+                              ] || null
+                          : null
                       }
                       renderInput={params => (
                         <Input
@@ -351,14 +360,16 @@ export class villages extends React.Component {
                       onChange={(event, value) => {
                         this.handleDistrictChange(event, value);
                       }}
-                      value={filterDistrict ?
-                        this.state.isCancel === true
-                          ? null
-                          : districtsFilter[
-                          districtsFilter.findIndex(function (item, i) {
-                            return item.id === filterDistrict;
-                          })
-                          ] || null : null
+                      value={
+                        filterDistrict
+                          ? this.state.isCancel === true
+                            ? null
+                            : districtsFilter[
+                                districtsFilter.findIndex(function(item, i) {
+                                  return item.id === filterDistrict;
+                                })
+                              ] || null
+                          : null
                       }
                       renderInput={params => (
                         <Input
@@ -384,14 +395,16 @@ export class villages extends React.Component {
                       onChange={(event, value) => {
                         this.handleVillageChange(event, value);
                       }}
-                      value={filterVillage ?
-                        this.state.isCancel === true
-                          ? null
-                          : villagesFilter[
-                          villagesFilter.findIndex(function (item, i) {
-                            return item.id === filterVillage;
-                          })
-                          ] || null : null
+                      value={
+                        filterVillage
+                          ? this.state.isCancel === true
+                            ? null
+                            : villagesFilter[
+                                villagesFilter.findIndex(function(item, i) {
+                                  return item.id === filterVillage;
+                                })
+                              ] || null
+                          : null
                       }
                       renderInput={params => (
                         <Input
@@ -408,27 +421,32 @@ export class villages extends React.Component {
               </div>
               <br></br>
               <Button onClick={this.handleSearch.bind(this)}>Search</Button>
+              &nbsp;&nbsp;&nbsp;
               <Button color="default" clicked={this.cancelForm}>
                 cancel
-          </Button>
+              </Button>
             </div>
-            {data ? <Table
-              title={"Villages"}
-              showSearch={false}
-              filterData={true}
-              // noDataComponent={"No Records To be shown"}
-              Searchplaceholder={"Seacrh by Village Name"}
-              filterBy={["name", "state.name"]}
-              filters={filters}
-              data={data}
-              column={Usercolumns}
-              editData={this.editData}
-              DeleteData={this.DeleteData}
-              DeleteAll={this.DeleteAll}
-              rowsSelected={this.rowsSelect}
-              columnsvalue={columnsvalue}
-              DeleteMessage={"Are you Sure you want to Delete"}
-            /> : <h1>Loading...</h1>}
+            {data ? (
+              <Table
+                title={"Villages"}
+                showSearch={false}
+                filterData={true}
+                // noDataComponent={"No Records To be shown"}
+                Searchplaceholder={"Seacrh by Village Name"}
+                filterBy={["name", "state.name"]}
+                filters={filters}
+                data={data}
+                column={Usercolumns}
+                editData={this.editData}
+                DeleteData={this.DeleteData}
+                DeleteAll={this.DeleteAll}
+                rowsSelected={this.rowsSelect}
+                columnsvalue={columnsvalue}
+                DeleteMessage={"Are you Sure you want to Delete"}
+              />
+            ) : (
+              <h1>Loading...</h1>
+            )}
           </div>
         </Grid>
       </Layout>
