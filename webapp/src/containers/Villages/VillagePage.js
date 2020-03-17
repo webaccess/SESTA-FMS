@@ -16,7 +16,7 @@ import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
 import { ADD_VILLAGE_BREADCRUMBS, EDIT_VILLAGE_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
-import Snackbar from "../../components/UI/Snackbar/Snackbar"
+import Snackbar from "../../components/UI/Snackbar/Snackbar";
 
 class Villages extends Component {
   constructor(props) {
@@ -171,14 +171,13 @@ class Villages extends Component {
   handleSubmit = async e => {
     e.preventDefault();
     this.validate();
-    this.setState({ formSubmitted: '' });
+    this.setState({ formSubmitted: "" });
 
     if (Object.keys(this.state.errors).length > 0) return;
     let villageName = this.state.values.addVillage;
     let districtId = this.state.values.addDistrict;
     let stateId = this.state.values.addState;
-   
-    
+
     if (this.state.editPage[0]) {
       // for edit data page
       await axios
@@ -204,7 +203,7 @@ class Villages extends Component {
         .then(res => {
           console.log("res", res);
           this.setState({ formSubmitted: true });
-          this.props.history.push({pathname:"/villages",editData:true});
+          this.props.history.push({ pathname: "/villages", editData: true });
         })
         .catch(error => {
           this.setState({ formSubmitted: false });
@@ -233,14 +232,13 @@ class Villages extends Component {
         )
         .then(res => {
           this.setState({ formSubmitted: true });
-          
-          this.props.history.push({pathname:"/villages",addData:true});
+
+          this.props.history.push({ pathname: "/villages", addData: true });
         })
         .catch(error => {
           this.setState({ formSubmitted: false });
           console.log(error);
-          console.log("formsubmitted",this.state.formSubmitted)
-
+          console.log("formsubmitted", this.state.formSubmitted);
         });
     }
   };
@@ -281,14 +279,16 @@ class Villages extends Component {
             <Divider />
             <CardContent>
               <Grid container spacing={3}>
-                 <Grid item md={12} xs={12}>
+                <Grid item md={12} xs={12}>
                   {/* {this.state.formSubmitted === true ? (
                     <Snackbar severity="success">
                       Village added successfully.
                     </Snackbar>
                   ) : null} */}
                   {this.state.formSubmitted === false ? (
-                    <Snackbar severity="error"  Showbutton={false}>Network Error - Please try again!</Snackbar>
+                    <Snackbar severity="error" Showbutton={false}>
+                      Network Error - Please try again!
+                    </Snackbar>
                   ) : null}
                 </Grid>
                 <Grid item md={6} xs={12}>

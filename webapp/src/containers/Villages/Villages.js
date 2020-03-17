@@ -65,7 +65,9 @@ export class villages extends React.Component {
       getState: [],
       getDistrict: [],
       getVillage: [],
-      isCancel: false
+      isCancel: false,
+      singleDelete: "",
+      multipleDelete: ""
     };
   }
   async componentDidMount() {
@@ -178,7 +180,7 @@ export class villages extends React.Component {
     this.props.history.push("/villages/edit/" + cellid);
   };
   DeleteData = cellid => {
-    if (cellid) {
+    if (cellid.length!==0) {
       axios
         .delete(process.env.REACT_APP_SERVER_URL + "villages/" + cellid, {
           headers: {
@@ -187,10 +189,12 @@ export class villages extends React.Component {
         })
         .then(res => {
           console.log("deleted data res", res.data);
+          this.setState({ singleDelete: res.data.name });
           this.componentDidMount();
         })
         .catch(error => {
-          console.log(error.response);
+          this.setState({ singleDelete: false });
+          console.log(error);
         });
     }
   };
@@ -207,10 +211,13 @@ export class villages extends React.Component {
         )
         .then(res => {
           console.log("deleted data res", res.data);
+          this.setState({ multipleDelete: true });
           this.componentDidMount();
         })
         .catch(error => {
-          console.log("err", error.response);
+          this.setState({ multipleDelete: false });
+
+          console.log("err", error);
         });
     }
   };
@@ -309,9 +316,33 @@ export class villages extends React.Component {
               </div>
             </div>
             {this.props.location.addData ? (
-              <Snackbar severity="success">SHG added successfully.</Snackbar>
+              <Snackbar severity="success">
+                Village added successfully.
+              </Snackbar>
             ) : this.props.location.editData ? (
-              <Snackbar severity="success">SHG edited successfully.</Snackbar>
+              <Snackbar severity="success">
+                Village edited successfully.
+              </Snackbar>
+            ) : null}
+            {this.state.singleDelete !== false && this.state.singleDelete !== '' && this.state.singleDelete? (
+              <Snackbar severity="success" Showbutton={false}>
+               Village {this.state.singleDelete} deleted successfully!
+              </Snackbar>
+            ) : null}
+            {this.state.singleDelete === false ? (
+              <Snackbar severity="error" Showbutton={false}>
+                An error occured - Please try again!
+              </Snackbar>
+            ) : null}
+            {this.state.multipleDelete === true? (
+              <Snackbar severity="success" Showbutton={false}>
+               Villages deleted successfully!
+              </Snackbar>
+            ) : null}
+            {this.state.multipleDelete === false ? (
+              <Snackbar severity="error" Showbutton={false}>
+                An error occured - Please try again!
+              </Snackbar>
             ) : null}
             <br></br>
             <div className={classes.row}>
