@@ -180,7 +180,7 @@ export class villages extends React.Component {
     this.props.history.push("/villages/edit/" + cellid);
   };
   DeleteData = cellid => {
-    if (cellid.length!==0) {
+    if (cellid.length !== 0) {
       axios
         .delete(process.env.REACT_APP_SERVER_URL + "villages/" + cellid, {
           headers: {
@@ -197,30 +197,6 @@ export class villages extends React.Component {
           console.log(error);
         });
     }
-<<<<<<< HEAD
-    console.log("deleted 2", selectedId);
-
-    if (selectedId) {
-      for (let i in selectedId) {
-        console.log("ids", selectedId[i]);
-        axios
-          .delete(
-            process.env.REACT_APP_SERVER_URL + "villages/" + selectedId[i],
-            {
-              headers: {
-                Authorization: "Bearer " + auth.getToken() + ""
-              }
-            }
-          )
-          .then(res => {
-            console.log("deleted data res", res.data);
-          })
-          .catch(error => {
-            console.log(error.response);
-            console.log(selectedId);
-          });
-      }
-=======
   };
   DeleteAll = selectedId => {
     for (let i in selectedId) {
@@ -243,7 +219,6 @@ export class villages extends React.Component {
 
           console.log("err", error);
         });
->>>>>>> 5de6ab50299306c4ff606d2ee198b770d4b54b1c
     }
   };
 
@@ -313,11 +288,7 @@ export class villages extends React.Component {
     for (let i in Usercolumns) {
       selectors.push(Usercolumns[i]["selector"]);
     }
-<<<<<<< HEAD
-    console.log("psdpds", this.props.location);
-=======
 
->>>>>>> 5de6ab50299306c4ff606d2ee198b770d4b54b1c
     let columnsvalue = selectors[0];
     const { classes } = this.props;
     let statesFilter = this.state.getState;
@@ -344,32 +315,6 @@ export class villages extends React.Component {
                 </Button>
               </div>
             </div>
-<<<<<<< HEAD
-          </div>
-          {this.props.location.addData ? (
-            <Snackbar severity="success">Village added successfully.</Snackbar>
-          ) : this.props.location.editData ? (
-            <Snackbar severity="success">Village edited successfully.</Snackbar>
-          ) : null}
-          <br></br>
-
-          <Table
-            title={"Villages"}
-            filterData={true}
-            Searchplaceholder={"Seacrh by Village Name"}
-            filterBy={["name"]}
-            data={data}
-            column={Usercolumns}
-            editData={this.editData}
-            DeleteData={this.DeleteData}
-            DeleteAll={this.DeleteData}
-            rowsSelected={this.rowsSelect}
-            modalHandle={this.modalHandle}
-            columnsvalue={columnsvalue}
-            DeleteMessage={"Are you Sure you want to Delete"}
-          />
-        </div>
-=======
             {this.props.location.addData ? (
               <Snackbar severity="success">
                 Village added successfully.
@@ -379,9 +324,11 @@ export class villages extends React.Component {
                 Village edited successfully.
               </Snackbar>
             ) : null}
-            {this.state.singleDelete !== false && this.state.singleDelete !== '' && this.state.singleDelete? (
+            {this.state.singleDelete !== false &&
+            this.state.singleDelete !== "" &&
+            this.state.singleDelete ? (
               <Snackbar severity="success" Showbutton={false}>
-               Village {this.state.singleDelete} deleted successfully!
+                Village {this.state.singleDelete} deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.singleDelete === false ? (
@@ -389,9 +336,9 @@ export class villages extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            {this.state.multipleDelete === true? (
+            {this.state.multipleDelete === true ? (
               <Snackbar severity="success" Showbutton={false}>
-               Villages deleted successfully!
+                Villages deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.multipleDelete === false ? (
@@ -535,7 +482,6 @@ export class villages extends React.Component {
             )}
           </div>
         </Grid>
->>>>>>> 5de6ab50299306c4ff606d2ee198b770d4b54b1c
       </Layout>
     );
   }

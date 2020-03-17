@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { findIndex, get, map, mapKeys, replace, set, isEmpty } from "lodash";
+import { get, map, replace, set } from "lodash";
 import { Link } from "react-router-dom";
 import form from "./forms.json";
 import styles from "./AuthPage.module.css";
@@ -213,7 +213,7 @@ class AuthPage extends PureComponent {
     map(inputs, (input, key) => {
       let renderFormErrors = map(this.state.formErrors, (error, keyval) => {
         let nameval = get(input, "name");
-        if (nameval == keyval && error.length > 0) {
+        if (nameval === keyval && error.length > 0) {
           return (
             <div
               className={`form-control-feedback invalid-feedback ${styles.errorContainer} d-block`}
@@ -283,7 +283,7 @@ class AuthPage extends PureComponent {
                           label={
                             Object.keys(validationData).indexOf("required") >
                               -1 &&
-                            validationData["required"]["value"] == "true"
+                            validationData["required"]["value"] === "true"
                               ? get(input, "label") + "*"
                               : get(input, "label")
                           }
@@ -319,7 +319,7 @@ class AuthPage extends PureComponent {
                       this.state.formErrors,
                       (error, keyval) => {
                         let nameval = get(input, "name");
-                        if (nameval == keyval && error.length > 0) {
+                        if (nameval === keyval && error.length > 0) {
                           return (
                             <div
                               className={`form-control-feedback invalid-feedback ${styles.errorContainer} d-block`}
