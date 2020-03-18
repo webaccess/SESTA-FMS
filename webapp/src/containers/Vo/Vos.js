@@ -480,7 +480,7 @@ export class VillageList extends React.Component {
                         <Input
                           {...params}
                           fullWidth
-                          label="Select VO"
+                          label="Select Village"
                           margin="dense"
                           value={filterVillage}
                           name="filterVillage"
