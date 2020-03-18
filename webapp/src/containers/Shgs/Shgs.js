@@ -25,9 +25,13 @@ const useStyles = theme => ({
   root: {},
   row: {
     height: "42px",
-    // display: 'flex',
+    display: "flex",
     alignItems: "center",
-    marginTop: theme.spacing(2)
+    marginTop: theme.spacing(1)
+  },
+  buttonRow: {
+    height: "42px",
+    marginTop: theme.spacing(1)
   },
   spacer: {
     flexGrow: 1
@@ -63,10 +67,13 @@ export class Shgs extends React.Component {
       getState: [],
       getDistrict: [],
       getVillage: [],
-      isCancel: false
+      isCancel: false,
+      singleDelete: "",
+      multipleDelete: ""
     };
   }
   async componentDidMount() {
+    // this.setState({singleDelete:'',multipleDelete:''})
     await axios
       .get(process.env.REACT_APP_SERVER_URL + "shgs/", {
         headers: {
@@ -105,11 +112,10 @@ export class Shgs extends React.Component {
   }
   handleStateChange = async (event, value) => {
     if (value !== null) {
-      this.state.filterState = value.id;
+      this.setState({ filterState: value.id });
       this.setState({
         isCancel: false
       });
-      console.log("state", this.state.filterState);
 
       let stateId = value.id;
       await axios
@@ -141,7 +147,7 @@ export class Shgs extends React.Component {
 
   handleDistrictChange(event, value) {
     if (value !== null) {
-      this.state.filterDistrict = value.id;
+      this.setState({ filterDistrict: value.id });
       console.log("District", this.state.filterDistrict);
       let distId = value.id;
       axios
@@ -168,7 +174,7 @@ export class Shgs extends React.Component {
 
   handleVillageChange(event, value) {
     if (value !== null) {
-      this.state.filterVillage = value.id;
+      this.setState({ filterVillage: value.id });
       console.log("village", this.state.filterVillage);
     } else {
       this.setState({
@@ -183,7 +189,8 @@ export class Shgs extends React.Component {
   };
 
   DeleteData = cellid => {
-    if (cellid) {
+    if (cellid.length !== 0) {
+      console.log("dataaaa",cellid);
       axios
         .delete(process.env.REACT_APP_SERVER_URL + "shgs/" + cellid, {
           headers: {
@@ -192,10 +199,12 @@ export class Shgs extends React.Component {
         })
         .then(res => {
           console.log("deleted data res", res.data);
+          this.setState({ singleDelete: res.data.name });
           this.componentDidMount();
         })
         .catch(error => {
-          console.log(error.response);
+          this.setState({ singleDelete: false });
+          console.log(error);
         });
     }
   };
@@ -209,10 +218,13 @@ export class Shgs extends React.Component {
         })
         .then(res => {
           console.log("deleted data res", res.data);
+          this.setState({ multipleDelete: true });
           this.componentDidMount();
         })
         .catch(error => {
-          console.log("err", error.response);
+          this.setState({ multipleDelete: false });
+
+          console.log("err", error);
         });
     }
   };
@@ -249,18 +261,7 @@ export class Shgs extends React.Component {
       })
       .then(res => {
         console.log("api 222222", res.data);
-        if (res.data.length) {
-          this.setState({ data: this.getData(res.data) });
-        } else {
-          this.setState({
-            data: {
-              name: "no data",
-              state: { name: "no data" },
-              district: { name: "no data" },
-              villages: "no data"
-            }
-          });
-        }
+        this.setState({ data: this.getData(res.data) });
       })
       .catch(err => {
         console.log("err", err);
@@ -329,109 +330,146 @@ export class Shgs extends React.Component {
           ) : this.props.location.editData ? (
             <Snackbar severity="success">SHG edited successfully.</Snackbar>
           ) : null}
+          {this.state.singleDelete !== false &&
+          this.state.singleDelete !== "" &&
+          this.state.singleDelete ? (
+            <Snackbar severity="success" Showbutton={false}>
+              SHG {this.state.singleDelete} deleted successfully!
+            </Snackbar>
+          ) : null}
+          {this.state.singleDelete === false ? (
+            <Snackbar severity="error" Showbutton={false}>
+              An error occured - Please try again!
+            </Snackbar>
+          ) : null}
+          {this.state.multipleDelete === true ? (
+            <Snackbar severity="success" Showbutton={false}>
+              SHG's deleted successfully!
+            </Snackbar>
+          ) : null}
+          {this.state.multipleDelete === false ? (
+            <Snackbar severity="error" Showbutton={false}>
+              An error occured - Please try again!
+            </Snackbar>
+          ) : null}
+
           <br></br>
-          <Grid item md={2} xs={12}>
-            <Autocomplete
-              id="combo-box-demo"
-              options={statesFilter}
-              getOptionLabel={option => option.name}
-              onChange={(event, value) => {
-                this.handleStateChange(event, value);
-              }}
-              value={
-                filterState
-                  ? this.state.isCancel === true
-                    ? null
-                    : statesFilter[
-                        statesFilter.findIndex(function(item, i) {
-                          return item.id === filterState;
-                        })
-                      ] || null
-                  : null
-              }
-              renderInput={params => (
-                <Input
-                  {...params}
-                  fullWidth
-                  label="Select State"
-                  margin="dense"
-                  name="addState"
-                  variant="outlined"
-                />
-              )}
-            />
-          </Grid>
-          <Grid item md={2} xs={12}>
-            <Autocomplete
-              id="combo-box-demo"
-              options={districtsFilter}
-              name="filterDistrict"
-              getOptionLabel={option => option.name}
-              onChange={(event, value) => {
-                this.handleDistrictChange(event, value);
-              }}
-              value={
-                filterDistrict
-                  ? this.state.isCancel === true
-                    ? null
-                    : districtsFilter[
-                        districtsFilter.findIndex(function(item, i) {
-                          return item.id === filterDistrict;
-                        })
-                      ] || null
-                  : null
-              }
-              renderInput={params => (
-                <Input
-                  {...params}
-                  fullWidth
-                  label="Select District"
-                  margin="dense"
-                  name="filterDistrict"
-                  variant="outlined"
-                />
-              )}
-            />
-          </Grid>
-          <Grid item md={2} xs={12}>
-            <Autocomplete
-              id="combo-box-demo"
-              options={villagesFilter}
-              name="filterVillage"
-              getOptionLabel={option => option.name}
-              onChange={(event, value) => {
-                this.handleVillageChange(event, value);
-              }}
-              value={
-                filterVillage
-                  ? this.state.isCancel === true
-                    ? null
-                    : villagesFilter[
-                        villagesFilter.findIndex(function(item, i) {
-                          return item.id === filterVillage;
-                        })
-                      ] || null
-                  : null
-              }
-              renderInput={params => (
-                <Input
-                  {...params}
-                  fullWidth
-                  label="Select Village"
-                  margin="dense"
-                  // value={filterVillage}
-                  name="filterVillage"
-                  variant="outlined"
-                />
-              )}
-            />
-          </Grid>
-          <br></br>
-          <Button onClick={this.handleSearch.bind(this)}>Save</Button>
-          &nbsp;&nbsp;&nbsp;&nbsp;
-          <Button color="default" clicked={this.cancelForm}>
-            cancel
-          </Button>
+          <div className={classes.row}>
+            <div className={classes.searchInput}>
+              <div className={style.Districts}>
+                <Grid item md={12} xs={12}>
+                  <Autocomplete
+                    id="combo-box-demo"
+                    options={statesFilter}
+                    getOptionLabel={option => option.name}
+                    onChange={(event, value) => {
+                      this.handleStateChange(event, value);
+                    }}
+                    value={
+                      filterState
+                        ? this.state.isCancel === true
+                          ? null
+                          : statesFilter[
+                              statesFilter.findIndex(function(item, i) {
+                                return item.id === filterState;
+                              })
+                            ] || null
+                        : null
+                    }
+                    renderInput={params => (
+                      <Input
+                        {...params}
+                        fullWidth
+                        label="Select State"
+                        margin="dense"
+                        name="addState"
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                </Grid>
+              </div>
+            </div>
+            <div className={classes.searchInput}>
+              <div className={style.Districts}>
+                <Grid item md={12} xs={12}>
+                  <Autocomplete
+                    id="combo-box-demo"
+                    options={districtsFilter}
+                    name="filterDistrict"
+                    getOptionLabel={option => option.name}
+                    onChange={(event, value) => {
+                      this.handleDistrictChange(event, value);
+                    }}
+                    value={
+                      filterDistrict
+                        ? this.state.isCancel === true
+                          ? null
+                          : districtsFilter[
+                              districtsFilter.findIndex(function(item, i) {
+                                return item.id === filterDistrict;
+                              })
+                            ] || null
+                        : null
+                    }
+                    renderInput={params => (
+                      <Input
+                        {...params}
+                        fullWidth
+                        label="Select District"
+                        margin="dense"
+                        name="filterDistrict"
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                </Grid>
+              </div>
+            </div>
+            <div className={classes.searchInput}>
+              <div className={style.Districts}>
+                <Grid item md={12} xs={12}>
+                  <Autocomplete
+                    id="combo-box-demo"
+                    options={villagesFilter}
+                    name="filterVillage"
+                    getOptionLabel={option => option.name}
+                    onChange={(event, value) => {
+                      this.handleVillageChange(event, value);
+                    }}
+                    value={
+                      filterVillage
+                        ? this.state.isCancel === true
+                          ? null
+                          : villagesFilter[
+                              villagesFilter.findIndex(function(item, i) {
+                                return item.id === filterVillage;
+                              })
+                            ] || null
+                        : null
+                    }
+                    renderInput={params => (
+                      <Input
+                        {...params}
+                        fullWidth
+                        label="Select Village"
+                        margin="dense"
+                        // value={filterVillage}
+                        name="filterVillage"
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                </Grid>
+              </div>
+            </div>
+            <br></br>
+            <Button onClick={this.handleSearch.bind(this)}>Save</Button>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <Button color="default" clicked={this.cancelForm}>
+              cancel
+            </Button>
+          </div>
           {data.length ? (
             <Table
               title={"Shgs"}
