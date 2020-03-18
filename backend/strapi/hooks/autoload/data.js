@@ -3,18 +3,23 @@ const roles = {
     data: {
       description: ""
     }
+  },
+  Admin2: {
+    data: {
+      description: ""
+    }
   }
 };
 
 const modules = {
-  tmod: {
+  tmod22: {
     is_active: true,
     icon_class: "dashboard",
     url: "/",
-    slug: "dsfds",
+    slug: "mod222",
     displayNavigation: true,
     module: "tedfsf", //slug
-    roles: ["Admin", "Authenticated"]
+    roles: ["Admin", "Admin2", "Authenticated"]
   }
 };
 

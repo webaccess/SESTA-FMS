@@ -26,7 +26,7 @@ async function allModules() {
 async function getRoleModules(roles, module) {
   return await bookshelf
     .model("roleModule")
-    .query(function(qb) {
+    .query(function (qb) {
       qb.where("role_id", "in", roles).andWhere("module_id", "=", module);
     })
     .fetchAll()
@@ -53,18 +53,18 @@ module.exports = strapi => {
       var _allRoles = await allRoles();
       var _allModules = await allModules();
       console.log("allroles", _allRoles);
-      Object.keys(roles).forEach(role => {
+      Object.keys(roles).forEach(async function getRoles(role) {
         console.log("role", role);
         // console.log(bookshelf);
-        bookshelf
+        await bookshelf
           .model("role")
           .fetchAll()
-          .then(model => {
+          .then(async function saveRole(model) {
             const response = model.toJSON();
             const isRolePresent = response.find(r => r.name === role);
             if (!isRolePresent) {
               // Creating role
-              bookshelf
+              await bookshelf
                 .model("role")
                 .forge({
                   name: role,
@@ -72,99 +72,105 @@ module.exports = strapi => {
                   type: role
                 })
                 .save()
-                .then(r => {
+                .then(async function rRoles(r) {
                   const _role = r.toJSON();
+                  console.log("role " + _role.name + " added!!!")
                   // addPermissionsToGivenRole(role, _role.id);
                 })
                 .catch(error => {
                   console.log(error);
                 });
             }
-          })
-          .catch(failed => {
-            console.log({ failed });
-          });
-      });
+            const modules = _data.modules;
 
-      const modules = _data.modules;
-
-      Object.keys(modules).forEach(module => {
-        bookshelf
-          .model("module")
-          .fetchAll()
-          .then(async function getAllModules(model) {
-            console.log("in---", module);
-            const response = model.toJSON();
-            console.log("res=+", response);
-            const isModulePresent = response.find(r => r.name === module);
-            if (!isModulePresent) {
-              console.log("fdsfsdf===");
-              const _roles = _allRoles.filter(
-                r => modules[module]["roles"].indexOf(r.name) > -1
-              );
-              // const _modules = _allModules.filter(
-              //   m => modules[module]["modules"].indexOf(m.name) > -1
-              // );
-              const _module = _allModules.find(
-                m => modules[module]["module"] === m.name
-              );
-              // var _modules_arr = _modules.map(value => value.id);
-              // var _roles_arr = _roles.map(value => value.id);
-              var roleModules = [];
-              // if (_module) {
-              //   roleModules = await getRoleModules(_roles_arr, _module.id);
-              //   console.log("rolmmm===", roleModules);
-              // }
-
-              // console.log("_modules", _modules_arr);
-              console.log("_module", _module);
-              console.log("_roles", _roles);
-
-              // Creating module
-              var moduleInsert = bookshelf
+            Object.keys(modules).forEach(module => {
+              bookshelf
                 .model("module")
-                .forge({
-                  name: module,
-                  is_active: modules[module]["is_active"],
-                  slug: modules[module]["slug"],
-                  icon_class: modules[module]["icon_class"],
-                  url: modules[module]["url"],
-                  displayNavigation: modules[module]["displayNavigation"],
-                  // roles: _roles_arr,
-                  module: _module ? _module.id : null
-                })
-                .save()
-                .then(m => {
-                  const moduleItem = m.toJSON();
-                  _roles.map(role => {
-                    bookshelf
-                      .model("roleModule")
+                .fetchAll()
+                .then(async function getAllModules(model) {
+                  console.log("in---", module);
+                  const response = model.toJSON();
+                  console.log("res=+", response);
+                  const isModulePresent = response.find(r => r.slug === modules[module]["slug"]);
+                  if (!isModulePresent) {
+                    console.log("fdsfsdf===");
+                    const _roles = _allRoles.filter(
+                      r => modules[module]["roles"].indexOf(r.name) > -1
+                    );
+                    // const _modules = _allModules.filter(
+                    //   m => modules[module]["modules"].indexOf(m.name) > -1
+                    // );
+                    const _module = _allModules.find(
+                      m => modules[module]["module"] === m.name
+                    );
+                    // var _modules_arr = _modules.map(value => value.id);
+                    // var _roles_arr = _roles.map(value => value.id);
+                    var roleModules = [];
+                    // if (_module) {
+                    //   roleModules = await getRoleModules(_roles_arr, _module.id);
+                    //   console.log("rolmmm===", roleModules);
+                    // }
+
+                    // console.log("_modules", _modules_arr);
+                    console.log("_module", _module);
+                    console.log("_roles", _roles);
+
+                    // Creating module
+                    var moduleInsert = bookshelf
+                      .model("module")
                       .forge({
-                        role_id: role.id,
-                        module_id: moduleItem.id
+                        name: module,
+                        is_active: modules[module]["is_active"],
+                        slug: modules[module]["slug"],
+                        icon_class: modules[module]["icon_class"],
+                        url: modules[module]["url"],
+                        displayNavigation: modules[module]["displayNavigation"],
+                        // roles: _roles_arr,
+                        module: _module ? _module.id : null
                       })
                       .save()
+                      .then(m => {
+                        const moduleItem = m.toJSON();
+                        _roles.map(role => {
+                          bookshelf
+                            .model("roleModule")
+                            .forge({
+                              role_id: role.id,
+                              module_id: moduleItem.id
+                            })
+                            .save().then(rr => {
+                              console.log("module " + moduleItem.name + " added!!!")
+                            })
+                            .catch(error => {
+                              console.log(error);
+                            });
+                        });
+                      })
                       .catch(error => {
                         console.log(error);
                       });
-                  });
+
+                    // console.log("moduleInsert==", moduleInsert);
+
+
+                    // if(roleModules.length<=0){
+
+                    // }
+                  }
                 })
-                .catch(error => {
-                  console.log(error);
+                .catch(failed => {
+                  console.log({ failed });
                 });
+            });
 
-              console.log("moduleInsert==", moduleInsert);
-
-              // if(roleModules.length<=0){
-
-              // }
-            }
           })
           .catch(failed => {
             console.log({ failed });
           });
       });
-      console.log("loaded---------");
+
+
+
       // await someAsyncCode()
       // this().defaults['your_config'] to access to your configs.
     }
