@@ -15,6 +15,7 @@ import NotFoundPage from "./containers/NotFoundPage/NotFoundPage";
 import AuthPage from "./containers/AuthPage/AuthPage";
 import Villages from "./containers/Villages/Villages";
 import villagePage from "./containers/Villages/VillagePage";
+import Shgs from "./containers/Shgs/Shgs";
 
 function Routes() {
   return (
@@ -30,6 +31,9 @@ function Routes() {
               exact
             />
             <PrivateRoute path="/villages" component={Villages} exact />
+            <PrivateRoute path="/Shgs" component={Shgs} exact />
+
+
 
 
             <Route path="/404" component={NotFoundPage} />
