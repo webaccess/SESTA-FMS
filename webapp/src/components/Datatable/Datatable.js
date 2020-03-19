@@ -213,8 +213,8 @@ const Table = props => {
             />
           </div>
         ) : (
-          <p></p>
-        )}
+            <p></p>
+          )}
         <Card>
           <DataTable
             data={filteredData}
@@ -236,10 +236,10 @@ const Table = props => {
               props.noDataComponent ? (
                 props.noDataComponent
               ) : (
-                <p>
-                  There are no records to display in <b>{props.title}</b>
-                </p>
-              )
+                  <p>
+                    There are no records to display in <b>{props.title}</b>
+                  </p>
+                )
             }
             noHeader={selected.length === 0 || selected.length < 2}
           />
@@ -259,17 +259,8 @@ const Table = props => {
             displaySave: { display: "true" }
           }}
         >
-          {selectedRows.length > 1 ? (
-            <p>
-              {" "}
-              Do you want to delete selected <b>{props.title}</b>
-            </p>
-          ) : (
-            <p>
-              {" "}
-              {props.DeleteMessage} <b>{dataName}</b> ?
-            </p>
-          )}
+          {selectedRows.length > 1 ? (<p>{" "}Do you want to delete selected <b>{props.title}</b></p>)
+            : (<p>{" "}{props.DeleteMessage} <b>{dataName}</b> ?</p>)}
         </Modal>
       </div>
     </>
