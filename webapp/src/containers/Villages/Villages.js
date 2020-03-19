@@ -180,7 +180,8 @@ export class villages extends React.Component {
     this.props.history.push("/villages/edit/" + cellid);
   };
   DeleteData = cellid => {
-    if (cellid.length!==0) {
+    if (cellid.length !== 0) {
+      this.setState({ singleDelete: "", multipleDelete: "" });
       axios
         .delete(process.env.REACT_APP_SERVER_URL + "villages/" + cellid, {
           headers: {
@@ -199,6 +200,7 @@ export class villages extends React.Component {
     }
   };
   DeleteAll = selectedId => {
+    this.setState({ singleDelete: "", multipleDelete: "" });
     for (let i in selectedId) {
       axios
         .delete(
@@ -324,9 +326,11 @@ export class villages extends React.Component {
                 Village edited successfully.
               </Snackbar>
             ) : null}
-            {this.state.singleDelete !== false && this.state.singleDelete !== '' && this.state.singleDelete? (
+            {this.state.singleDelete !== false &&
+            this.state.singleDelete !== "" &&
+            this.state.singleDelete ? (
               <Snackbar severity="success" Showbutton={false}>
-               Village {this.state.singleDelete} deleted successfully!
+                Village {this.state.singleDelete} deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.singleDelete === false ? (
@@ -334,9 +338,9 @@ export class villages extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            {this.state.multipleDelete === true? (
+            {this.state.multipleDelete === true ? (
               <Snackbar severity="success" Showbutton={false}>
-               Villages deleted successfully!
+                Villages deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.multipleDelete === false ? (
