@@ -179,8 +179,8 @@ export class Shgs extends React.Component {
     this.props.history.push("/shgs/edit/" + cellid);
   };
 
-  DeleteData = cellid => {
-    if (cellid.length !== 0) {
+  DeleteData =(cellid, selectedId)  => {
+    if (cellid.length !== null && selectedId < 1) {
       console.log("delete", cellid);
       this.setState({ singleDelete: "", multipleDelete: "" });
 
@@ -202,8 +202,8 @@ export class Shgs extends React.Component {
     }
   };
   DeleteAll = selectedId => {
-    console.log("delete all",selectedId);
-    this.setState({ multipleDelete: "", singleDelete: "" });
+    if (selectedId.length !== 0) {
+      this.setState({ singleDelete: "", multipleDelete: "" });
     for (let i in selectedId) {
       axios
         .delete(process.env.REACT_APP_SERVER_URL + "shgs/" + selectedId[i], {
@@ -222,6 +222,7 @@ export class Shgs extends React.Component {
           console.log("err", error);
         });
     }
+  }
   };
   cancelForm = () => {
     this.setState({
