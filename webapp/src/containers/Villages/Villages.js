@@ -277,11 +277,6 @@ export class villages extends React.Component {
     let data = this.state.data;
     const Usercolumns = [
       {
-        name: "id",
-        selector: "id",
-        sortable: true
-      },
-      {
         name: "Village Name",
         selector: "name",
         sortable: true
