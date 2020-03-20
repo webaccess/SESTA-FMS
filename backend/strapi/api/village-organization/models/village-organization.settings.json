@@ -1,4 +1,6 @@
 {
+  "connection": "default",
+  "collectionName": "village_organizations",
   "info": {
     "name": "village organization"
   },
@@ -18,10 +20,8 @@
       "type": "string"
     },
     "shgs": {
-      "collection": "shg",
-      "via": "village_organization"
+      "via": "village_organization",
+      "collection": "shg"
     }
-  },
-  "connection": "default",
-  "collectionName": "village_organizations"
+  }
 }

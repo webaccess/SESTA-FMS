@@ -20,8 +20,8 @@
       "type": "string"
     },
     "villages": {
-      "via": "shgs",
-      "collection": "village"
+      "collection": "village",
+      "via": "shgs"
     },
     "state": {
       "model": "state"
@@ -30,11 +30,12 @@
       "model": "district"
     },
     "bank_detail": {
-      "model": "bank-detail"
+      "model": "bank-detail",
+      "via": "shg"
     },
     "village_organization": {
-      "via": "shgs",
-      "model": "village-organization"
+      "model": "village-organization",
+      "via": "shgs"
     }
   }
 }

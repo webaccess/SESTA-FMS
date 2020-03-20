@@ -28,6 +28,10 @@
     "ifsc_code": {
       "type": "string",
       "required": true
+    },
+    "shg": {
+      "via": "bank_detail",
+      "model": "shg"
     }
   }
 }
