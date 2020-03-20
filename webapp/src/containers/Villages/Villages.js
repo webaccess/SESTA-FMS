@@ -67,6 +67,7 @@ export class villages extends React.Component {
       getDistrict: [],
       getVillage: [],
       isCancel: false,
+      dataCellId: [],
       singleDelete: "",
       multipleDelete: ""
     };
@@ -167,7 +168,6 @@ export class villages extends React.Component {
     }
   }
   handleVillageChange(event, value, target) {
-    // console.log("hjsdsjhfdsjhsfdjhdfss", event.target.value)
     this.setState({
       values: { ...this.state.values, [event.target.name]: event.target.value }
     });
@@ -175,8 +175,9 @@ export class villages extends React.Component {
   editData = cellid => {
     this.props.history.push("/villages/edit/" + cellid);
   };
-  DeleteData = cellid => {
-    if (cellid.length !== 0) {
+
+  DeleteData = (cellid, selectedId) => {
+    if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       axios
         .delete(process.env.REACT_APP_SERVER_URL + "villages/" + cellid, {
@@ -185,8 +186,8 @@ export class villages extends React.Component {
           }
         })
         .then(res => {
-          console.log("deleted data res", res.data);
           this.setState({ singleDelete: res.data.name });
+          this.setState({ dataCellId: "" });
           this.componentDidMount();
         })
         .catch(error => {
@@ -194,29 +195,31 @@ export class villages extends React.Component {
           console.log(error);
         });
     }
+    // }
+
   };
   DeleteAll = selectedId => {
-    this.setState({ singleDelete: "", multipleDelete: "" });
-    for (let i in selectedId) {
-      axios
-        .delete(
-          process.env.REACT_APP_SERVER_URL + "villages/" + selectedId[i],
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
+    if (selectedId.length !== 0) {
+      this.setState({ singleDelete: "", multipleDelete: "" });
+      for (let i in selectedId) {
+        axios
+          .delete(
+            process.env.REACT_APP_SERVER_URL + "villages/" + selectedId[i],
+            {
+              headers: {
+                Authorization: "Bearer " + auth.getToken() + ""
+              }
             }
-          }
-        )
-        .then(res => {
-          console.log("deleted data res", res.data);
-          this.setState({ multipleDelete: true });
-          this.componentDidMount();
-        })
-        .catch(error => {
-          this.setState({ multipleDelete: false });
-
-          console.log("err", error);
-        });
+          )
+          .then(res => {
+            this.setState({ multipleDelete: true });
+            this.componentDidMount();
+          })
+          .catch(error => {
+            this.setState({ multipleDelete: false });
+            console.log("err", error);
+          });
+      }
     }
   };
 
@@ -273,6 +276,11 @@ export class villages extends React.Component {
   render() {
     let data = this.state.data;
     const Usercolumns = [
+      {
+        name: "id",
+        selector: "id",
+        sortable: true
+      },
       {
         name: "Village Name",
         selector: "name",
