@@ -21,10 +21,6 @@
     "icon_class": {
       "type": "string"
     },
-    "user_roles": {
-      "collection": "user-role",
-      "via": "modules"
-    },
     "modules": {
       "collection": "module",
       "via": "module"

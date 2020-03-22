@@ -2,13 +2,9 @@ const fs = require("fs");
 const path = require("path");
 const _data = require("./data.js");
 const bookshelf = require("../../config/config.js");
-// const minimist = require("minimist");
-// const args = minimist(process.argv.slice(2));
-// console.log("args", args);
-// const _skip = args["roles"].length > 0;
-// const skip = new RegExp(args["roles"].join("|"), "i");
+var Promise = require("bluebird");
+const apiFolder = "./api/";
 
-// console.log("skip---" + (args["_"].indexOf("roles") > -1));
 async function allRoles() {
   return await bookshelf
     .model("role")
@@ -26,15 +22,40 @@ async function allModules() {
 async function getRoleModules(roles, module) {
   return await bookshelf
     .model("roleModule")
-    .query(function (qb) {
+    .query(function(qb) {
       qb.where("role_id", "in", roles).andWhere("module_id", "=", module);
     })
     .fetchAll()
     .then(res => res.toJSON());
 }
 
+function addPermissionsToGivenRole(role, id) {
+  /**
+   * Creating permissions WRT to controllers and mapping to created role
+   */
+  Object.keys(role.permissions || {}).forEach(type => {
+    Object.keys(role.permissions[type].controllers).forEach(controller => {
+      console.log(`Adding permission for ${controller} for role ${role.name}`);
+      Object.keys(role.permissions[type].controllers[controller]).forEach(
+        action => {
+          bookshelf
+            .model("permission")
+            .forge({
+              role: id,
+              type: controller === "user" ? "users-permissions" : type,
+              controller: controller,
+              action: action.toLowerCase(),
+              ...role.permissions[type].controllers[controller][action]
+            })
+            .save();
+        }
+      );
+    });
+    console.log("\n");
+  });
+}
+
 module.exports = strapi => {
-  // console.log(strapi);
   const hook = {
     /**
      * Default options
@@ -49,130 +70,205 @@ module.exports = strapi => {
      */
 
     async initialize() {
-      const roles = _data.roles;
-      var _allRoles = await allRoles();
-      var _allModules = await allModules();
-      console.log("allroles", _allRoles);
-      Object.keys(roles).forEach(async function getRoles(role) {
-        console.log("role", role);
-        // console.log(bookshelf);
-        await bookshelf
-          .model("role")
-          .fetchAll()
-          .then(async function saveRole(model) {
-            const response = model.toJSON();
-            const isRolePresent = response.find(r => r.name === role);
-            if (!isRolePresent) {
-              // Creating role
-              await bookshelf
-                .model("role")
-                .forge({
-                  name: role,
-                  description: roles[role]["data"]["description"],
-                  type: role
-                })
-                .save()
-                .then(async function rRoles(r) {
-                  const _role = r.toJSON();
-                  console.log("role " + _role.name + " added!!!")
-                  // addPermissionsToGivenRole(role, _role.id);
-                })
-                .catch(error => {
-                  console.log(error);
-                });
-            }
-            const modules = _data.modules;
-
-            Object.keys(modules).forEach(module => {
-              bookshelf
-                .model("module")
-                .fetchAll()
-                .then(async function getAllModules(model) {
-                  console.log("in---", module);
-                  const response = model.toJSON();
-                  console.log("res=+", response);
-                  const isModulePresent = response.find(r => r.slug === modules[module]["slug"]);
-                  if (!isModulePresent) {
-                    console.log("fdsfsdf===");
-                    const _roles = _allRoles.filter(
-                      r => modules[module]["roles"].indexOf(r.name) > -1
-                    );
-                    // const _modules = _allModules.filter(
-                    //   m => modules[module]["modules"].indexOf(m.name) > -1
-                    // );
-                    const _module = _allModules.find(
-                      m => modules[module]["module"] === m.name
-                    );
-                    // var _modules_arr = _modules.map(value => value.id);
-                    // var _roles_arr = _roles.map(value => value.id);
-                    var roleModules = [];
-                    // if (_module) {
-                    //   roleModules = await getRoleModules(_roles_arr, _module.id);
-                    //   console.log("rolmmm===", roleModules);
-                    // }
-
-                    // console.log("_modules", _modules_arr);
-                    console.log("_module", _module);
-                    console.log("_roles", _roles);
-
-                    // Creating module
-                    var moduleInsert = bookshelf
-                      .model("module")
-                      .forge({
-                        name: module,
-                        is_active: modules[module]["is_active"],
-                        slug: modules[module]["slug"],
-                        icon_class: modules[module]["icon_class"],
-                        url: modules[module]["url"],
-                        displayNavigation: modules[module]["displayNavigation"],
-                        // roles: _roles_arr,
-                        module: _module ? _module.id : null
-                      })
-                      .save()
-                      .then(m => {
-                        const moduleItem = m.toJSON();
-                        _roles.map(role => {
-                          bookshelf
-                            .model("roleModule")
-                            .forge({
-                              role_id: role.id,
-                              module_id: moduleItem.id
-                            })
-                            .save().then(rr => {
-                              console.log("module " + moduleItem.name + " added!!!")
-                            })
-                            .catch(error => {
-                              console.log(error);
-                            });
-                        });
-                      })
-                      .catch(error => {
-                        console.log(error);
-                      });
-
-                    // console.log("moduleInsert==", moduleInsert);
-
-
-                    // if(roleModules.length<=0){
-
-                    // }
-                  }
-                })
-                .catch(failed => {
-                  console.log({ failed });
-                });
-            });
-
-          })
-          .catch(failed => {
-            console.log({ failed });
-          });
+      let controllerActionWithoutUser = fs
+        .readdirSync(apiFolder, { withFileTypes: true })
+        .filter(api => api.isDirectory())
+        .reduce((acc, folder) => {
+          const { name } = folder;
+          const raw = fs.readFileSync(`./api/${name}/config/routes.json`);
+          const route = JSON.parse(raw);
+          const actionObj = route.routes.reduce((result, r) => {
+            const action = r.handler.split(".")[1].toLowerCase();
+            result[action] = { enabled: false };
+            return result;
+          }, {});
+          acc[name] = actionObj;
+          return acc;
+        }, {});
+      const allControllerActions = Object.assign(controllerActionWithoutUser, {
+        user: {
+          find: { enabled: false },
+          count: { enabled: false },
+          findone: { enabled: false },
+          create: { enabled: false },
+          update: { enabled: false },
+          destroy: { enabled: false },
+          me: { enabled: false }
+        }
       });
 
+      const roles = _data.roles;
 
+      var _allModules = await allModules();
 
-      // await someAsyncCode()
-      // this().defaults['your_config'] to access to your configs.
+      const _roleRequestData = Object.keys(roles).map(r => {
+        const { controllers, grantAllPermissions, content } = roles[r];
+        const updatedController = controllers.reduce((result, controller) => {
+          const { name, action } = controller;
+          if (grantAllPermissions) {
+            const controllerWithAction = allControllerActions[name];
+            const updatedActions = Object.keys(controllerWithAction).reduce(
+              (acc, a) => {
+                acc[a] = { enabled: true };
+                return acc;
+              },
+              {}
+            );
+            result[name] = updatedActions;
+            return result;
+          } else {
+            const controllerWithAction = allControllerActions[name];
+            let updatedActions;
+            if (action.length) {
+              const regex = new RegExp(action.join("|"), "i");
+              updatedActions = Object.keys(controllerWithAction).reduce(
+                (acc, a) => {
+                  acc[a] = { enabled: regex.test(a) };
+                  return acc;
+                },
+                {}
+              );
+            } else {
+              updatedActions = Object.keys(controllerWithAction).reduce(
+                (acc, a) => {
+                  acc[a] = { enabled: false };
+                  return acc;
+                },
+                {}
+              );
+            }
+            result[name] = updatedActions;
+            return result;
+          }
+        }, {});
+        return {
+          name: r,
+          description: content.description ? content.description : r,
+          permissions: {
+            application: {
+              controllers: updatedController
+            }
+          }
+        };
+      });
+
+      var promise = new Promise(function(resolve, reject) {
+        _roleRequestData.forEach(role => {
+          bookshelf
+            .model("role")
+            .fetchAll()
+            .then(model => {
+              const response = model.toJSON();
+              const isRolePresent = response.find(r => r.name === role.name);
+
+              if (!isRolePresent) {
+                // Creating role
+                bookshelf
+                  .model("role")
+                  .forge({
+                    name: role.name,
+                    description: role.description,
+                    type: role.name
+                  })
+                  .save()
+                  .then(async function rRoles(r) {
+                    const _role = r.toJSON();
+                    console.log("role " + _role.name + " added!!!");
+                    addPermissionsToGivenRole(role, _role.id);
+                    resolve();
+                  })
+                  .catch(error => {
+                    reject(error);
+                  });
+              } else {
+                bookshelf
+                  .model("permission")
+                  .where({ role: isRolePresent.id })
+                  .destroy()
+                  .then(async function rRole() {
+                    console.log(
+                      `Deleting existing permissions for role ${isRolePresent.name}\nAdding new permissions\n`
+                    );
+                    addPermissionsToGivenRole(role, isRolePresent.id);
+                    resolve();
+                  })
+                  .catch(error => {
+                    reject(error);
+                  });
+              }
+            })
+            .catch(failed => {
+              reject({ failed });
+            });
+        });
+      });
+
+      const modules = _data.modules;
+
+      promise.then(async function() {
+        var _allRoles = await allRoles();
+        Object.keys(modules).forEach(module => {
+          bookshelf
+            .model("module")
+            .fetchAll()
+            .then(async function getAllModules(model) {
+              const response = model.toJSON();
+              const isModulePresent = response.find(
+                r => r.slug === modules[module]["slug"]
+              );
+              if (!isModulePresent) {
+                const _roles = _allRoles.filter(
+                  r => modules[module]["roles"].indexOf(r.name) > -1
+                );
+                const _module = _allModules.find(
+                  m => modules[module]["module"] === m.name
+                );
+                var roleModules = [];
+
+                // Creating module
+                bookshelf
+                  .model("module")
+                  .forge({
+                    name: module,
+                    is_active: modules[module]["is_active"],
+                    slug: modules[module]["slug"],
+                    icon_class: modules[module]["icon_class"],
+                    url: modules[module]["url"],
+                    displayNavigation: modules[module]["displayNavigation"],
+                    module: _module ? _module.id : null
+                  })
+                  .save()
+                  .then(m => {
+                    const moduleItem = m.toJSON();
+                    _roles.map(role => {
+                      //linking roles to modules
+                      bookshelf
+                        .model("roleModule")
+                        .forge({
+                          role_id: role.id,
+                          module_id: moduleItem.id
+                        })
+                        .save()
+                        .then(rr => {
+                          console.log(
+                            "module " + moduleItem.name + " added!!!"
+                          );
+                        })
+                        .catch(error => {
+                          console.log(error);
+                        });
+                    });
+                  })
+                  .catch(error => {
+                    console.log(error);
+                  });
+              }
+            })
+            .catch(failed => {
+              reject({ failed });
+            });
+        });
+      });
     }
   };
 

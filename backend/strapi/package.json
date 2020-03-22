@@ -11,6 +11,7 @@
   },
   "devDependencies": {},
   "dependencies": {
+    "bluebird": "^3.7.2",
     "bookshelf": "^1.1.0",
     "knex": "<0.20.0",
     "pg": "latest",
