@@ -48,6 +48,7 @@ export class Shgs extends React.Component {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
+      filterShg:'',
       Result: [],
       TestData: [],
       data: [],
@@ -135,6 +136,9 @@ export class Shgs extends React.Component {
       console.log("state null", this.state.filterState);
     }
   };
+  handleChange(event){
+    this.setState({filterShg:event.target.value})
+  }
 
   handleDistrictChange(event, value) {
     if (value !== null) {
@@ -179,7 +183,7 @@ export class Shgs extends React.Component {
     this.props.history.push("/shgs/edit/" + cellid);
   };
 
-  DeleteData =(cellid, selectedId)  => {
+  DeleteData = (cellid, selectedId) => {
     if (cellid.length !== null && selectedId < 1) {
       console.log("delete", cellid);
       this.setState({ singleDelete: "", multipleDelete: "" });
@@ -204,31 +208,32 @@ export class Shgs extends React.Component {
   DeleteAll = selectedId => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-    for (let i in selectedId) {
-      axios
-        .delete(process.env.REACT_APP_SERVER_URL + "shgs/" + selectedId[i], {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
-        })
-        .then(res => {
-          console.log("deleted data res", res.data);
-          this.setState({ multipleDelete: true });
-          this.componentDidMount();
-        })
-        .catch(error => {
-          this.setState({ multipleDelete: false });
+      for (let i in selectedId) {
+        axios
+          .delete(process.env.REACT_APP_SERVER_URL + "shgs/" + selectedId[i], {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + ""
+            }
+          })
+          .then(res => {
+            console.log("deleted data res", res.data);
+            this.setState({ multipleDelete: true });
+            this.componentDidMount();
+          })
+          .catch(error => {
+            this.setState({ multipleDelete: false });
 
-          console.log("err", error);
-        });
+            console.log("err", error);
+          });
+      }
     }
-  }
   };
   cancelForm = () => {
     this.setState({
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
+      filterShg:'',
 
       isCancel: true
     });
@@ -238,6 +243,9 @@ export class Shgs extends React.Component {
   handleSearch() {
     console.log("kkk", this.state);
     let searchData = "";
+    if (this.state.filterShg){
+      searchData += "name_contains=" + this.state.filterShg + "&&";
+    }
     if (this.state.filterState) {
       searchData += "state.id=" + this.state.filterState + "&&";
     }
@@ -308,7 +316,7 @@ export class Shgs extends React.Component {
     return (
       <Layout>
         <div className="App">
-          <h1 className={style.title}>Shgs</h1>
+          <h1 className={style.title}>Manage Self Help Group</h1>
           <div className={classes.row}>
             <div className={style.addButton}>
               <Button
@@ -351,6 +359,22 @@ export class Shgs extends React.Component {
 
           <br></br>
           <div className={classes.row}>
+            <div className={classes.searchInput}>
+              <div className={style.Districts}>
+                <Grid item md={12} xs={12}>
+                  <Input
+                    fullWidth
+                    label="SHG Name"
+                    name="filterShg"
+                    id="combo-box-demo"
+                    margin="dense"
+                    value={this.state.filterShg || ""}
+                    onChange={this.handleChange.bind(this)}
+                    variant="outlined"
+                  />
+                </Grid>
+              </div>
+            </div>
             <div className={classes.searchInput}>
               <div className={style.Districts}>
                 <Grid item md={12} xs={12}>
@@ -460,13 +484,13 @@ export class Shgs extends React.Component {
               </div>
             </div>
             <br></br>
-            <Button onClick={this.handleSearch.bind(this)}>Save</Button>
+            <Button onClick={this.handleSearch.bind(this)}>Search</Button>
             &nbsp;&nbsp;&nbsp;&nbsp;
             <Button color="default" clicked={this.cancelForm}>
               cancel
             </Button>
           </div>
-          {data.length ? (
+          {data ? (
             <Table
               title={"Shgs"}
               filterData={true}
@@ -481,14 +505,10 @@ export class Shgs extends React.Component {
               modalHandle={this.modalHandle}
               columnsvalue={columnsvalue}
               DeleteMessage={"Are you Sure you want to Delete"}
-              noDataComponent={true}
+              noDataComponent={false}
             />
           ) : (
-            <div className={style.Progess}>
-              <center>
-                <Spinner />
-              </center>
-            </div>
+            <h1>Loading...</h1>
           )}
         </div>
       </Layout>
