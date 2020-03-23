@@ -293,7 +293,7 @@ class Vo extends Component {
                     fullWidth
                     label="Select FPO"
                     margin="dense"
-                    name="addFpo"
+                    name="addFpo"n
                     onChange={this.handleStateChange}
                     select
                     value={this.state.values.addFpo || ""}

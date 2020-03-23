@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import Spinner from "../../components/Spinner";
 import auth from "../../components/Auth/Auth.js";
 import Input from "../../components/UI/Input/Input";
+import AutoSuggest from "../../components/UI/Autosuggest/Autosuggest";
 import { Grid } from "@material-ui/core";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autocomplete from "@material-ui/lab/Autocomplete";
@@ -68,16 +69,37 @@ export class VillageList extends React.Component {
       open: false,
       columnsvalue: [],
       DeleteData: false,
-      isCancel: false,
       properties: props,
       getState: [],
       getDistrict: [],
       getVillage: [],
+      getShgs: [],
+      selectedShg: [],
+      isCancel: false,
       singleDelete: "",
       multipleDelete: ""
     };
+    const suggestions = [
+      { label: "Afghanistan" },
+      { label: "Aland Islands" },
+      { label: "Albania" },
+      { label: "Algeria" }
+    ];
+
     let history = props;
   }
+  // Imagine you have a list of languages that you'd like to autosuggest.
+
+  languages = [
+    {
+      name: "C",
+      year: 1972
+    },
+    {
+      name: "Elm",
+      year: 2012
+    }
+  ];
   async componentDidMount() {
     await axios
       .get(
@@ -106,12 +128,27 @@ export class VillageList extends React.Component {
       .catch(error => {
         console.log(error);
       });
+    await axios
+      .get(process.env.REACT_APP_SERVER_URL + "shgs/", {
+        headers: {
+          Authorization: "Bearer " + auth.getToken() + ""
+        }
+      })
+      .then(res => {
+        this.setState({ getShgs: res.data });
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
   handleChange = (event, value) => {
     console.log("event", event, "value", value);
   };
-  handleStateChange = async (event, value) => {
-    console.log("Inside state");
+  handleStateChange = async (event, value, method) => {
+    console.log("event", method);
+    const shouldUpdateSelectedValue =
+      event === "type" || event === "enter" || event === "click";
+    console.log("Inside state", shouldUpdateSelectedValue);
     if (value !== null) {
       this.setState({ filterState: value.id });
 
@@ -189,27 +226,31 @@ export class VillageList extends React.Component {
   };
 
   DeleteData = cellid => {
-    axios
-      .delete(
-        process.env.REACT_APP_SERVER_URL + "village-organizations/" + cellid,
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
+    if (cellid.length) {
+      axios
+        .delete(
+          process.env.REACT_APP_SERVER_URL + "village-organizations/" + cellid,
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + ""
+            }
           }
-        }
-      )
-      .then(res => {
-        this.setState({ singleDelete: res.data.name });
-        this.setState({ multipleDelete: false });
-        this.componentDidMount();
-      })
-      .catch(error => {
-        this.setState({ singleDelete: false });
-        this.setState({ multipleDelete: false });
-        console.log(error.response);
-      });
+        )
+        .then(res => {
+          this.setState({ singleDelete: res.data.name });
+          this.setState({ multipleDelete: false });
+          this.componentDidMount();
+        })
+        .catch(error => {
+          this.setState({ singleDelete: false });
+          this.setState({ multipleDelete: false });
+          console.log(error.response);
+        });
+    }
   };
   DeleteAll = selectedId => {
+    this.setState({ multipleDelete: "" });
+    this.setState({ multipleDelete: "" });
     for (let i in selectedId) {
       axios
         .delete(
@@ -257,6 +298,7 @@ export class VillageList extends React.Component {
       searchData += "shgs.villages=" + this.state.filterVillage;
     }
 
+    console.log("shgValue in search", this.state.selectedShg);
     //api call after search filter
     axios
       .get(
@@ -271,34 +313,61 @@ export class VillageList extends React.Component {
       )
       .then(res => {
         console.log("api 222222", res.data);
-        // if (res.data.length) {
         this.setState({ data: res.data });
         console.log("data after search", this.state.data);
-        // }
-        // else {
-        //   this.setState({
-        //     data: {
-        //       name: "no data",
-        //       state: { name: "no data" },
-        //       district: { name: "no data" },
-        //       villages: "no data"
-        //     }
-        //   });
-        // }
       })
       .catch(err => {
         console.log("err", err);
       });
+    if (this.state.selectedShg) {
+      // searchData += "=" + this.state.selectedShg;
+      axios
+        .get(
+          process.env.REACT_APP_SERVER_URL +
+            "shgs/?id=" +
+            this.state.selectedShg["id"],
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + ""
+            }
+          }
+        )
+        .then(res => {
+          this.setState({ data: res.data });
+          // console.log("api vo", res.data);
+          console.log(
+            "data after search",
+            this.state.data[0]["village_organization"]["name"]
+          );
+        })
+        .catch(err => {
+          console.log("err", err);
+        });
+    }
   }
-  setData(val) {}
+  // onHandleChange(event, value) {
+  //   console.log("--------------------");
+  //   console.log("event", event, "value", value);
+  // }
+  onHandleChange = shgValue => {
+    console.log("selectedShg shgValue", shgValue);
+    this.setState({ selectedShg: shgValue });
+    console.log("selectedShg", this.state.selectedShg["id"]);
+  };
 
   render() {
     let data = this.state.data;
     console.log("data", data);
-    // let data = [];
     if (data.length !== 0) {
     }
-
+    if (this.state.selectedShg) {
+      const Usercolumns = [
+        {
+          name: "Village Organization Name",
+          selector: "village-organizations.name"
+        }
+      ];
+    }
     const Usercolumns = [
       {
         name: "Village Organization Name",
@@ -320,13 +389,15 @@ export class VillageList extends React.Component {
     let villagesFilter = this.state.getVillage;
     let filterVillage = this.state.filterVillage;
     console.log("State in render", this.state);
+    console.log("this.languages", this.languages);
+
     return (
       <Layout>
         <Grid>
           <div className="App">
             <h1 className={style.title}>Village organizations</h1>
             <div className={classes.row}>
-              <div className={style.buttonRow}>
+              <div className={classes.buttonRow}>
                 <Button
                   color="primary"
                   variant="contained"
@@ -400,7 +471,6 @@ export class VillageList extends React.Component {
                           {...params}
                           fullWidth
                           label="Select State"
-                          margin="dense"
                           name="addState"
                           variant="outlined"
                         />
@@ -445,7 +515,6 @@ export class VillageList extends React.Component {
                           {...params}
                           fullWidth
                           label="Select District"
-                          margin="dense"
                           name="filterDistrict"
                           variant="outlined"
                         />
@@ -481,7 +550,6 @@ export class VillageList extends React.Component {
                           {...params}
                           fullWidth
                           label="Select Village"
-                          margin="dense"
                           value={filterVillage}
                           name="filterVillage"
                           variant="outlined"
@@ -490,6 +558,13 @@ export class VillageList extends React.Component {
                     />
                   </Grid>
                 </div>
+              </div>
+              <div>
+                {/* <Autosuggest /> */}
+                <AutoSuggest
+                  data={this.state.getShgs}
+                  onSelectShg={this.onHandleChange}
+                />
               </div>
               <br></br>
               <Button
@@ -500,15 +575,19 @@ export class VillageList extends React.Component {
                 Search
               </Button>
               &nbsp;&nbsp;&nbsp;
-              {/* <Button color="default" clicked={this.cancelForm}>
+              <Button
+                color="default"
+                variant="contained"
+                clicked={this.cancelForm}
+              >
                 cancel
-              </Button> */}
+              </Button>
             </div>
             {data ? (
               <Table
                 title={"Village Organizations"}
                 filterData={true}
-                showSearch={true}
+                showSearch={false}
                 Searchplaceholder={"Search by Village Organization Name"}
                 filterBy={["name"]}
                 data={data}
@@ -522,11 +601,7 @@ export class VillageList extends React.Component {
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (
-              <div className={style.Progess}>
-                <center>
-                  <Spinner />
-                </center>
-              </div>
+              <h1>Loading...</h1>
             )}
           </div>
         </Grid>
