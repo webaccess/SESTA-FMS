@@ -319,14 +319,14 @@ export class Shgs extends React.Component {
           <h1 className={style.title}>Manage Self Help Group</h1>
           <div className={classes.row}>
             <div className={style.addButton}>
-              <Button
+              {/* <Button
                 color="primary"
                 variant="contained"
                 component={Link}
                 to="/Shgs/add"
               >
                 Add SHG
-              </Button>
+              </Button> */}
             </div>
           </div>
           {this.props.location.addData ? (
