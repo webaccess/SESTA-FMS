@@ -30,14 +30,7 @@ function Routes() {
               component={villagePage}
               exact
             />
-            <PrivateRoute
-              path="/shgs/edit/:id"
-              component={ShgPage}
-              exact
-            />
             <PrivateRoute path="/villages" component={Villages} exact />
-            <PrivateRoute path="/shgspage" component={ShgPage} exact />
-            <PrivateRoute path="/shgspage/add" component={ShgPage} exact />
             <Route path="/404" component={NotFoundPage} />
             <AuthRoute path="/:authType/:id?" component={AuthPage} />
           </Switch>
