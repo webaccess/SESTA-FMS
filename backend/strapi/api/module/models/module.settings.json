@@ -21,10 +21,6 @@
     "icon_class": {
       "type": "string"
     },
-    "user_roles": {
-      "collection": "user-role",
-      "via": "modules"
-    },
     "modules": {
       "collection": "module",
       "via": "module"
@@ -40,12 +36,17 @@
     "slug": {
       "type": "string",
       "unique": true,
-      "required": true
+      "required": false
     },
     "displayNavigation": {
       "type": "boolean",
       "default": true,
-      "required": true
+      "required": false
+    },
+    "roles": {
+      "via": "modules",
+      "plugin": "users-permissions",
+      "collection": "role"
     }
   }
 }
