@@ -22,8 +22,8 @@ function Breadcrumbs(props) {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "modules?is_active=true&user_roles.id_in=" +
-            userInfo.user_role.id +
+            "modules?is_active=true&roles.id_in=" +
+            userInfo.role.id +
             "&slug_in=" +
             moduleStr,
           {
@@ -33,14 +33,6 @@ function Breadcrumbs(props) {
           }
         )
         .then(res => {
-          console.log(res.data);
-          // let moduleStatesArr = {};
-          // map(res.data, (module, key) => {
-          //   if (module.id in moduleStatesArr === false)
-          //     moduleStatesArr[module.id] = {};
-          //   moduleStatesArr[module.id] = { open: false };
-          // });
-          // if (mount) setModuleStates(moduleStatesArr);
           if (mount) setModules(res.data);
         });
     };
