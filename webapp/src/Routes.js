@@ -14,7 +14,6 @@ import Dashboard from "./containers/Dashboard/Dashboard";
 import NotFoundPage from "./containers/NotFoundPage/NotFoundPage";
 import AuthPage from "./containers/AuthPage/AuthPage";
 import Villages from "./containers/Villages/Villages";
-import ShgPage from "./containers/Shg/ShgPage"
 import villagePage from "./containers/Villages/VillagePage";
 
 function Routes() {
