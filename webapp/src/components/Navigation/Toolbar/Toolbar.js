@@ -32,7 +32,6 @@ function Toolbar(props) {
 
   const handleProfileMenuOpen = event => {
     setAnchorEl(event.currentTarget);
-    console.log("anchorEl==" + anchorEl);
   };
 
   const handleMenuClose = () => {

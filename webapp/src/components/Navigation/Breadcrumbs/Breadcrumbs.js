@@ -10,7 +10,6 @@ function Breadcrumbs(props) {
   const [modules, setModules] = React.useState([]);
 
   useEffect(() => {
-    console.log(auth.getToken());
     let userInfo = auth.getUserInfo();
     mount = true;
     const fetchData = async () => {
@@ -22,10 +21,10 @@ function Breadcrumbs(props) {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "modules?is_active=true&roles.id_in=" +
-            userInfo.role.id +
-            "&slug_in=" +
-            moduleStr,
+          "modules?is_active=true&roles.id_in=" +
+          userInfo.role.id +
+          "&slug_in=" +
+          moduleStr,
           {
             headers: {
               Authorization: "Bearer " + auth.getToken()
@@ -42,7 +41,6 @@ function Breadcrumbs(props) {
     };
   }, []);
 
-  console.log(props.modules);
   return (
     <BreadcrumbsElem aria-label="breadcrumb">
       {map(modules, (module, key) => {

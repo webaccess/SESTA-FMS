@@ -1,0 +1,33 @@
+{
+  "connection": "default",
+  "collectionName": "bank_details",
+  "info": {
+    "name": "bank detail"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "account_name": {
+      "type": "string",
+      "required": true
+    },
+    "account_no": {
+      "type": "string",
+      "required": true
+    },
+    "bank_name": {
+      "type": "string",
+      "required": true
+    },
+    "branch": {
+      "type": "string",
+      "required": true
+    },
+    "ifsc_code": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

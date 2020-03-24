@@ -1,0 +1,30 @@
+{
+  "connection": "default",
+  "collectionName": "villages",
+  "info": {
+    "name": "village"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "shgs": {
+      "collection": "shg",
+      "via": "villages",
+      "dominant": true
+    },
+    "district": {
+      "model": "district",
+      "via": "villages"
+    },
+    "state": {
+      "model": "state",
+      "via": "villages"
+    }
+  }
+}

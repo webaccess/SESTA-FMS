@@ -1,5 +1,7 @@
+.Hidden {
+  display: none;
+}
 
-  .Hidden {
-    display: none;
-  }
-
+/* .HiddenMobile {
+  display: none;
+} */

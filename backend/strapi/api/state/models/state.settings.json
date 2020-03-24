@@ -1,0 +1,28 @@
+{
+  "connection": "default",
+  "collectionName": "states",
+  "info": {
+    "name": "master state"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "master_districts": {
+      "collection": "district",
+      "via": "master_state"
+    },
+    "villages": {
+      "via": "state",
+      "collection": "village"
+    }
+  }
+}
