@@ -1,0 +1,32 @@
+{
+  "csp": {
+    "enabled": true,
+    "policy": ["block-all-mixed-content"]
+  },
+  "p3p": {
+    "enabled": false,
+    "value": ""
+  },
+  "hsts": {
+    "enabled": true,
+    "maxAge": 31536000,
+    "includeSubDomains": true
+  },
+  "xframe": {
+    "enabled": true,
+    "value": "SAMEORIGIN"
+  },
+  "xss": {
+    "enabled": true,
+    "mode": "block"
+  },
+  "cors": {
+    "origin": ["http://192.168.2.96:3000", "http://192.168.2.96:1337"],
+    "enabled": true
+  },
+  "ip": {
+    "enabled": false,
+    "whiteList": [],
+    "blackList": []
+  }
+}
