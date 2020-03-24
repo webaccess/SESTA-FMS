@@ -6,6 +6,7 @@ import AuthRoute from "./hoc/AuthRoute/AuthRoute";
 import Dashboard from "./containers/Dashboard/Dashboard";
 import NotFoundPage from "./containers/NotFoundPage/NotFoundPage";
 import AuthPage from "./containers/AuthPage/AuthPage";
+import Account from "./containers/Account/Account";
 
 function Routes() {
   return (
@@ -14,6 +15,7 @@ function Routes() {
         <div>
           <Switch>
             <PrivateRoute path="/" component={Dashboard} exact />
+            <PrivateRoute path="/my-account" component={Account} exact />
             <Route path="/404" component={NotFoundPage} />
             <AuthRoute path="/:authType/:id?" component={AuthPage} />
           </Switch>

@@ -5,6 +5,10 @@ const roles = {
     },
     controllers: [
       {
+        name: "user",
+        action: ["update"]
+      },
+      {
         name: "module",
         action: ["find", "count", "findone", "create", "update", "delete"]
       }
@@ -16,6 +20,10 @@ const roles = {
       description: "Sesta admin user"
     },
     controllers: [
+      {
+        name: "user",
+        action: ["update"]
+      },
       {
         name: "module",
         action: ["find", "count", "findone", "create", "update", "delete"]
@@ -29,6 +37,10 @@ const roles = {
     },
     controllers: [
       {
+        name: "user",
+        action: ["update"]
+      },
+      {
         name: "module",
         action: []
       }
@@ -40,6 +52,10 @@ const roles = {
       description: "Superadmin user"
     },
     controllers: [
+      {
+        name: "user",
+        action: ["update"]
+      },
       {
         name: "module",
         action: ["find", "count", "findone", "create", "update", "delete"]
