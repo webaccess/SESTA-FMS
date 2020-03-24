@@ -258,22 +258,30 @@ export class VillageList extends React.Component {
   };
   handleSearch() {
     let searchData = "";
+    if (
+      this.state.filterState ||
+      this.state.filterDistrict ||
+      this.state.filterDistrict
+    )
+      searchData = "?";
     if (this.state.filterState) {
-      searchData += "state=" + this.state.filterState + "&&";
+      searchData += "shgs.state=" + this.state.filterState;
     }
+
     if (this.state.filterDistrict) {
-      searchData += "shgs.district=" + this.state.filterDistrict + "&&";
+      searchData += searchData ? "&" : "";
+      searchData += "shgs.district=" + this.state.filterDistrict;
     }
+
     if (this.state.filterVillage) {
+      searchData += searchData ? "&" : "";
       searchData += "shgs.villages=" + this.state.filterVillage;
     }
 
     //api call after search filter
     axios
       .get(
-        process.env.REACT_APP_SERVER_URL +
-          "village-organizations?shgs." +
-          searchData,
+        process.env.REACT_APP_SERVER_URL + "village-organizations" + searchData,
         {
           headers: {
             Authorization: "Bearer " + auth.getToken() + ""

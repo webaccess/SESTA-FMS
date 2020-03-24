@@ -1,5 +1,12 @@
 import React from "react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import ReactDOM from "react-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  useLocation,
+  Route
+} from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import Aux from "./hoc/Auxiliary/Auxiliary.js";
 import PrivateRoute from "./hoc/PrivateRoute/PrivateRoute";
 import AuthRoute from "./hoc/AuthRoute/AuthRoute";
@@ -10,6 +17,7 @@ import Villages from "./containers/Villages/Villages";
 import villagePage from "./containers/Villages/VillagePage";
 import Vopage from "./containers/Vo/Vopage";
 import Vos from "./containers/Vo/Vos";
+import Account from "./containers/Account/Account";
 
 function Routes() {
   return (
@@ -37,6 +45,7 @@ function Routes() {
             <PrivateRoute path="/village-organizations" component={Vos} exact />
             <PrivateRoute path="/villages" component={Villages} exact />
 
+            <PrivateRoute path="/my-account" component={Account} exact />
             <Route path="/404" component={NotFoundPage} />
             <AuthRoute path="/:authType/:id?" component={AuthPage} />
           </Switch>

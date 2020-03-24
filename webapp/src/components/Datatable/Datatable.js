@@ -54,7 +54,6 @@ const Table = props => {
   const [selectedRows, setSelectedRows] = React.useState([]);
   const row = selectedRows.map(r => r.id);
   const [cellId, setcellId] = React.useState([]);
-  const [EditcellId, setEditcellId] = React.useState([]);
   const [cellName, setcellName] = React.useState([]);
   const handleChange = React.useCallback(state => {
     setSelectedRows(state.selectedRows);
@@ -74,24 +73,14 @@ const Table = props => {
     props.editData(event.target.id);
   };
 
-  const handleDeleteEvent = () => {
-    setisDeleteShowing(!isDeleteShowing);
-    props.DeleteData(DataID);
-  };
-
   const handleDeleteAllEvent = () => {
-    setisDeleteShowing(!isDeleteShowing);
-    props.DeleteAll(row);
-    props.DeleteData(DataID, setToggleCleared(!toggleCleared));
+    props.DeleteAll(row, DataID, setisDeleteShowing(!isDeleteShowing));
+    props.DeleteData(DataID, row, setToggleCleared(!toggleCleared));
   };
 
   const handleEditEvent = () => {
     setisDeleteShowing(!isDeleteShowing);
     props.editData(DataID, selectedId);
-  };
-
-  const closeDeleteModalHandler = () => {
-    setisDeleteShowing(!isDeleteShowing);
   };
 
   const closeDeleteAllModalHandler = () => {
@@ -102,6 +91,7 @@ const Table = props => {
 
   const [isDeleteShowing, setisDeleteShowing] = React.useState(false);
   const [isDeleteAllShowing, setisDeleteAllShowing] = React.useState(false);
+
   const column = [
     {
       cell: cell => (
@@ -183,7 +173,7 @@ const Table = props => {
   const [toggleCleared, setToggleCleared] = React.useState(false);
   const contextActions = React.useMemo(() => {
     const handledelete = () => {
-      setisDeleteAllShowing(!isDeleteAllShowing);
+      setisDeleteAllShowing(true);
       setData(differenceBy(data, selectedRows, "name"));
     };
     return (

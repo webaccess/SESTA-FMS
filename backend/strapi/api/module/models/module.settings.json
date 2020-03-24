@@ -35,7 +35,8 @@
     },
     "slug": {
       "type": "string",
-      "unique": true
+      "unique": true,
+      "required": false
     },
     "displayNavigation": {
       "type": "boolean",

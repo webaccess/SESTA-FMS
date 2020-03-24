@@ -47,10 +47,11 @@ const useStyles = theme => ({
   }
 });
 
-export class villages extends React.Component {
+export class Villages extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      values: {},
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
@@ -66,6 +67,7 @@ export class villages extends React.Component {
       getDistrict: [],
       getVillage: [],
       isCancel: false,
+      dataCellId: [],
       singleDelete: "",
       multipleDelete: ""
     };
@@ -103,7 +105,6 @@ export class villages extends React.Component {
       }
       result[i]["villages"] = villages;
     }
-    console.log("final data", result);
     return result;
   }
   handleStateChange = async (event, value) => {
@@ -165,22 +166,19 @@ export class villages extends React.Component {
       });
     }
   }
-  handleVillageChange(event, value) {
-    if (value !== null) {
-      this.setState({ filterVillage: value.id });
-      console.log("value", this.state.filterVillage);
-    } else {
-      console.log("hi", this.state.filterVillage);
-      this.setState({
-        filterVillage: ""
-      });
-    }
+  handleVillageChange(event, value, target) {
+    this.setState({
+      values: { ...this.state.values, [event.target.name]: event.target.value }
+    });
   }
   editData = cellid => {
     this.props.history.push("/villages/edit/" + cellid);
   };
-  DeleteData = cellid => {
-    if (cellid.length !== 0) {
+
+  DeleteData = (cellid, selectedId) => {
+    if (cellid.length !== null && selectedId < 1) {
+      this.setState({ singleDelete: "", multipleDelete: "" });
+
       axios
         .delete(process.env.REACT_APP_SERVER_URL + "villages/" + cellid, {
           headers: {
@@ -188,8 +186,8 @@ export class villages extends React.Component {
           }
         })
         .then(res => {
-          console.log("deleted data res", res.data);
           this.setState({ singleDelete: res.data.name });
+          this.setState({ dataCellId: "" });
           this.componentDidMount();
         })
         .catch(error => {
@@ -197,28 +195,30 @@ export class villages extends React.Component {
           console.log(error);
         });
     }
+    // }
   };
   DeleteAll = selectedId => {
-    for (let i in selectedId) {
-      axios
-        .delete(
-          process.env.REACT_APP_SERVER_URL + "villages/" + selectedId[i],
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
+    if (selectedId.length !== 0) {
+      this.setState({ singleDelete: "", multipleDelete: "" });
+      for (let i in selectedId) {
+        axios
+          .delete(
+            process.env.REACT_APP_SERVER_URL + "villages/" + selectedId[i],
+            {
+              headers: {
+                Authorization: "Bearer " + auth.getToken() + ""
+              }
             }
-          }
-        )
-        .then(res => {
-          console.log("deleted data res", res.data);
-          this.setState({ multipleDelete: true });
-          this.componentDidMount();
-        })
-        .catch(error => {
-          this.setState({ multipleDelete: false });
-
-          console.log("err", error);
-        });
+          )
+          .then(res => {
+            this.setState({ multipleDelete: true });
+            this.componentDidMount();
+          })
+          .catch(error => {
+            this.setState({ multipleDelete: false });
+            console.log("err", error);
+          });
+      }
     }
   };
 
@@ -227,10 +227,19 @@ export class villages extends React.Component {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
+      values: {},
+      formSubmitted: "",
+      stateSelected: false,
       isCancel: true
     });
     this.componentDidMount();
     //routing code #route to village_list page
+  };
+
+  handleChange = ({ target }) => {
+    this.setState({
+      values: { ...this.state.values, [target.name]: target.value }
+    });
   };
 
   handleSearch() {
@@ -241,8 +250,8 @@ export class villages extends React.Component {
     if (this.state.filterDistrict) {
       searchData += "district.id=" + this.state.filterDistrict + "&&";
     }
-    if (this.state.filterVillage) {
-      searchData += "id=" + this.state.filterVillage;
+    if (this.state.values.addVillage) {
+      searchData += "name_contains=" + this.state.values.addVillage;
     }
     axios
       .get(
@@ -331,6 +340,7 @@ export class villages extends React.Component {
                 Village {this.state.singleDelete} deleted successfully!
               </Snackbar>
             ) : null}
+
             {this.state.singleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
@@ -348,6 +358,22 @@ export class villages extends React.Component {
             ) : null}
             <br></br>
             <div className={classes.row}>
+              <div className={classes.searchInput}>
+                <div className={style.Districts}>
+                  <Grid item md={12} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Village Name"
+                      name="addVillage"
+                      variant="outlined"
+                      onChange={(event, value) => {
+                        this.handleVillageChange(event, value);
+                      }}
+                      value={this.state.values.addVillage || ""}
+                    />
+                  </Grid>
+                </div>
+              </div>
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -417,41 +443,7 @@ export class villages extends React.Component {
                   </Grid>
                 </div>
               </div>
-              <div className={classes.searchInput}>
-                <div className={style.Districts}>
-                  <Grid item md={12} xs={12}>
-                    <Autocomplete
-                      id="combo-box-demo"
-                      options={villagesFilter}
-                      name="filterVillage"
-                      getOptionLabel={option => option.name}
-                      onChange={(event, value) => {
-                        this.handleVillageChange(event, value);
-                      }}
-                      value={
-                        filterVillage
-                          ? this.state.isCancel === true
-                            ? null
-                            : villagesFilter[
-                                villagesFilter.findIndex(function(item, i) {
-                                  return item.id === filterVillage;
-                                })
-                              ] || null
-                          : null
-                      }
-                      renderInput={params => (
-                        <Input
-                          {...params}
-                          fullWidth
-                          label="Select Village"
-                          name="filterVillage"
-                          variant="outlined"
-                        />
-                      )}
-                    />
-                  </Grid>
-                </div>
-              </div>
+              <div className={classes.searchInput}></div>
               <br></br>
               <Button onClick={this.handleSearch.bind(this)}>Search</Button>
               &nbsp;&nbsp;&nbsp;
@@ -486,4 +478,4 @@ export class villages extends React.Component {
     );
   }
 }
-export default withStyles(useStyles)(villages);
+export default withStyles(useStyles)(Villages);
