@@ -14,8 +14,8 @@
       "required": true
     },
     "shgs": {
-      "collection": "shg",
       "via": "villages",
+      "collection": "shg",
       "dominant": true
     },
     "district": {

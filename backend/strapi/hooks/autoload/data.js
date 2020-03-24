@@ -15,6 +15,10 @@ const roles = {
       {
         name: "village",
         action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "shg",
+        action: ["find", "count", "findone", "create", "update", "delete"]
       }
     ],
     grantAllPermissions: false
@@ -34,6 +38,10 @@ const roles = {
       },
       {
         name: "village",
+        action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "shg",
         action: ["find", "count", "findone", "create", "update", "delete"]
       }
     ],
@@ -55,6 +63,10 @@ const roles = {
       {
         name: "village",
         action: []
+      },
+      {
+        name: "shg",
+        action: []
       }
     ],
     grantAllPermissions: false
@@ -74,6 +86,10 @@ const roles = {
       },
       {
         name: "village",
+        action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "shg",
         action: ["find", "count", "findone", "create", "update", "delete"]
       }
     ],
@@ -120,6 +136,15 @@ const modules = {
     url: "/villages/edit/:id",
     slug: "edit_village",
     displayNavigation: false,
+    module: "", //slug
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+  },
+  SHGs: {
+    is_active: true,
+    icon_class: "people",
+    url: "/shgs",
+    slug: "list_shg",
+    displayNavigation: true,
     module: "", //slug
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
   }
