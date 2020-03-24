@@ -1,12 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import {
-  BrowserRouter as Router,
-  Switch,
-  useLocation,
-  Route
-} from "react-router-dom";
-import { useHistory } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Aux from "./hoc/Auxiliary/Auxiliary.js";
 import PrivateRoute from "./hoc/PrivateRoute/PrivateRoute";
 import AuthRoute from "./hoc/AuthRoute/AuthRoute";
