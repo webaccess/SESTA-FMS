@@ -103,37 +103,25 @@ const modules = {
     slug: "list_village",
     displayNavigation: true,
     module: "", //slug
-    roles: [
-      "FPO Admin",
-      "Sesta Admin",
-      "Superadmin"
-    ]
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
   },
-  Add_Village: {
+  "Add Village": {
     is_active: true,
-    icon_class: "add",
+    icon_class: "",
     url: "/villages/add",
     slug: "add_village",
     displayNavigation: false,
     module: "", //slug
-    roles: [
-      "FPO Admin",
-      "Sesta Admin",
-      "Superadmin"
-    ]
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
   },
-  Edit_Village: {
+  "Edit Village": {
     is_active: true,
-    icon_class: "edit",
+    icon_class: "",
     url: "/villages/edit/:id",
     slug: "edit_village",
     displayNavigation: false,
     module: "", //slug
-    roles: [
-      "FPO Admin",
-      "Sesta Admin",
-      "Superadmin"
-    ]
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
   }
 };
 
