@@ -11,6 +11,14 @@ const roles = {
       {
         name: "module",
         action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "village",
+        action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "shg",
+        action: ["find", "count", "findone", "create", "update", "delete"]
       }
     ],
     grantAllPermissions: false
@@ -26,6 +34,14 @@ const roles = {
       },
       {
         name: "module",
+        action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "village",
+        action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "shg",
         action: ["find", "count", "findone", "create", "update", "delete"]
       }
     ],
@@ -43,6 +59,14 @@ const roles = {
       {
         name: "module",
         action: []
+      },
+      {
+        name: "village",
+        action: []
+      },
+      {
+        name: "shg",
+        action: []
       }
     ],
     grantAllPermissions: false
@@ -58,6 +82,14 @@ const roles = {
       },
       {
         name: "module",
+        action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "village",
+        action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "shg",
         action: ["find", "count", "findone", "create", "update", "delete"]
       }
     ],
@@ -79,6 +111,42 @@ const modules = {
       "CSP (Community Service Provider)",
       "Superadmin"
     ]
+  },
+  Villages: {
+    is_active: true,
+    icon_class: "people",
+    url: "/villages",
+    slug: "list_village",
+    displayNavigation: true,
+    module: "", //slug
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+  },
+  "Add Village": {
+    is_active: true,
+    icon_class: "",
+    url: "/villages/add",
+    slug: "add_village",
+    displayNavigation: false,
+    module: "", //slug
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+  },
+  "Edit Village": {
+    is_active: true,
+    icon_class: "",
+    url: "/villages/edit/:id",
+    slug: "edit_village",
+    displayNavigation: false,
+    module: "", //slug
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+  },
+  SHGs: {
+    is_active: true,
+    icon_class: "people",
+    url: "/shgs",
+    slug: "list_shg",
+    displayNavigation: true,
+    module: "", //slug
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
   }
 };
 

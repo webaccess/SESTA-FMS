@@ -47,7 +47,7 @@ const useStyles = theme => ({
   }
 });
 
-export class villages extends React.Component {
+export class Villages extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -105,7 +105,6 @@ export class villages extends React.Component {
       }
       result[i]["villages"] = villages;
     }
-    console.log("final data", result);
     return result;
   }
   handleStateChange = async (event, value) => {
@@ -360,6 +359,22 @@ export class villages extends React.Component {
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Village Name"
+                      name="addVillage"
+                      variant="outlined"
+                      onChange={(event, value) => {
+                        this.handleVillageChange(event, value);
+                      }}
+                      value={this.state.values.addVillage || ""}
+                    />
+                  </Grid>
+                </div>
+              </div>
+              <div className={classes.searchInput}>
+                <div className={style.Districts}>
+                  <Grid item md={12} xs={12}>
                     <Autocomplete
                       id="combo-box-demo"
                       options={statesFilter}
@@ -427,40 +442,7 @@ export class villages extends React.Component {
                 </div>
               </div>
               <div className={classes.searchInput}>
-                <div className={style.Districts}>
-                  <Grid item md={12} xs={12}>
-                    {/* <Autocomplete
-                      id="combo-box-demo"
-                      options={villagesFilter}
-                      name="filterVillage"
-                      getOptionLabel={option => option.name}
-                      onChange={(event, value) => {
-                        this.handleVillageChange(event, value);
-                      }}
-                      value={
-                        filterVillage
-                          ? this.state.isCancel === true
-                            ? null
-                            : villagesFilter[
-                                villagesFilter.findIndex(function(item, i) {
-                                  return item.id === filterVillage;
-                                })
-                              ] || null
-                          : null
-                      }
-                      renderInput={params => ( */}
-                    <Input
-                      fullWidth
-                      label="Select Village"
-                      name="addVillage"
-                      variant="outlined"
-                      onChange={(event, value) => {
-                        this.handleVillageChange(event, value);
-                      }}
-                      value={this.state.values.addVillage || ""}
-                    />
-                  </Grid>
-                </div>
+
               </div>
               <br></br>
               <Button onClick={this.handleSearch.bind(this)}>Search</Button>
@@ -496,4 +478,4 @@ export class villages extends React.Component {
     );
   }
 }
-export default withStyles(useStyles)(villages);
+export default withStyles(useStyles)(Villages);
