@@ -21,9 +21,10 @@ function Breadcrumbs(props) {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "modules?is_active=true&user_roles.id_in=" +
-            userInfo.user_role.id +
-            moduleStr,
+          "modules?is_active=true&roles.id_in=" +
+          userInfo.role.id +
+          "&slug_in=" +
+          moduleStr,
           {
             headers: {
               Authorization: "Bearer " + auth.getToken()
