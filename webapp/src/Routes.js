@@ -14,9 +14,10 @@ import Dashboard from "./containers/Dashboard/Dashboard";
 import NotFoundPage from "./containers/NotFoundPage/NotFoundPage";
 import AuthPage from "./containers/AuthPage/AuthPage";
 import Villages from "./containers/Villages/Villages";
-import villagePage from "./containers/Villages/VillagePage";
+import VillagePage from "./containers/Villages/VillagePage";
 import Vopage from "./containers/Vo/Vopage";
 import Vos from "./containers/Vo/Vos";
+
 import Account from "./containers/Account/Account";
 
 function Routes() {
@@ -26,10 +27,10 @@ function Routes() {
         <div>
           <Switch>
             <PrivateRoute path="/" component={Dashboard} exact />
-            <PrivateRoute path="/villages/add" component={villagePage} exact />
+            <PrivateRoute path="/villages/add" component={VillagePage} exact />
             <PrivateRoute
               path="/villages/edit/:id"
-              component={villagePage}
+              component={VillagePage}
               exact
             />
             <PrivateRoute

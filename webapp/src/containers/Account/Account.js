@@ -95,7 +95,7 @@ export class Account extends Component {
       .put(
         process.env.REACT_APP_SERVER_URL + "users/" + userInfo.id,
         {
-          password: "test"
+          password: this.state.values.password
         },
         {
           headers: {

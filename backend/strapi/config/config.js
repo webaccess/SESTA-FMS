@@ -4,7 +4,7 @@ const knex = require("knex")({
     host: "127.0.0.1",
     port: "5432",
     user: "postgres",
-    password: "root",
+    password: "postgres",
     database: "sesta"
     // host: "${process.env.DATABASE_HOST || '127.0.0.1'}",
     // port: "${process.env.DATABASE_PORT || 5432}",

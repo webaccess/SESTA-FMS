@@ -340,7 +340,6 @@ export class Villages extends React.Component {
                 Village {this.state.singleDelete} deleted successfully!
               </Snackbar>
             ) : null}
-
             {this.state.singleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
