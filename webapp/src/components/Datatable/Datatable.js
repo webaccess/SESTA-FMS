@@ -41,26 +41,12 @@
 **/
 
 import React from "react";
-<<<<<<< HEAD
-import DataTable from 'react-data-table-component';
-import Button from '../UI/Button/Button.js';
-import Modal from '../UI/Modal/Modal.js';
-import style from './Datatable.module.css';
-import SearchInput from '../SearchInput';
-import differenceBy from 'lodash/differenceBy';
-
-import {
-  Card,
-  Checkbox,
-} from '@material-ui/core';
-=======
 import DataTable from "react-data-table-component";
 import Button from "../UI/Button/Button.js";
 import Modal from "../UI/Modal/Modal.js";
 import style from "./Datatable.module.css";
 import SearchInput from "../SearchInput";
 import differenceBy from "lodash/differenceBy";
->>>>>>> b048a09c597ca7957afb966ac0bec444364cec81
 
 import { Card, Checkbox } from "@material-ui/core";
 
@@ -72,65 +58,30 @@ const Table = props => {
   const handleChange = React.useCallback(state => {
     setSelectedRows(state.selectedRows);
   }, []);
-<<<<<<< HEAD
-  const deleteDataModal = (event) => {
-    setisDeleteAllShowing(!isDeleteAllShowing);
-    setcellId(event.target.id);
-    setcellName(event.target.value);
-  }
-=======
   const deleteDataModal = event => {
     setisDeleteAllShowing(!isDeleteAllShowing);
     setcellId(event.target.id);
     setcellName(event.target.value);
   };
->>>>>>> b048a09c597ca7957afb966ac0bec444364cec81
 
   let searchFilter = props.filters;
   let selected = selectedRows;
   let dataName = cellName;
   let DataID = cellId;
 
-<<<<<<< HEAD
-  const editData = (event) => {
-=======
   const editData = event => {
->>>>>>> b048a09c597ca7957afb966ac0bec444364cec81
     props.editData(event.target.id);
   };
 
-<<<<<<< HEAD
-  const handleDeleteEvent = () => {
-    setisDeleteShowing(!isDeleteShowing);
-    props.DeleteData(DataID);
-    console.log("dsfsdfsfdsf", DataID)
-  }
-
-  const handleDeleteAllEvent = () => {
-    setisDeleteShowing(!isDeleteShowing);
-    props.DeleteAll(row);
-    props.DeleteData(DataID, setToggleCleared(!toggleCleared));
-
-  }
-=======
   const handleDeleteAllEvent = () => {
     props.DeleteAll(row, DataID, setisDeleteShowing(!isDeleteShowing));
     props.DeleteData(DataID, row, setToggleCleared(!toggleCleared));
   };
->>>>>>> b048a09c597ca7957afb966ac0bec444364cec81
 
   const handleEditEvent = () => {
     setisDeleteShowing(!isDeleteShowing);
     props.editData(DataID, selectedId);
-<<<<<<< HEAD
-  }
-
-  const closeDeleteModalHandler = () => {
-    setisDeleteShowing(!isDeleteShowing);
-  }
-=======
   };
->>>>>>> b048a09c597ca7957afb966ac0bec444364cec81
 
   const closeDeleteAllModalHandler = () => {
     setisDeleteAllShowing(!isDeleteAllShowing);
@@ -143,15 +94,6 @@ const Table = props => {
 
   const column = [
     {
-<<<<<<< HEAD
-      cell: (cell) => <button className="material-icons" className={style.editButton} id={cell.id} value={cell[valueformodal]} onClick={editData}>edit</button>,
-      button: true,
-    },
-    {
-      cell: (cell) => <button className="material-icons" className={style.deleteButton} id={cell.id} value={cell[valueformodal]} onClick={deleteDataModal}>delete</button>,
-      button: true,
-    },
-=======
       cell: cell => (
         <button
           className="material-icons"
@@ -179,7 +121,6 @@ const Table = props => {
       ),
       button: true
     }
->>>>>>> b048a09c597ca7957afb966ac0bec444364cec81
   ];
 
   const makeColumns = columns => {
@@ -188,21 +129,13 @@ const Table = props => {
     }
   };
 
-<<<<<<< HEAD
-  const [filterText, setFilterText] = React.useState('');
-=======
   const [filterText, setFilterText] = React.useState("");
->>>>>>> b048a09c597ca7957afb966ac0bec444364cec81
   const [noHeader, setNoHeader] = React.useState(true);
   let filteredItems = [];
   let filteredData = [];
   const [data, setData] = React.useState(props.filterBy);
   if (props.filterData) {
     for (let i in data) {
-<<<<<<< HEAD
-      filteredItems.push(props.data.filter(item => item[data[i]] && (item[data[i]].toLowerCase()).includes(filterText.toLowerCase())
-      ));
-=======
       filteredItems.push(
         props.data.filter(
           item =>
@@ -210,7 +143,6 @@ const Table = props => {
             item[data[i]].toLowerCase().includes(filterText.toLowerCase())
         )
       );
->>>>>>> b048a09c597ca7957afb966ac0bec444364cec81
     }
     for (let i in filteredItems) {
       filteredData = filteredData.concat(filteredItems[i]);
@@ -234,20 +166,6 @@ const Table = props => {
   let SelectedId = selectedId.join("");
   let SelectedIds = SelectedId.substring(0, SelectedId.length - 1);
 
-<<<<<<< HEAD
-  const onFilter = (e) => {
-    setFilterText(e.target.value)
-  };
-
-
-  const [toggleCleared, setToggleCleared] = React.useState(false);
-  const contextActions = React.useMemo(() => {
-    const handledelete = () => {
-      setisDeleteAllShowing(!isDeleteAllShowing)
-      setData(differenceBy(data, selectedRows, 'name'));
-    };
-    return <Button key="delete" onClick={handledelete} style={{ backgroundColor: '#d63447', color: 'white' }} >Delete</Button>;
-=======
   const onFilter = e => {
     setFilterText(e.target.value);
   };
@@ -255,7 +173,7 @@ const Table = props => {
   const [toggleCleared, setToggleCleared] = React.useState(false);
   const contextActions = React.useMemo(() => {
     const handledelete = () => {
-      setisDeleteAllShowing(!isDeleteAllShowing);
+      setisDeleteAllShowing(true);
       setData(differenceBy(data, selectedRows, "name"));
     };
     return (
@@ -267,7 +185,6 @@ const Table = props => {
         Delete
       </Button>
     );
->>>>>>> b048a09c597ca7957afb966ac0bec444364cec81
   }, [data, selectedRows, toggleCleared]);
 
   let columns = [];
@@ -277,25 +194,17 @@ const Table = props => {
   return (
     <>
       <div>
-<<<<<<< HEAD
-        {(props.showSearch) ?
-=======
         {props.showSearch ? (
->>>>>>> b048a09c597ca7957afb966ac0bec444364cec81
           <div className={style.row}>
             <SearchInput
               placeholder={props.Searchplaceholder}
               onChange={onFilter}
               type="search"
             />
-<<<<<<< HEAD
-          </div> : <p></p>}
-=======
           </div>
         ) : (
-            <p></p>
-          )}
->>>>>>> b048a09c597ca7957afb966ac0bec444364cec81
+          <p></p>
+        )}
         <Card>
           <DataTable
             data={filteredData}
@@ -313,19 +222,15 @@ const Table = props => {
             clearSelectedRows={toggleCleared}
             persistTableHead
             DeleteAllSucccess={props.DeleteAllSucccess}
-<<<<<<< HEAD
-            noDataComponent={props.noDataComponent ? props.noDataComponent : <p>There are no records to display in <b>{props.title}</b></p>}
-=======
             noDataComponent={
               props.noDataComponent ? (
                 props.noDataComponent
               ) : (
-                  <p>
-                    There are no records to display in <b>{props.title}</b>
-                  </p>
-                )
+                <p>
+                  There are no records to display in <b>{props.title}</b>
+                </p>
+              )
             }
->>>>>>> b048a09c597ca7957afb966ac0bec444364cec81
             noHeader={selected.length === 0 || selected.length < 2}
           />
         </Card>
@@ -344,8 +249,17 @@ const Table = props => {
             displaySave: { display: "true" }
           }}
         >
-          {selectedRows.length > 1 ? (<p>{" "}Do you want to delete selected <b>{props.title}</b></p>)
-            : (<p>{" "}{props.DeleteMessage} <b>{dataName}</b> ?</p>)}
+          {selectedRows.length > 1 ? (
+            <p>
+              {" "}
+              Do you want to delete selected <b>{props.title}</b>
+            </p>
+          ) : (
+            <p>
+              {" "}
+              {props.DeleteMessage} <b>{dataName}</b> ?
+            </p>
+          )}
         </Modal>
       </div>
     </>

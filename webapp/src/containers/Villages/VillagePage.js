@@ -22,7 +22,7 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 =======
 >>>>>>> b048a09c597ca7957afb966ac0bec444364cec81
 
-class Villages extends Component {
+class VillagePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -460,30 +460,7 @@ class Villages extends Component {
                     ))}
                   </Input> */}
                 </Grid>
-                {/* <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Select FPO"
-                    margin="dense"
-                    name="addFpo"
-                    onChange={this.handleStateChange}
-                    select
-                    error={this.hasError("addFpo")}
-                    helperText={
-                      this.hasError("addFpo")
-                        ? this.state.errors.addState[0]
-                        : null
-                    }
-                    value={this.state.values.addState || ""}
-                    variant="outlined"
-                  >
-                    {this.state.getState.map(states => (
-                      <option value={states.id} key={states.id}>
-                        {states.name}
-                      </option>
-                    ))}
-                  </Input>
-                </Grid> */}
+              
               </Grid>
             </CardContent>
             <Divider />
@@ -504,4 +481,4 @@ class Villages extends Component {
     );
   }
 }
-export default Villages;
+export default VillagePage;
