@@ -110,6 +110,21 @@ export class VillageList extends React.Component {
       .catch(error => {
         console.log(error);
       });
+
+    //api call for villages filter
+    await axios
+      .get(process.env.REACT_APP_SERVER_URL + "Villages/", {
+        headers: {
+          Authorization: "Bearer " + auth.getToken() + ""
+        }
+      })
+      .then(res => {
+        this.setState({ getVillage: res.data });
+      })
+      .catch(error => {
+        console.log(error);
+      });
+    //api for shgs filter
     await axios
       .get(process.env.REACT_APP_SERVER_URL + "shgs/", {
         headers: {
@@ -161,23 +176,10 @@ export class VillageList extends React.Component {
   handleDistrictChange(event, value) {
     if (value !== null) {
       this.setState({ filterDistrict: value.id });
-      let distId = value.id;
-      axios
-        .get(process.env.REACT_APP_SERVER_URL + "districts/" + distId, {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
-        })
-        .then(res => {
-          this.setState({ getVillage: res.data.villages });
-        })
-        .catch(error => {
-          console.log(error);
-        });
     } else {
       this.setState({
-        filterDistrict: "",
-        filterVillage: ""
+        filterDistrict: ""
+        // filterVillage: ""
       });
     }
   }
@@ -261,10 +263,15 @@ export class VillageList extends React.Component {
     if (
       this.state.filterState ||
       this.state.filterDistrict ||
-      this.state.filterDistrict
+      this.state.filterDistrict ||
+      this.state.selectedShg
     )
       searchData = "?";
+    if (this.state.selectedShg) {
+      searchData += "shgs.id=" + this.state.selectedShg["id"];
+    }
     if (this.state.filterState) {
+      searchData += searchData ? "&" : "";
       searchData += "shgs.state=" + this.state.filterState;
     }
 
@@ -273,8 +280,14 @@ export class VillageList extends React.Component {
       searchData += "shgs.district=" + this.state.filterDistrict;
     }
 
-    if (this.state.filterVillage) {
+    if (
+      (this.state.filterVillage && this.state.filterDistrict) ||
+      this.state.filterState ||
+      this.state.selectedShg
+    ) {
       searchData += searchData ? "&" : "";
+      searchData += "shgs.villages=" + this.state.filterVillage;
+    } else {
       searchData += "shgs.villages=" + this.state.filterVillage;
     }
 
@@ -294,25 +307,6 @@ export class VillageList extends React.Component {
       .catch(err => {
         console.log("err", err);
       });
-    if (this.state.selectedShg) {
-      axios
-        .get(
-          process.env.REACT_APP_SERVER_URL +
-            "village-organizations?shgs.id=" +
-            this.state.selectedShg["id"],
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
-          }
-        )
-        .then(res => {
-          this.setState({ data: res.data });
-        })
-        .catch(err => {
-          console.log("err", err);
-        });
-    }
   }
   onHandleChange = shgValue => {
     this.setState({
