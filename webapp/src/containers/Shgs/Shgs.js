@@ -177,7 +177,6 @@ export class Shgs extends React.Component {
       this.setState({
         filterDistrict: "",
         filterVillage: ""
-        // getVillage:"",
       });
       this.componentDidMount();
     }
