@@ -10,6 +10,14 @@ const roles = {
       },
       {
         name: "module",
+        action: ["find", "count", "findone"]
+      },
+      {
+        name: "state",
+        action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "district",
         action: ["find", "count", "findone", "create", "update", "delete"]
       },
       {
@@ -34,6 +42,14 @@ const roles = {
       },
       {
         name: "module",
+        action: ["find", "count", "findone"]
+      },
+      {
+        name: "state",
+        action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "district",
         action: ["find", "count", "findone", "create", "update", "delete"]
       },
       {
@@ -58,6 +74,14 @@ const roles = {
       },
       {
         name: "module",
+        action: ["find", "count", "findone"]
+      },
+      {
+        name: "state",
+        action: []
+      },
+      {
+        name: "district",
         action: []
       },
       {
@@ -82,6 +106,14 @@ const roles = {
       },
       {
         name: "module",
+        action: ["find", "count", "findone"]
+      },
+      {
+        name: "state",
+        action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "district",
         action: ["find", "count", "findone", "create", "update", "delete"]
       },
       {
