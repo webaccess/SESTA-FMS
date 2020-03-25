@@ -10,10 +10,22 @@ const roles = {
       },
       {
         name: "module",
+        action: ["find", "count", "findone"]
+      },
+      {
+        name: "state",
+        action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "district",
         action: ["find", "count", "findone", "create", "update", "delete"]
       },
       {
         name: "village",
+        action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "shg",
         action: ["find", "count", "findone", "create", "update", "delete"]
       }
     ],
@@ -30,10 +42,22 @@ const roles = {
       },
       {
         name: "module",
+        action: ["find", "count", "findone"]
+      },
+      {
+        name: "state",
+        action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "district",
         action: ["find", "count", "findone", "create", "update", "delete"]
       },
       {
         name: "village",
+        action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "shg",
         action: ["find", "count", "findone", "create", "update", "delete"]
       }
     ],
@@ -50,10 +74,22 @@ const roles = {
       },
       {
         name: "module",
+        action: ["find", "count", "findone"]
+      },
+      {
+        name: "state",
+        action: []
+      },
+      {
+        name: "district",
         action: []
       },
       {
         name: "village",
+        action: []
+      },
+      {
+        name: "shg",
         action: []
       }
     ],
@@ -70,10 +106,22 @@ const roles = {
       },
       {
         name: "module",
+        action: ["find", "count", "findone"]
+      },
+      {
+        name: "state",
+        action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "district",
         action: ["find", "count", "findone", "create", "update", "delete"]
       },
       {
         name: "village",
+        action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "shg",
         action: ["find", "count", "findone", "create", "update", "delete"]
       }
     ],
@@ -120,6 +168,15 @@ const modules = {
     url: "/villages/edit/:id",
     slug: "edit_village",
     displayNavigation: false,
+    module: "", //slug
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+  },
+  SHGs: {
+    is_active: true,
+    icon_class: "people",
+    url: "/shgs",
+    slug: "list_shg",
+    displayNavigation: true,
     module: "", //slug
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
   }

@@ -14,7 +14,10 @@ import Dashboard from "./containers/Dashboard/Dashboard";
 import NotFoundPage from "./containers/NotFoundPage/NotFoundPage";
 import AuthPage from "./containers/AuthPage/AuthPage";
 import Villages from "./containers/Villages/Villages";
+import Shgs from "./containers/Shgs/Shgs";
+
 import VillagePage from "./containers/Villages/VillagePage";
+
 import Account from "./containers/Account/Account";
 
 function Routes() {
@@ -31,6 +34,8 @@ function Routes() {
               exact
             />
             <PrivateRoute path="/villages" component={Villages} exact />
+            <PrivateRoute path="/shgs" component={Shgs} exact />
+
             <PrivateRoute path="/my-account" component={Account} exact />
             <Route path="/404" component={NotFoundPage} />
             <AuthRoute path="/:authType/:id?" component={AuthPage} />
