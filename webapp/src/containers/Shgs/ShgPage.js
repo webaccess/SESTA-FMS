@@ -3,8 +3,8 @@ import Layout from "../../hoc/Layout/Layout";
 import axios from "axios";
 import auth from "../../components/Auth/Auth";
 import Button from "../../components/UI/Button/Button";
-import Input from "../../components/UI/Input/Input";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import Input from "../../components/UI/Input/Input";
 import {
   Card,
   CardHeader,
@@ -15,19 +15,26 @@ import {
 } from "@material-ui/core";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
-import { ADD_VILLAGE_BREADCRUMBS, EDIT_VILLAGE_BREADCRUMBS } from "./config";
+import { ADD_SHG_BREADCRUMBS, EDIT_SHG_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 
-class ShgPage extends Component {
+class VillagePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
       values: {},
+      filterState: "",
+      addShg:'',
+      filterDistrict: "",
+      filterVillage: "",
       getState: [],
       getDistrict: [],
-      filterVillage: "",
+      getVillage: [],
       validations: {
+        addShg: {
+          required: { value: "true", message: "Shg field required" }
+        },
         addVillage: {
           required: { value: "true", message: "Village field required" }
         },
@@ -58,7 +65,7 @@ class ShgPage extends Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "villages?id=" +
+            "shgs?id=" +
             this.state.editPage[1],
           {
             headers: {
@@ -114,38 +121,73 @@ class ShgPage extends Component {
     }
   }
 
-  handleChange = ({ target }) => {
+ handleStateChange = async (event, value) => {
+    if (value !== null) {
+      this.setState({ filterState: value.id });
+      this.setState({
+        isCancel: false
+      });
+
+      let stateId = value.id;
+      await axios
+        .get(
+          process.env.REACT_APP_SERVER_URL +
+            "districts?master_state.id=" +
+            stateId,
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + ""
+            }
+          }
+        )
+        .then(res => {
+          this.setState({ getDistrict: res.data });
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    } else {
+      this.setState({
+        filterState: "",
+        filterDistrict: "",
+        filterVillage: ""
+      });
+      console.log("state null", this.state.filterState);
+    }
+  };
+
+ handleChange = ({ target }) => {
     this.setState({
       values: { ...this.state.values, [target.name]: target.value }
     });
   };
 
-  handleStateChange = async ({ target }) => {
-    this.setState({
-      values: { ...this.state.values, [target.name]: target.value }
-    });
-    let stateId = target.value;
-    await axios
-      .get(
-        process.env.REACT_APP_SERVER_URL +
-          "districts?master_state.id=" +
-          stateId,
-        {
+  handleDistrictChange(event, value) {
+    if (value !== null) {
+      this.setState({ filterDistrict: value.id });
+      console.log("District", this.state.filterDistrict);
+      let distId = value.id;
+      axios
+        .get(process.env.REACT_APP_SERVER_URL + "districts/" + distId, {
           headers: {
             Authorization: "Bearer " + auth.getToken() + ""
           }
-        }
-      )
-      .then(res => {
-        this.setState({ getDistrict: res.data });
-      })
-      .catch(error => {
-        console.log(error);
+        })
+        .then(res => {
+          console.log("villagedata", res.data.villages);
+          this.setState({ getVillage: res.data.villages });
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    } else {
+      this.setState({
+        filterDistrict: "",
+        filterVillage: ""
       });
-    if (this.state.values.addState) {
-      this.setState({ stateSelected: true });
+      console.log("District null", this.state.filterDistrict);
     }
-  };
+  }
 
   handleVillageChange(event, value) {
     if (value !== null) {
@@ -186,75 +228,8 @@ class ShgPage extends Component {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
-
-    if (Object.keys(this.state.errors).length > 0) return;
-    let villageName = this.state.values.addVillage;
-    let districtId = this.state.values.addDistrict;
-    let stateId = this.state.values.addState;
-
-    if (this.state.editPage[0]) {
-      // for edit data page
-      await axios
-        .put(
-          process.env.REACT_APP_SERVER_URL +
-            "villages/" +
-            this.state.editPage[1],
-          {
-            name: villageName,
-            district: {
-              id: districtId
-            },
-            state: {
-              id: stateId
-            }
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
-          }
-        )
-        .then(res => {
-          console.log("res", res);
-          this.setState({ formSubmitted: true });
-          this.props.history.push({ pathname: "/villages", editData: true });
-        })
-        .catch(error => {
-          this.setState({ formSubmitted: false });
-          console.log(error);
-        });
-    } else {
-      //for add data page
-      await axios
-        .post(
-          process.env.REACT_APP_SERVER_URL + "villages",
-
-          {
-            name: villageName,
-            district: {
-              id: districtId
-            },
-            state: {
-              id: stateId
-            }
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
-          }
-        )
-        .then(res => {
-          this.setState({ formSubmitted: true });
-
-          this.props.history.push({ pathname: "/villages", addData: true });
-        })
-        .catch(error => {
-          this.setState({ formSubmitted: false });
-          console.log(error);
-          console.log("formsubmitted", this.state.formSubmitted);
-        });
-    }
+    console.log("aLLVALUES",this.state.values)
+    // 
   };
 
   cancelForm = () => {
@@ -263,10 +238,10 @@ class ShgPage extends Component {
       formSubmitted: "",
       stateSelected: false
     });
+    //routing code #route to village_list page
   };
 
   render() {
-    const { classes } = this.props;
     let statesFilter = this.state.getState;
     let filterState = this.state.filterState;
     let districtsFilter = this.state.getDistrict;
@@ -274,13 +249,12 @@ class ShgPage extends Component {
     let villagesFilter = this.state.getVillage;
     let filterVillage = this.state.filterVillage;
     let isCancel = this.state.isCancel;
-    console.log(this.state);
     return (
       <Layout
         breadcrumbs={
           this.state.editPage[0]
-            ? EDIT_VILLAGE_BREADCRUMBS
-            : ADD_VILLAGE_BREADCRUMBS
+            ? EDIT_SHG_BREADCRUMBS
+            : ADD_SHG_BREADCRUMBS
         }
       >
         <Card>
@@ -302,12 +276,108 @@ class ShgPage extends Component {
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item md={12} xs={12}>
+                  {/* {this.state.formSubmitted === true ? (
+                    <Snackbar severity="success">
+                      Village added successfully.
+                    </Snackbar>
+                  ) : null} */}
                   {this.state.formSubmitted === false ? (
                     <Snackbar severity="error" Showbutton={false}>
                       Network Error - Please try again!
                     </Snackbar>
                   ) : null}
                 </Grid>
+               <Grid item md={12} xs={12}>
+                   <Input
+                    fullWidth
+                    label="Shg Name"
+                    name="addShg"
+                    error={this.hasError("addShg")}
+                    helperText={
+                      this.hasError("addShg")
+                        ? this.state.errors.addShg[0]
+                        : null
+                    }
+                    value={this.state.values.addShg || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                 <Grid item md={6} xs={12}>
+                <Autocomplete
+                    id="combo-box-demo"
+                    options={statesFilter}
+                    getOptionLabel={option => option.name}
+                    onChange={(event, value) => {
+                      this.handleStateChange(event, value);
+                    }}
+                    value={
+                      filterState
+                        ? this.state.isCancel === true
+                          ? null
+                          : statesFilter[
+                              statesFilter.findIndex(function(item, i) {
+                                return item.id === filterState;
+                              })
+                            ] || null
+                        : null
+                    }
+                    renderInput={params => (
+                      <Input
+                        {...params}
+                        fullWidth
+                        label="Select State"
+                        error={this.hasError("addState")}
+                    helperText={
+                      this.hasError("addState")
+                        ? this.state.errors.addState[0]
+                        : null
+                    }
+                        name="addState"
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+               <Autocomplete
+                    id="combo-box-demo"
+                    options={districtsFilter}
+                    name="filterDistrict"
+                    getOptionLabel={option => option.name}
+                    onChange={(event, value) => {
+                      this.handleDistrictChange(event, value);
+                    }}
+                    value={
+                      filterDistrict
+                        ? this.state.isCancel === true
+                          ? null
+                          : districtsFilter[
+                              districtsFilter.findIndex(function(item, i) {
+                                return item.id === filterDistrict;
+                              })
+                            ] || null
+                        : null
+                    }
+                    renderInput={params => (
+                      <Input
+                        {...params}
+                        fullWidth
+                        label="Select District"
+                        error={this.hasError("addDistrict")}
+                        helperText={
+                          this.hasError("addDistrict")
+                            ? this.state.errors.addDistrict[0]
+                            : this.state.stateSelected
+                        }
+                        name="filterDistrict"
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                </Grid>
+               
+          
                 <Grid item md={6} xs={12}>
                   <Autocomplete
                     id="combo-box-demo"
@@ -333,62 +403,159 @@ class ShgPage extends Component {
                         {...params}
                         fullWidth
                         label="Select Village"
-                        margin="dense"
-                        // value={filterVillage}
+                        error={this.hasError("addVillage")}
+                        helperText={
+                          this.hasError("addVillage")
+                            ? this.state.errors.addVillage[0]
+                            : null
+                        }
                         name="filterVillage"
                         variant="outlined"
                       />
                     )}
                   />
                 </Grid>
-
-                <Grid item md={6} xs={12}>
-                  <Input
+                  <Grid item md={12} xs={12}>
+                   <Input
                     fullWidth
-                    label="Select State"
-                    name="addState"
-                    onChange={this.handleStateChange}
-                    select
-                    error={this.hasError("addState")}
+                    label="Address"
+                    name="addVillage"
+                    error={this.hasError("addVillage")}
                     helperText={
-                      this.hasError("addState")
-                        ? this.state.errors.addState[0]
+                      this.hasError("addVillage")
+                        ? this.state.errors.addVillage[0]
                         : null
                     }
-                    value={this.state.values.addState || ""}
-                    variant="outlined"
-                  >
-                    {this.state.getState.map(states => (
-                      <option value={states.id} key={states.id}>
-                        {states.name}
-                      </option>
-                    ))}
-                  </Input>
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Select District"
-                    name="addDistrict"
+                    value={this.state.values.addVillage || ""}
                     onChange={this.handleChange}
-                    select
-                    error={this.hasError("addDistrict")}
-                    helperText={
-                      this.hasError("addDistrict")
-                        ? this.state.errors.addDistrict[0]
-                        : this.state.stateSelected
-                        ? null
-                        : "Please select the state first"
-                    }
-                    value={this.state.values.addDistrict || ""}
                     variant="outlined"
-                  >
-                    {this.state.getDistrict.map(district => (
-                      <option value={district.id} key={district.id}>
-                        {district.name}
-                      </option>
-                    ))}
-                  </Input>
+                  />
+                </Grid>
+                  <Grid item md={6} xs={12}>
+                   <Input
+                    fullWidth
+                    label="Point Of Contact"
+                    name="addVillage"
+                    error={this.hasError("addVillage")}
+                    helperText={
+                      this.hasError("addVillage")
+                        ? this.state.errors.addVillage[0]
+                        : null
+                    }
+                    value={this.state.values.addVillage || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                 <Grid item md={6} xs={12}>
+                <Autocomplete
+                    id="combo-box-demo"
+                    options={statesFilter}
+                    getOptionLabel={option => option.name}
+                    onChange={(event, value) => {
+                      this.handleStateChange(event, value);
+                    }}
+                    value={
+                      filterState
+                        ? this.state.isCancel === true
+                          ? null
+                          : statesFilter[
+                              statesFilter.findIndex(function(item, i) {
+                                return item.id === filterState;
+                              })
+                            ] || null
+                        : null
+                    }
+                    renderInput={params => (
+                      <Input
+                        {...params}
+                        fullWidth
+                        label="Select VO"
+                        name="addState"
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                </Grid>
+                 <Grid item md={6} xs={12}>
+                   <Input
+                    fullWidth
+                    label="Bank Account Name"
+                    name="addVillage"
+                    error={this.hasError("addVillage")}
+                    helperText={
+                      this.hasError("addVillage")
+                        ? this.state.errors.addVillage[0]
+                        : null
+                    }
+                    value={this.state.values.addVillage || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                 <Grid item md={6} xs={12}>
+                   <Input
+                    fullWidth
+                    label="Account Number"
+                    name="addVillage"
+                    error={this.hasError("addVillage")}
+                    helperText={
+                      this.hasError("addVillage")
+                        ? this.state.errors.addVillage[0]
+                        : null
+                    }
+                    value={this.state.values.addVillage || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                 <Grid item md={6} xs={12}>
+                   <Input
+                    fullWidth
+                    label="Bank Name"
+                    name="addVillage"
+                    error={this.hasError("addVillage")}
+                    helperText={
+                      this.hasError("addVillage")
+                        ? this.state.errors.addVillage[0]
+                        : null
+                    }
+                    value={this.state.values.addVillage || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                 <Grid item md={6} xs={12}>
+                   <Input
+                    fullWidth
+                    label="Branch"
+                    name="addVillage"
+                    error={this.hasError("addVillage")}
+                    helperText={
+                      this.hasError("addVillage")
+                        ? this.state.errors.addVillage[0]
+                        : null
+                    }
+                    value={this.state.values.addVillage || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                 <Grid item md={6} xs={12}>
+                   <Input
+                    fullWidth
+                    label="IFSC Code"
+                    name="addVillage"
+                    error={this.hasError("addVillage")}
+                    helperText={
+                      this.hasError("addVillage")
+                        ? this.state.errors.addVillage[0]
+                        : null
+                    }
+                    value={this.state.values.addVillage || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
                 </Grid>
               </Grid>
             </CardContent>
@@ -410,4 +577,4 @@ class ShgPage extends Component {
     );
   }
 }
-export default ShgPage;
+export default VillagePage;
