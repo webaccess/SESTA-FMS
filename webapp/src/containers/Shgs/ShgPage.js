@@ -18,6 +18,9 @@ import validateInput from "../../components/Validation/ValidateInput/ValidateInp
 import { ADD_SHG_BREADCRUMBS, EDIT_SHG_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
+import FormGroup from "@material-ui/core/FormGroup";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Checkbox from "@material-ui/core/Checkbox";
 
 class VillagePage extends Component {
   constructor(props) {
@@ -29,6 +32,7 @@ class VillagePage extends Component {
       filterDistrict: "",
       filterVillage: "",
       getState: [],
+      checkedB: false,
       getDistrict: [],
       getVillage: [],
       validations: {
@@ -43,7 +47,16 @@ class VillagePage extends Component {
         },
         addDistrict: {
           required: { value: "true", message: "District field required" }
-        }
+        },
+        addVo: {
+          required: { value: "true", message: "Village Organization field required" }
+        },
+        addAddress: {
+          required: { value: "true", message: "Address Organization field required" }
+        },
+        addPointOfContact: {
+          required: { value: "true", message: "Point of Contact field required" }
+        },
       },
       errors: {
         addVillage: [],
@@ -62,6 +75,7 @@ class VillagePage extends Component {
 
   async componentDidMount() {
     if (this.state.editPage[0]) {
+      this.setState({checkedB: true})
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
@@ -74,15 +88,15 @@ class VillagePage extends Component {
           }
         )
         .then(res => {
-          console.log("results",res.data)
+          console.log("results",res.data[0].state)
           this.setState({
             values: {
               addShg: res.data[0].name,
               addAddress: res.data[0].address,
               addPointOfContact: res.data[0].person_incharge,
               // addVillage: res.data[0].name,
-              // addDistrict: res.data[0].district.id,
-              filterState: res.data[0].state.name
+              filterDistrict: res.data[0].district.id,
+              statesFilter: res.data[0].state
             }
           });
         })
@@ -90,23 +104,7 @@ class VillagePage extends Component {
           console.log(error);
         });
       this.stateIds = this.state.values.addState;
-      await axios
-        .get(
-          process.env.REACT_APP_SERVER_URL +
-            "districts?master_state.id=" +
-            this.state.values.addState,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
-          }
-        )
-        .then(res => {
-          this.setState({ getDistrict: res.data });
-        })
-        .catch(error => {
-          console.log(error);
-        });
+      
     }
     await axios
       .get(process.env.REACT_APP_SERVER_URL + "states/", {
@@ -123,6 +121,22 @@ class VillagePage extends Component {
     if (this.state.values.addState) {
       this.setState({ stateSelected: true });
     }
+
+   await axios
+        .get(process.env.REACT_APP_SERVER_URL + "village-organizations/",{
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + ""
+          }
+        })
+        .then(res => {
+          console.log("villagedata", res.data);
+         
+          console.log("Resultsjadkhajhdasad",res.data.name)
+          this.setState({ getVillageOrganization: res.data });
+        })
+        .catch(error => {
+          console.log(error);
+        });
   }
 
  handleStateChange = async (event, value) => {
@@ -207,29 +221,9 @@ class VillagePage extends Component {
 
   handleVoChange(event,value){
     if (value !== null) {
-      let distId = value.id;
-      axios
-        .get(process.env.REACT_APP_SERVER_URL + "village-organizations/",{
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
-        })
-        .then(res => {
-          console.log("villagedata", res.data);
-          let data = res.data;
-          let villageOriganisation = [];
-          for(let i in res.data){
-            console.log("Resultsjadkhajhdasad",data[i]["name"])
-            villageOriganisation.push(data[i]["name"])
-          } 
-          console.log("Resultsjadkhajhdasad",villageOriganisation)
-          // this.setState({ getVillage: res.data.villages });
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    } else {
-      console.log("District null", this.state.filterDistrict);
+     console.log("gdgdgfgfgfgfgff",value.id)
+     this.setState({filterVo :value.id});
+      
     }
   }
 
@@ -256,6 +250,10 @@ class VillagePage extends Component {
     }
   };
 
+  handleCheckBox = event => {
+    this.setState({ ...this.state, [event.target.name]: event.target.checked });
+  };
+
   handleSubmit = async e => {
     e.preventDefault();
     this.validate();
@@ -279,12 +277,16 @@ class VillagePage extends Component {
 
   render() {
     let statesFilter = this.state.getState;
+    let voFilters = this.state.getVillageOrganization;
+    let filterVo = this.state.filterVo;
     let filterState = this.state.filterState;
     let districtsFilter = this.state.getDistrict;
     let filterDistrict = this.state.filterDistrict;
     let villagesFilter = this.state.getVillage;
     let filterVillage = this.state.filterVillage;
     let isCancel = this.state.isCancel;
+    let checked = this.state.checkedB;
+    console.log("DFSDFDSFFSDFDDF",this.state.checkedB)
     return (
       <Layout
         breadcrumbs={
@@ -486,18 +488,18 @@ class VillagePage extends Component {
                  <Grid item md={6} xs={12}>
                 <Autocomplete
                     id="combo-box-demo"
-                    options={statesFilter}
+                    options={voFilters}
                     getOptionLabel={option => option.name}
                     onChange={(event, value) => {
                       this.handleVoChange(event, value);
                     }}
                     value={
-                      filterState
+                      filterVo
                         ? this.state.isCancel === true
                           ? null
-                          : statesFilter[
-                              statesFilter.findIndex(function(item, i) {
-                                return item.id === filterState;
+                          : voFilters[
+                              voFilters.findIndex(function(item, i) {
+                                return item.id === filterVo;
                               })
                             ] || null
                         : null
@@ -508,15 +510,37 @@ class VillagePage extends Component {
                         fullWidth
                         label="Select VO"
                         name="addVo"
+                        error={this.hasError("addVo")}
+                        helperText={
+                          this.hasError("addVo")
+                            ? this.state.errors.addVo[0]
+                            : null
+                        }
                         variant="outlined"
                       />
                     )}
                   />
                 </Grid>
+                <Grid item md={12} xs={12}>
+                 <FormGroup row>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={this.state.checkedB}
+                        onChange={this.handleCheckBox}
+                        name="checkedB"
+                        color="primary"
+                      />
+                    }
+                    label="Bank details"
+                  />
+                </FormGroup>
+                 </Grid>
                  <Grid item md={6} xs={12}>
                    <Input
                     fullWidth
                     label="Bank Account Name"
+                    disabled={ checked ? false : true}  
                     name="addAccountName"
                     error={this.hasError("addAccountName")}
                     helperText={
@@ -534,6 +558,7 @@ class VillagePage extends Component {
                     fullWidth
                     label="Account Number"
                     name="addAccountNo"
+                    disabled={ checked ? false : true}  
                     error={this.hasError("addAccountNo")}
                     helperText={
                       this.hasError("addAccountNo")
@@ -548,6 +573,7 @@ class VillagePage extends Component {
                  <Grid item md={6} xs={12}>
                    <Input
                     fullWidth
+                    disabled={ checked ? false : true}        
                     label="Bank Name"
                     name="addBankName"
                     error={this.hasError("addBankName")}
@@ -565,6 +591,7 @@ class VillagePage extends Component {
                    <Input
                     fullWidth
                     label="Branch"
+                    disabled={ checked ? false : true}  
                     name="addBranch"
                     error={this.hasError("addBranch")}
                     helperText={
@@ -582,6 +609,7 @@ class VillagePage extends Component {
                     fullWidth
                     label="IFSC Code"
                     name="addIfsc"
+                    disabled={ checked ? false : true}  
                     error={this.hasError("addIfsc")}
                     helperText={
                       this.hasError("addIfsc")
@@ -602,7 +630,7 @@ class VillagePage extends Component {
                 color="default"
                 clicked={this.cancelForm}
                 component={Link}
-                to="/Villages"
+                to="/shgs"
               >
                 cancel
               </Button>
