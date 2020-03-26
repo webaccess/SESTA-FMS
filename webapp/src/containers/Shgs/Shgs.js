@@ -319,14 +319,14 @@ export class Shgs extends React.Component {
           <h1 className={style.title}>Manage Self Help Group</h1>
           <div className={classes.row}>
             <div className={style.addButton}>
-              {/* <Button
+               <Button
                 color="primary"
                 variant="contained"
                 component={Link}
                 to="/Shgs/add"
               >
                 Add SHG
-              </Button> */}
+              </Button> 
             </div>
           </div>
           {this.props.location.addData ? (
@@ -364,12 +364,16 @@ export class Shgs extends React.Component {
                 <Grid item md={12} xs={12}>
                   <Input
                     fullWidth
-                    label="SHG Name"
-                    name="filterShg"
-                    id="combo-box-demo"
-                    margin="dense"
-                    value={this.state.filterShg || ""}
-                    onChange={this.handleChange.bind(this)}
+                    label="Shg Name"
+                    name="addShg"
+                    error={this.hasError("addShg")}
+                    helperText={
+                      this.hasError("addShg")
+                        ? this.state.errors.addShg[0]
+                        : null
+                    }
+                    value={this.state.values.addShg || ""}
+                    onChange={this.handleChange}
                     variant="outlined"
                   />
                 </Grid>
