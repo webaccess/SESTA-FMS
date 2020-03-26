@@ -74,11 +74,15 @@ class VillagePage extends Component {
           }
         )
         .then(res => {
+          console.log("results",res.data)
           this.setState({
             values: {
-              addVillage: res.data[0].name,
-              addDistrict: res.data[0].district.id,
-              addState: res.data[0].state.id
+              addShg: res.data[0].name,
+              addAddress: res.data[0].address,
+              addPointOfContact: res.data[0].person_incharge,
+              // addVillage: res.data[0].name,
+              // addDistrict: res.data[0].district.id,
+              filterState: res.data[0].state.name
             }
           });
         })
@@ -201,6 +205,34 @@ class VillagePage extends Component {
     }
   }
 
+  handleVoChange(event,value){
+    if (value !== null) {
+      let distId = value.id;
+      axios
+        .get(process.env.REACT_APP_SERVER_URL + "village-organizations/",{
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + ""
+          }
+        })
+        .then(res => {
+          console.log("villagedata", res.data);
+          let data = res.data;
+          let villageOriganisation = [];
+          for(let i in res.data){
+            console.log("Resultsjadkhajhdasad",data[i]["name"])
+            villageOriganisation.push(data[i]["name"])
+          } 
+          console.log("Resultsjadkhajhdasad",villageOriganisation)
+          // this.setState({ getVillage: res.data.villages });
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    } else {
+      console.log("District null", this.state.filterDistrict);
+    }
+  }
+
   validate = () => {
     const values = this.state.values;
     const validations = this.state.validations;
@@ -229,6 +261,10 @@ class VillagePage extends Component {
     this.validate();
     this.setState({ formSubmitted: "" });
     console.log("aLLVALUES",this.state.values)
+     console.log("State Id",this.state.filterState)
+    console.log("District Id",this.state.filterDistrict)
+    console.log("Village Id",this.state.filterVillage)
+    
     // 
   };
 
@@ -328,11 +364,11 @@ class VillagePage extends Component {
                         fullWidth
                         label="Select State"
                         error={this.hasError("addState")}
-                    helperText={
-                      this.hasError("addState")
-                        ? this.state.errors.addState[0]
-                        : null
-                    }
+                        helperText={
+                          this.hasError("addState")
+                            ? this.state.errors.addState[0]
+                            : null
+                        }
                         name="addState"
                         variant="outlined"
                       />
@@ -419,14 +455,14 @@ class VillagePage extends Component {
                    <Input
                     fullWidth
                     label="Address"
-                    name="addVillage"
-                    error={this.hasError("addVillage")}
+                    name="addAddress"
+                    error={this.hasError("addAddress")}
                     helperText={
-                      this.hasError("addVillage")
-                        ? this.state.errors.addVillage[0]
+                      this.hasError("addAddress")
+                        ? this.state.errors.addAddress[0]
                         : null
                     }
-                    value={this.state.values.addVillage || ""}
+                    value={this.state.values.addAddress || ""}
                     onChange={this.handleChange}
                     variant="outlined"
                   />
@@ -435,14 +471,14 @@ class VillagePage extends Component {
                    <Input
                     fullWidth
                     label="Point Of Contact"
-                    name="addVillage"
-                    error={this.hasError("addVillage")}
+                    name="addPointOfContact"
+                    error={this.hasError("addPointOfContact")}
                     helperText={
-                      this.hasError("addVillage")
-                        ? this.state.errors.addVillage[0]
+                      this.hasError("addPointOfContact")
+                        ? this.state.errors.addPointOfContact[0]
                         : null
                     }
-                    value={this.state.values.addVillage || ""}
+                    value={this.state.values.addPointOfContact || ""}
                     onChange={this.handleChange}
                     variant="outlined"
                   />
@@ -453,7 +489,7 @@ class VillagePage extends Component {
                     options={statesFilter}
                     getOptionLabel={option => option.name}
                     onChange={(event, value) => {
-                      this.handleStateChange(event, value);
+                      this.handleVoChange(event, value);
                     }}
                     value={
                       filterState
@@ -471,7 +507,7 @@ class VillagePage extends Component {
                         {...params}
                         fullWidth
                         label="Select VO"
-                        name="addState"
+                        name="addVo"
                         variant="outlined"
                       />
                     )}
@@ -481,14 +517,14 @@ class VillagePage extends Component {
                    <Input
                     fullWidth
                     label="Bank Account Name"
-                    name="addVillage"
-                    error={this.hasError("addVillage")}
+                    name="addAccountName"
+                    error={this.hasError("addAccountName")}
                     helperText={
-                      this.hasError("addVillage")
-                        ? this.state.errors.addVillage[0]
+                      this.hasError("addAccountName")
+                        ? this.state.errors.addAccountName[0]
                         : null
                     }
-                    value={this.state.values.addVillage || ""}
+                    value={this.state.values.addAccountName || ""}
                     onChange={this.handleChange}
                     variant="outlined"
                   />
@@ -497,14 +533,14 @@ class VillagePage extends Component {
                    <Input
                     fullWidth
                     label="Account Number"
-                    name="addVillage"
-                    error={this.hasError("addVillage")}
+                    name="addAccountNo"
+                    error={this.hasError("addAccountNo")}
                     helperText={
-                      this.hasError("addVillage")
-                        ? this.state.errors.addVillage[0]
+                      this.hasError("addAccountNo")
+                        ? this.state.errors.addAccountNo[0]
                         : null
                     }
-                    value={this.state.values.addVillage || ""}
+                    value={this.state.values.addAccountNo || ""}
                     onChange={this.handleChange}
                     variant="outlined"
                   />
@@ -513,14 +549,14 @@ class VillagePage extends Component {
                    <Input
                     fullWidth
                     label="Bank Name"
-                    name="addVillage"
-                    error={this.hasError("addVillage")}
+                    name="addBankName"
+                    error={this.hasError("addBankName")}
                     helperText={
-                      this.hasError("addVillage")
-                        ? this.state.errors.addVillage[0]
+                      this.hasError("addBankName")
+                        ? this.state.errors.addBankName[0]
                         : null
                     }
-                    value={this.state.values.addVillage || ""}
+                    value={this.state.values.addBankName || ""}
                     onChange={this.handleChange}
                     variant="outlined"
                   />
@@ -529,14 +565,14 @@ class VillagePage extends Component {
                    <Input
                     fullWidth
                     label="Branch"
-                    name="addVillage"
-                    error={this.hasError("addVillage")}
+                    name="addBranch"
+                    error={this.hasError("addBranch")}
                     helperText={
-                      this.hasError("addVillage")
-                        ? this.state.errors.addVillage[0]
+                      this.hasError("addBranch")
+                        ? this.state.errors.addBranch[0]
                         : null
                     }
-                    value={this.state.values.addVillage || ""}
+                    value={this.state.values.addBranch || ""}
                     onChange={this.handleChange}
                     variant="outlined"
                   />
@@ -545,14 +581,14 @@ class VillagePage extends Component {
                    <Input
                     fullWidth
                     label="IFSC Code"
-                    name="addVillage"
-                    error={this.hasError("addVillage")}
+                    name="addIfsc"
+                    error={this.hasError("addIfsc")}
                     helperText={
-                      this.hasError("addVillage")
-                        ? this.state.errors.addVillage[0]
+                      this.hasError("addIfsc")
+                        ? this.state.errors.addIfsc[0]
                         : null
                     }
-                    value={this.state.values.addVillage || ""}
+                    value={this.state.values.addIfsc || ""}
                     onChange={this.handleChange}
                     variant="outlined"
                   />

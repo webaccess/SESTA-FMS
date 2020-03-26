@@ -364,16 +364,12 @@ export class Shgs extends React.Component {
                 <Grid item md={12} xs={12}>
                   <Input
                     fullWidth
-                    label="Shg Name"
-                    name="addShg"
-                    error={this.hasError("addShg")}
-                    helperText={
-                      this.hasError("addShg")
-                        ? this.state.errors.addShg[0]
-                        : null
-                    }
-                    value={this.state.values.addShg || ""}
-                    onChange={this.handleChange}
+                    label="SHG Name"
+                    name="filterShg"
+                    id="combo-box-demo"
+                    margin="dense"
+                    value={this.state.filterShg || ""}
+                    onChange={this.handleChange.bind(this)}
                     variant="outlined"
                   />
                 </Grid>
