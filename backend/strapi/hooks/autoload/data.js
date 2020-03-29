@@ -179,7 +179,25 @@ const modules = {
     displayNavigation: true,
     module: "", //slug
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
-  }
+  },
+  "Add Shg": {
+    is_active: true,
+    icon_class: "",
+    url: "/Shgs/add",
+    slug: "add_shg",
+    displayNavigation: false,
+    module: "", //slug
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+  },
+  "Edit Shg": {
+    is_active: true,
+    icon_class: "",
+    url: "/shgs/edit/:id",
+    slug: "edit_shg",
+    displayNavigation: false,
+    module: "", //slug
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+  },
 };
 
 module.exports = Object.freeze({

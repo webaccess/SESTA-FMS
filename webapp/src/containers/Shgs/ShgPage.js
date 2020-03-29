@@ -91,12 +91,13 @@ class VillagePage extends Component {
           console.log("results",res.data[0].state)
           this.setState({
             values: {
+              Villagesdata:res.data[0].villages,
               addShg: res.data[0].name,
               addAddress: res.data[0].address,
               addPointOfContact: res.data[0].person_incharge,
               // addVillage: res.data[0].name,
-              filterDistrict: res.data[0].district.id,
-              statesFilter: res.data[0].state
+              filterDistrict: res.data[0].district,
+              filterState: res.data[0].state.id
             }
           });
         })
@@ -104,8 +105,8 @@ class VillagePage extends Component {
           console.log(error);
         });
       this.stateIds = this.state.values.addState;
-      
     }
+
     await axios
       .get(process.env.REACT_APP_SERVER_URL + "states/", {
         headers: {
@@ -122,16 +123,13 @@ class VillagePage extends Component {
       this.setState({ stateSelected: true });
     }
 
-   await axios
+    await axios
         .get(process.env.REACT_APP_SERVER_URL + "village-organizations/",{
           headers: {
             Authorization: "Bearer " + auth.getToken() + ""
           }
         })
         .then(res => {
-          console.log("villagedata", res.data);
-         
-          console.log("Resultsjadkhajhdasad",res.data.name)
           this.setState({ getVillageOrganization: res.data });
         })
         .catch(error => {
@@ -170,7 +168,6 @@ class VillagePage extends Component {
         filterDistrict: "",
         filterVillage: ""
       });
-      console.log("state null", this.state.filterState);
     }
   };
 
@@ -258,12 +255,91 @@ class VillagePage extends Component {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
-    console.log("aLLVALUES",this.state.values)
+    console.log("aLLVALUES",this.state.addPointOfContact)
      console.log("State Id",this.state.filterState)
     console.log("District Id",this.state.filterDistrict)
     console.log("Village Id",this.state.filterVillage)
-    
-    // 
+    console.log("shgname",this.state.values.addShg);
+    let shgName = this.state.values.addShg;
+    let shgAddress = this.state.values.addAddress;
+    if (this.state.editPage[0]) {
+    await axios
+    .post(
+      process.env.REACT_APP_SERVER_URL + "shgs/" +
+        this.state.editPage[1],
+      {
+        name: this.state.values.addShg,
+        address: shgAddress,
+        person_incharge: this.state.values.addPointOfContact,
+        state: {
+          id: this.state.filterState
+        },
+        district: {
+          id: this.state.filterDistrict
+        },
+        villages: [
+          {
+            id:  this.state.filterVillage
+          },
+        ],
+        village_organization: {
+          id: this.state.filterVo
+        }
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + auth.getToken() + ""
+        }
+      }
+    )
+    .then(res => {
+      console.log("response from post",res.data)
+      this.setState({ formSubmitted: true });
+      this.props.history.push({ pathname: "/shgs", editData: true });
+    })
+    .catch(error => {
+      console.log(error);
+    });
+    }else {
+       await axios
+    .post(
+      process.env.REACT_APP_SERVER_URL + "shgs/",
+
+      {
+        name: this.state.values.addShg,
+        address: shgAddress,
+        person_incharge: this.state.values.addPointOfContact,
+        state: {
+          id: this.state.filterState
+        },
+        district: {
+          id: this.state.filterDistrict
+        },
+        villages: [
+          {
+            id:  this.state.filterVillage
+          },
+        ],
+        village_organization: {
+          id: this.state.filterVo
+        }
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + auth.getToken() + ""
+        }
+      }
+    )
+    .then(res => {
+      console.log("response from post",res)
+       this.setState({ formSubmitted: true });
+
+          this.props.history.push({ pathname: "/shgs", addData: true });
+    })
+    .catch(error => {
+      console.log("Error  aya",error);
+    });
+    }
   };
 
   cancelForm = () => {
@@ -276,6 +352,8 @@ class VillagePage extends Component {
   };
 
   render() {
+    console.log("aLLVALUES",this.state.values.addPointOfContact)
+    // console.log("hshadshdsajsaddsa",this.state.values.addAddress)
     let statesFilter = this.state.getState;
     let voFilters = this.state.getVillageOrganization;
     let filterVo = this.state.filterVo;
@@ -342,7 +420,7 @@ class VillagePage extends Component {
                   />
                 </Grid>
                  <Grid item md={6} xs={12}>
-                <Autocomplete
+                  <Autocomplete
                     id="combo-box-demo"
                     options={statesFilter}
                     getOptionLabel={option => option.name}
@@ -414,13 +492,13 @@ class VillagePage extends Component {
                     )}
                   />
                 </Grid>
-               
-          
                 <Grid item md={6} xs={12}>
                   <Autocomplete
                     id="combo-box-demo"
                     options={villagesFilter}
                     name="filterVillage"
+                    multiple={filterVillage.length > 0 ? true : false}
+                    filterSelectedOptions
                     getOptionLabel={option => option.name}
                     onChange={(event, value) => {
                       this.handleVillageChange(event, value);
@@ -448,6 +526,7 @@ class VillagePage extends Component {
                             : null
                         }
                         name="filterVillage"
+                        value={this.state.Villagesdata || ""}
                         variant="outlined"
                       />
                     )}
