@@ -48,7 +48,7 @@ export class Shgs extends React.Component {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
-      filterShg:'',
+      filterShg: "",
       Result: [],
       TestData: [],
       data: [],
@@ -136,8 +136,8 @@ export class Shgs extends React.Component {
       console.log("state null", this.state.filterState);
     }
   };
-  handleChange(event){
-    this.setState({filterShg:event.target.value})
+  handleChange(event) {
+    this.setState({ filterShg: event.target.value });
   }
 
   handleDistrictChange(event, value) {
@@ -233,7 +233,7 @@ export class Shgs extends React.Component {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
-      filterShg:'',
+      filterShg: "",
 
       isCancel: true
     });
@@ -243,7 +243,7 @@ export class Shgs extends React.Component {
   handleSearch() {
     console.log("kkk", this.state);
     let searchData = "";
-    if (this.state.filterShg){
+    if (this.state.filterShg) {
       searchData += "name_contains=" + this.state.filterShg + "&&";
     }
     if (this.state.filterState) {
@@ -486,7 +486,7 @@ export class Shgs extends React.Component {
             <br></br>
             <Button onClick={this.handleSearch.bind(this)}>Search</Button>
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <Button color="default" clicked={this.cancelForm}>
+            <Button color="secondary" clicked={this.cancelForm}>
               cancel
             </Button>
           </div>
