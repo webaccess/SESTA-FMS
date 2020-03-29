@@ -4,6 +4,7 @@ import Chip from '@material-ui/core/Chip';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import Input from "../UI/Input/Input.js";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -27,7 +28,7 @@ export default function Tags(props) {
         // defaultValue={[top100Films[13]]}
         filterSelectedOptions
         renderInput={params => (
-          <TextField
+          <Input
             {...params}
             variant={props.variant}
             label={props.label}
