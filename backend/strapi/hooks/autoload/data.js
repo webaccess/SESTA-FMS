@@ -1,7 +1,8 @@
 const roles = {
   "Public": {
     content: {
-      description: "Default role given to unauthenticated user."
+      description: "Default role given to unauthenticated user.",
+      type: "public"
     },
     controllers: [
       {
