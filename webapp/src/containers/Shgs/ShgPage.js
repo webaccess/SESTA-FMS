@@ -3,7 +3,7 @@ import Layout from "../../hoc/Layout/Layout";
 import axios from "axios";
 import auth from "../../components/Auth/Auth";
 import Button from "../../components/UI/Button/Button";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autocomplete from "../../components/Autocomplete/Autocomplete.js";
 import Input from "../../components/UI/Input/Input";
 import {
   Card,
@@ -56,6 +56,21 @@ class VillagePage extends Component {
         },
         addPointOfContact: {
           required: { value: "true", message: "Point of Contact field required" }
+        },
+        addAccountName: {
+          required: { value: "true", message: "Bank Account Name field required" }
+        },
+        addAccountNo: {
+          required: { value: "true", message: "Account Number field required" }
+        },
+        addBankName: {
+          required: { value: "true", message: "Bank Name field required" }
+        },
+        addBranch: {
+          required: { value: "true", message: "Branch field required" }
+        },
+         addIfsc: {
+          required: { value: "true", message: "IFSC field required" }
         },
       },
       errors: {
@@ -143,7 +158,7 @@ class VillagePage extends Component {
       this.setState({
         isCancel: false
       });
-
+      console.log("hgjasdjhsadjhsad")
       let stateId = value.id;
       await axios
         .get(
@@ -205,15 +220,17 @@ class VillagePage extends Component {
   }
 
   handleVillageChange(event, value) {
-    if (value !== null) {
-      this.setState({ filterVillage: value.id });
-      console.log("village", this.state.filterVillage);
-    } else {
-      this.setState({
-        filterVillage: ""
-      });
-      console.log("village", this.state.filterVillage);
-    }
+  
+      console.log("kehta hai dil",event.target)
+    // if (value !== null) {
+    //   this.setState({ filterVillage: value.id });
+    //   console.log("village", this.state.filterVillage);
+    // } else {
+    //   this.setState({
+    //     filterVillage: ""
+    //   });
+    //   console.log("village", this.state.filterVillage);
+    // }
   }
 
   handleVoChange(event,value){
@@ -352,7 +369,10 @@ class VillagePage extends Component {
   };
 
   render() {
-    console.log("aLLVALUES",this.state.values.addPointOfContact)
+    console.log("State",this.state.filterState)
+    console.log("District",this.state.filterDistrict)
+    console.log("VO",this.state.filterVo)
+    console.log("Village",this.state.filterVillage)
     // console.log("hshadshdsajsaddsa",this.state.values.addAddress)
     let statesFilter = this.state.getState;
     let voFilters = this.state.getVillageOrganization;
@@ -392,11 +412,11 @@ class VillagePage extends Component {
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item md={12} xs={12}>
-                  {/* {this.state.formSubmitted === true ? (
+                  {this.state.formSubmitted === true ? (
                     <Snackbar severity="success">
                       Village added successfully.
                     </Snackbar>
-                  ) : null} */}
+                  ) : null} 
                   {this.state.formSubmitted === false ? (
                     <Snackbar severity="error" Showbutton={false}>
                       Network Error - Please try again!
@@ -423,6 +443,8 @@ class VillagePage extends Component {
                   <Autocomplete
                     id="combo-box-demo"
                     options={statesFilter}
+                    label="Select State"
+                    variant="outlined"
                     getOptionLabel={option => option.name}
                     onChange={(event, value) => {
                       this.handleStateChange(event, value);
@@ -440,7 +462,6 @@ class VillagePage extends Component {
                     }
                     renderInput={params => (
                       <Input
-                        {...params}
                         fullWidth
                         label="Select State"
                         error={this.hasError("addState")}
@@ -459,6 +480,8 @@ class VillagePage extends Component {
                <Autocomplete
                     id="combo-box-demo"
                     options={districtsFilter}
+                    label="Select District"
+                    variant="outlined"
                     name="filterDistrict"
                     getOptionLabel={option => option.name}
                     onChange={(event, value) => {
@@ -477,7 +500,6 @@ class VillagePage extends Component {
                     }
                     renderInput={params => (
                       <Input
-                        {...params}
                         fullWidth
                         label="Select District"
                         error={this.hasError("addDistrict")}
@@ -496,9 +518,10 @@ class VillagePage extends Component {
                   <Autocomplete
                     id="combo-box-demo"
                     options={villagesFilter}
+                    variant="outlined"
+                    label="Select Village"
                     name="filterVillage"
-                    multiple={filterVillage.length > 0 ? true : false}
-                    filterSelectedOptions
+                    multiple={true}
                     getOptionLabel={option => option.name}
                     onChange={(event, value) => {
                       this.handleVillageChange(event, value);
@@ -516,7 +539,6 @@ class VillagePage extends Component {
                     }
                     renderInput={params => (
                       <Input
-                        {...params}
                         fullWidth
                         label="Select Village"
                         error={this.hasError("addVillage")}
@@ -568,6 +590,8 @@ class VillagePage extends Component {
                 <Autocomplete
                     id="combo-box-demo"
                     options={voFilters}
+                    variant="outlined"
+                    label="Select VO"
                     getOptionLabel={option => option.name}
                     onChange={(event, value) => {
                       this.handleVoChange(event, value);
@@ -585,7 +609,6 @@ class VillagePage extends Component {
                     }
                     renderInput={params => (
                       <Input
-                        {...params}
                         fullWidth
                         label="Select VO"
                         name="addVo"

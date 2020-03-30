@@ -16,8 +16,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function Tags(props) {
+  console.log("testttt",props.value)
   const classes = useStyles();
-
   return (
       <Autocomplete
         multiple={props.multiple}
@@ -34,8 +34,6 @@ export default function Tags(props) {
             label={props.label}
             placeholder={props.placeholder}
             name={props.name}
-            helperText={props.helperText}
-            error={props.error}
           />
         )}
       />
