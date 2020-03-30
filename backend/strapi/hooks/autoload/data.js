@@ -43,6 +43,10 @@ const roles = {
     },
     controllers: [
       {
+        name: "userspermissions",
+        action: []
+      },
+      {
         name: "user",
         action: ["update"]
       },
@@ -75,6 +79,10 @@ const roles = {
       type: ""
     },
     controllers: [
+      {
+        name: "userspermissions",
+        action: []
+      },
       {
         name: "user",
         action: ["update"]
@@ -109,6 +117,10 @@ const roles = {
     },
     controllers: [
       {
+        name: "userspermissions",
+        action: []
+      },
+      {
         name: "user",
         action: ["update"]
       },
@@ -141,6 +153,10 @@ const roles = {
       type: ""
     },
     controllers: [
+      {
+        name: "userspermissions",
+        action: []
+      },
       {
         name: "user",
         action: ["update"]
