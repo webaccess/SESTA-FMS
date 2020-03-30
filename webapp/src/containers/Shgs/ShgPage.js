@@ -220,8 +220,8 @@ class VillagePage extends Component {
   }
 
   handleVillageChange(event, value) {
-  
-      console.log("kehta hai dil",event.target)
+      
+      console.log("kehta hai dil",event.value)
     // if (value !== null) {
     //   this.setState({ filterVillage: value.id });
     //   console.log("village", this.state.filterVillage);
