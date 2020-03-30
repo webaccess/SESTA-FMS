@@ -6,6 +6,10 @@ const roles = {
     },
     controllers: [
       {
+        name: "userspermissions",
+        action: []
+      },
+      {
         name: "user",
         action: []
       },
