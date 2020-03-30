@@ -48,7 +48,7 @@ bookshelf.model("permission", {
 
 bookshelf.model("roleModule", {
   requireFetch: false,
-  tableName: "modules_roles__roles_modules",
+  tableName: "modules_roles__roles_modules"
 });
 
 module.exports = bookshelf;
