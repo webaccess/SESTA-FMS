@@ -3,7 +3,32 @@ const roles = {
     content: {
       description: "Default role given to unauthenticated user."
     },
-    controllers: [],
+    controllers: [
+      {
+        name: "user",
+        action: []
+      },
+      {
+        name: "module",
+        action: []
+      },
+      {
+        name: "state",
+        action: []
+      },
+      {
+        name: "district",
+        action: []
+      },
+      {
+        name: "village",
+        action: []
+      },
+      {
+        name: "shg",
+        action: []
+      }
+    ],
     grantAllPermissions: true
   },
   "FPO Admin": {
