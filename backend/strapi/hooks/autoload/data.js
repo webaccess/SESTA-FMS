@@ -1,4 +1,11 @@
 const roles = {
+  "Public": {
+    content: {
+      description: "Default role given to unauthenticated user."
+    },
+    controllers: [],
+    grantAllPermissions: true
+  },
   "FPO Admin": {
     content: {
       description: "FPO admin user"
