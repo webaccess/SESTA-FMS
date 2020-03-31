@@ -62,8 +62,8 @@ export class VillageList extends React.Component {
     this.state = {
       filterState: "",
       filterDistrict: "",
-			filterVillage: "",
-			fiterShg:"",
+      filterVillage: "",
+      fiterShg: "",
       Result: [],
       data: [],
       selectedid: 0,
@@ -138,16 +138,16 @@ export class VillageList extends React.Component {
       .catch(error => {
         console.log(error);
       });
-	}
-	onHandleChange = shgValue => {
-		// if (shgValue){    
-			this.setState({
-			isCancel: false,
-			fiterShg:shgValue['id']
-			});
-			this.setState({ selectedShg: shgValue });
-		// }
-	};
+  }
+  onHandleChange = shgValue => {
+    // if (shgValue){
+    this.setState({
+      isCancel: false,
+      fiterShg: shgValue["id"]
+    });
+    this.setState({ selectedShg: shgValue });
+    // }
+  };
   handleChange = (event, value) => {};
   handleStateChange = async (event, value, method) => {
     if (value !== null) {
@@ -179,51 +179,38 @@ export class VillageList extends React.Component {
       this.setState({
         filterState: "",
         filterDistrict: "",
-				filterVillage: "",
-				fiterShg:""
-				// selectedShg:""
+        filterVillage: "",
+        fiterShg: ""
+        // selectedShg:""
       });
     }
   };
   handleDistrictChange(event, value) {
     if (value !== null) {
-			this.setState({ filterDistrict: value.id });
-			let distId = value.id;
-			axios
-			.get(process.env.REACT_APP_SERVER_URL + "districts/" + distId, {
-				headers: {
-					Authorization: "Bearer " + auth.getToken() + ""
-				}
-			})
-			.then(res => {
-				this.setState({ getVillage: res.data.villages });
-			})
-			.catch(error => {
-				console.log(error);
-			});
+      this.setState({ filterDistrict: value.id });
+      let distId = value.id;
     } else {
       this.setState({
         filterDistrict: "",
-				filterVillage: "",
-				fiterShg:""
-				// selectedShg:""
-				
+        filterVillage: "",
+        fiterShg: ""
+        // selectedShg:""
       });
     }
   }
   handleVillageChange(event, value) {
     if (value !== null) {
-			// this.state.filterVillage = value.id;
+      // this.state.filterVillage = value.id;
       this.setState({ filterVillage: value.id });
     } else {
       this.setState({
-				filterVillage: "",
-				fiterShg:""
-				// selectedShg:""
+        filterVillage: "",
+        fiterShg: ""
+        // selectedShg:""
       });
     }
     // this.setState({ selectedShg: "" });
-	}
+  }
 
   editData = cellid => {
     this.props.history.push("/village-organizations/edit/" + cellid);
@@ -283,14 +270,14 @@ export class VillageList extends React.Component {
     this.setState({
       filterState: "",
       filterDistrict: "",
-			filterVillage: "",
-			fiterShg:"",
+      filterVillage: "",
+      fiterShg: "",
       // selectedShg: "",
       isCancel: true
     });
 
     this.componentDidMount();
-	};
+  };
 
   handleSearch() {
     let searchData = "";
@@ -315,14 +302,17 @@ export class VillageList extends React.Component {
     }
 
     if (this.state.filterVillage) {
-			if (!this.state.fiterShg && !this.state.filterState && !this.state.filterDistrict){
-				searchData = "?";
-			}
-			else{
-				searchData += searchData ? "&" : "";
-			}
-			searchData += "shgs.villages=" + this.state.filterVillage;
-		}
+      if (
+        !this.state.fiterShg &&
+        !this.state.filterState &&
+        !this.state.filterDistrict
+      ) {
+        searchData = "?";
+      } else {
+        searchData += searchData ? "&" : "";
+      }
+      searchData += "shgs.villages=" + this.state.filterVillage;
+    }
     // } else {
     //   searchData += "shgs.villages=" + this.state.filterVillage;
     // }
@@ -344,7 +334,6 @@ export class VillageList extends React.Component {
         console.log("err", err);
       });
   }
-
 
   render() {
     let data = this.state.data;
@@ -472,7 +461,6 @@ export class VillageList extends React.Component {
                   </Grid>
                 </div>
               </div>
-
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
