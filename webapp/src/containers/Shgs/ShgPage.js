@@ -365,7 +365,7 @@ class VillagePage extends Component {
       this.bankValidate();
     }
     this.setState({ formSubmitted: "" });
-    if (Object.keys(this.state.errors).length > 0) return;
+    // if (Object.keys(this.state.errors).length > 0) return;
     let shgName = this.state.values.addShg;
     let shgAddress = this.state.values.addAddress;
     let shgPersonInCharge = this.state.values.addPointOfContact;
@@ -453,10 +453,44 @@ class VillagePage extends Component {
 
     let bankDetails = this.state.bankDeatilsId;
      console.log("bank ka details " ,bankDetails);
-    
-
+     if (bankDetails.length > 0){
+      this.handleBankDetails(bankDetails);
+    }
     }
   };
+
+ handleBankDetails = async (bankDetails )=> {
+    if (this.state.checkedB){
+    await axios
+  .put(
+    process.env.REACT_APP_SERVER_URL + "bank-details?shg="+ this.state.editPage[1], //edit page shg  id will be here
+
+    {
+      account_name: this.state.values.addAccountName,
+      account_no: this.state.values.addAccountName,
+      bank_name: this.state.values.addBankName,
+      branch: this.state.values.addBranch,
+      ifsc_code: this.state.values.addIfsc,
+      shg: bankDetails
+    },
+    {
+      headers: {
+        Authorization: "Bearer " + auth.getToken() + ""
+      }
+    }
+  )
+  .then(res => {
+    this.setState({ formSubmitted: true });
+
+    this.props.history.push({ pathname: "/Shgs", addData: true });
+  })
+  .catch(error => {
+    this.setState({ formSubmitted: false });
+    console.log(error);
+    console.log("formsubmitted", this.state.formSubmitted);
+  });
+}
+  }
 
   cancelForm = () => {
     this.setState({
