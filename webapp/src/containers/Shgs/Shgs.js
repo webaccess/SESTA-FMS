@@ -383,7 +383,6 @@ export class Shgs extends React.Component {
                     label="SHG Name"
                     name="filterShg"
                     id="combo-box-demo"
-                    margin="dense"
                     value={this.state.filterShg || ""}
                     onChange={this.handleChange.bind(this)}
                     variant="outlined"
@@ -417,7 +416,6 @@ export class Shgs extends React.Component {
                         {...params}
                         fullWidth
                         label="Select State"
-                        margin="dense"
                         name="addState"
                         variant="outlined"
                       />
@@ -453,7 +451,6 @@ export class Shgs extends React.Component {
                         {...params}
                         fullWidth
                         label="Select District"
-                        margin="dense"
                         name="filterDistrict"
                         variant="outlined"
                       />
@@ -489,7 +486,6 @@ export class Shgs extends React.Component {
                         {...params}
                         fullWidth
                         label="Select Village"
-                        margin="dense"
                         // value={filterVillage}
                         name="filterVillage"
                         variant="outlined"
@@ -502,7 +498,7 @@ export class Shgs extends React.Component {
             <br></br>
             <Button onClick={this.handleSearch.bind(this)}>Search</Button>
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <Button color="default" clicked={this.cancelForm}>
+            <Button color="secondary" clicked={this.cancelForm}>
               cancel
             </Button>
           </div>
