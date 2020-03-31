@@ -89,6 +89,20 @@ export class Shgs extends React.Component {
       .catch(error => {
         console.log(error);
       });
+    //api call for village filter
+    await axios
+      .get(process.env.REACT_APP_SERVER_URL + "villages/", {
+        headers: {
+          Authorization: "Bearer " + auth.getToken() + ""
+        }
+      })
+      .then(res => {
+        console.log("villagedata", res.data);
+        this.setState({ getVillage: res.data });
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
   getData(result) {
     for (let i in result) {
@@ -131,9 +145,10 @@ export class Shgs extends React.Component {
       this.setState({
         filterState: "",
         filterDistrict: "",
-        filterVillage: ""
+        filterVillage: "",
+        getVillage: ""
       });
-      console.log("state null", this.state.filterState);
+      this.componentDidMount();
     }
   };
   handleChange(event) {
@@ -163,19 +178,20 @@ export class Shgs extends React.Component {
         filterDistrict: "",
         filterVillage: ""
       });
-      console.log("District null", this.state.filterDistrict);
+      this.componentDidMount();
     }
   }
 
   handleVillageChange(event, value) {
     if (value !== null) {
       this.setState({ filterVillage: value.id });
-      console.log("village", this.state.filterVillage);
+      this.setState({
+        isCancel: false
+      });
     } else {
       this.setState({
         filterVillage: ""
       });
-      console.log("village", this.state.filterVillage);
     }
   }
 

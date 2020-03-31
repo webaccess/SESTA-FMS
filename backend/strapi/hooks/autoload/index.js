@@ -144,6 +144,7 @@ module.exports = strapi => {
         return {
           name: r,
           description: content.description ? content.description : r,
+          type: content.type ? content.type : r,
           permissions: {
             application: {
               controllers: updatedController
@@ -168,7 +169,7 @@ module.exports = strapi => {
                   .forge({
                     name: role.name,
                     description: role.description,
-                    type: role.name
+                    type: role.type
                   })
                   .save()
                   .then(async function rRoles(r) {
