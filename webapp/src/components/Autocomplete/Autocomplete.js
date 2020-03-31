@@ -1,4 +1,3 @@
-/* eslint-disable no-use-before-define */
 import React from 'react';
 import Chip from '@material-ui/core/Chip';
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -16,26 +15,34 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function Tags(props) {
-  console.log("testttt",props.value)
+  const { autoFocus, variant, error, ...rest } = props;
+  // console.log("testttt",props.value)
   const classes = useStyles();
   return (
       <Autocomplete
+      
         multiple={props.multiple}
         id={props.id}
         options={props.options}
         getOptionLabel={props.getOptionLabel}
         onChange={props.onChange}
+        // error={props.error}
         // defaultValue={[top100Films[13]]}
         filterSelectedOptions
+        value={props.value}
+        {...rest}
+       
         renderInput={params => (
           <Input
             {...params}
+            helperText={props.error===true?props.helperText:null}
+            error={ props.error?props.error:false}
             variant={props.variant}
             label={props.label}
             placeholder={props.placeholder}
             name={props.name}
-            error={props.error}
-            helperText={props.helperText}
+           
+          //  {...rest}
           />
         )}
       />
