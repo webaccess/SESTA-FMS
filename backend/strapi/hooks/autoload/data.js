@@ -1,7 +1,41 @@
 const roles = {
+  "Public": {
+    content: {
+      description: "Default role given to unauthenticated user.",
+      type: "public"
+    },
+    controllers: [
+      {
+        name: "user",
+        action: []
+      },
+      {
+        name: "module",
+        action: []
+      },
+      {
+        name: "state",
+        action: []
+      },
+      {
+        name: "district",
+        action: []
+      },
+      {
+        name: "village",
+        action: []
+      },
+      {
+        name: "shg",
+        action: []
+      }
+    ],
+    grantAllPermissions: true
+  },
   "FPO Admin": {
     content: {
-      description: "FPO admin user"
+      description: "FPO admin user",
+      type: ""
     },
     controllers: [
       {
@@ -33,7 +67,8 @@ const roles = {
   },
   "Sesta Admin": {
     content: {
-      description: "Sesta admin user"
+      description: "Sesta admin user",
+      type: ""
     },
     controllers: [
       {
@@ -65,7 +100,8 @@ const roles = {
   },
   "CSP (Community Service Provider)": {
     content: {
-      description: "Community service provider user"
+      description: "Community service provider user",
+      type: ""
     },
     controllers: [
       {
@@ -97,7 +133,8 @@ const roles = {
   },
   Superadmin: {
     content: {
-      description: "Superadmin user"
+      description: "Superadmin user",
+      type: ""
     },
     controllers: [
       {
