@@ -49,8 +49,34 @@ import SearchInput from "../SearchInput";
 import differenceBy from "lodash/differenceBy";
 
 import { Card, Checkbox } from "@material-ui/core";
+import IconButton from "@material-ui/core/IconButton";
+import DeleteIcon from "@material-ui/icons/Delete";
+import EditIcon from "@material-ui/icons/Edit";
+import { makeStyles } from "@material-ui/styles";
+
+const useStyles = makeStyles(theme => ({
+  editIcon: {
+    color: "#028941",
+    "&:hover": {
+      color: "#026430"
+    },
+    "&:active": {
+      color: "#03b053"
+    }
+  },
+  deleteIcon: {
+    color: "#e60000",
+    "&:hover": {
+      color: "#b30000"
+    },
+    "&:active": {
+      color: "#ff1a1a"
+    }
+  }
+}));
 
 const Table = props => {
+  const classes = useStyles();
   const [selectedRows, setSelectedRows] = React.useState([]);
   const row = selectedRows.map(r => r.id);
   const [cellId, setcellId] = React.useState([]);
@@ -58,10 +84,10 @@ const Table = props => {
   const handleChange = React.useCallback(state => {
     setSelectedRows(state.selectedRows);
   }, []);
-  const deleteDataModal = event => {
+  const deleteDataModal = (id, value) => {
     setisDeleteAllShowing(!isDeleteAllShowing);
-    setcellId(event.target.id);
-    setcellName(event.target.value);
+    setcellId(id);
+    setcellName(value);
   };
 
   let searchFilter = props.filters;
@@ -69,8 +95,9 @@ const Table = props => {
   let dataName = cellName;
   let DataID = cellId;
 
-  const editData = event => {
-    props.editData(event.target.id);
+  const editData = id => {
+    console.log("id==", id);
+    props.editData(id);
   };
 
   const handleDeleteAllEvent = () => {
@@ -95,29 +122,24 @@ const Table = props => {
   const column = [
     {
       cell: cell => (
-        <button
-          className="material-icons"
-          className={style.editButton}
-          id={cell.id}
-          value={cell[valueformodal]}
-          onClick={editData}
-        >
-          edit
-        </button>
+        <div onClick={event => editData(cell.id)} id={cell.id}>
+          <IconButton aria-label="edit" value={cell[valueformodal]}>
+            <EditIcon className={classes.editIcon} />
+          </IconButton>
+        </div>
       ),
       button: true
     },
     {
       cell: cell => (
-        <button
-          className="material-icons"
-          className={style.deleteButton}
+        <div
+          onClick={event => deleteDataModal(cell.id, cell[valueformodal])}
           id={cell.id}
-          value={cell[valueformodal]}
-          onClick={deleteDataModal}
         >
-          delete
-        </button>
+          <IconButton aria-label="delete">
+            <DeleteIcon className={classes.deleteIcon} />
+          </IconButton>
+        </div>
       ),
       button: true
     }

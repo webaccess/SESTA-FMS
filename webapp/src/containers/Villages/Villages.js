@@ -119,8 +119,8 @@ export class Villages extends React.Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-          "districts?master_state.id=" +
-          stateId,
+            "districts?master_state.id=" +
+            stateId,
           {
             headers: {
               Authorization: "Bearer " + auth.getToken() + ""
@@ -195,7 +195,6 @@ export class Villages extends React.Component {
         });
     }
     // }
-
   };
   DeleteAll = selectedId => {
     if (selectedId.length !== 0) {
@@ -249,15 +248,16 @@ export class Villages extends React.Component {
     }
     if (this.state.filterDistrict) {
       searchData += "district.id=" + this.state.filterDistrict + "&&";
-    } if (this.state.values.addVillage) {
+    }
+    if (this.state.values.addVillage) {
       searchData += "name_contains=" + this.state.values.addVillage;
     }
     axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-        "villages?" +
-        searchData +
-        "&&_sort=name:ASC",
+          "villages?" +
+          searchData +
+          "&&_sort=name:ASC",
         {
           headers: {
             Authorization: "Bearer " + auth.getToken() + ""
@@ -333,12 +333,12 @@ export class Villages extends React.Component {
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
-              this.state.singleDelete !== "" &&
-              this.state.singleDelete ? (
-                <Snackbar severity="success" Showbutton={false}>
-                  Village {this.state.singleDelete} deleted successfully!
-                </Snackbar>
-              ) : null}
+            this.state.singleDelete !== "" &&
+            this.state.singleDelete ? (
+              <Snackbar severity="success" Showbutton={false}>
+                Village {this.state.singleDelete} deleted successfully!
+              </Snackbar>
+            ) : null}
             {this.state.singleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
@@ -387,10 +387,10 @@ export class Villages extends React.Component {
                           ? this.state.isCancel === true
                             ? null
                             : statesFilter[
-                            statesFilter.findIndex(function (item, i) {
-                              return item.id === filterState;
-                            })
-                            ] || null
+                                statesFilter.findIndex(function(item, i) {
+                                  return item.id === filterState;
+                                })
+                              ] || null
                           : null
                       }
                       renderInput={params => (
@@ -422,10 +422,10 @@ export class Villages extends React.Component {
                           ? this.state.isCancel === true
                             ? null
                             : districtsFilter[
-                            districtsFilter.findIndex(function (item, i) {
-                              return item.id === filterDistrict;
-                            })
-                            ] || null
+                                districtsFilter.findIndex(function(item, i) {
+                                  return item.id === filterDistrict;
+                                })
+                              ] || null
                           : null
                       }
                       renderInput={params => (
@@ -441,13 +441,11 @@ export class Villages extends React.Component {
                   </Grid>
                 </div>
               </div>
-              <div className={classes.searchInput}>
-
-              </div>
+              <div className={classes.searchInput}></div>
               <br></br>
               <Button onClick={this.handleSearch.bind(this)}>Search</Button>
               &nbsp;&nbsp;&nbsp;
-              <Button color="default" clicked={this.cancelForm}>
+              <Button color="secondary" clicked={this.cancelForm}>
                 cancel
               </Button>
             </div>
@@ -470,8 +468,8 @@ export class Villages extends React.Component {
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (
-                <h1>Loading...</h1>
-              )}
+              <h1>Loading...</h1>
+            )}
           </div>
         </Grid>
       </Layout>

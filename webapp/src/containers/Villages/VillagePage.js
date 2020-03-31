@@ -47,6 +47,7 @@ class VillagePage extends Component {
       },
       serverErrors: {},
       formSubmitted: "",
+      errorCode:"",
       stateSelected: false,
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
@@ -234,6 +235,11 @@ class VillagePage extends Component {
         })
         .catch(error => {
           this.setState({ formSubmitted: false });
+          if(error.response !== undefined){
+          this.setState({errorCode:error.response.data.statusCode+" Error- "+error.response.data.error+" Message- "+error.response.data.message+" Please try again!"})
+          }else{
+            this.setState({errorCode:"Network Error - Please try again!"});
+          }
           console.log(error);
         });
     } else {
@@ -264,7 +270,11 @@ class VillagePage extends Component {
         })
         .catch(error => {
           this.setState({ formSubmitted: false });
-          console.log(error);
+          if(error.response !== undefined){
+            this.setState({errorCode:error.response.data.statusCode+" Error- "+error.response.data.error+" Message- "+error.response.data.message+" Please try again!"})
+            }else{
+              this.setState({errorCode:"Network Error - Please try again!"});
+            }
           console.log("formsubmitted", this.state.formSubmitted);
         });
     }
@@ -318,7 +328,7 @@ class VillagePage extends Component {
                   ) : null} */}
                   {this.state.formSubmitted === false ? (
                     <Snackbar severity="error" Showbutton={false}>
-                      Network Error - Please try again!
+                      {this.state.errorCode}
                     </Snackbar>
                   ) : null}
                 </Grid>

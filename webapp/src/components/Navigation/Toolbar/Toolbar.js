@@ -22,6 +22,15 @@ const useStyles = makeStyles(theme => ({
   },
   signOutButton: {
     marginLeft: theme.spacing(1)
+  },
+  accntBtn: {
+    backgroundColor: "#028941",
+    "&:hover": {
+      backgroundColor: "#026430"
+    },
+    "&:active": {
+      backgroundColor: "#03b053"
+    }
   }
 }));
 
@@ -75,6 +84,7 @@ function Toolbar(props) {
           <div className={classes.flexGrow} />
           <Hidden mdDown>
             <IconButton
+              className={classes.accntBtn}
               edge="end"
               aria-label="account of current user"
               aria-controls={menuId}
