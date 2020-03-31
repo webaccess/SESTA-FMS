@@ -139,6 +139,7 @@ class VillagePage extends Component {
               addBankName: res.data[0].bank_detail.bank_name,
               addAccountNo: res.data[0].bank_detail.account_no,
               addIfsc: res.data[0].bank_detail.ifsc_code,
+              addBranch: res.data[0].bank_detail.branch,
             }
           });
           stateId = res.data[0].state.id;
@@ -278,12 +279,12 @@ class VillagePage extends Component {
     let villageValue = [];
     for(let i in value){
     if(i!==value.length){
-villageValue.push("{"+"id :"+value[i]+"},");
-    }else{
-villageValue.push("{"+"id :"+value[i]+"}");
-}
+    villageValue.push("{"+"id :"+value[i]['id']+"}");
+        }else{
+    villageValue.push("{"+"id :"+value[i]['id']+"}");
     }
-    
+    }
+
      console.log("test",villageValue)
     if (value !== null) {
       this.setState({
@@ -388,7 +389,7 @@ villageValue.push("{"+"id :"+value[i]+"}");
     // if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
     await axios
-    .post(
+    .put(
       process.env.REACT_APP_SERVER_URL + "shgs/" +
         this.state.editPage[1],
       {
@@ -403,7 +404,7 @@ villageValue.push("{"+"id :"+value[i]+"}");
         },
         villages: [
           {
-            id:  shgVillage
+           shgVillage
           },
         ],
         village_organization: {
@@ -439,7 +440,7 @@ villageValue.push("{"+"id :"+value[i]+"}");
           id: shgDistrict
         },
         villages: {
-            id:  shgVillage
+           shgVillage
           },
         village_organization: {
           id: shgVo
