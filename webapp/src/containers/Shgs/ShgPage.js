@@ -122,6 +122,7 @@ class VillagePage extends Component {
         )
         .then(res => {
           console.log("results", res.data[0].state);
+          console.log("village",res.data[0].bank_detail.id)
           this.setState({
             values: {
               Villagesdata: res.data[0].villages,
@@ -129,8 +130,15 @@ class VillagePage extends Component {
               addAddress: res.data[0].address,
               addPointOfContact: res.data[0].person_incharge,
               addDistrict: res.data[0].district.id,
+              addVillage: res.data[0].villages[0].id,
               addState: res.data[0].state.id,
- 	            addVo: res.data[0].village_organization.id
+ 	            addVo: res.data[0].village_organization.id, 
+            },
+            bankValues:{
+              addAccountName: res.data[0].bank_detail.account_name,
+              addBankName: res.data[0].bank_detail.bank_name,
+              addAccountNo: res.data[0].bank_detail.account_no,
+              addIfsc: res.data[0].bank_detail.ifsc_code,
             }
           });
           stateId = res.data[0].state.id;
@@ -157,39 +165,23 @@ class VillagePage extends Component {
         .catch(error => {
           console.log(error);
         });
-    } //if ends here
-    //default village list
-    // await axios
-    //   .get(
-    //     process.env.REACT_APP_SERVER_URL + "villages", //value recovered from shg api call state value
-    //     {
-    //       headers: {
-    //         Authorization: "Bearer " + auth.getToken() + ""
-    //       }
-    //     }
-    //   )
-    //   .then(res => {
-    //     this.setState({ getVillage: res.data }); // village list data
-    //   })
-    //   .catch(error => {
-    //     console.log(error);
-    //   });
+      }
 
-    await axios
-      .get(process.env.REACT_APP_SERVER_URL + "states/", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
-      })
-      .then(res => {
-        this.setState({ getState: res.data });
-      })
-      .catch(error => {
-        console.log(error);
-      });
-    if (this.state.values.addState) {
-      this.setState({ stateSelected: true });
-    }
+      await axios
+        .get(process.env.REACT_APP_SERVER_URL + "states/", {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + ""
+          }
+        })
+        .then(res => {
+          this.setState({ getState: res.data });
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      if (this.state.values.addState) {
+        this.setState({ stateSelected: true });
+      }
 
     await axios
       .get(process.env.REACT_APP_SERVER_URL + "village-organizations/", {
@@ -285,9 +277,13 @@ class VillagePage extends Component {
     console.log("kehta hai dil", value);
     let villageValue = [];
     for(let i in value){
-     
-      villageValue.push(value[i]['id'])
+    if(i!==value.length){
+villageValue.push("{"+"id :"+value[i]+"},");
+    }else{
+villageValue.push("{"+"id :"+value[i]+"}");
+}
     }
+    
      console.log("test",villageValue)
     if (value !== null) {
       this.setState({
@@ -386,6 +382,7 @@ class VillagePage extends Component {
     let shgDistrict = this.state.values.addDistrict;
     let shgVillage = this.state.values.addVillage;
     let shgVo = this.state.values.addVo;
+
     console.log("sdghasdghsadhgsad",Object.keys(this.state.errors).length)
     let bankId = [];
     // if (Object.keys(this.state.errors).length > 0) return;
