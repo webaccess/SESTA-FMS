@@ -130,7 +130,7 @@ class VillagePage extends Component {
           // console.log("village",villageArr)
           this.setState({
             values: {
-              // Villagesdata: res.data[0].villages.id,
+              Villagesdata: res.data[0].villages.id,
               addShg: res.data[0].name,
               addAddress: res.data[0].address,
               addPointOfContact: res.data[0].person_incharge,
@@ -148,9 +148,12 @@ class VillagePage extends Component {
               addAccountNo: res.data[0].bank_detail.account_no,
               addIfsc: res.data[0].bank_detail.ifsc_code,
               addBranch: res.data[0].bank_detail.branch,
-            }})
-          
-}
+          }})
+          }else{
+          this.setState({
+            checkedB: false
+          })}
+
           stateId = res.data[0].state.id;
         })
         .catch(error => {
