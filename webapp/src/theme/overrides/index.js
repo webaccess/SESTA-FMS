@@ -1,9 +1,10 @@
-import MuiButton from './MuiButton';
-import MuiIconButton from './MuiIconButton';
-import MuiPaper from './MuiPaper';
-import MuiTableCell from './MuiTableCell';
-import MuiTableHead from './MuiTableHead';
-import MuiTypography from './MuiTypography';
+import MuiButton from "./MuiButton";
+import MuiIconButton from "./MuiIconButton";
+import MuiPaper from "./MuiPaper";
+import MuiTableCell from "./MuiTableCell";
+import MuiTableHead from "./MuiTableHead";
+import MuiTypography from "./MuiTypography";
+import MuiAppBar from "./MuiAppBar";
 
 export default {
   MuiButton,
@@ -11,5 +12,6 @@ export default {
   MuiPaper,
   MuiTableCell,
   MuiTableHead,
-  MuiTypography
+  MuiTypography,
+  MuiAppBar
 };

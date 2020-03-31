@@ -37,7 +37,9 @@ function renderInputComponent(inputProps) {
 }
 
 function getSuggestions(value, data) {
-  if (value) {
+  console.log("Value",value,value.length);
+  if (value.length > 1 ) {
+  // if (value) {
     const inputValue = deburr(value.trim()).toLowerCase();
     const inputLength = inputValue.length;
     let count = 0;

@@ -48,7 +48,7 @@ export class Shgs extends React.Component {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
-      filterShg:'',
+      filterShg: "",
       Result: [],
       TestData: [],
       data: [],
@@ -85,6 +85,20 @@ export class Shgs extends React.Component {
       })
       .then(res => {
         this.setState({ getState: res.data });
+      })
+      .catch(error => {
+        console.log(error);
+      });
+    //api call for village filter
+    await axios
+      .get(process.env.REACT_APP_SERVER_URL + "villages/", {
+        headers: {
+          Authorization: "Bearer " + auth.getToken() + ""
+        }
+      })
+      .then(res => {
+        console.log("villagedata", res.data);
+        this.setState({ getVillage: res.data });
       })
       .catch(error => {
         console.log(error);
@@ -131,13 +145,14 @@ export class Shgs extends React.Component {
       this.setState({
         filterState: "",
         filterDistrict: "",
-        filterVillage: ""
+        filterVillage: "",
+        getVillage: ""
       });
-      console.log("state null", this.state.filterState);
+      this.componentDidMount();
     }
   };
-  handleChange(event){
-    this.setState({filterShg:event.target.value})
+  handleChange(event) {
+    this.setState({ filterShg: event.target.value });
   }
 
   handleDistrictChange(event, value) {
@@ -163,19 +178,20 @@ export class Shgs extends React.Component {
         filterDistrict: "",
         filterVillage: ""
       });
-      console.log("District null", this.state.filterDistrict);
+      this.componentDidMount();
     }
   }
 
   handleVillageChange(event, value) {
     if (value !== null) {
       this.setState({ filterVillage: value.id });
-      console.log("village", this.state.filterVillage);
+      this.setState({
+        isCancel: false
+      });
     } else {
       this.setState({
         filterVillage: ""
       });
-      console.log("village", this.state.filterVillage);
     }
   }
 
@@ -233,7 +249,7 @@ export class Shgs extends React.Component {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
-      filterShg:'',
+      filterShg: "",
 
       isCancel: true
     });
@@ -243,7 +259,7 @@ export class Shgs extends React.Component {
   handleSearch() {
     console.log("kkk", this.state);
     let searchData = "";
-    if (this.state.filterShg){
+    if (this.state.filterShg) {
       searchData += "name_contains=" + this.state.filterShg + "&&";
     }
     if (this.state.filterState) {
@@ -367,7 +383,6 @@ export class Shgs extends React.Component {
                     label="SHG Name"
                     name="filterShg"
                     id="combo-box-demo"
-                    margin="dense"
                     value={this.state.filterShg || ""}
                     onChange={this.handleChange.bind(this)}
                     variant="outlined"
@@ -401,7 +416,6 @@ export class Shgs extends React.Component {
                         {...params}
                         fullWidth
                         label="Select State"
-                        margin="dense"
                         name="addState"
                         variant="outlined"
                       />
@@ -437,7 +451,6 @@ export class Shgs extends React.Component {
                         {...params}
                         fullWidth
                         label="Select District"
-                        margin="dense"
                         name="filterDistrict"
                         variant="outlined"
                       />
@@ -473,7 +486,6 @@ export class Shgs extends React.Component {
                         {...params}
                         fullWidth
                         label="Select Village"
-                        margin="dense"
                         // value={filterVillage}
                         name="filterVillage"
                         variant="outlined"
@@ -486,7 +498,7 @@ export class Shgs extends React.Component {
             <br></br>
             <Button onClick={this.handleSearch.bind(this)}>Search</Button>
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <Button color="default" clicked={this.cancelForm}>
+            <Button color="secondary" clicked={this.cancelForm}>
               cancel
             </Button>
           </div>
