@@ -541,7 +541,7 @@ class VillagePage extends Component {
                 <Grid item md={12} xs={12}>
                   {this.state.formSubmitted === true ? (
                     <Snackbar severity="success">
-                      Village added successfully.
+                      Shg added successfully.
                     </Snackbar>
                   ) : null}
                   {this.state.formSubmitted === false ? (
@@ -646,6 +646,7 @@ class VillagePage extends Component {
                     id="combo-box-demo"
                     options={villagesFilter}
                     variant="outlined"
+                    multiple={true}
                     label="Select Village"
                     name="addVillage"
                     getOptionLabel={option => option.name}
