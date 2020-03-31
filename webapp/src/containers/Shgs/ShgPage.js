@@ -4,6 +4,7 @@ import axios from "axios";
 import auth from "../../components/Auth/Auth";
 import Button from "../../components/UI/Button/Button";
 import Autocomplete from "../../components/Autocomplete/Autocomplete.js";
+import Autosuggest from "../../components/Autosuggest/Autosuggest.js";
 import Input from "../../components/UI/Input/Input";
 import {
   Card,
@@ -41,9 +42,9 @@ class VillagePage extends Component {
         addShg: {
           required: { value: "true", message: "Shg field required" }
         },
-        addVillage: {
-          required: { value: "true", message: "Village field required" }
-        },
+        // addVillage: {
+        //   required: { value: "true", message: "Village field required" }
+        // },
         addState: {
           required: { value: "true", message: "State field required" }
         },
@@ -158,21 +159,21 @@ class VillagePage extends Component {
         });
     } //if ends here
     //default village list
-    await axios
-      .get(
-        process.env.REACT_APP_SERVER_URL + "villages", //value recovered from shg api call state value
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
-        }
-      )
-      .then(res => {
-        this.setState({ getVillage: res.data }); // village list data
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    // await axios
+    //   .get(
+    //     process.env.REACT_APP_SERVER_URL + "villages", //value recovered from shg api call state value
+    //     {
+    //       headers: {
+    //         Authorization: "Bearer " + auth.getToken() + ""
+    //       }
+    //     }
+    //   )
+    //   .then(res => {
+    //     this.setState({ getVillage: res.data }); // village list data
+    //   })
+    //   .catch(error => {
+    //     console.log(error);
+    //   });
 
     await axios
       .get(process.env.REACT_APP_SERVER_URL + "states/", {
@@ -210,10 +211,7 @@ class VillagePage extends Component {
       this.setState({
         values: { ...this.state.values, addState: value.id }
       });
-      this.setState({
-        isCancel: false
-      });
-      console.log("hgjasdjhsadjhsad");
+
       let stateId = value.id;
       await axios
         .get(
@@ -234,9 +232,13 @@ class VillagePage extends Component {
         });
     } else {
       this.setState({
-        addState: "",
-        addDistrict: "",
-        addVillage: ""
+        values: {
+          ...this.state.values,
+          addState: "",
+          addDistrict: "",
+          filterVillage: "",
+          addVillage: ""
+        }
       });
     }
   };
@@ -269,23 +271,27 @@ class VillagePage extends Component {
         });
     } else {
       this.setState({
-        addDistrict: "",
-        addVillage: ""
+        values: {
+          ...this.state.values,
+          addDistrict: "",
+          filterVillage: "",
+          addVillage: ""
+        }
       });
     }
   }
 
   handleVillageChange(event, value) {
     console.log("kehta hai dil", value);
-    // let villageValue = [];
-    // for(let i in value){
+    let villageValue = [];
+    for(let i in value){
      
-    //   villageValue.push(value[i]['id'])
-    // }
-    //  console.log("test",villageValue)
+      villageValue.push(value[i]['id'])
+    }
+     console.log("test",villageValue)
     if (value !== null) {
       this.setState({
-        values: { ...this.state.values, addVillage: value.id }
+        values: { ...this.state.values, addVillage: villageValue }
       });
       console.log("village", this.state.addVillage);
     } else {
@@ -300,6 +306,13 @@ class VillagePage extends Component {
     if (value !== null) {
       this.setState({
         values: { ...this.state.values, addVo: value.id }
+      });
+    } else {
+      this.setState({
+        values: {
+          ...this.state.values,
+          addVo: ""
+        }
       });
     }
   }
@@ -341,15 +354,15 @@ class VillagePage extends Component {
     }
   };
 
-   hasBankError = field => {
-    if(this.state.checkedB){
-    if (this.state.bankErrors[field] !== undefined) {
-      return Object.keys(this.state.bankErrors).length > 0 &&
-        this.state.bankErrors[field].length > 0
-        ? true
-        : false;
+  hasBankError = field => {
+    if (this.state.checkedB) {
+      if (this.state.bankErrors[field] !== undefined) {
+        return Object.keys(this.state.bankErrors).length > 0 &&
+          this.state.bankErrors[field].length > 0
+          ? true
+          : false;
+      }
     }
-  }
   };
 
   handleCheckBox = event => {
@@ -374,8 +387,8 @@ class VillagePage extends Component {
     let shgVillage = this.state.values.addVillage;
     let shgVo = this.state.values.addVo;
     console.log("sdghasdghsadhgsad",Object.keys(this.state.errors).length)
-
-    if (Object.keys(this.state.errors).length > 0) return;
+    let bankId = [];
+    // if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
     await axios
     .post(
@@ -444,26 +457,22 @@ class VillagePage extends Component {
     .then(res => {
       console.log("response from post",res)
        this.setState({ formSubmitted: true });
-       this.setState({ bankDeatilsId: res.data.id });
-          // this.props.history.push({ pathname: "/shgs", addData: true });
+       let bankId = res.data.id
+       this.setState({ bankDeatilsId: bankId });
+       this.handleBankDetails(bankId);   // 
+       this.props.history.push({ pathname: "/shgs", addData: true });
     })
     .catch(error => {
       console.log("Error  aya",error);
     });
-
-    let bankDetails = this.state.bankDeatilsId;
-     console.log("bank ka details " ,bankDetails);
-     if (bankDetails.length > 0){
-      this.handleBankDetails(bankDetails);
-    }
     }
   };
 
- handleBankDetails = async (bankDetails )=> {
-    if (this.state.checkedB){
+ handleBankDetails = async (bankId )=> {
+   if (this.state.checkedB){
     await axios
-  .put(
-    process.env.REACT_APP_SERVER_URL + "bank-details?shg="+ this.state.editPage[1], //edit page shg  id will be here
+  .post(
+    process.env.REACT_APP_SERVER_URL + "bank-details?shg=", 
 
     {
       account_name: this.state.values.addAccountName,
@@ -471,7 +480,7 @@ class VillagePage extends Component {
       bank_name: this.state.values.addBankName,
       branch: this.state.values.addBranch,
       ifsc_code: this.state.values.addIfsc,
-      shg: bankDetails
+      shg: this.state.bankDeatilsId
     },
     {
       headers: {
@@ -490,7 +499,7 @@ class VillagePage extends Component {
     console.log("formsubmitted", this.state.formSubmitted);
   });
 }
-  }
+  };
 
   cancelForm = () => {
     this.setState({
@@ -567,7 +576,7 @@ class VillagePage extends Component {
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <Autocomplete
+                  <Autosuggest
                     id="combo-box-demo"
                     options={statesFilter}
                     label="Select State"
@@ -604,7 +613,7 @@ class VillagePage extends Component {
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <Autocomplete
+                  <Autosuggest
                     id="combo-box-demo"
                     options={districtsFilter}
                     label="Select District"
@@ -645,8 +654,8 @@ class VillagePage extends Component {
                     <Autocomplete
                     id="combo-box-demo"
                     options={villagesFilter}
-                    variant="outlined"
                     multiple={true}
+                    variant="outlined"
                     label="Select Village"
                     name="addVillage"
                     getOptionLabel={option => option.name}
@@ -714,7 +723,7 @@ class VillagePage extends Component {
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <Autocomplete
+                  <Autosuggest
                     id="combo-box-demo"
                     options={voFilters}
                     variant="outlined"

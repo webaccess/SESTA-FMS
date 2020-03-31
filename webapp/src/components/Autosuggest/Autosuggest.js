@@ -3,6 +3,7 @@ import Chip from '@material-ui/core/Chip';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import Input from "../UI/Input/Input.js";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -13,9 +14,9 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function Tags(props) {
+const Autosuggest = props => {
+  const { autoFocus, variant, error, ...rest } = props;
   const classes = useStyles();
-
   return (
       <Autocomplete
         multiple={props.multiple}
@@ -24,17 +25,20 @@ export default function Tags(props) {
         getOptionLabel={props.getOptionLabel}
         onChange={props.onChange}
         filterSelectedOptions
+        value={props.value}
+        {...rest}
         renderInput={params => (
-          <TextField
+          <Input
             {...params}
+            helperText={props.error===true?props.helperText:null}
+            error={ props.error?props.error:false}
             variant={props.variant}
             label={props.label}
             placeholder={props.placeholder}
             name={props.name}
-            helperText={props.helperText}
-            error={props.error}
           />
         )}
       />
   );
 }
+export default Autosuggest;
