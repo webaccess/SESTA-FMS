@@ -1,5 +1,5 @@
 const roles = {
-  "Public": {
+  /*"Public": {   //to be added on first time setup only
     content: {
       description: "Default role given to unauthenticated user.",
       type: "public"
@@ -31,7 +31,7 @@ const roles = {
       }
     ],
     grantAllPermissions: true
-  },
+  },*/
   "FPO Admin": {
     content: {
       description: "FPO admin user",
