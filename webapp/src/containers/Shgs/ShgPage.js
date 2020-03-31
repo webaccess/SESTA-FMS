@@ -121,11 +121,16 @@ class VillagePage extends Component {
           }
         )
         .then(res => {
-          console.log("results", res.data[0].state);
-          console.log("village",res.data[0].bank_detail.id)
+          console.log("results", res.data);
+          
+          // let villageArr = [];
+          // for(let i in res.data[0]["villages"]){
+          //   villageArr.push( res.data[0]["villages"][i]["id"])
+          // }
+          // console.log("village",villageArr)
           this.setState({
             values: {
-              Villagesdata: res.data[0].villages,
+              // Villagesdata: res.data[0].villages.id,
               addShg: res.data[0].name,
               addAddress: res.data[0].address,
               addPointOfContact: res.data[0].person_incharge,
@@ -134,14 +139,18 @@ class VillagePage extends Component {
               addState: res.data[0].state.id,
  	            addVo: res.data[0].village_organization.id, 
             },
-            bankValues:{
+          });
+          if(res.data[0].bank_detail !== null) {
+          this.setState({
+           bankValues:{
               addAccountName: res.data[0].bank_detail.account_name,
               addBankName: res.data[0].bank_detail.bank_name,
               addAccountNo: res.data[0].bank_detail.account_no,
               addIfsc: res.data[0].bank_detail.ifsc_code,
               addBranch: res.data[0].bank_detail.branch,
-            }
-          });
+            }})
+          
+}
           stateId = res.data[0].state.id;
         })
         .catch(error => {
@@ -278,11 +287,9 @@ class VillagePage extends Component {
     console.log("kehta hai dil", value);
     let villageValue = [];
     for(let i in value){
-    if(i!==value.length){
-    villageValue.push("{"+"id :"+value[i]['id']+"}");
-        }else{
-    villageValue.push("{"+"id :"+value[i]['id']+"}");
-    }
+    
+    villageValue.push(value[i]['id']);
+     
     }
 
      console.log("test",villageValue)
@@ -404,7 +411,7 @@ class VillagePage extends Component {
         },
         villages: [
           {
-           shgVillage
+           id: shgVillage
           },
         ],
         village_organization: {
@@ -440,7 +447,7 @@ class VillagePage extends Component {
           id: shgDistrict
         },
         villages: {
-           shgVillage
+           id: shgVillage
           },
         village_organization: {
           id: shgVo
