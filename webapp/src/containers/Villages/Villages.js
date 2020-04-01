@@ -277,17 +277,17 @@ export class Villages extends React.Component {
     let data = this.state.data;
     const Usercolumns = [
       {
-        name: "Village Name",
+        name: "Name",
         selector: "name",
         sortable: true
       },
       {
-        name: "District Name",
+        name: "District",
         selector: "district.name",
         sortable: true
       },
       {
-        name: "State Name",
+        name: "State",
         selector: "state.name",
         sortable: true
       }
@@ -311,7 +311,7 @@ export class Villages extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>Villages</h1>
+            <h1 className={style.title}>Manage Villages</h1>
             <div className={classes.row}>
               <div className={classes.buttonRow}>
                 <Button
@@ -447,7 +447,7 @@ export class Villages extends React.Component {
               <Button onClick={this.handleSearch.bind(this)}>Search</Button>
               &nbsp;&nbsp;&nbsp;
               <Button color="default" clicked={this.cancelForm}>
-                cancel
+                reset
               </Button>
             </div>
             {data ? (
