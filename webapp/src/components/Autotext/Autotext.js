@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Autosuggest = props => {
+const Autotext = props => {
   const { autoFocus, variant, error, ...rest } = props;
   const classes = useStyles();
   return (
@@ -41,4 +41,4 @@ const Autosuggest = props => {
       />
   );
 }
-export default Autosuggest;
+export default Autotext;

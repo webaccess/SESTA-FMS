@@ -4,7 +4,7 @@ import axios from "axios";
 import auth from "../../components/Auth/Auth";
 import Button from "../../components/UI/Button/Button";
 import Autocomplete from "../../components/Autocomplete/Autocomplete.js";
-import Autosuggest from "../../components/Autosuggest/Autosuggest.js";
+import Autotext from "../../components/Autotext/Autotext.js";
 import Input from "../../components/UI/Input/Input";
 import {
   Card,
@@ -581,7 +581,7 @@ class VillagePage extends Component {
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <Autosuggest
+                  <Autotext
                     id="combo-box-demo"
                     options={statesFilter}
                     label="Select State"
@@ -618,7 +618,7 @@ class VillagePage extends Component {
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <Autosuggest
+                  <Autotext
                     id="combo-box-demo"
                     options={districtsFilter}
                     label="Select District"
@@ -728,7 +728,7 @@ class VillagePage extends Component {
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <Autosuggest
+                  <Autotext
                     id="combo-box-demo"
                     options={voFilters}
                     variant="outlined"
