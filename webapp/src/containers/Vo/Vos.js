@@ -290,8 +290,8 @@ export class VillageList extends React.Component {
       filterDistrict: "",
 			filterVillage: "",
 			filterVo:"",
-			// fiterShg:"",
-      // selectedShg: "",
+			//fiterShg:"",
+      //selectedShg: "",
       isCancel: true
     });
 
@@ -364,7 +364,7 @@ export class VillageList extends React.Component {
 
     const Usercolumns = [
       {
-        name: "Village Organizations",
+        name: "Village Organization",
         selector: "name"
       }
     ];
