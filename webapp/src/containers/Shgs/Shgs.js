@@ -49,7 +49,7 @@ export class Shgs extends React.Component {
       filterDistrict: "",
       filterVillage: "",
       filterShg: "",
-      filterVo:"",
+      filterVo: "",
       Result: [],
       TestData: [],
       data: [],
@@ -150,8 +150,7 @@ export class Shgs extends React.Component {
     }
   };
   handleChange(event) {
-    console.log("hi", [event.target.name] , event.target.value)
-    this.setState({[event.target.name] : event.target.value });
+    this.setState({ [event.target.name]: event.target.value });
   }
 
   handleDistrictChange(event, value) {
@@ -243,7 +242,7 @@ export class Shgs extends React.Component {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
-      filterVo:"",
+      filterVo: "",
       filterShg: "",
 
       isCancel: true
@@ -257,7 +256,8 @@ export class Shgs extends React.Component {
       searchData += "name_contains=" + this.state.filterShg + "&&";
     }
     if (this.state.filterVo) {
-      searchData += "village_organization.name_contains=" + this.state.filterVo + "&&";
+      searchData +=
+        "village_organization.name_contains=" + this.state.filterVo + "&&";
     }
     if (this.state.filterState) {
       searchData += "state.id=" + this.state.filterState + "&&";
