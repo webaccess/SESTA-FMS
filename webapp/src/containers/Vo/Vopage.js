@@ -52,7 +52,6 @@ class Vo extends Component {
   }
 
   async componentDidMount() {
-    console.log("token", auth.getToken());
     if (this.state.editPage[0]) {
       await axios
         .get(
@@ -78,7 +77,6 @@ class Vo extends Component {
           console.log(error);
         });
       this.stateIds = this.state.values.addState;
-      console.log("this.stateIds", this.stateIds);
     }
   }
 
@@ -115,12 +113,10 @@ class Vo extends Component {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
-    console.log("values", this.state.values);
     if (Object.keys(this.state.errors).length > 0) return;
     let voName = this.state.values.addVo;
     let voAddress = this.state.values.addVoAddress;
     let person = this.state.values.addPerson;
-    console.log("Handle submit ", voName, voAddress, person);
     let body = {
       name: voName,
       address: voAddress,
@@ -145,7 +141,6 @@ class Vo extends Component {
           }
         )
         .then(res => {
-          console.log("res", res);
           this.setState({ formSubmitted: true });
           this.props.history.push({
             pathname: "/village-organizations",
@@ -179,7 +174,6 @@ class Vo extends Component {
             pathname: "/village-organizations",
             addVoData: true
           });
-          console.log("resu", res);
         })
         .catch(error => {
           this.setState({ formSubmitted: false });

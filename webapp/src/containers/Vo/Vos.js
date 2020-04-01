@@ -312,7 +312,6 @@ export class VillageList extends React.Component {
 		// }
 		// let searchData = "";
     if (this.state.filterVo) {
-			console.log("searchData",searchData)
 			searchData = "?";
       searchData += "name_contains=" + this.state.filterVo;
     }
