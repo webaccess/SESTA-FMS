@@ -218,8 +218,8 @@ export class VillageList extends React.Component {
   }
   handleVillageChange(event, value) {
     if (value !== null) {
-			// this.state.filterVillage = value.id;
-      this.setState({ filterVillage: value.id });
+			this.setState({ filterVillage: value.id });
+			this.setState({isCancel:false});
     } else {
       this.setState({
 				filterVillage: "",
@@ -560,7 +560,6 @@ export class VillageList extends React.Component {
                         <Input
                           {...params}
                           fullWidth
-                          // margin="dense"
                           label="Select Village"
                           // value={filterVillage}
                           name="filterVillage"
