@@ -62,9 +62,9 @@ export class VillageList extends React.Component {
     this.state = {
       filterState: "",
       filterDistrict: "",
-			filterVillage: "",
-			// fiterShg:"",
-			filterVo:"",
+      filterVillage: "",
+      // fiterShg:"",
+      filterVo: "",
       Result: [],
       data: [],
       selectedid: 0,
@@ -139,16 +139,16 @@ export class VillageList extends React.Component {
       .catch(error => {
         console.log(error);
       });
-	}
-	// onHandleChange = shgValue => {
-	// 	// if (shgValue){    
-	// 		this.setState({
-	// 		isCancel: false,
-	// 		fiterShg:shgValue['id']
-	// 		});
-	// 		this.setState({ selectedShg: shgValue });
-	// 	// }
-	// };
+  }
+  // onHandleChange = shgValue => {
+  // 	// if (shgValue){
+  // 		this.setState({
+  // 		isCancel: false,
+  // 		fiterShg:shgValue['id']
+  // 		});
+  // 		this.setState({ selectedShg: shgValue });
+  // 	// }
+  // };
 
   handleStateChange = async (event, value, method) => {
     if (value !== null) {
@@ -180,55 +180,54 @@ export class VillageList extends React.Component {
       this.setState({
         filterState: "",
         filterDistrict: "",
-				filterVillage: "",
+        filterVillage: "",
         getVillage: ""
-				// fiterShg:""
-				// selectedShg:""
+        // fiterShg:""
+        // selectedShg:""
       });
     }
-	};
-	handleChange = (event, value) => {
+  };
+  handleChange = (event, value) => {
     this.setState({ filterVo: event.target.value });
-	};
+  };
   handleDistrictChange(event, value) {
     if (value !== null) {
-			this.setState({ filterDistrict: value.id });
-			let distId = value.id;
-			axios
-			.get(process.env.REACT_APP_SERVER_URL + "districts/" + distId, {
-				headers: {
-					Authorization: "Bearer " + auth.getToken() + ""
-				}
-			})
-			.then(res => {
-				this.setState({ getVillage: res.data.villages });
-			})
-			.catch(error => {
-				console.log(error);
-			});
+      this.setState({ filterDistrict: value.id });
+      let distId = value.id;
+      axios
+        .get(process.env.REACT_APP_SERVER_URL + "districts/" + distId, {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + ""
+          }
+        })
+        .then(res => {
+          this.setState({ getVillage: res.data.villages });
+        })
+        .catch(error => {
+          console.log(error);
+        });
     } else {
       this.setState({
         filterDistrict: "",
-				filterVillage: "",
-				// fiterShg:""
-				// selectedShg:""
-				
+        filterVillage: ""
+        // fiterShg:""
+        // selectedShg:""
       });
     }
   }
   handleVillageChange(event, value) {
     if (value !== null) {
-			this.setState({ filterVillage: value.id });
-			this.setState({isCancel:false});
+      this.setState({ filterVillage: value.id });
+      this.setState({ isCancel: false });
     } else {
       this.setState({
-				filterVillage: "",
-				// fiterShg:""
-				// selectedShg:""
+        filterVillage: ""
+        // fiterShg:""
+        // selectedShg:""
       });
     }
     // this.setState({ selectedShg: "" });
-	}
+  }
 
   editData = cellid => {
     this.props.history.push("/village-organizations/edit/" + cellid);
@@ -288,15 +287,15 @@ export class VillageList extends React.Component {
     this.setState({
       filterState: "",
       filterDistrict: "",
-			filterVillage: "",
-			filterVo:"",
-			//fiterShg:"",
+      filterVillage: "",
+      filterVo: "",
+      //fiterShg:"",
       //selectedShg: "",
       isCancel: true
     });
 
     this.componentDidMount();
-	};
+  };
 
   handleSearch() {
     let searchData = "";
@@ -309,14 +308,14 @@ export class VillageList extends React.Component {
       searchData = "?";
     // if (this.state.fiterShg) {
     //   searchData += "shgs.id=" + this.state.fiterShg;
-		// }
-		// let searchData = "";
+    // }
+    // let searchData = "";
     if (this.state.filterVo) {
-			searchData = "?";
+      searchData = "?";
       searchData += "name_contains=" + this.state.filterVo;
     }
     if (this.state.filterState) {
-			searchData += searchData ? "&" : "";
+      searchData += searchData ? "&" : "";
       searchData += "shgs.state=" + this.state.filterState;
     }
 
@@ -326,14 +325,17 @@ export class VillageList extends React.Component {
     }
 
     if (this.state.filterVillage) {
-			if (!this.state.filterVo && !this.state.filterState && !this.state.filterDistrict){
-				searchData = "?";
-			}
-			else{
-				searchData += searchData ? "&" : "";
-			}
-			searchData += "shgs.villages=" + this.state.filterVillage;
-		}
+      if (
+        !this.state.filterVo &&
+        !this.state.filterState &&
+        !this.state.filterDistrict
+      ) {
+        searchData = "?";
+      } else {
+        searchData += searchData ? "&" : "";
+      }
+      searchData += "shgs.villages=" + this.state.filterVillage;
+    }
     // } else {
     //   searchData += "shgs.villages=" + this.state.filterVillage;
     // }
@@ -355,7 +357,6 @@ export class VillageList extends React.Component {
         console.log("err", err);
       });
   }
-
 
   render() {
     let data = this.state.data;
@@ -434,21 +435,21 @@ export class VillageList extends React.Component {
             ) : null}
             <br></br>
             <div className={classes.row}>
- 							<div className={classes.searchInput}>
-              <div className={style.Districts}>
-                <Grid item md={12} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Village Organization"
-                    name="filterVo"
-                    id="combo-box-demo"
-                    value={this.state.filterVo || ""}
-                    onChange={this.handleChange.bind(this)}
-                    variant="outlined"
-                  />
-                </Grid>
+              <div className={classes.searchInput}>
+                <div className={style.Districts}>
+                  <Grid item md={12} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Village Organization"
+                      name="filterVo"
+                      id="combo-box-demo"
+                      value={this.state.filterVo || ""}
+                      onChange={this.handleChange.bind(this)}
+                      variant="outlined"
+                    />
+                  </Grid>
+                </div>
               </div>
-            </div>
               {/* <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -497,7 +498,6 @@ export class VillageList extends React.Component {
                   </Grid>
                 </div>
               </div>
-
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
