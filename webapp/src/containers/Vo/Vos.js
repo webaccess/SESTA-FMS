@@ -63,7 +63,8 @@ export class VillageList extends React.Component {
       filterState: "",
       filterDistrict: "",
 			filterVillage: "",
-			fiterShg:"",
+			// fiterShg:"",
+			filterVo:"",
       Result: [],
       data: [],
       selectedid: 0,
@@ -75,7 +76,7 @@ export class VillageList extends React.Component {
       getDistrict: [],
       getVillage: [],
       getShgs: [],
-      selectedShg: [],
+      // selectedShg: [],
       isCancel: false,
       singleDelete: "",
       multipleDelete: ""
@@ -139,16 +140,16 @@ export class VillageList extends React.Component {
         console.log(error);
       });
 	}
-	onHandleChange = shgValue => {
-		// if (shgValue){    
-			this.setState({
-			isCancel: false,
-			fiterShg:shgValue['id']
-			});
-			this.setState({ selectedShg: shgValue });
-		// }
-	};
-  handleChange = (event, value) => {};
+	// onHandleChange = shgValue => {
+	// 	// if (shgValue){    
+	// 		this.setState({
+	// 		isCancel: false,
+	// 		fiterShg:shgValue['id']
+	// 		});
+	// 		this.setState({ selectedShg: shgValue });
+	// 	// }
+	// };
+
   handleStateChange = async (event, value, method) => {
     if (value !== null) {
       this.setState({ filterState: value.id });
@@ -180,11 +181,15 @@ export class VillageList extends React.Component {
         filterState: "",
         filterDistrict: "",
 				filterVillage: "",
-				fiterShg:""
+        getVillage: ""
+				// fiterShg:""
 				// selectedShg:""
       });
     }
-  };
+	};
+	handleChange = (event, value) => {
+    this.setState({ filterVo: event.target.value });
+	};
   handleDistrictChange(event, value) {
     if (value !== null) {
 			this.setState({ filterDistrict: value.id });
@@ -205,7 +210,7 @@ export class VillageList extends React.Component {
       this.setState({
         filterDistrict: "",
 				filterVillage: "",
-				fiterShg:""
+				// fiterShg:""
 				// selectedShg:""
 				
       });
@@ -218,7 +223,7 @@ export class VillageList extends React.Component {
     } else {
       this.setState({
 				filterVillage: "",
-				fiterShg:""
+				// fiterShg:""
 				// selectedShg:""
       });
     }
@@ -230,7 +235,7 @@ export class VillageList extends React.Component {
   };
 
   DeleteData = (cellid, selectedId) => {
-    if (cellid.length !== null) {
+    if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
       axios
@@ -284,7 +289,8 @@ export class VillageList extends React.Component {
       filterState: "",
       filterDistrict: "",
 			filterVillage: "",
-			fiterShg:"",
+			filterVo:"",
+			// fiterShg:"",
       // selectedShg: "",
       isCancel: true
     });
@@ -298,14 +304,20 @@ export class VillageList extends React.Component {
       this.state.filterState ||
       this.state.filterDistrict ||
       this.state.filterDistrict ||
-      this.state.fiterShg
+      this.state.fiterVo
     )
       searchData = "?";
-    if (this.state.fiterShg) {
-      searchData += "shgs.id=" + this.state.fiterShg;
+    // if (this.state.fiterShg) {
+    //   searchData += "shgs.id=" + this.state.fiterShg;
+		// }
+		// let searchData = "";
+    if (this.state.filterVo) {
+			console.log("searchData",searchData)
+			searchData = "?";
+      searchData += "name_contains=" + this.state.filterVo;
     }
     if (this.state.filterState) {
-      searchData += searchData ? "&" : "";
+			searchData += searchData ? "&" : "";
       searchData += "shgs.state=" + this.state.filterState;
     }
 
@@ -315,7 +327,7 @@ export class VillageList extends React.Component {
     }
 
     if (this.state.filterVillage) {
-			if (!this.state.fiterShg && !this.state.filterState && !this.state.filterDistrict){
+			if (!this.state.filterVo && !this.state.filterState && !this.state.filterDistrict){
 				searchData = "?";
 			}
 			else{
@@ -353,7 +365,7 @@ export class VillageList extends React.Component {
 
     const Usercolumns = [
       {
-        name: "Name of the Village Organizations",
+        name: "Village Organizations",
         selector: "name"
       }
     ];
@@ -423,10 +435,24 @@ export class VillageList extends React.Component {
             ) : null}
             <br></br>
             <div className={classes.row}>
-              <div className={classes.searchInput}>
+ 							<div className={classes.searchInput}>
+              <div className={style.Districts}>
+                <Grid item md={12} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Village Organization"
+                    name="filterVo"
+                    id="combo-box-demo"
+                    value={this.state.filterVo || ""}
+                    onChange={this.handleChange.bind(this)}
+                    variant="outlined"
+                  />
+                </Grid>
+              </div>
+            </div>
+              {/* <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
-                    {/* <Autosuggest /> */}
                     <AutoSuggest
                       data={this.state.getShgs}
                       margin="dense"
@@ -435,7 +461,7 @@ export class VillageList extends React.Component {
                     />
                   </Grid>
                 </div>
-              </div>
+              </div> */}
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -462,7 +488,7 @@ export class VillageList extends React.Component {
                         <Input
                           {...params}
                           fullWidth
-                          margin="dense"
+                          // margin="dense"
                           label="Select State"
                           name="addState"
                           variant="outlined"
@@ -499,7 +525,7 @@ export class VillageList extends React.Component {
                         <Input
                           {...params}
                           fullWidth
-                          margin="dense"
+                          // margin="dense"
                           label="Select District"
                           name="filterDistrict"
                           variant="outlined"
@@ -535,9 +561,9 @@ export class VillageList extends React.Component {
                         <Input
                           {...params}
                           fullWidth
-                          margin="dense"
+                          // margin="dense"
                           label="Select Village"
-                          value={filterVillage}
+                          // value={filterVillage}
                           name="filterVillage"
                           variant="outlined"
                         />
@@ -561,7 +587,7 @@ export class VillageList extends React.Component {
                 // clicked={this.cancelForm}
                 onClick={this.cancelForm.bind(this)}
               >
-                cancel
+                Reset
               </Button>
             </div>
             {data ? (

@@ -228,11 +228,6 @@ class Vo extends Component {
             <CardContent>
               <Grid container spacing={2}>
                 <Grid item md={12} xs={12}>
-                  {/* {this.state.formSubmitted === true ? (
-                    <Snackbar severity="success">
-                      Village added successfully.
-                    </Snackbar>
-                  ) : null} */}
                   {this.state.formSubmitted === false ? (
                     <Snackbar severity="error" Showbutton={false}>
                       Network Error - Please try again!
