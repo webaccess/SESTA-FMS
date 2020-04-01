@@ -202,7 +202,6 @@ class VillagePage extends Component {
           }
         )
         .then(res => {
-          console.log("res", res);
           this.setState({ formSubmitted: true });
           this.props.history.push({ pathname: "/villages", editData: true });
         })
@@ -248,7 +247,6 @@ class VillagePage extends Component {
             }else{
               this.setState({errorCode:"Network Error - Please try again!"});
             }
-          console.log("formsubmitted", this.state.formSubmitted);
         });
     }
   };
