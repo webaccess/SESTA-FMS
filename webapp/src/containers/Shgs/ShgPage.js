@@ -122,15 +122,8 @@ class VillagePage extends Component {
         )
         .then(res => {
           console.log("results", res.data);
-          
-          // let villageArr = [];
-          // for(let i in res.data[0]["villages"]){
-          //   villageArr.push( res.data[0]["villages"][i]["id"])
-          // }
-          // console.log("village",villageArr)
           this.setState({
             values: {
-              Villagesdata: res.data[0].villages.id,
               addShg: res.data[0].name,
               addAddress: res.data[0].address,
               addPointOfContact: res.data[0].person_incharge,
@@ -289,12 +282,11 @@ class VillagePage extends Component {
   handleVillageChange(event, value) {
     console.log("kehta hai dil", value);
     let villageValue = [];
+    console.log("sddsfdfs",value.length)
     for(let i in value){
-    
-    villageValue.push(value[i]['id']);
-     
+        villageValue.push('id:'+value[i]['id']);
     }
-
+    console.log("asdsadhdsahsadhdsah",villageValue)
      console.log("test",villageValue)
     if (value !== null) {
       this.setState({
@@ -396,6 +388,9 @@ class VillagePage extends Component {
 
     console.log("sdghasdghsadhgsad",Object.keys(this.state.errors).length)
     let bankId = [];
+    let body = {
+
+    }
     // if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
     await axios
@@ -436,6 +431,7 @@ class VillagePage extends Component {
       console.log(error);
     });
     }else {
+
        await axios
     .post(
       process.env.REACT_APP_SERVER_URL + "shgs/",
@@ -449,9 +445,10 @@ class VillagePage extends Component {
         district: {
           id: shgDistrict
         },
-        villages: {
-           id: shgVillage
-          },
+
+        villages: 
+           shgVillage
+          ,
         village_organization: {
           id: shgVo
         }
