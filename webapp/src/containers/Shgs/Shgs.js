@@ -293,23 +293,23 @@ export class Shgs extends React.Component {
 
     const Usercolumns = [
       {
-        name: "SHG Name",
+        name: "SHG",
         selector: "name",
         sortable: true
       },
       {
-        name: "State Name",
-        selector: "state.name",
+        name: "Village",
+        selector: "villages",
         sortable: true
       },
       {
-        name: "District Name",
+        name: "District",
         selector: "district.name",
         sortable: true
       },
       {
-        name: "Village Name",
-        selector: "villages",
+        name: "State",
+        selector: "state.name",
         sortable: true
       }
     ];
@@ -498,8 +498,8 @@ export class Shgs extends React.Component {
             <br></br>
             <Button onClick={this.handleSearch.bind(this)}>Search</Button>
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <Button color="secondary" clicked={this.cancelForm}>
-              cancel
+            <Button color="default" clicked={this.cancelForm}>
+              reset
             </Button>
           </div>
           {data ? (
