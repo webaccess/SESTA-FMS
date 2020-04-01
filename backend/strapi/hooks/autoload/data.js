@@ -28,9 +28,13 @@ const roles = {
       {
         name: "shg",
         action: []
+      },
+      {
+        name: "village-organization",
+        action: []
       }
     ],
-    grantAllPermissions: true
+    grantAllPermissions: false
   },*/
   "FPO Admin": {
     content: {
@@ -60,6 +64,10 @@ const roles = {
       },
       {
         name: "shg",
+        action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "village-organization",
         action: ["find", "count", "findone", "create", "update", "delete"]
       }
     ],
@@ -94,6 +102,10 @@ const roles = {
       {
         name: "shg",
         action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "village-organization",
+        action: ["find", "count", "findone", "create", "update", "delete"]
       }
     ],
     grantAllPermissions: false
@@ -127,6 +139,10 @@ const roles = {
       {
         name: "shg",
         action: []
+      },
+      {
+        name: "village-organization",
+        action: []
       }
     ],
     grantAllPermissions: false
@@ -159,6 +175,10 @@ const roles = {
       },
       {
         name: "shg",
+        action: ["find", "count", "findone", "create", "update", "delete"]
+      },
+      {
+        name: "village-organization",
         action: ["find", "count", "findone", "create", "update", "delete"]
       }
     ],
@@ -217,24 +237,33 @@ const modules = {
     module: "", //slug
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
   },
-  "Add Shg": {
+  "Village Organizations": {
+    is_active: true,
+    icon_class: "people",
+    url: "/village-organizations",
+    slug: "list_village_organizations",
+    displayNavigation: true,
+    module: "", //slug
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+  },
+  "Add Village Organization": {
     is_active: true,
     icon_class: "",
-    url: "/Shgs/add",
-    slug: "add_shg",
+    url: "/village-organizations/add",
+    slug: "add_village_organizations",
     displayNavigation: false,
     module: "", //slug
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
   },
-  "Edit Shg": {
+  "Edit Village Organization": {
     is_active: true,
     icon_class: "",
-    url: "/shgs/edit/:id",
-    slug: "edit_shg",
+    url: "/village-organizations/edit/:id",
+    slug: "edit_village_organizations",
     displayNavigation: false,
     module: "", //slug
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
-  },
+  }
 };
 
 module.exports = Object.freeze({

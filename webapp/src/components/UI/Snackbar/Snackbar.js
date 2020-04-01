@@ -8,22 +8,22 @@
 // severity="success"
 
 // **Sample code for using Snackbar**
-// <Snackbar severity="error"> 
+// <Snackbar severity="error">
 //   This is a success message!
 // </Snackbar>
 // **/
 
-import React from 'react';
-import Button from '@material-ui/core/Button';
-import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert from '@material-ui/lab/Alert';
-import { makeStyles } from '@material-ui/core/styles';
+import React from "react";
+import Button from "@material-ui/core/Button";
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
+import { makeStyles } from "@material-ui/core/styles";
 import { useTheme } from "@material-ui/styles";
 import { useMediaQuery } from "@material-ui/core";
 import style from "./Snackbar.module.css";
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import Collapse from '@material-ui/core/Collapse';
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
+import Collapse from "@material-ui/core/Collapse";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="standard" {...props} />;
@@ -31,11 +31,11 @@ function Alert(props) {
 
 const useStyles = makeStyles(theme => ({
   root: {
-    width: '100%',
-    '& > * + *': {
-      marginTop: theme.spacing(2),
-    },
-  },
+    width: "100%",
+    "& > * + *": {
+      marginTop: theme.spacing(2)
+    }
+  }
 }));
 
 export default function CustomizedSnackbars(props) {
@@ -52,7 +52,7 @@ export default function CustomizedSnackbars(props) {
   };
 
   const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
 
@@ -61,7 +61,13 @@ export default function CustomizedSnackbars(props) {
 
   return (
     <div className={classes.root}>
-      {(props.Showbutton) ? <Button variant="outlined" onClick={handleClick}>{props.buttonMessage}</Button> : <p></p>}
+      {props.Showbutton ? (
+        <Button variant="outlined" Showbutton={false} onClick={handleClick}>
+          {props.buttonMessage}
+        </Button>
+      ) : (
+        <p></p>
+      )}
       <div className={!isDesktop ? "" : style.Hidden}>
         <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
           <Alert onClose={handleClose} severity={props.severity}>

@@ -15,9 +15,10 @@ import NotFoundPage from "./containers/NotFoundPage/NotFoundPage";
 import AuthPage from "./containers/AuthPage/AuthPage";
 import Villages from "./containers/Villages/Villages";
 import Shgs from "./containers/Shgs/Shgs";
-import ShgPage from "./containers/Shgs/ShgPage";
-import VillagePage from "./containers/Villages/VillagePage";
 
+import VillagePage from "./containers/Villages/VillagePage";
+import Vopage from "./containers/Vo/Vopage";
+import Vos from "./containers/Vo/Vos";
 import Account from "./containers/Account/Account";
 
 function Routes() {
@@ -34,13 +35,20 @@ function Routes() {
               exact
             />
             <PrivateRoute
-              path="/shgs/edit/:id"
-              component={ShgPage}
+              path="/village-organizations/add"
+              component={Vopage}
               exact
             />
+            <PrivateRoute
+              path="/village-organizations/edit/:id"
+              component={Vopage}
+              exact
+            />
+            <PrivateRoute path="/village-organizations" component={Vos} exact />
             <PrivateRoute path="/villages" component={Villages} exact />
             <PrivateRoute path="/shgs" component={Shgs} exact />
-            <PrivateRoute path="/shgs/add" component={ShgPage} exact />
+
+
             <PrivateRoute path="/my-account" component={Account} exact />
             <Route path="/404" component={NotFoundPage} />
             <AuthRoute path="/:authType/:id?" component={AuthPage} />
