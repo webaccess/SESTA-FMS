@@ -7,16 +7,12 @@ import { withStyles, ThemeProvider } from "@material-ui/core/styles";
 import style from "./Vos.module.css";
 import { Redirect, Route } from "react-router-dom";
 import { Link } from "react-router-dom";
-import Spinner from "../../components/Spinner";
 import auth from "../../components/Auth/Auth.js";
 import Input from "../../components/UI/Input/Input";
 import AutoSuggest from "../../components/UI/Autosuggest/Autosuggest";
 import { Grid } from "@material-ui/core";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import Select from "@material-ui/core/Select";
-import PrivateRoute from "../../hoc/PrivateRoute/PrivateRoute";
-import VoPage from "./VoPage";
 
 import { createBrowserHistory } from "history";
 
