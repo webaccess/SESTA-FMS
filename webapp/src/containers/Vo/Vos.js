@@ -75,7 +75,7 @@ export class Vos extends React.Component {
       getState: [],
       getDistrict: [],
       getVillage: [],
-      getShgs: [],
+      // getShgs: [],
       // selectedShg: [],
       isCancel: false,
       singleDelete: "",
@@ -127,18 +127,18 @@ export class Vos extends React.Component {
         console.log(error);
       });
     //api for shgs filter
-    await axios
-      .get(process.env.REACT_APP_SERVER_URL + "shgs/", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
-      })
-      .then(res => {
-        this.setState({ getShgs: res.data });
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    // await axios
+    //   .get(process.env.REACT_APP_SERVER_URL + "shgs/", {
+    //     headers: {
+    //       Authorization: "Bearer " + auth.getToken() + ""
+    //     }
+    //   })
+    //   .then(res => {
+    //     this.setState({ getShgs: res.data });
+    //   })
+    //   .catch(error => {
+    //     console.log(error);
+    //   });
   }
   // onHandleChange = shgValue => {
   // 	// if (shgValue){
