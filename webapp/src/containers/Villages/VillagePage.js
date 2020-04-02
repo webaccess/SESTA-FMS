@@ -17,10 +17,7 @@ import validateInput from "../../components/Validation/ValidateInput/ValidateInp
 import { ADD_VILLAGE_BREADCRUMBS, EDIT_VILLAGE_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-<<<<<<< HEAD
 import Autocomplete from "@material-ui/lab/Autocomplete";
-=======
->>>>>>> b048a09c597ca7957afb966ac0bec444364cec81
 
 class VillagePage extends Component {
   constructor(props) {
