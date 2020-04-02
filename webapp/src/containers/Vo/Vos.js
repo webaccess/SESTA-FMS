@@ -388,7 +388,7 @@ export class Vos extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}> Manage Village organizations</h1>
+            <h1 className={style.title}> Manage Village Organizations</h1>
             <div className={classes.row}>
               <div className={classes.buttonRow}>
                 <Button
