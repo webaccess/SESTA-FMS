@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 import Table from "../../components/Datatable/Datatable.js";
 import Layout from "../../hoc/Layout/Layout";
-import Button from "@material-ui/core/Button";
+import Button from "../../components/UI/Button/Button";
 import { withStyles, ThemeProvider } from "@material-ui/core/styles";
 import style from "./Vo.module.css";
 import { Redirect, Route } from "react-router-dom";
@@ -56,14 +56,14 @@ const useStyles = theme => ({
   }
 });
 
-export class VillageList extends React.Component {
+export class Vos extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       filterState: "",
       filterDistrict: "",
-			filterVillage: "",
-			fiterShg:"",
+      filterVillage: "",
+      fiterShg: "",
       Result: [],
       data: [],
       selectedid: 0,
@@ -85,6 +85,7 @@ export class VillageList extends React.Component {
   }
 
   async componentDidMount() {
+    let APIdata = [];
     await axios
       .get(
         process.env.REACT_APP_SERVER_URL +
@@ -100,6 +101,23 @@ export class VillageList extends React.Component {
       });
     //api call for states filter
     await axios
+      .get(
+        "https://data.gov.in/resources/complete-villages-directory-indiastatedistrictsub-district-level-census-2011-assam/api#/Resource/get_resource_4e8f0544_6acb_4674_bdb0_da7d7e1b009b",
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + ""
+          }
+        }
+      )
+      .then(res => {
+        APIdata = res.data;
+        console.log("APIdata", APIdata);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+    //api call for states filter
+    await axios
       .get(process.env.REACT_APP_SERVER_URL + "states/", {
         headers: {
           Authorization: "Bearer " + auth.getToken() + ""
@@ -111,7 +129,6 @@ export class VillageList extends React.Component {
       .catch(error => {
         console.log(error);
       });
-
     //api call for villages filter
     await axios
       .get(process.env.REACT_APP_SERVER_URL + "Villages/", {
@@ -138,16 +155,16 @@ export class VillageList extends React.Component {
       .catch(error => {
         console.log(error);
       });
-	}
-	onHandleChange = shgValue => {
-		// if (shgValue){    
-			this.setState({
-			isCancel: false,
-			fiterShg:shgValue['id']
-			});
-			this.setState({ selectedShg: shgValue });
-		// }
-	};
+  }
+  onHandleChange = shgValue => {
+    // if (shgValue){
+    this.setState({
+      isCancel: false,
+      fiterShg: shgValue["id"]
+    });
+    this.setState({ selectedShg: shgValue });
+    // }
+  };
   handleChange = (event, value) => {};
   handleStateChange = async (event, value, method) => {
     if (value !== null) {
@@ -179,51 +196,50 @@ export class VillageList extends React.Component {
       this.setState({
         filterState: "",
         filterDistrict: "",
-				filterVillage: "",
-				fiterShg:""
-				// selectedShg:""
+        filterVillage: "",
+        fiterShg: ""
+        // selectedShg:""
       });
     }
   };
   handleDistrictChange(event, value) {
     if (value !== null) {
-			this.setState({ filterDistrict: value.id });
-			let distId = value.id;
-			axios
-			.get(process.env.REACT_APP_SERVER_URL + "districts/" + distId, {
-				headers: {
-					Authorization: "Bearer " + auth.getToken() + ""
-				}
-			})
-			.then(res => {
-				this.setState({ getVillage: res.data.villages });
-			})
-			.catch(error => {
-				console.log(error);
-			});
+      this.setState({ filterDistrict: value.id });
+      let distId = value.id;
+      axios
+        .get(process.env.REACT_APP_SERVER_URL + "districts/" + distId, {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + ""
+          }
+        })
+        .then(res => {
+          this.setState({ getVillage: res.data.villages });
+        })
+        .catch(error => {
+          console.log(error);
+        });
     } else {
       this.setState({
         filterDistrict: "",
-				filterVillage: "",
-				fiterShg:""
-				// selectedShg:""
-				
+        filterVillage: "",
+        fiterShg: ""
+        // selectedShg:""
       });
     }
   }
   handleVillageChange(event, value) {
     if (value !== null) {
-			// this.state.filterVillage = value.id;
+      // this.state.filterVillage = value.id;
       this.setState({ filterVillage: value.id });
     } else {
       this.setState({
-				filterVillage: "",
-				fiterShg:""
-				// selectedShg:""
+        filterVillage: "",
+        fiterShg: ""
+        // selectedShg:""
       });
     }
     // this.setState({ selectedShg: "" });
-	}
+  }
 
   editData = cellid => {
     this.props.history.push("/village-organizations/edit/" + cellid);
@@ -283,14 +299,14 @@ export class VillageList extends React.Component {
     this.setState({
       filterState: "",
       filterDistrict: "",
-			filterVillage: "",
-			fiterShg:"",
+      filterVillage: "",
+      fiterShg: "",
       // selectedShg: "",
       isCancel: true
     });
 
     this.componentDidMount();
-	};
+  };
 
   handleSearch() {
     let searchData = "";
@@ -315,14 +331,17 @@ export class VillageList extends React.Component {
     }
 
     if (this.state.filterVillage) {
-			if (!this.state.fiterShg && !this.state.filterState && !this.state.filterDistrict){
-				searchData = "?";
-			}
-			else{
-				searchData += searchData ? "&" : "";
-			}
-			searchData += "shgs.villages=" + this.state.filterVillage;
-		}
+      if (
+        !this.state.fiterShg &&
+        !this.state.filterState &&
+        !this.state.filterDistrict
+      ) {
+        searchData = "?";
+      } else {
+        searchData += searchData ? "&" : "";
+      }
+      searchData += "shgs.villages=" + this.state.filterVillage;
+    }
     // } else {
     //   searchData += "shgs.villages=" + this.state.filterVillage;
     // }
@@ -344,7 +363,6 @@ export class VillageList extends React.Component {
         console.log("err", err);
       });
   }
-
 
   render() {
     let data = this.state.data;
@@ -380,7 +398,6 @@ export class VillageList extends React.Component {
             <div className={classes.row}>
               <div className={classes.buttonRow}>
                 <Button
-                  color="primary"
                   variant="contained"
                   component={Link}
                   to="/Village-organizations/add"
@@ -472,7 +489,6 @@ export class VillageList extends React.Component {
                   </Grid>
                 </div>
               </div>
-
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -548,7 +564,6 @@ export class VillageList extends React.Component {
               </div>
               <br></br>
               <Button
-                color="primary"
                 variant="contained"
                 onClick={this.handleSearch.bind(this)}
               >
@@ -556,12 +571,12 @@ export class VillageList extends React.Component {
               </Button>
               &nbsp;&nbsp;&nbsp;
               <Button
-                color="default"
+                color="secondary"
                 variant="contained"
                 // clicked={this.cancelForm}
                 onClick={this.cancelForm.bind(this)}
               >
-                cancel
+                Reset
               </Button>
             </div>
             {data ? (
@@ -590,4 +605,4 @@ export class VillageList extends React.Component {
     );
   }
 }
-export default withStyles(useStyles)(VillageList);
+export default withStyles(useStyles)(Vos);

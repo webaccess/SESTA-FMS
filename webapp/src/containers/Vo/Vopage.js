@@ -21,7 +21,7 @@ import {
 } from "./config";
 import { Link } from "react-router-dom";
 
-class Vo extends Component {
+class Vopage extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -215,8 +215,8 @@ class Vo extends Component {
             <CardHeader
               title={
                 this.state.editPage[0]
-                  ? "Village Organization"
-                  : "Village Organization"
+                  ? "Edit Village Organization"
+                  : "Add Village Organization"
               }
               subheader={
                 this.state.editPage[0]
@@ -228,22 +228,17 @@ class Vo extends Component {
             <CardContent>
               <Grid container spacing={2}>
                 <Grid item md={12} xs={12}>
-                  {/* {this.state.formSubmitted === true ? (
-                    <Snackbar severity="success">
-                      Village added successfully.
-                    </Snackbar>
-                  ) : null} */}
                   {this.state.formSubmitted === false ? (
                     <Snackbar severity="error" Showbutton={false}>
                       Network Error - Please try again!
                     </Snackbar>
                   ) : null}
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
                     label="Village Organization Name"
-                    margin="dense"
+                    // margin="dense"
                     name="addVo"
                     error={this.hasError("addVo")}
                     helperText={
@@ -254,11 +249,11 @@ class Vo extends Component {
                     variant="outlined"
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
                     label="Address"
-                    margin="dense"
+                    // margin="dense"
                     name="addVoAddress"
                     error={this.hasError("addVoAddress")}
                     helperText={
@@ -271,11 +266,11 @@ class Vo extends Component {
                     variant="outlined"
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
                     label="Point of Contact"
-                    margin="dense"
+                    // margin="dense"
                     name="addPerson"
                     error={this.hasError("addPerson")}
                     helperText={
@@ -308,7 +303,7 @@ class Vo extends Component {
             <CardActions>
               <Button type="submit">Save</Button>
               <Button
-                color="default"
+                color="secondary"
                 clicked={this.cancelForm}
                 component={Link}
                 to="/village-organizations"
@@ -322,4 +317,4 @@ class Vo extends Component {
     );
   }
 }
-export default Vo;
+export default Vopage;
