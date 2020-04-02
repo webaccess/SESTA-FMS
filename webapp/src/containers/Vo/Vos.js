@@ -4,7 +4,7 @@ import Table from "../../components/Datatable/Datatable.js";
 import Layout from "../../hoc/Layout/Layout";
 import Button from "../../components/UI/Button/Button";
 import { withStyles, ThemeProvider } from "@material-ui/core/styles";
-import style from "./Vo.module.css";
+import style from "./Vos.module.css";
 import { Redirect, Route } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Spinner from "../../components/Spinner";
@@ -194,18 +194,6 @@ export class Vos extends React.Component {
     if (value !== null) {
       this.setState({ filterDistrict: value.id });
       let distId = value.id;
-      axios
-        .get(process.env.REACT_APP_SERVER_URL + "districts/" + distId, {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
-        })
-        .then(res => {
-          this.setState({ getVillage: res.data.villages });
-        })
-        .catch(error => {
-          console.log(error);
-        });
     } else {
       this.setState({
         filterDistrict: "",
