@@ -2,21 +2,17 @@ import React from "react";
 import axios from "axios";
 import Table from "../../components/Datatable/Datatable.js";
 import Layout from "../../hoc/Layout/Layout";
-import Button from "@material-ui/core/Button";
+import Button from "../../components/UI/Button/Button";
 import { withStyles, ThemeProvider } from "@material-ui/core/styles";
-import style from "./Vo.module.css";
+import style from "./Vos.module.css";
 import { Redirect, Route } from "react-router-dom";
 import { Link } from "react-router-dom";
-import Spinner from "../../components/Spinner";
 import auth from "../../components/Auth/Auth.js";
 import Input from "../../components/UI/Input/Input";
 import AutoSuggest from "../../components/UI/Autosuggest/Autosuggest";
 import { Grid } from "@material-ui/core";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import Select from "@material-ui/core/Select";
-import PrivateRoute from "../../hoc/PrivateRoute/PrivateRoute";
-import Vopage from "./Vopage";
 
 import { createBrowserHistory } from "history";
 
@@ -56,14 +52,15 @@ const useStyles = theme => ({
   }
 });
 
-export class VillageList extends React.Component {
+export class Vos extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
-      fiterShg: "",
+      // fiterShg:"",
+      filterVo: "",
       Result: [],
       data: [],
       selectedid: 0,
@@ -74,8 +71,8 @@ export class VillageList extends React.Component {
       getState: [],
       getDistrict: [],
       getVillage: [],
-      getShgs: [],
-      selectedShg: [],
+      // getShgs: [],
+      // selectedShg: [],
       isCancel: false,
       singleDelete: "",
       multipleDelete: ""
@@ -126,29 +123,29 @@ export class VillageList extends React.Component {
         console.log(error);
       });
     //api for shgs filter
-    await axios
-      .get(process.env.REACT_APP_SERVER_URL + "shgs/", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
-      })
-      .then(res => {
-        this.setState({ getShgs: res.data });
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    // await axios
+    //   .get(process.env.REACT_APP_SERVER_URL + "shgs/", {
+    //     headers: {
+    //       Authorization: "Bearer " + auth.getToken() + ""
+    //     }
+    //   })
+    //   .then(res => {
+    //     this.setState({ getShgs: res.data });
+    //   })
+    //   .catch(error => {
+    //     console.log(error);
+    //   });
   }
-  onHandleChange = shgValue => {
-    // if (shgValue){
-    this.setState({
-      isCancel: false,
-      fiterShg: shgValue["id"]
-    });
-    this.setState({ selectedShg: shgValue });
-    // }
-  };
-  handleChange = (event, value) => {};
+  // onHandleChange = shgValue => {
+  // 	// if (shgValue){
+  // 		this.setState({
+  // 		isCancel: false,
+  // 		fiterShg:shgValue['id']
+  // 		});
+  // 		this.setState({ selectedShg: shgValue });
+  // 	// }
+  // };
+
   handleStateChange = async (event, value, method) => {
     if (value !== null) {
       this.setState({ filterState: value.id });
@@ -180,10 +177,14 @@ export class VillageList extends React.Component {
         filterState: "",
         filterDistrict: "",
         filterVillage: "",
-        fiterShg: ""
+        getVillage: ""
+        // fiterShg:""
         // selectedShg:""
       });
     }
+  };
+  handleChange = (event, value) => {
+    this.setState({ filterVo: event.target.value });
   };
   handleDistrictChange(event, value) {
     if (value !== null) {
@@ -192,20 +193,20 @@ export class VillageList extends React.Component {
     } else {
       this.setState({
         filterDistrict: "",
-        filterVillage: "",
-        fiterShg: ""
+        filterVillage: ""
+        // fiterShg:""
         // selectedShg:""
       });
     }
   }
   handleVillageChange(event, value) {
     if (value !== null) {
-      // this.state.filterVillage = value.id;
       this.setState({ filterVillage: value.id });
+      this.setState({ isCancel: false });
     } else {
       this.setState({
-        filterVillage: "",
-        fiterShg: ""
+        filterVillage: ""
+        // fiterShg:""
         // selectedShg:""
       });
     }
@@ -217,7 +218,7 @@ export class VillageList extends React.Component {
   };
 
   DeleteData = (cellid, selectedId) => {
-    if (cellid.length !== null) {
+    if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
       axios
@@ -271,8 +272,9 @@ export class VillageList extends React.Component {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
-      fiterShg: "",
-      // selectedShg: "",
+      filterVo: "",
+      //fiterShg:"",
+      //selectedShg: "",
       isCancel: true
     });
 
@@ -285,11 +287,16 @@ export class VillageList extends React.Component {
       this.state.filterState ||
       this.state.filterDistrict ||
       this.state.filterDistrict ||
-      this.state.fiterShg
+      this.state.fiterVo
     )
       searchData = "?";
-    if (this.state.fiterShg) {
-      searchData += "shgs.id=" + this.state.fiterShg;
+    // if (this.state.fiterShg) {
+    //   searchData += "shgs.id=" + this.state.fiterShg;
+    // }
+    // let searchData = "";
+    if (this.state.filterVo) {
+      searchData = "?";
+      searchData += "name_contains=" + this.state.filterVo;
     }
     if (this.state.filterState) {
       searchData += searchData ? "&" : "";
@@ -303,7 +310,7 @@ export class VillageList extends React.Component {
 
     if (this.state.filterVillage) {
       if (
-        !this.state.fiterShg &&
+        !this.state.filterVo &&
         !this.state.filterState &&
         !this.state.filterDistrict
       ) {
@@ -342,7 +349,7 @@ export class VillageList extends React.Component {
 
     const Usercolumns = [
       {
-        name: "Name of the Village Organizations",
+        name: "Village Organization",
         selector: "name"
       }
     ];
@@ -365,11 +372,10 @@ export class VillageList extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}> Manage Village organizations</h1>
+            <h1 className={style.title}> Manage Village Organizations</h1>
             <div className={classes.row}>
               <div className={classes.buttonRow}>
                 <Button
-                  color="primary"
                   variant="contained"
                   component={Link}
                   to="/Village-organizations/add"
@@ -415,7 +421,21 @@ export class VillageList extends React.Component {
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
-                    {/* <Autosuggest /> */}
+                    <Input
+                      fullWidth
+                      label="Village Organization"
+                      name="filterVo"
+                      id="combo-box-demo"
+                      value={this.state.filterVo || ""}
+                      onChange={this.handleChange.bind(this)}
+                      variant="outlined"
+                    />
+                  </Grid>
+                </div>
+              </div>
+              {/* <div className={classes.searchInput}>
+                <div className={style.Districts}>
+                  <Grid item md={12} xs={12}>
                     <AutoSuggest
                       data={this.state.getShgs}
                       margin="dense"
@@ -424,7 +444,7 @@ export class VillageList extends React.Component {
                     />
                   </Grid>
                 </div>
-              </div>
+              </div> */}
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -451,7 +471,7 @@ export class VillageList extends React.Component {
                         <Input
                           {...params}
                           fullWidth
-                          margin="dense"
+                          // margin="dense"
                           label="Select State"
                           name="addState"
                           variant="outlined"
@@ -487,7 +507,7 @@ export class VillageList extends React.Component {
                         <Input
                           {...params}
                           fullWidth
-                          margin="dense"
+                          // margin="dense"
                           label="Select District"
                           name="filterDistrict"
                           variant="outlined"
@@ -523,9 +543,8 @@ export class VillageList extends React.Component {
                         <Input
                           {...params}
                           fullWidth
-                          margin="dense"
                           label="Select Village"
-                          value={filterVillage}
+                          // value={filterVillage}
                           name="filterVillage"
                           variant="outlined"
                         />
@@ -536,7 +555,6 @@ export class VillageList extends React.Component {
               </div>
               <br></br>
               <Button
-                color="primary"
                 variant="contained"
                 onClick={this.handleSearch.bind(this)}
               >
@@ -544,12 +562,12 @@ export class VillageList extends React.Component {
               </Button>
               &nbsp;&nbsp;&nbsp;
               <Button
-                color="default"
+                color="secondary"
                 variant="contained"
                 // clicked={this.cancelForm}
                 onClick={this.cancelForm.bind(this)}
               >
-                cancel
+                Reset
               </Button>
             </div>
             {data ? (
@@ -578,4 +596,4 @@ export class VillageList extends React.Component {
     );
   }
 }
-export default withStyles(useStyles)(VillageList);
+export default withStyles(useStyles)(Vos);
