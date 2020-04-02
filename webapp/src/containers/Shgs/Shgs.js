@@ -513,7 +513,7 @@ export class Shgs extends React.Component {
             <br></br>
             <Button onClick={this.handleSearch.bind(this)}>Search</Button>
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <Button color="default" clicked={this.cancelForm}>
+            <Button color="secondary" clicked={this.cancelForm}>
               reset
             </Button>
           </div>
