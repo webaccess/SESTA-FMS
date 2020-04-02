@@ -311,12 +311,7 @@ export class Villages extends React.Component {
             <h1 className={style.title}>Manage Villages</h1>
             <div className={classes.row}>
               <div className={classes.buttonRow}>
-                <Button
-                  color="primary"
-                  variant="contained"
-                  component={Link}
-                  to="/Villages/add"
-                >
+                <Button variant="contained" component={Link} to="/Villages/add">
                   Add Village
                 </Button>
               </div>
@@ -443,7 +438,7 @@ export class Villages extends React.Component {
               <br></br>
               <Button onClick={this.handleSearch.bind(this)}>Search</Button>
               &nbsp;&nbsp;&nbsp;
-              <Button color="default" clicked={this.cancelForm}>
+              <Button color="secondary" clicked={this.cancelForm}>
                 reset
               </Button>
             </div>
