@@ -89,7 +89,7 @@ class VillagePage extends Component {
         }
       },
       errors: {
-        addVillage: [],
+        // addVillage: [],
         addState: [],
         addDistrict: [],
         addVo: []
@@ -121,7 +121,6 @@ class VillagePage extends Component {
           }
         )
         .then(res => {
-          console.log("results", res.data);
           
           // let villageArr = [];
           // for(let i in res.data[0]["villages"]){
@@ -204,7 +203,6 @@ class VillagePage extends Component {
       })
       .then(res => {
         this.setState({ getVillageOrganization: res.data });
-        console.log("dataaaa", res.data);
       })
       .catch(error => {
         console.log(error);
@@ -251,7 +249,7 @@ class VillagePage extends Component {
   handleChange = ({ target }) => {
     this.setState({
       values: { ...this.state.values, [target.name]: target.value },
-      bankValues: { ...this.state.values, [target.name]: target.value }
+      bankValues: { ...this.state.bankValues, [target.name]: target.value }
     });
   };
 
@@ -268,7 +266,6 @@ class VillagePage extends Component {
           }
         })
         .then(res => {
-          console.log("villagedata", res.data.villages);
           this.setState({ getVillage: res.data.villages });
         })
         .catch(error => {
@@ -287,7 +284,6 @@ class VillagePage extends Component {
   }
 
   handleVillageChange(event, value) {
-    console.log("kehta hai dil", value);
     let villageValue = [];
     for(let i in value){
     
@@ -295,17 +291,14 @@ class VillagePage extends Component {
      
     }
 
-     console.log("test",villageValue)
     if (value !== null) {
       this.setState({
         values: { ...this.state.values, addVillage: villageValue }
       });
-      console.log("village", this.state.addVillage);
     } else {
       this.setState({
         addVillage: ""
       });
-      console.log("village", this.state.addVillage);
     }
   }
 
@@ -354,6 +347,7 @@ class VillagePage extends Component {
 
   hasError = field => {
     if (this.state.errors[field] !== undefined) {
+      console.log("errors length",Object.keys(this.state.errors).length)
       return Object.keys(this.state.errors).length > 0 &&
         this.state.errors[field].length > 0
         ? true
@@ -364,6 +358,7 @@ class VillagePage extends Component {
   hasBankError = field => {
     if (this.state.checkedB) {
       if (this.state.bankErrors[field] !== undefined) {
+        console.log("bankerr length",Object.keys(this.state.bankErrors).length)
         return Object.keys(this.state.bankErrors).length > 0 &&
           this.state.bankErrors[field].length > 0
           ? true
@@ -394,10 +389,9 @@ class VillagePage extends Component {
     let shgVillage = this.state.values.addVillage;
     let shgVo = this.state.values.addVo;
 
-    console.log("sdghasdghsadhgsad",Object.keys(this.state.errors).length)
-    let bankId = [];
-    // if (Object.keys(this.state.errors).length > 0) return;
+    if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
+      // let bankIds = "";
     await axios
     .put(
       process.env.REACT_APP_SERVER_URL + "shgs/" +
@@ -428,13 +422,46 @@ class VillagePage extends Component {
       }
     )
     .then(res => {
-      console.log("response from post",res.data)
       this.setState({ formSubmitted: true });
       this.props.history.push({ pathname: "/shgs", editData: true });
+      // bankIds = res.data.id;
+      console.log("data added",res)
     })
     .catch(error => {
       console.log(error);
     });
+    //api call for edited values in bank
+    await axios
+  .put(
+    process.env.REACT_APP_SERVER_URL + "bank-details?shg="+ this.state.editPage[1], //edit page shg  id will be here
+
+    {
+      account_name: this.state.values.addAccountName,
+      account_no: this.state.values.addAccountName,
+      bank_name: this.state.values.addBankName,
+      branch: this.state.values.addBranch,
+      ifsc_code: this.state.values.addIfsc,
+      shg: this.state.bankDeatilsId
+    },
+    {
+      headers: {
+        Authorization: "Bearer " + auth.getToken() + ""
+      }
+    }
+  )
+  .then(res => {
+    console.log("hello ",res.data)
+    this.setState({ formSubmitted: true });
+    this.props.history.push({ pathname: "/Shgs", addData: true });
+    this.setState({ formSubmitted: true });
+    this.props.history.push({ pathname: "/Shgs", addData: true });
+  })
+  .catch(error => {
+    this.setState({ formSubmitted: false });
+    console.log(error);
+    console.log("formsubmitted", this.state.formSubmitted);
+  });
+    
     }else {
        await axios
     .post(
@@ -463,7 +490,7 @@ class VillagePage extends Component {
       }
     )
     .then(res => {
-      console.log("response from post",res)
+      console.log("add shg",res);
        this.setState({ formSubmitted: true });
        let bankId = res.data.id
        this.setState({ bankDeatilsId: bankId });
@@ -471,7 +498,7 @@ class VillagePage extends Component {
        this.props.history.push({ pathname: "/shgs", addData: true });
     })
     .catch(error => {
-      console.log("Error  aya",error);
+      console.log("Error  ",error);
     });
     }
   };
@@ -504,7 +531,6 @@ class VillagePage extends Component {
   .catch(error => {
     this.setState({ formSubmitted: false });
     console.log(error);
-    console.log("formsubmitted", this.state.formSubmitted);
   });
 }
   };
@@ -518,8 +544,6 @@ class VillagePage extends Component {
   };
 
   render() {
-    console.log("all the value", auth.getToken())
-    console.log("checked", this.state.checkedB);
     let statesFilter = this.state.getState;
     let voFilters = this.state.getVillageOrganization;
     let addVo = this.state.values.addVo;
