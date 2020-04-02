@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 import Table from "../../components/Datatable/Datatable.js";
 import Layout from "../../hoc/Layout/Layout";
-import Button from "@material-ui/core/Button";
+import Button from "../../components/UI/Button/Button";
 import { withStyles, ThemeProvider } from "@material-ui/core/styles";
 import style from "./Vo.module.css";
 import { Redirect, Route } from "react-router-dom";
@@ -16,7 +16,7 @@ import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import Select from "@material-ui/core/Select";
 import PrivateRoute from "../../hoc/PrivateRoute/PrivateRoute";
-import Vopage from "./Vopage";
+import VoPage from "./VoPage";
 
 import { createBrowserHistory } from "history";
 
@@ -56,7 +56,7 @@ const useStyles = theme => ({
   }
 });
 
-export class VillageList extends React.Component {
+export class Vos extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -392,7 +392,6 @@ export class VillageList extends React.Component {
             <div className={classes.row}>
               <div className={classes.buttonRow}>
                 <Button
-                  color="primary"
                   variant="contained"
                   component={Link}
                   to="/Village-organizations/add"
@@ -572,7 +571,6 @@ export class VillageList extends React.Component {
               </div>
               <br></br>
               <Button
-                color="primary"
                 variant="contained"
                 onClick={this.handleSearch.bind(this)}
               >
@@ -580,7 +578,7 @@ export class VillageList extends React.Component {
               </Button>
               &nbsp;&nbsp;&nbsp;
               <Button
-                color="default"
+                color="secondary"
                 variant="contained"
                 // clicked={this.cancelForm}
                 onClick={this.cancelForm.bind(this)}
@@ -614,4 +612,4 @@ export class VillageList extends React.Component {
     );
   }
 }
-export default withStyles(useStyles)(VillageList);
+export default withStyles(useStyles)(Vos);
