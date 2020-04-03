@@ -11,6 +11,8 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
+import Switch from "../../components/Switch/Switch";
+
 const useStyles = theme => ({
   root: {},
   row: {
@@ -52,8 +54,8 @@ export class Villages extends React.Component {
     super(props);
     this.state = {
       values: {},
-      
-      filterVillage: "",
+      FilterState: "",
+      toggleSwitch: false,
       Result: [],
       TestData: [],
       data: [],
@@ -68,12 +70,13 @@ export class Villages extends React.Component {
       isCancel: false,
       dataCellId: [],
       singleDelete: "",
-      multipleDelete: ""
+      multipleDelete: "",
+      active:{}
     };
   }
   async componentDidMount() {
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "villages/?_sort=name:ASC", {
+      .get(process.env.REACT_APP_SERVER_URL + "states/?_sort=name:ASC", {
         headers: {
           Authorization: "Bearer " + auth.getToken() + ""
         }
@@ -81,33 +84,72 @@ export class Villages extends React.Component {
       .then(res => {
         this.setState({ data: res.data });
       });
-    //api call for states filter
-    await axios
-      .get(process.env.REACT_APP_SERVER_URL + "states/", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
-      })
-      .then(res => {
-        this.setState({ getState: res.data });
-      })
-      .catch(error => {
-        console.log(error);
-      });
+   
   }
 
+  StateFilter (event, value, target){
+  this.setState({
+      values: { ...this.state.values, [event.target.name]: event.target.value }
+    });
+  }
+ getData(result) {
+    for (let i in result) {
+      let states = [];
+      for (let j in result[i].states) {
+        states.push(result[i].states[j].name + " ");
+        console.log("push");
+      }
+      result[i]["states"] = states;
+    }
+    return result;
+  }
 
- 
+handleSearch() {
+  let searchData = "";
+  if (this.state.values.FilterState) {
+searchData += "name_contains=" + this.state.values.FilterState;
+   }
+      // searchData += "name_contains=" + 
+    
+    axios
+      .get(
+        process.env.REACT_APP_SERVER_URL +
+          "states?" +
+          searchData +
+          "&&_sort=name:ASC",
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + ""
+          }
+        }
+      )
+      .then(res => {
+        this.setState({ data: this.getData(res.data) });
+      })
+      .catch(err => {
+        console.log("err", err);
+      });
+  }
   editData = cellid => {
-    this.props.history.push("/villages/edit/" + cellid);
+    this.props.history.push("/states/edit/" + cellid);
   };
+
+  cancelForm = () => {
+      this.setState({
+        FilterState: "",
+        values: {},
+        formSubmitted: "",
+        stateSelected: false,
+        isCancel: true
+      });
+      this.componentDidMount();
+    };
 
   DeleteData = (cellid, selectedId) => {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-
       axios
-        .delete(process.env.REACT_APP_SERVER_URL + "villages/" + cellid, {
+        .delete(process.env.REACT_APP_SERVER_URL + "states/" + cellid, {
           headers: {
             Authorization: "Bearer " + auth.getToken() + ""
           }
@@ -122,15 +164,15 @@ export class Villages extends React.Component {
           console.log(error);
         });
     }
-    // }
   };
+
   DeleteAll = selectedId => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       for (let i in selectedId) {
         axios
           .delete(
-            process.env.REACT_APP_SERVER_URL + "villages/" + selectedId[i],
+            process.env.REACT_APP_SERVER_URL + "states/" + selectedId[i],
             {
               headers: {
                 Authorization: "Bearer " + auth.getToken() + ""
@@ -149,36 +191,31 @@ export class Villages extends React.Component {
     }
   };
 
-  cancelForm = () => {
-    this.setState({
-      filterState: "",
-      filterDistrict: "",
-      filterVillage: "",
-      values: {},
-      formSubmitted: "",
-      stateSelected: false,
-      isCancel: true
-    });
-    this.componentDidMount();
-    //routing code #route to village_list page
-  };
-
-  handleChange = ({ target }) => {
-    this.setState({
-      values: { ...this.state.values, [target.name]: target.value }
-    });
-  };
-
- 
-
+  handleActive = (event) => {
+    if(this.state.toggleSwitch === true )
+    this.setState({toggleSwitch: false})
+    else{
+      this.setState({toggleSwitch: true})
+    }
+    this.setState({ ...this.state.active, [event.target.name]: event.target.checked });
+    // console.log("IsActive??:",event.target.id)
+  }
   render() {
     let data = this.state.data;
     const Usercolumns = [
       {
         name: "State Name",
         selector: "name",
-        sortable: true
+        sortable: true,
+        grow: 2,
       },
+      {
+        name: "Active",
+         cell: cell => ( <div><Switch checked={this.state.toggleSwitch} onChange={this.handleActive} id={cell.id} name={cell.name}/></div> 
+        ),
+        sortable: true,
+        button: true
+      }
     ];
 
     let selectors = [];
@@ -188,10 +225,7 @@ export class Villages extends React.Component {
 
     let columnsvalue = selectors[0];
     const { classes } = this.props;
-  
-    let villagesFilter = this.state.getVillage;
-   
-    let filters = this.state.values;
+     let filters = this.state.values;
     return (
       <Layout>
         <Grid>
@@ -200,7 +234,6 @@ export class Villages extends React.Component {
             <div className={classes.row}>
               <div className={classes.buttonRow}>
                 <Button
-                  color="primary"
                   variant="contained"
                   component={Link}
                   to="/states/add"
@@ -240,13 +273,35 @@ export class Villages extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            <br></br>
+             <div className={classes.searchInput}>
+                <div className={style.Districts}>
+                  <Grid item md={12} xs={12}>
+                    <Input
+                      fullWidth
+                      label="State Name"
+                      name="FilterState"
+                      variant="outlined"
+                      onChange={(event, value) => {
+                        this.StateFilter(event, value);
+                      }}
+                      value={this.state.values.FilterState || ""}
+                    />
+                  </Grid>
+                </div>
+              </div>
+              <div className={classes.searchInput}></div>
+              <br></br>
+              <Button onClick={this.handleSearch.bind(this)}>Search</Button>
+             
+              <Button color="secondary" clicked={this.cancelForm}>
+                cancel
+              </Button>
            
-           
+            <br></br> 
             {data ? (
               <Table
                 title={"States"}
-                showSearch={true}
+                showSearch={false}
                 filterData={true}
                 // noDataComponent={"No Records To be shown"}
                 Searchplaceholder={"Search by State Name"}

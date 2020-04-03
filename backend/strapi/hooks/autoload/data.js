@@ -263,6 +263,33 @@ const modules = {
     displayNavigation: false,
     module: "", //slug
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+  },
+  States: {
+    is_active: true,
+    icon_class: "people",
+    url: "/states",
+    slug: "list_states",
+    displayNavigation: true,
+    module: "", //slug
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+  },
+  "Add States": {
+    is_active: true,
+    icon_class: "",
+    url: "/states/add",
+    slug: "add_states",
+    displayNavigation: false,
+    module: "", //slug
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+  },
+  "Edit States": {
+    is_active: true,
+    icon_class: "",
+    url: "/states/edit/:id",
+    slug: "edit_states",
+    displayNavigation: false,
+    module: "", //slug
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
   }
 };
 
