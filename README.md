@@ -25,6 +25,8 @@ Sesta uses a technology solution to track the following:
   
     ``` cd backend ```
     
+    ``` cd strapi ```
+    
     ``` yarn install ```
     
   - Configure Database settings in /backend/strapi/config/environments/development/database.json 
