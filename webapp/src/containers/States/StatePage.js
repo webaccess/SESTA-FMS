@@ -20,7 +20,6 @@ import validateInput from "../../components/Validation/ValidateInput/ValidateInp
 import { ADD_STATE_BREADCRUMBS, EDIT_STATE_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import GreenCheckbox from "./GreenCheckbox";
 
 class StatePage extends Component {
   constructor(props) {
@@ -29,18 +28,14 @@ class StatePage extends Component {
       values: {},
       getState: [],
       getDistrict: [],
-       addIsActive:false,
+      addIsActive:false,
       validations: {
         addState: {
           required: { value: "true", message: "State field required" }
         },
-         active: {
-          required: { value: "true", message: "Active field required" }
-        },
       },
       errors: {
         addState: [],
-        active: []
       },
       serverErrors: {},
       formSubmitted: "",
@@ -115,7 +110,7 @@ class StatePage extends Component {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
-    // if (Object.keys(this.state.errors).length > 0) return;
+    if (Object.keys(this.state.errors).length > 0) return;
     let stateName = this.state.values.addState;
     let IsActive = this.state.addIsActive;
     if (this.state.editPage[0]) {

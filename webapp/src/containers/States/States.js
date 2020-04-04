@@ -11,7 +11,11 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import Switch from "../../components/Switch/Switch";
+import CustomizedSwitches from "../../components/Switch/Switch";
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import Switch from '@material-ui/core/Switch';
 
 const useStyles = theme => ({
   root: {},
@@ -55,6 +59,8 @@ export class Villages extends React.Component {
     this.state = {
       values: {},
       FilterState: "",
+      // addIsActive:false,'' 
+      gilad: true ,
       toggleSwitch: false,
       Result: [],
       TestData: [],
@@ -83,6 +89,8 @@ export class Villages extends React.Component {
       })
       .then(res => {
         this.setState({ data: res.data });
+        // this.setState({gilad:})
+        console.log("sdhkshjds",res.data.is_active)
       });
    
   }
@@ -107,10 +115,8 @@ export class Villages extends React.Component {
 handleSearch() {
   let searchData = "";
   if (this.state.values.FilterState) {
-searchData += "name_contains=" + this.state.values.FilterState;
+    searchData += "name_contains=" + this.state.values.FilterState;
    }
-      // searchData += "name_contains=" + 
-    
     axios
       .get(
         process.env.REACT_APP_SERVER_URL +
@@ -191,15 +197,45 @@ searchData += "name_contains=" + this.state.values.FilterState;
     }
   };
 
-  handleActive = (event) => {
-    if(this.state.toggleSwitch === true )
-    this.setState({toggleSwitch: false})
-    else{
-      this.setState({toggleSwitch: true})
-    }
-    this.setState({ ...this.state.active, [event.target.name]: event.target.checked });
-    // console.log("IsActive??:",event.target.id)
-  }
+  handleActive = async(e,target,cellid) => {
+    let setActiveId = e.target.id;
+    let IsActive = e.target.checked;
+    await axios
+        .put(
+          process.env.REACT_APP_SERVER_URL +
+            "states/" +
+            setActiveId,
+          {
+              is_active: IsActive
+          },
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + ""
+            }
+          }
+        )
+        .then(res => {
+          console.log("res", res);
+          this.setState({ formSubmitted: true });
+          this.props.history.push({ pathname: "/states", editData: true });
+        })
+        .catch(error => {
+          this.setState({ formSubmitted: false });
+          if(error.response !== undefined){
+          this.setState({errorCode:error.response.data.statusCode+" Error- "+error.response.data.error+" Message- "+error.response.data.message+" Please try again!"})
+          }else{
+            this.setState({errorCode:"Network Error - Please try again!"});
+          }
+          console.log(error);
+        });
+      }
+
+    handleCheckBox = (event) => {
+    this.setState({  [event.target.name]: event.target.checked });
+    this.setState({addIsActive: true})
+    console.log("sdsdhjtest",event.target)
+  };
+
   render() {
     let data = this.state.data;
     const Usercolumns = [
@@ -207,12 +243,10 @@ searchData += "name_contains=" + this.state.values.FilterState;
         name: "State Name",
         selector: "name",
         sortable: true,
-        grow: 2,
       },
       {
         name: "Active",
-         cell: cell => ( <div><Switch checked={this.state.toggleSwitch} onChange={this.handleActive} id={cell.id} name={cell.name}/></div> 
-        ),
+        cell: cell => (<Switch id={cell.id} onChange={e=>{this.handleActive(e)}}  defaultChecked={cell.is_active} />),
         sortable: true,
         button: true
       }
@@ -294,7 +328,7 @@ searchData += "name_contains=" + this.state.values.FilterState;
               <Button onClick={this.handleSearch.bind(this)}>Search</Button>
              
               <Button color="secondary" clicked={this.cancelForm}>
-                cancel
+                Reset
               </Button>
            
             <br></br> 
