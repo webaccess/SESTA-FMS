@@ -17,24 +17,24 @@ export default function Tags(props) {
   const classes = useStyles();
 
   return (
-      <Autocomplete
-        multiple={props.multiple}
-        id={props.id}
-        options={props.options}
-        getOptionLabel={props.getOptionLabel}
-        onChange={props.onChange}
-        filterSelectedOptions
-        renderInput={params => (
-          <TextField
-            {...params}
-            variant={props.variant}
-            label={props.label}
-            placeholder={props.placeholder}
-            name={props.name}
-            helperText={props.helperText}
-            error={props.error}
-          />
-        )}
-      />
+    <Autocomplete
+      multiple={props.multiple}
+      id={props.id}
+      options={props.options}
+      getOptionLabel={props.getOptionLabel}
+      onChange={props.onChange}
+      filterSelectedOptions
+      renderInput={params => (
+        <TextField
+          {...params}
+          variant={props.variant}
+          label={props.label}
+          placeholder={props.placeholder}
+          name={props.name}
+          helperText={props.helperText}
+          error={props.error}
+        />
+      )}
+    />
   );
 }

@@ -76,7 +76,7 @@ export class Villages extends React.Component {
       dataCellId: [],
       singleDelete: "",
       multipleDelete: "",
-      active:{}
+      active: {}
     };
   }
 
@@ -92,12 +92,12 @@ export class Villages extends React.Component {
       });
   }
 
-  StateFilter (event, value, target){
-  this.setState({
+  StateFilter(event, value, target) {
+    this.setState({
       values: { ...this.state.values, [event.target.name]: event.target.value }
     });
   }
- getData(result) {
+  getData(result) {
     for (let i in result) {
       let states = [];
       for (let j in result[i].states) {
@@ -108,29 +108,29 @@ export class Villages extends React.Component {
     return result;
   }
 
-handleSearch() {
-  let searchData = "";
-  if (this.state.values.FilterState) {
-    searchData += "name_contains=" + this.state.values.FilterState;
-   }
+  handleSearch() {
+    let searchData = "";
+    if (this.state.values.FilterState) {
+      searchData += "name_contains=" + this.state.values.FilterState;
+    }
     axios
-    .get(
-      process.env.REACT_APP_SERVER_URL +
+      .get(
+        process.env.REACT_APP_SERVER_URL +
         "states?" +
         searchData +
         "&&_sort=name:ASC",
-      {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + ""
+          }
         }
-      }
-    )
-    .then(res => {
-      this.setState({ data: this.getData(res.data) });
-    })
-    .catch(err => {
-      console.log("err", err);
-    });
+      )
+      .then(res => {
+        this.setState({ data: this.getData(res.data) });
+      })
+      .catch(err => {
+        console.log("err", err);
+      });
   }
   editData = cellid => {
     this.props.history.push("/states/edit/" + cellid);
@@ -151,20 +151,20 @@ handleSearch() {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       axios
-      .delete(process.env.REACT_APP_SERVER_URL + "states/" + cellid, {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
-      })
-      .then(res => {
-        this.setState({ singleDelete: res.data.name });
-        this.setState({ dataCellId: "" });
-        this.componentDidMount();
-      })
-      .catch(error => {
-        this.setState({ singleDelete: false });
-        console.log(error);
-      });
+        .delete(process.env.REACT_APP_SERVER_URL + "states/" + cellid, {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + ""
+          }
+        })
+        .then(res => {
+          this.setState({ singleDelete: res.data.name });
+          this.setState({ dataCellId: "" });
+          this.componentDidMount();
+        })
+        .catch(error => {
+          this.setState({ singleDelete: false });
+          console.log(error);
+        });
     }
   };
 
@@ -173,34 +173,34 @@ handleSearch() {
       this.setState({ singleDelete: "", multipleDelete: "" });
       for (let i in selectedId) {
         axios
-        .delete(
-          process.env.REACT_APP_SERVER_URL + "states/" + selectedId[i],
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
+          .delete(
+            process.env.REACT_APP_SERVER_URL + "states/" + selectedId[i],
+            {
+              headers: {
+                Authorization: "Bearer " + auth.getToken() + ""
+              }
             }
-          }
-        )
-        .then(res => {
-          this.setState({ multipleDelete: true });
-          this.componentDidMount();
-        })
-        .catch(error => {
-          this.setState({ multipleDelete: false });
-          console.log("err", error);
-        });
+          )
+          .then(res => {
+            this.setState({ multipleDelete: true });
+            this.componentDidMount();
+          })
+          .catch(error => {
+            this.setState({ multipleDelete: false });
+            console.log("err", error);
+          });
       }
     }
   };
 
-  handleActive = async(e,target,cellid) => {
+  handleActive = async (e, target, cellid) => {
     let setActiveId = e.target.id;
     let IsActive = e.target.checked;
     await axios
       .put(
         process.env.REACT_APP_SERVER_URL +
-          "states/" +
-          setActiveId,
+        "states/" +
+        setActiveId,
         {
           is_active: IsActive
         },
@@ -212,24 +212,24 @@ handleSearch() {
       )
       .then(res => {
         this.setState({ formSubmitted: true });
-        this.componentDidMount({editData: true });
+        this.componentDidMount({ editData: true });
         this.props.history.push({ pathname: "/states", editData: true });
       })
       .catch(error => {
         this.setState({ formSubmitted: false });
-        if(error.response !== undefined){
-          this.setState({errorCode:error.response.data.statusCode+" Error- "+error.response.data.error+" Message- "+error.response.data.message+" Please try again!"})
-        }else{
-          this.setState({errorCode:"Network Error - Please try again!"});
+        if (error.response !== undefined) {
+          this.setState({ errorCode: error.response.data.statusCode + " Error- " + error.response.data.error + " Message- " + error.response.data.message + " Please try again!" })
+        } else {
+          this.setState({ errorCode: "Network Error - Please try again!" });
         }
         console.log(error);
       });
-    };
+  };
 
-    handleCheckBox = (event) => {
-      this.setState({  [event.target.name]: event.target.checked });
-      this.setState({addIsActive: true})
-    };
+  handleCheckBox = (event) => {
+    this.setState({ [event.target.name]: event.target.checked });
+    this.setState({ addIsActive: true })
+  };
 
   render() {
     let data = this.state.data;
@@ -241,7 +241,7 @@ handleSearch() {
       },
       {
         name: "Active",
-        cell: cell => (<Switch id={cell.id} onChange={e=>{this.handleActive(e)}} defaultChecked={cell.is_active} Small={true}/>),
+        cell: cell => (<Switch id={cell.id} onChange={e => { this.handleActive(e) }} defaultChecked={cell.is_active} Small={true} />),
         sortable: true,
         button: true
       }
@@ -254,7 +254,7 @@ handleSearch() {
 
     let columnsvalue = selectors[0];
     const { classes } = this.props;
-     let filters = this.state.values;
+    let filters = this.state.values;
     return (
       <Layout>
         <Grid>
@@ -277,18 +277,18 @@ handleSearch() {
                 State added successfully.
               </Snackbar>
             ) : null}
-            { this.props.location.editData ? (
+            {this.props.location.editData ? (
               <Snackbar severity="success">
                 State edited successfully.
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
-            this.state.singleDelete !== "" &&
-            this.state.singleDelete ? (
-              <Snackbar severity="success" Showbutton={false}>
-                State {this.state.singleDelete} deleted successfully!
-              </Snackbar>
-            ) : null}
+              this.state.singleDelete !== "" &&
+              this.state.singleDelete ? (
+                <Snackbar severity="success" Showbutton={false}>
+                  State {this.state.singleDelete} deleted successfully!
+                </Snackbar>
+              ) : null}
             {this.state.singleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
@@ -305,7 +305,7 @@ handleSearch() {
               </Snackbar>
             ) : null}
             <div className={classes.row}>
-             <div className={classes.searchInput}>
+              <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
                     <Input
@@ -322,14 +322,14 @@ handleSearch() {
                 </div>
               </div>
               <div className={classes.searchInput}>
-              <Button onClick={this.handleSearch.bind(this)}>Search</Button>
+                <Button onClick={this.handleSearch.bind(this)}>Search</Button>
                &nbsp;&nbsp;&nbsp;
               <Button color="secondary" clicked={this.cancelForm}>
-                Reset
+                  Reset
               </Button>
               </div>
-           </div>
-            <br></br> 
+            </div>
+            <br></br>
             {data ? (
               <Table
                 title={"States"}
@@ -349,8 +349,8 @@ handleSearch() {
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (
-              <h1>Loading...</h1>
-            )}
+                <h1>Loading...</h1>
+              )}
           </div>
         </Grid>
       </Layout>

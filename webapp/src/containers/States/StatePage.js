@@ -28,7 +28,7 @@ class StatePage extends Component {
       values: {},
       getState: [],
       getDistrict: [],
-      addIsActive:false,
+      addIsActive: false,
       validations: {
         addState: {
           required: { value: "true", message: "State field required" }
@@ -39,7 +39,7 @@ class StatePage extends Component {
       },
       serverErrors: {},
       formSubmitted: "",
-      errorCode:"",
+      errorCode: "",
       stateSelected: false,
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
@@ -53,8 +53,8 @@ class StatePage extends Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "states?id=" +
-            this.state.editPage[1],
+          "states?id=" +
+          this.state.editPage[1],
           {
             headers: {
               Authorization: "Bearer " + auth.getToken() + ""
@@ -73,9 +73,9 @@ class StatePage extends Component {
         .catch(error => {
           console.log(error);
         });
-      }
-      this.stateIds = this.state.values.addState;
-    };
+    }
+    this.stateIds = this.state.values.addState;
+  };
 
   handleChange = ({ target, event }) => {
     this.setState({
@@ -118,11 +118,11 @@ class StatePage extends Component {
       await axios
         .put(
           process.env.REACT_APP_SERVER_URL +
-            "states/" +
-            this.state.editPage[1],
+          "states/" +
+          this.state.editPage[1],
           {
-              name: stateName,
-              is_active: IsActive
+            name: stateName,
+            is_active: IsActive
           },
           {
             headers: {
@@ -136,10 +136,10 @@ class StatePage extends Component {
         })
         .catch(error => {
           this.setState({ formSubmitted: false });
-          if(error.response !== undefined){
-          this.setState({errorCode:error.response.data.statusCode+" Error- "+error.response.data.error+" Message- "+error.response.data.message+" Please try again!"})
-          }else{
-            this.setState({errorCode:"Network Error - Please try again!"});
+          if (error.response !== undefined) {
+            this.setState({ errorCode: error.response.data.statusCode + " Error- " + error.response.data.error + " Message- " + error.response.data.message + " Please try again!" })
+          } else {
+            this.setState({ errorCode: "Network Error - Please try again!" });
           }
           console.log(error);
         });
@@ -149,8 +149,8 @@ class StatePage extends Component {
         .post(
           process.env.REACT_APP_SERVER_URL + "states",
           {
-              name: stateName,
-              is_active: IsActive
+            name: stateName,
+            is_active: IsActive
           },
           {
             headers: {
@@ -165,17 +165,17 @@ class StatePage extends Component {
         })
         .catch(error => {
           this.setState({ formSubmitted: false });
-          if(error.response !== undefined){
-            this.setState({errorCode:error.response.data.statusCode+" Error- "+error.response.data.error+" Message- "+error.response.data.message+" Please try again!"})
-            }else{
-              this.setState({errorCode:"Network Error - Please try again!"});
-            }
+          if (error.response !== undefined) {
+            this.setState({ errorCode: error.response.data.statusCode + " Error- " + error.response.data.error + " Message- " + error.response.data.message + " Please try again!" })
+          } else {
+            this.setState({ errorCode: "Network Error - Please try again!" });
+          }
         });
-      }
-    };
-    
-handleCheckBox = (event) => {
-    this.setState({  [event.target.name]: event.target.checked });
+    }
+  };
+
+  handleCheckBox = (event) => {
+    this.setState({ [event.target.name]: event.target.checked });
 
   };
 
@@ -238,8 +238,8 @@ handleCheckBox = (event) => {
                     variant="outlined"
                   />
                 </Grid>
-                 <Grid item md={6} xs={12}>
-                 <FormControlLabel
+                <Grid item md={6} xs={12}>
+                  <FormControlLabel
                     control={
                       <Checkbox
                         checked={this.state.addIsActive}
