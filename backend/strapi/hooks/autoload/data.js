@@ -268,25 +268,25 @@ const modules = {
     is_active: true,
     icon_class: "people",
     url: "/states",
-    slug: "list_states",
+    slug: "list_state",
     displayNavigation: true,
     module: "", //slug
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
   },
-  "Add States": {
+  "Add State": {
     is_active: true,
     icon_class: "",
     url: "/states/add",
-    slug: "add_states",
+    slug: "add_state",
     displayNavigation: false,
     module: "", //slug
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
   },
-  "Edit States": {
+  "Edit State": {
     is_active: true,
     icon_class: "",
     url: "/states/edit/:id",
-    slug: "edit_states",
+    slug: "edit_state",
     displayNavigation: false,
     module: "", //slug
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"]

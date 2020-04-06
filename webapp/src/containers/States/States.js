@@ -59,14 +59,13 @@ export class Villages extends React.Component {
     this.state = {
       values: {},
       FilterState: "",
-      // addIsActive:false,'' 
-      gilad: true ,
-      toggleSwitch: false,
       Result: [],
       TestData: [],
       data: [],
       selectedid: 0,
       open: false,
+      isSetActive: false,
+      isSetInActive: false,
       columnsvalue: [],
       DeleteData: false,
       properties: props,
@@ -80,6 +79,7 @@ export class Villages extends React.Component {
       active:{}
     };
   }
+
   async componentDidMount() {
     await axios
       .get(process.env.REACT_APP_SERVER_URL + "states/?_sort=name:ASC", {
@@ -89,10 +89,7 @@ export class Villages extends React.Component {
       })
       .then(res => {
         this.setState({ data: res.data });
-        // this.setState({gilad:})
-        console.log("sdhkshjds",res.data.is_active)
       });
-   
   }
 
   StateFilter (event, value, target){
@@ -105,7 +102,6 @@ export class Villages extends React.Component {
       let states = [];
       for (let j in result[i].states) {
         states.push(result[i].states[j].name + " ");
-        console.log("push");
       }
       result[i]["states"] = states;
     }
@@ -118,57 +114,57 @@ handleSearch() {
     searchData += "name_contains=" + this.state.values.FilterState;
    }
     axios
-      .get(
-        process.env.REACT_APP_SERVER_URL +
-          "states?" +
-          searchData +
-          "&&_sort=name:ASC",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+    .get(
+      process.env.REACT_APP_SERVER_URL +
+        "states?" +
+        searchData +
+        "&&_sort=name:ASC",
+      {
+        headers: {
+          Authorization: "Bearer " + auth.getToken() + ""
         }
-      )
-      .then(res => {
-        this.setState({ data: this.getData(res.data) });
-      })
-      .catch(err => {
-        console.log("err", err);
-      });
+      }
+    )
+    .then(res => {
+      this.setState({ data: this.getData(res.data) });
+    })
+    .catch(err => {
+      console.log("err", err);
+    });
   }
   editData = cellid => {
     this.props.history.push("/states/edit/" + cellid);
   };
 
   cancelForm = () => {
-      this.setState({
-        FilterState: "",
-        values: {},
-        formSubmitted: "",
-        stateSelected: false,
-        isCancel: true
-      });
-      this.componentDidMount();
-    };
+    this.setState({
+      FilterState: "",
+      values: {},
+      formSubmitted: "",
+      stateSelected: false,
+      isCancel: true
+    });
+    this.componentDidMount();
+  };
 
   DeleteData = (cellid, selectedId) => {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       axios
-        .delete(process.env.REACT_APP_SERVER_URL + "states/" + cellid, {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
-        })
-        .then(res => {
-          this.setState({ singleDelete: res.data.name });
-          this.setState({ dataCellId: "" });
-          this.componentDidMount();
-        })
-        .catch(error => {
-          this.setState({ singleDelete: false });
-          console.log(error);
-        });
+      .delete(process.env.REACT_APP_SERVER_URL + "states/" + cellid, {
+        headers: {
+          Authorization: "Bearer " + auth.getToken() + ""
+        }
+      })
+      .then(res => {
+        this.setState({ singleDelete: res.data.name });
+        this.setState({ dataCellId: "" });
+        this.componentDidMount();
+      })
+      .catch(error => {
+        this.setState({ singleDelete: false });
+        console.log(error);
+      });
     }
   };
 
@@ -177,22 +173,22 @@ handleSearch() {
       this.setState({ singleDelete: "", multipleDelete: "" });
       for (let i in selectedId) {
         axios
-          .delete(
-            process.env.REACT_APP_SERVER_URL + "states/" + selectedId[i],
-            {
-              headers: {
-                Authorization: "Bearer " + auth.getToken() + ""
-              }
+        .delete(
+          process.env.REACT_APP_SERVER_URL + "states/" + selectedId[i],
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + ""
             }
-          )
-          .then(res => {
-            this.setState({ multipleDelete: true });
-            this.componentDidMount();
-          })
-          .catch(error => {
-            this.setState({ multipleDelete: false });
-            console.log("err", error);
-          });
+          }
+        )
+        .then(res => {
+          this.setState({ multipleDelete: true });
+          this.componentDidMount();
+        })
+        .catch(error => {
+          this.setState({ multipleDelete: false });
+          console.log("err", error);
+        });
       }
     }
   };
@@ -201,52 +197,51 @@ handleSearch() {
     let setActiveId = e.target.id;
     let IsActive = e.target.checked;
     await axios
-        .put(
-          process.env.REACT_APP_SERVER_URL +
-            "states/" +
-            setActiveId,
-          {
-              is_active: IsActive
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
+      .put(
+        process.env.REACT_APP_SERVER_URL +
+          "states/" +
+          setActiveId,
+        {
+          is_active: IsActive
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + ""
           }
-        )
-        .then(res => {
-          console.log("res", res);
-          this.setState({ formSubmitted: true });
-          this.props.history.push({ pathname: "/states", editData: true });
-        })
-        .catch(error => {
-          this.setState({ formSubmitted: false });
-          if(error.response !== undefined){
+        }
+      )
+      .then(res => {
+        this.setState({ formSubmitted: true });
+        this.componentDidMount({editData: true });
+        this.props.history.push({ pathname: "/states", editData: true });
+      })
+      .catch(error => {
+        this.setState({ formSubmitted: false });
+        if(error.response !== undefined){
           this.setState({errorCode:error.response.data.statusCode+" Error- "+error.response.data.error+" Message- "+error.response.data.message+" Please try again!"})
-          }else{
-            this.setState({errorCode:"Network Error - Please try again!"});
-          }
-          console.log(error);
-        });
-      }
+        }else{
+          this.setState({errorCode:"Network Error - Please try again!"});
+        }
+        console.log(error);
+      });
+    };
 
     handleCheckBox = (event) => {
-    this.setState({  [event.target.name]: event.target.checked });
-    this.setState({addIsActive: true})
-    console.log("sdsdhjtest",event.target)
-  };
+      this.setState({  [event.target.name]: event.target.checked });
+      this.setState({addIsActive: true})
+    };
 
   render() {
     let data = this.state.data;
     const Usercolumns = [
       {
-        name: "State Name",
+        name: "State",
         selector: "name",
         sortable: true,
       },
       {
         name: "Active",
-        cell: cell => (<Switch id={cell.id} onChange={e=>{this.handleActive(e)}}  defaultChecked={cell.is_active} />),
+        cell: cell => (<Switch id={cell.id} onChange={e=>{this.handleActive(e)}} defaultChecked={cell.is_active} Small={true}/>),
         sortable: true,
         button: true
       }
@@ -264,7 +259,7 @@ handleSearch() {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>States</h1>
+            <h1 className={style.title}>Manage States</h1>
             <div className={classes.row}>
               <div className={classes.buttonRow}>
                 <Button
@@ -276,11 +271,13 @@ handleSearch() {
                 </Button>
               </div>
             </div>
+            <br></br>
             {this.props.location.addData ? (
               <Snackbar severity="success">
                 State added successfully.
               </Snackbar>
-            ) : this.props.location.editData ? (
+            ) : null}
+            { this.props.location.editData ? (
               <Snackbar severity="success">
                 State edited successfully.
               </Snackbar>
@@ -307,6 +304,7 @@ handleSearch() {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
+            <div className={classes.row}>
              <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -323,14 +321,14 @@ handleSearch() {
                   </Grid>
                 </div>
               </div>
-              <div className={classes.searchInput}></div>
-              <br></br>
+              <div className={classes.searchInput}>
               <Button onClick={this.handleSearch.bind(this)}>Search</Button>
-             
+               &nbsp;&nbsp;&nbsp;
               <Button color="secondary" clicked={this.cancelForm}>
                 Reset
               </Button>
-           
+              </div>
+           </div>
             <br></br> 
             {data ? (
               <Table

@@ -131,7 +131,6 @@ class StatePage extends Component {
           }
         )
         .then(res => {
-          console.log("res", res);
           this.setState({ formSubmitted: true });
           this.props.history.push({ pathname: "/states", editData: true });
         })
@@ -171,7 +170,6 @@ class StatePage extends Component {
             }else{
               this.setState({errorCode:"Network Error - Please try again!"});
             }
-          console.log("formsubmitted", this.state.formSubmitted);
         });
       }
     };
@@ -191,8 +189,6 @@ handleCheckBox = (event) => {
   };
 
   render() {
-    console.log("active?",this.state.addIsActive)
-    console.log("sdsdhjjshsadjhsdajh",this.state.values)
     return (
       <Layout
         breadcrumbs={
@@ -220,7 +216,6 @@ handleCheckBox = (event) => {
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item md={12} xs={12}>
-                 
                   {this.state.formSubmitted === false ? (
                     <Snackbar severity="error" Showbutton={false}>
                       {this.state.errorCode}
@@ -265,7 +260,7 @@ handleCheckBox = (event) => {
                 color="secondary"
                 clicked={this.cancelForm}
                 component={Link}
-                to="/Villages"
+                to="/states"
               >
                 Reset
               </Button>
