@@ -24,13 +24,13 @@ function Switch(props) {
     <div>
       <input
         type="checkbox"
-        name={this.props.Name}
+        name={props.name}
         className="toggle-switch-checkbox"
-        id={this.props.id}
-        checked={this.props.currentValue}
-        defaultChecked={this.props.defaultChecked}
-        onChange={this.onChange}
-        disabled={this.props.disabled}
+        id={props.id}
+        checked={props.currentValue}
+        defaultChecked={props.defaultChecked}
+        onChange={onChange}
+        disabled={props.disabled}
       />
     </div>
   );
