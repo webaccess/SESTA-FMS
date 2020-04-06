@@ -1,4 +1,4 @@
-.toggle-switch {
+.toggleSwitch {
   position: relative;
   width: 75px;
   display: inline-block;
@@ -11,7 +11,7 @@
 .toggleSwitchCheckbox {
   display: none;
 }
-.toggle-switch-label {
+.toggleSwitchLabel {
   display: block;
   overflow: hidden;
   cursor: pointer;
@@ -25,7 +25,7 @@
   margin-left: -100%;
   transition: margin 0.3s ease-in 0s;
 }
-.toggle-switch-inner::before, .toggle-switch-inner::after {
+.toggleSwitchInner::before, .toggleSwitchInner::after {
   display: block;
   float: left;
   width: 50%;
@@ -37,7 +37,7 @@
   font-weight: bold;
   box-sizing: border-box;
 }
-.toggle-switch-inner:before {
+.toggleSwitchInner:before {
   content: "Yes";
   text-transform: uppercase;
   padding-left: 10px;
@@ -52,7 +52,7 @@
   background-color: #ccc;
   cursor: not-allowed;
 }
-.toggle-switch-inner::after {
+.toggleSwitchInner::after {
   content: "No";
   text-transform: uppercase;
   padding-right: 10px;
