@@ -8,7 +8,7 @@ import React, { Component ,useState} from "react";
 import { withStyles } from '@material-ui/core/styles';
 import Switch from '@material-ui/core/Switch';
 import PropTypes from "prop-types";
-import '../../App.css';
+import styles from "./Switch.module.css"
 
 function ToggleSwitch(props){
 const [state, setState] = useState({
@@ -24,12 +24,12 @@ checked: props.defaultChecked
 
     return (
       <div
-        className={"toggle-switch" + (props.Small ? " small-switch" : "")}
+        className={styles.toggleSwitch + (props.Small ? " small-switch" : "")}
       >
         <input
           type="checkbox"
           name={props.Name}
-          className="toggle-switch-checkbox"
+          className={styles.toggleSwitchCheckbox}
           id={props.id}
           checked={props.currentValue}
           defaultChecked={props.defaultChecked}
@@ -37,33 +37,21 @@ checked: props.defaultChecked
           disabled={props.disabled}
         />
         {props.id ? (
-          <label className="toggle-switch-label" htmlFor={props.id}>
+          <label className={styles.toggleSwitchLabel} htmlFor={props.id}>
             <span
               className={
-                props.disabled
-                  ? "toggle-switch-inner toggle-switch-disabled"
-                  : "toggle-switch-inner"
+                styles.toggleSwitchInner
               }
-              // data-yes={props.Text[0]}
-              // data-no={props.Text[1]}
             />
             <span
-              className={
-                props.disabled
-                  ? "toggle-switch-switch toggle-switch-disabled"
-                  : "toggle-switch-switch"
-              }
+              className=
+              {styles.toggleSwitchSwitch}
             />
           </label>
         ) : null}
       </div>
     );
   }
-  // Set text for rendering.
-  // static defaultProps = {
-  //   Text: ["Yes", "No"]
-  // };
-
 
 ToggleSwitch.propTypes = {
   id: PropTypes.string.isRequired,

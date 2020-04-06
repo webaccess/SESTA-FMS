@@ -19,7 +19,7 @@
   border-radius: 20px;
   margin: 0;
 }
-.toggle-switch-inner {
+.toggleSwitchInner {
   display: block;
   width: 200%;
   margin-left: -100%;
@@ -41,14 +41,14 @@
   content: "Yes";
   text-transform: uppercase;
   padding-left: 10px;
-  background-color: #f90;
+  background-color: #028941;
   color: #fff;
 }
-.toggle-switch-disabled {
+.toggleSwitchDisabled {
   background-color: #ccc;
   cursor: not-allowed;
 }
-.toggle-switch-disabled::before {
+.toggleSwitchDisabled::before {
   background-color: #ccc;
   cursor: not-allowed;
 }
@@ -56,11 +56,11 @@
   content: "No";
   text-transform: uppercase;
   padding-right: 10px;
-  background-color: #ccc;
+  background-color: #666666;
   color: #fff;
   text-align: right;
 }
-.toggle-switch-switch {
+.toggleSwitchSwitch {
   display: block;
   width: 24px;
   margin: 5px;
@@ -73,9 +73,9 @@
   border-radius: 20px;
   transition: all 0.3s ease-in 0s;
 }
-.toggle-switch-checkbox:checked + .toggle-switch-label .toggle-switch-inner {
+.toggleSwitchCheckbox:checked + .toggleSwitchLabel .toggleSwitchInner {
   margin-left: 0;
 }
-.toggle-switch-checkbox:checked + .toggle-switch-label .toggle-switch-switch {
+.toggleSwitchCheckbox:checked + .toggleSwitchLabel .toggleSwitchSwitch {
   right: 0px;
 }
