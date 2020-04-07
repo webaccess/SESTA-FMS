@@ -54,8 +54,8 @@ checked: props.defaultChecked
   }
 
 ToggleSwitch.propTypes = {
-  id: PropTypes.string.isRequired,
-  Text: PropTypes.string.isRequired,
+  id: PropTypes.any.isRequired,
+  Text: PropTypes.string,
   Name: PropTypes.string,
   onChange: PropTypes.func,
   defaultChecked: PropTypes.bool,
