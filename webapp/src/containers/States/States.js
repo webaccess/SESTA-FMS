@@ -5,12 +5,18 @@ import Layout from "../../hoc/Layout/Layout";
 import Button from "../../components/UI/Button/Button";
 import { withStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
-import style from "./Pgs.module.css";
+import style from "./States.module.css";
 import { Grid } from "@material-ui/core";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import Switch from "../../components/Switch/Switch";
+import CustomizedSwitches from "../../components/Switch/Switch";
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import Switch from '@material-ui/core/Switch';
+
 const useStyles = theme => ({
   root: {},
   row: {
@@ -47,44 +53,105 @@ const useStyles = theme => ({
   }
 });
 
-export class Pgs extends React.Component {
+export class Villages extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       values: {},
+      FilterState: "",
+      Result: [],
+      TestData: [],
       data: [],
+      selectedid: 0,
+      open: false,
+      isSetActive: false,
+      isSetInActive: false,
+      columnsvalue: [],
       DeleteData: false,
+      properties: props,
+      getState: [],
+      getDistrict: [],
+      getVillage: [],
       isCancel: false,
+      dataCellId: [],
       singleDelete: "",
-      multipleDelete: ""
+      multipleDelete: "",
+      active: {}
     };
   }
+
   async componentDidMount() {
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "tags/?_sort=name:ASC", {
+      .get(process.env.REACT_APP_SERVER_URL + "states/?_sort=name:ASC", {
         headers: {
           Authorization: "Bearer " + auth.getToken() + ""
         }
       })
       .then(res => {
-        this.setState({ data:res.data });
-      })
-      .catch(error => {
-        console.log(error);
+        this.setState({ data: res.data });
       });
- 
   }
 
+  StateFilter(event, value, target) {
+    this.setState({
+      values: { ...this.state.values, [event.target.name]: event.target.value }
+    });
+  }
+  getData(result) {
+    for (let i in result) {
+      let states = [];
+      for (let j in result[i].states) {
+        states.push(result[i].states[j].name + " ");
+      }
+      result[i]["states"] = states;
+    }
+    return result;
+  }
+
+  handleSearch() {
+    let searchData = "";
+    if (this.state.values.FilterState) {
+      searchData += "name_contains=" + this.state.values.FilterState;
+    }
+    axios
+      .get(
+        process.env.REACT_APP_SERVER_URL +
+        "states?" +
+        searchData +
+        "&&_sort=name:ASC",
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + ""
+          }
+        }
+      )
+      .then(res => {
+        this.setState({ data: this.getData(res.data) });
+      })
+      .catch(err => {
+        console.log("err", err);
+      });
+  }
   editData = cellid => {
-    this.props.history.push("/pgs/edit/" + cellid);
+    this.props.history.push("/states/edit/" + cellid);
+  };
+
+  cancelForm = () => {
+    this.setState({
+      FilterState: "",
+      values: {},
+      formSubmitted: "",
+      stateSelected: false,
+      isCancel: true
+    });
+    this.componentDidMount();
   };
 
   DeleteData = (cellid, selectedId) => {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-
       axios
-        .delete(process.env.REACT_APP_SERVER_URL + "tags/" + cellid, {
+        .delete(process.env.REACT_APP_SERVER_URL + "states/" + cellid, {
           headers: {
             Authorization: "Bearer " + auth.getToken() + ""
           }
@@ -99,18 +166,21 @@ export class Pgs extends React.Component {
           console.log(error);
         });
     }
-    
   };
+
   DeleteAll = selectedId => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       for (let i in selectedId) {
         axios
-          .delete(process.env.REACT_APP_SERVER_URL + "tags/" + selectedId[i], {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
+          .delete(
+            process.env.REACT_APP_SERVER_URL + "states/" + selectedId[i],
+            {
+              headers: {
+                Authorization: "Bearer " + auth.getToken() + ""
+              }
             }
-          })
+          )
           .then(res => {
             this.setState({ multipleDelete: true });
             this.componentDidMount();
@@ -123,28 +193,13 @@ export class Pgs extends React.Component {
     }
   };
 
-  resetForm = () => {
-    this.setState({
-      values: {},
-      formSubmitted: "",
-      stateSelected: false,
-      isCancel: true
-    });
-    this.componentDidMount();
-  };
-
-  handleChange = ({ target }) => {
-    this.setState({
-      values: { ...this.state.values, [target.name]: target.value }
-    });
-  };
   handleActive = async (e, target, cellid) => {
     let setActiveId = e.target.id;
     let IsActive = e.target.checked;
     await axios
       .put(
         process.env.REACT_APP_SERVER_URL +
-        "tags/" +
+        "states/" +
         setActiveId,
         {
           is_active: IsActive
@@ -158,7 +213,7 @@ export class Pgs extends React.Component {
       .then(res => {
         this.setState({ formSubmitted: true });
         this.componentDidMount({ editData: true });
-        this.props.history.push({ pathname: "/pgs", editData: true });
+        this.props.history.push({ pathname: "/states", editData: true });
       })
       .catch(error => {
         this.setState({ formSubmitted: false });
@@ -170,38 +225,19 @@ export class Pgs extends React.Component {
         console.log(error);
       });
   };
-  handleSearch() {
-    let searchData = "";
-    if (this.state.values.filterPg) {
-      searchData += "name_contains=" + this.state.values.filterPg;
-    }
-    axios
-      .get(
-        process.env.REACT_APP_SERVER_URL +
-          "tags?" +
-          searchData +
-          "&&_sort=name:ASC",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
-        }
-      )
-      .then(res => {
-        this.setState({ data: res.data });
-      })
-      .catch(err => {
-        console.log("err", err);
-      });
-  }
+
+  handleCheckBox = (event) => {
+    this.setState({ [event.target.name]: event.target.checked });
+    this.setState({ addIsActive: true })
+  };
 
   render() {
     let data = this.state.data;
     const Usercolumns = [
       {
-        name: "Producer Group",
+        name: "State",
         selector: "name",
-        sortable: true
+        sortable: true,
       },
       {
         name: "Active",
@@ -223,30 +259,36 @@ export class Pgs extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>Manage Producer Group</h1>
+            <h1 className={style.title}>Manage States</h1>
             <div className={classes.row}>
               <div className={classes.buttonRow}>
-                <Button variant="contained" component={Link} to="/Pgs/add">
-                  Add PG
+                <Button
+                  variant="contained"
+                  component={Link}
+                  to="/states/add"
+                >
+                  Add State
                 </Button>
               </div>
             </div>
+            <br></br>
             {this.props.location.addData ? (
               <Snackbar severity="success">
-                PG added successfully.
+                State added successfully.
               </Snackbar>
-            ) : this.props.location.editData ? (
+            ) : null}
+            {this.props.location.editData ? (
               <Snackbar severity="success">
-                PG edited successfully.
+                State edited successfully.
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
-            this.state.singleDelete !== "" &&
-            this.state.singleDelete ? (
-              <Snackbar severity="success" Showbutton={false}>
-                PG {this.state.singleDelete} deleted successfully!
-              </Snackbar>
-            ) : null}
+              this.state.singleDelete !== "" &&
+              this.state.singleDelete ? (
+                <Snackbar severity="success" Showbutton={false}>
+                  State {this.state.singleDelete} deleted successfully!
+                </Snackbar>
+              ) : null}
             {this.state.singleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
@@ -254,7 +296,7 @@ export class Pgs extends React.Component {
             ) : null}
             {this.state.multipleDelete === true ? (
               <Snackbar severity="success" Showbutton={false}>
-                PGs deleted successfully!
+                States deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.multipleDelete === false ? (
@@ -262,41 +304,40 @@ export class Pgs extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            <br></br>
             <div className={classes.row}>
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
                     <Input
                       fullWidth
-                      label="PG Name"
-                      name="filterPg"
+                      label="State Name"
+                      name="FilterState"
                       variant="outlined"
-                      onChange={(event) => {
-                        this.handleChange(event);
+                      onChange={(event, value) => {
+                        this.StateFilter(event, value);
                       }}
-                      value={this.state.values.filterPg || ""}
+                      value={this.state.values.FilterState || ""}
                     />
                   </Grid>
                 </div>
               </div>
-            
-              <div className={classes.searchInput}></div>
-              <br></br>
-              <Button onClick={this.handleSearch.bind(this)}>Search</Button>
-              &nbsp;&nbsp;&nbsp;
-              <Button color="secondary" clicked={this.resetForm}>
-                reset
+              <div className={classes.searchInput}>
+                <Button onClick={this.handleSearch.bind(this)}>Search</Button>
+               &nbsp;&nbsp;&nbsp;
+              <Button color="secondary" clicked={this.cancelForm}>
+                  Reset
               </Button>
+              </div>
             </div>
+            <br></br>
             {data ? (
               <Table
-                title={"Villages"}
+                title={"States"}
                 showSearch={false}
                 filterData={true}
                 // noDataComponent={"No Records To be shown"}
-                Searchplaceholder={"Seacrh by Village Name"}
-                filterBy={["name", "state.name"]}
+                Searchplaceholder={"Search by State Name"}
+                filterBy={["name"]}
                 filters={filters}
                 data={data}
                 column={Usercolumns}
@@ -308,12 +349,12 @@ export class Pgs extends React.Component {
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (
-              <h1>Loading...</h1>
-            )}
+                <h1>Loading...</h1>
+              )}
           </div>
         </Grid>
       </Layout>
     );
   }
 }
-export default withStyles(useStyles)(Pgs);
+export default withStyles(useStyles)(Villages);

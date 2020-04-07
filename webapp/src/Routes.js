@@ -17,6 +17,8 @@ import Villages from "./containers/Villages/Villages";
 import Shgs from "./containers/Shgs/Shgs";
 import Pgs from "./containers/Pgs/Pgs";
 import PgPage from "./containers/Pgs/PgPage";
+import states from "./containers/States/States";
+import StatesPage from "./containers/States/StatePage";
 import VillagePage from "./containers/Villages/VillagePage";
 import Vopage from "./containers/Vo/Vopage";
 import Vos from "./containers/Vo/Vos";
@@ -60,6 +62,9 @@ function Routes() {
               exact
             />
 
+            <PrivateRoute path="/states" component={states} exact />
+            <PrivateRoute path="/states/add" component={StatesPage} exact />
+            <PrivateRoute path="/states/edit/:id" component={StatesPage} exact />
             <PrivateRoute path="/my-account" component={Account} exact />
             <Route path="/404" component={NotFoundPage} />
             <AuthRoute path="/:authType/:id?" component={AuthPage} />

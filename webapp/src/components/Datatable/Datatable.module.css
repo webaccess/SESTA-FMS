@@ -103,3 +103,7 @@ ClearButton {
 
 /*  */
 /* class="sc-fzqBZW dNoAIX" */
+
+:global(.dNoAIX) {
+  display: none;
+}
