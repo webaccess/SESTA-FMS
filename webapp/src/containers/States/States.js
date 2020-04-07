@@ -15,7 +15,7 @@ import CustomizedSwitches from "../../components/Switch/Switch";
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import Switch from '../../components/Switch/Switch';
+import Switch from '../../components/UI/Switch/Switch';
 
 const useStyles = theme => ({
   root: {},
