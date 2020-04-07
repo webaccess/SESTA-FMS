@@ -17,10 +17,6 @@ import validateInput from "../../components/Validation/ValidateInput/ValidateInp
 import { ADD_VILLAGE_BREADCRUMBS, EDIT_VILLAGE_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-<<<<<<< HEAD
-import Autocomplete from "@material-ui/lab/Autocomplete";
-=======
->>>>>>> b048a09c597ca7957afb966ac0bec444364cec81
 
 class VillagePage extends Component {
   constructor(props) {
@@ -123,15 +119,11 @@ class VillagePage extends Component {
     });
   };
 
-  handleStateChange = async (event, value) => {
-    console.log("hi",event,value)
-    if (value !== null) {
+  handleStateChange = async ({ target }) => {
     this.setState({
-      values: { ...this.state.values, addState: value.id }
+      values: { ...this.state.values, [target.name]: target.value }
     });
-    console.log("hhh",value)
-    let stateId = value.id;
-    console.log("stateId",stateId)
+    let stateId = target.value;
     await axios
       .get(
         process.env.REACT_APP_SERVER_URL +
@@ -152,26 +144,7 @@ class VillagePage extends Component {
     if (this.state.values.addState) {
       this.setState({ stateSelected: true });
     }
-  }else{
-    this.setState({
-      values: { ...this.state.values, addState:'',addDistrict:'' }
-    });
-    console.log("jjjj",this.state.values)
-  }
   };
-
-  handleDistrictChange(event,value){
-    if (value !== null) {
-      this.setState({
-        values: { ...this.state.values, addDistrict: value.id }
-      });
-    }else{
-      this.setState({
-        values: { ...this.state.values, addDistrict:'' }
-      });
-    }
-
-  }
 
   validate = () => {
     const values = this.state.values;
@@ -304,10 +277,6 @@ class VillagePage extends Component {
   };
 
   render() {
-    let states = this.state.getState;
-    let addState = this.state.values.addState;
-    let districts =this.state.getDistrict;
-    let addDistrict = this.state.values.addDistrict;
     return (
       <Layout
         breadcrumbs={
@@ -350,7 +319,6 @@ class VillagePage extends Component {
                   <Input
                     fullWidth
                     label="Village Name"
-                    margin="dense"
                     name="addVillage"
                     error={this.hasError("addVillage")}
                     helperText={
@@ -365,42 +333,7 @@ class VillagePage extends Component {
                 </Grid>
 
                 <Grid item md={6} xs={12}>
-                <Autocomplete
-                  id="combo-box-demo"
-                  options={states}
-                  name="addState"
-                  getOptionLabel={option => option.name}
-                  // onChange={this.handleStateChange}
-                  onChange={(event, value) => {
-                    this.handleStateChange( event, value);
-                  }}
-                  value={
-                    states[
-                      states.findIndex(function(item, i) {
-                        return item.id === addState;
-                      })
-                    ] || null
-                  }
-                  renderInput={params => (
-                    <Input
-                      {...params}
-                      fullWidth
-                      label="Select State"
-                      margin="dense"
-                      name="addState"
-                      value={this.state.values.addState || ""}
-                      error={this.hasError("addState")}
-                      helperText={
-                        this.hasError("addState")
-                          ? this.state.errors.addState[0]
-                          : null
-                      }
-                      variant="outlined"
-                     
-                    />
-                  )}
-                />
-                  {/* <Inputdelhi
+                  <Input
                     fullWidth
                     label="Select State"
                     name="addState"
@@ -420,49 +353,12 @@ class VillagePage extends Component {
                         {states.name}
                       </option>
                     ))}
-                  </Input> */}
+                  </Input>
                 </Grid>
                 <Grid item md={6} xs={12}>
-                <Autocomplete
-                  id="combo-box-demo"
-                  options={districts}
-                  name="addDistrict"
-                  getOptionLabel={option => option.name}
-                  // onChange={this.handleStateChange}
-                  onChange={(event, value) => {
-                    this.handleDistrictChange( event, value);
-                  }}
-                  value={
-                    districts[
-                      districts.findIndex(function(item, i) {
-                        return item.id === addDistrict;
-                      })
-                    ] || null
-                  }
-                  renderInput={params => (
-                    <Input
-                      {...params}
-                      fullWidth
-                      label="Select District"
-                      margin="dense"
-                      name="addDistrict"
-                      error={this.hasError("addDistrict")}
-                      helperText={
-                        this.hasError("addDistrict")
-                          ? this.state.errors.addDistrict[0]
-                          : this.state.stateSelected
-                          ? null
-                          : "Please select the state first"
-                      }
-                      variant="outlined"
-                     
-                    />
-                  )}
-                />
-                  {/* <Input
+                  <Input
                     fullWidth
                     label="Select District"
-                    margin="dense"
                     name="addDistrict"
                     onChange={this.handleChange}
                     select
@@ -482,7 +378,7 @@ class VillagePage extends Component {
                         {district.name}
                       </option>
                     ))}
-                  </Input> */}
+                  </Input>
                 </Grid>
               </Grid>
             </CardContent>
