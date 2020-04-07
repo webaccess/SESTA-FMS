@@ -39,151 +39,151 @@ const roles = {
   "FPO Admin": {
     content: {
       description: "FPO admin user",
-      type: ""
+      type: "",
     },
     controllers: [
       {
         name: "user",
-        action: ["update"]
+        action: ["update"],
       },
       {
         name: "module",
-        action: ["find", "count", "findone"]
+        action: ["find", "count", "findone"],
       },
       {
         name: "state",
-        action: ["find", "count", "findone", "create", "update", "delete"]
+        action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
         name: "district",
-        action: ["find", "count", "findone", "create", "update", "delete"]
+        action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
         name: "village",
-        action: ["find", "count", "findone", "create", "update", "delete"]
+        action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
         name: "shg",
-        action: ["find", "count", "findone", "create", "update", "delete"]
+        action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
         name: "village-organization",
-        action: ["find", "count", "findone", "create", "update", "delete"]
-      }
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
     ],
-    grantAllPermissions: false
+    grantAllPermissions: false,
   },
   "Sesta Admin": {
     content: {
       description: "Sesta admin user",
-      type: ""
+      type: "",
     },
     controllers: [
       {
         name: "user",
-        action: ["update"]
+        action: ["update"],
       },
       {
         name: "module",
-        action: ["find", "count", "findone"]
+        action: ["find", "count", "findone"],
       },
       {
         name: "state",
-        action: ["find", "count", "findone", "create", "update", "delete"]
+        action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
         name: "district",
-        action: ["find", "count", "findone", "create", "update", "delete"]
+        action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
         name: "village",
-        action: ["find", "count", "findone", "create", "update", "delete"]
+        action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
         name: "shg",
-        action: ["find", "count", "findone", "create", "update", "delete"]
+        action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
         name: "village-organization",
-        action: ["find", "count", "findone", "create", "update", "delete"]
-      }
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
     ],
-    grantAllPermissions: false
+    grantAllPermissions: false,
   },
   "CSP (Community Service Provider)": {
     content: {
       description: "Community service provider user",
-      type: ""
+      type: "",
     },
     controllers: [
       {
         name: "user",
-        action: ["update"]
+        action: ["update"],
       },
       {
         name: "module",
-        action: ["find", "count", "findone"]
+        action: ["find", "count", "findone"],
       },
       {
         name: "state",
-        action: []
+        action: [],
       },
       {
         name: "district",
-        action: []
+        action: [],
       },
       {
         name: "village",
-        action: []
+        action: [],
       },
       {
         name: "shg",
-        action: []
+        action: [],
       },
       {
         name: "village-organization",
-        action: []
-      }
+        action: [],
+      },
     ],
-    grantAllPermissions: false
+    grantAllPermissions: false,
   },
   Superadmin: {
     content: {
       description: "Superadmin user",
-      type: ""
+      type: "",
     },
     controllers: [
       {
         name: "user",
-        action: ["update"]
+        action: ["update"],
       },
       {
         name: "module",
-        action: ["find", "count", "findone"]
+        action: ["find", "count", "findone"],
       },
       {
         name: "state",
-        action: ["find", "count", "findone", "create", "update", "delete"]
+        action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
         name: "district",
-        action: ["find", "count", "findone", "create", "update", "delete"]
+        action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
         name: "village",
-        action: ["find", "count", "findone", "create", "update", "delete"]
+        action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
         name: "shg",
-        action: ["find", "count", "findone", "create", "update", "delete"]
+        action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
         name: "village-organization",
-        action: ["find", "count", "findone", "create", "update", "delete"]
-      }
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
     ],
-    grantAllPermissions: false
-  }
+    grantAllPermissions: false,
+  },
 };
 
 const modules = {
@@ -199,8 +199,8 @@ const modules = {
       "FPO Admin",
       "Sesta Admin",
       "CSP (Community Service Provider)",
-      "Superadmin"
-    ]
+      "Superadmin",
+    ],
   },
   Villages: {
     is_active: true,
@@ -209,8 +209,8 @@ const modules = {
     slug: "list_village",
     displayNavigation: true,
     module: "", //slug
-    order: 3,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+    order: 4,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Add Village": {
     is_active: true,
@@ -219,8 +219,8 @@ const modules = {
     slug: "add_village",
     displayNavigation: false,
     module: "", //slug
-    order: 0,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+    order: 5,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Edit Village": {
     is_active: true,
@@ -229,8 +229,8 @@ const modules = {
     slug: "edit_village",
     displayNavigation: false,
     module: "", //slug
-    order: 0,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+    order: 5,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   SHGs: {
     is_active: true,
@@ -239,8 +239,8 @@ const modules = {
     slug: "list_shg",
     displayNavigation: true,
     module: "", //slug
-    order: 4,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+    order: 6,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Village Organizations": {
     is_active: true,
@@ -250,7 +250,7 @@ const modules = {
     displayNavigation: true,
     module: "", //slug
     order: 2,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Add Village Organization": {
     is_active: true,
@@ -259,8 +259,8 @@ const modules = {
     slug: "add_village_organizations",
     displayNavigation: false,
     module: "", //slug
-    order: 0,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+    order: 3,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Edit Village Organization": {
     is_active: true,
@@ -269,8 +269,8 @@ const modules = {
     slug: "edit_village_organizations",
     displayNavigation: false,
     module: "", //slug
-    order: 0,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+    order: 3,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   States: {
     is_active: true,
@@ -279,7 +279,8 @@ const modules = {
     slug: "list_state",
     displayNavigation: true,
     module: "", //slug
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+    order: 7,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Add State": {
     is_active: true,
@@ -288,7 +289,8 @@ const modules = {
     slug: "add_state",
     displayNavigation: false,
     module: "", //slug
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
+    order: 8,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Edit State": {
     is_active: true,
@@ -297,11 +299,12 @@ const modules = {
     slug: "edit_state",
     displayNavigation: false,
     module: "", //slug
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
-  }
+    order: 8,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
 };
 
 module.exports = Object.freeze({
   roles,
-  modules
+  modules,
 });
