@@ -302,6 +302,37 @@ const modules = {
     order: 8,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
+  Pgs: {
+    is_active: true,
+    icon_class: "people",
+    url: "/Pgs",
+    slug: "list_pg",
+    displayNavigation: true,
+    module: "", //slug
+    order: 9,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Add Pg": {
+    is_active: true,
+    icon_class: "",
+    url: "/Pgs/add",
+    slug: "add_pg",
+    displayNavigation: false,
+    module: "", //slug
+    order: 10,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Edit Pg": {
+    is_active: true,
+    icon_class: "",
+    url: "/Pgs/edit/:id",
+    slug: "edit_pg",
+    displayNavigation: false,
+    module: "", //slug
+    order: 10,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+
 };
 
 module.exports = Object.freeze({
