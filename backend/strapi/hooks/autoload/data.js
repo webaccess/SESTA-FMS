@@ -70,6 +70,10 @@ const roles = {
         name: "village-organization",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
+      {
+        name: "tag",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
     ],
     grantAllPermissions: false,
   },
@@ -105,6 +109,10 @@ const roles = {
       },
       {
         name: "village-organization",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "tag",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
     ],
@@ -144,6 +152,10 @@ const roles = {
         name: "village-organization",
         action: [],
       },
+      {
+        name: "tag",
+        action: [],
+      },
     ],
     grantAllPermissions: false,
   },
@@ -179,6 +191,10 @@ const roles = {
       },
       {
         name: "village-organization",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "tag",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
     ],
@@ -332,7 +348,6 @@ const modules = {
     order: 10,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
-
 };
 
 module.exports = Object.freeze({
