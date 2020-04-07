@@ -43,7 +43,7 @@ class VillagePage extends Component {
       },
       serverErrors: {},
       formSubmitted: "",
-      errorCode:"",
+      errorCode: "",
       stateSelected: false,
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
@@ -202,16 +202,23 @@ class VillagePage extends Component {
           }
         )
         .then(res => {
-          console.log("res", res);
           this.setState({ formSubmitted: true });
           this.props.history.push({ pathname: "/villages", editData: true });
         })
         .catch(error => {
           this.setState({ formSubmitted: false });
-          if(error.response !== undefined){
-          this.setState({errorCode:error.response.data.statusCode+" Error- "+error.response.data.error+" Message- "+error.response.data.message+" Please try again!"})
-          }else{
-            this.setState({errorCode:"Network Error - Please try again!"});
+          if (error.response !== undefined) {
+            this.setState({
+              errorCode:
+                error.response.data.statusCode +
+                " Error- " +
+                error.response.data.error +
+                " Message- " +
+                error.response.data.message +
+                " Please try again!"
+            });
+          } else {
+            this.setState({ errorCode: "Network Error - Please try again!" });
           }
           console.log(error);
         });
@@ -243,12 +250,19 @@ class VillagePage extends Component {
         })
         .catch(error => {
           this.setState({ formSubmitted: false });
-          if(error.response !== undefined){
-            this.setState({errorCode:error.response.data.statusCode+" Error- "+error.response.data.error+" Message- "+error.response.data.message+" Please try again!"})
-            }else{
-              this.setState({errorCode:"Network Error - Please try again!"});
-            }
-          console.log("formsubmitted", this.state.formSubmitted);
+          if (error.response !== undefined) {
+            this.setState({
+              errorCode:
+                error.response.data.statusCode +
+                " Error- " +
+                error.response.data.error +
+                " Message- " +
+                error.response.data.message +
+                " Please try again!"
+            });
+          } else {
+            this.setState({ errorCode: "Network Error - Please try again!" });
+          }
         });
     }
   };
@@ -366,14 +380,13 @@ class VillagePage extends Component {
                     ))}
                   </Input>
                 </Grid>
-              
               </Grid>
             </CardContent>
             <Divider />
             <CardActions>
               <Button type="submit">Save</Button>
               <Button
-                color="default"
+                color="secondary"
                 clicked={this.cancelForm}
                 component={Link}
                 to="/Villages"

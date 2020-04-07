@@ -35,8 +35,8 @@
       "plugin": "users-permissions"
     },
     "modules": {
-      "collection": "module",
       "via": "roles",
+      "collection": "module",
       "dominant": true
     }
   }

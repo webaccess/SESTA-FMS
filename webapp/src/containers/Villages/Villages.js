@@ -101,7 +101,6 @@ export class Villages extends React.Component {
       let villages = [];
       for (let j in result[i].villages) {
         villages.push(result[i].villages[j].name + " ");
-        console.log("push");
       }
       result[i]["villages"] = villages;
     }
@@ -114,7 +113,6 @@ export class Villages extends React.Component {
       this.setState({
         isCancel: false
       });
-      console.log("state", this.state.filterState);
       let stateId = value.id;
       await axios
         .get(
@@ -139,7 +137,6 @@ export class Villages extends React.Component {
         filterDistrict: "",
         filterVillage: ""
       });
-      console.log("state null", this.state.filterState);
     }
   };
   handleDistrictChange(event, value) {
@@ -277,17 +274,17 @@ export class Villages extends React.Component {
     let data = this.state.data;
     const Usercolumns = [
       {
-        name: "Village Name",
+        name: "Village",
         selector: "name",
         sortable: true
       },
       {
-        name: "District Name",
+        name: "District",
         selector: "district.name",
         sortable: true
       },
       {
-        name: "State Name",
+        name: "State",
         selector: "state.name",
         sortable: true
       }
@@ -311,15 +308,10 @@ export class Villages extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>Villages</h1>
+            <h1 className={style.title}>Manage Villages</h1>
             <div className={classes.row}>
               <div className={classes.buttonRow}>
-                <Button
-                  color="primary"
-                  variant="contained"
-                  component={Link}
-                  to="/Villages/add"
-                >
+                <Button variant="contained" component={Link} to="/Villages/add">
                   Add Village
                 </Button>
               </div>
@@ -446,8 +438,8 @@ export class Villages extends React.Component {
               <br></br>
               <Button onClick={this.handleSearch.bind(this)}>Search</Button>
               &nbsp;&nbsp;&nbsp;
-              <Button color="default" clicked={this.cancelForm}>
-                cancel
+              <Button color="secondary" clicked={this.cancelForm}>
+                reset
               </Button>
             </div>
             {data ? (
