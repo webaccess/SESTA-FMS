@@ -271,4 +271,5 @@ class StatePage extends Component {
     );
   }
 }
+
 export default StatePage;
