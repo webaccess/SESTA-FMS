@@ -11,40 +11,40 @@ import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Switch from "../../components/Switch/Switch";
-const useStyles = theme => ({
+const useStyles = (theme) => ({
   root: {},
   row: {
     height: "42px",
     display: "flex",
     alignItems: "center",
-    marginTop: theme.spacing(1)
+    marginTop: theme.spacing(1),
   },
   buttonRow: {
     height: "42px",
-    marginTop: theme.spacing(1)
+    marginTop: theme.spacing(1),
   },
   spacer: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   addButton: {
     float: "right",
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   searchInput: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   Districts: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   States: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   Search: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   Cancel: {
-    marginRight: theme.spacing(1)
-  }
+    marginRight: theme.spacing(1),
+  },
 });
 
 export class Pgs extends React.Component {
@@ -56,26 +56,27 @@ export class Pgs extends React.Component {
       DeleteData: false,
       isCancel: false,
       singleDelete: "",
-      multipleDelete: ""
+      multipleDelete: "",
+      errorCode: "",
+      successCode: "",
     };
   }
   async componentDidMount() {
     await axios
       .get(process.env.REACT_APP_SERVER_URL + "tags/?_sort=name:ASC", {
         headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
+          Authorization: "Bearer " + auth.getToken() + "",
+        },
       })
-      .then(res => {
-        this.setState({ data:res.data });
+      .then((res) => {
+        this.setState({ data: res.data });
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
- 
   }
 
-  editData = cellid => {
+  editData = (cellid) => {
     this.props.history.push("/pgs/edit/" + cellid);
   };
 
@@ -86,36 +87,35 @@ export class Pgs extends React.Component {
       axios
         .delete(process.env.REACT_APP_SERVER_URL + "tags/" + cellid, {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         })
-        .then(res => {
+        .then((res) => {
           this.setState({ singleDelete: res.data.name });
           this.setState({ dataCellId: "" });
           this.componentDidMount();
         })
-        .catch(error => {
+        .catch((error) => {
           this.setState({ singleDelete: false });
           console.log(error);
         });
     }
-    
   };
-  DeleteAll = selectedId => {
+  DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       for (let i in selectedId) {
         axios
           .delete(process.env.REACT_APP_SERVER_URL + "tags/" + selectedId[i], {
             headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
           })
-          .then(res => {
+          .then((res) => {
             this.setState({ multipleDelete: true });
             this.componentDidMount();
           })
-          .catch(error => {
+          .catch((error) => {
             this.setState({ multipleDelete: false });
             console.log("err", error);
           });
@@ -128,42 +128,57 @@ export class Pgs extends React.Component {
       values: {},
       formSubmitted: "",
       stateSelected: false,
-      isCancel: true
+      isCancel: true,
     });
     this.componentDidMount();
   };
 
   handleChange = ({ target }) => {
     this.setState({
-      values: { ...this.state.values, [target.name]: target.value }
+      values: { ...this.state.values, [target.name]: target.value },
     });
   };
-  handleActive = async (e, target, cellid) => {
+  handleActive = async (e) => {
+    this.setState({ successCode: "",errorCode:"" });
     let setActiveId = e.target.id;
     let IsActive = e.target.checked;
     await axios
       .put(
-        process.env.REACT_APP_SERVER_URL +
-        "tags/" +
-        setActiveId,
+        process.env.REACT_APP_SERVER_URL + "tags/" + setActiveId,
         {
-          is_active: IsActive
+          is_active: IsActive,
         },
         {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         }
       )
-      .then(res => {
+      .then((res) => 
+      {
+        let isActive ="";
+        if(res.data.is_active){
+          isActive="Active";
+        }else{
+          isActive="Inactive";
+        }
         this.setState({ formSubmitted: true });
-        this.componentDidMount({ editData: true });
+        this.setState({ successCode: "PG "+res.data.name+" is "+isActive+"." });
+        this.componentDidMount();
         this.props.history.push({ pathname: "/pgs", editData: true });
       })
-      .catch(error => {
+      .catch((error) => {
         this.setState({ formSubmitted: false });
         if (error.response !== undefined) {
-          this.setState({ errorCode: error.response.data.statusCode + " Error- " + error.response.data.error + " Message- " + error.response.data.message + " Please try again!" })
+          this.setState({
+            errorCode:
+              error.response.data.statusCode +
+              " Error- " +
+              error.response.data.error +
+              " Message- " +
+              error.response.data.message +
+              " Please try again!",
+          });
         } else {
           this.setState({ errorCode: "Network Error - Please try again!" });
         }
@@ -183,14 +198,14 @@ export class Pgs extends React.Component {
           "&&_sort=name:ASC",
         {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         }
       )
-      .then(res => {
+      .then((res) => {
         this.setState({ data: res.data });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log("err", err);
       });
   }
@@ -201,14 +216,23 @@ export class Pgs extends React.Component {
       {
         name: "Producer Group",
         selector: "name",
-        sortable: true
+        sortable: true,
       },
       {
         name: "Active",
-        cell: cell => (<Switch id={cell.id} onChange={e => { this.handleActive(e) }} defaultChecked={cell.is_active} Small={true} />),
+        cell: (cell) => (
+          <Switch
+            id={cell.id}
+            onChange={(e) => {
+              this.handleActive(e);
+            }}
+            defaultChecked={cell.is_active}
+            Small={true}
+          />
+        ),
         sortable: true,
-        button: true
-      }
+        button: true,
+      },
     ];
 
     let selectors = [];
@@ -232,13 +256,13 @@ export class Pgs extends React.Component {
               </div>
             </div>
             {this.props.location.addData ? (
-              <Snackbar severity="success">
-                PG added successfully.
-              </Snackbar>
+              <Snackbar severity="success">PG added successfully.</Snackbar>
             ) : this.props.location.editData ? (
-              <Snackbar severity="success">
-                PG edited successfully.
-              </Snackbar>
+              this.state.successCode !== "" ? (
+                <Snackbar severity="success">{this.state.successCode}</Snackbar>
+              ) : (
+                <Snackbar severity="success">PG edited successfully.</Snackbar>
+              )
             ) : null}
             {this.state.singleDelete !== false &&
             this.state.singleDelete !== "" &&
@@ -262,6 +286,16 @@ export class Pgs extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
+            {this.state.formSubmitted === false ? (
+              <Snackbar severity="error" Showbutton={false}>
+                {this.state.errorCode}
+              </Snackbar>
+            ) : null}
+            {/* {this.state.formSubmitted === true ? (
+              <Snackbar severity="success" Showbutton={false}>
+                {this.state.successCode}
+              </Snackbar>
+            ) : null} */}
             <br></br>
             <div className={classes.row}>
               <div className={classes.searchInput}>
@@ -280,7 +314,6 @@ export class Pgs extends React.Component {
                   </Grid>
                 </div>
               </div>
-            
               <div className={classes.searchInput}></div>
               <br></br>
               <Button onClick={this.handleSearch.bind(this)}>Search</Button>

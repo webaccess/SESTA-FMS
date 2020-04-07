@@ -10,7 +10,7 @@ import {
   CardContent,
   CardActions,
   Divider,
-  Grid
+  Grid,
 } from "@material-ui/core";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
@@ -28,28 +28,28 @@ class VillagePage extends Component {
       getDistrict: [],
       validations: {
         addVillage: {
-          required: { value: "true", message: "Village field required" }
+          required: { value: "true", message: "Village field required" },
         },
         addState: {
-          required: { value: "true", message: "State field required" }
+          required: { value: "true", message: "State field required" },
         },
         addDistrict: {
-          required: { value: "true", message: "District field required" }
-        }
+          required: { value: "true", message: "District field required" },
+        },
       },
       errors: {
         addVillage: [],
         addState: [],
-        addDistrict: []
+        addDistrict: [],
       },
       serverErrors: {},
       formSubmitted: "",
-      errorCode:"",
+      errorCode: "",
       stateSelected: false,
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
-        this.props.match.params.id
-      ]
+        this.props.match.params.id,
+      ],
     };
   }
 
@@ -62,20 +62,20 @@ class VillagePage extends Component {
             this.state.editPage[1],
           {
             headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
           }
         )
-        .then(res => {
+        .then((res) => {
           this.setState({
             values: {
               addVillage: res.data[0].name,
               addDistrict: res.data[0].district.id,
-              addState: res.data[0].state.id
-            }
+              addState: res.data[0].state.id,
+            },
           });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
       this.stateIds = this.state.values.addState;
@@ -86,27 +86,27 @@ class VillagePage extends Component {
             this.state.values.addState,
           {
             headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
           }
         )
-        .then(res => {
+        .then((res) => {
           this.setState({ getDistrict: res.data });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     }
     await axios
       .get(process.env.REACT_APP_SERVER_URL + "states/", {
         headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
+          Authorization: "Bearer " + auth.getToken() + "",
+        },
       })
-      .then(res => {
+      .then((res) => {
         this.setState({ getState: res.data });
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
     if (this.state.values.addState) {
@@ -116,19 +116,15 @@ class VillagePage extends Component {
 
   handleChange = ({ target }) => {
     this.setState({
-      values: { ...this.state.values, [target.name]: target.value }
+      values: { ...this.state.values, [target.name]: target.value },
     });
   };
 
-  handleStateChange = async (event, value) => {
-    console.log("hi",event,value)
-    if (value !== null) {
+  handleStateChange = async ({ target }) => {
     this.setState({
-      values: { ...this.state.values, addState: value.id }
+      values: { ...this.state.values, [target.name]: target.value },
     });
-    console.log("hhh",value)
-    let stateId = value.id;
-    console.log("stateId",stateId)
+    let stateId = target.value;
     await axios
       .get(
         process.env.REACT_APP_SERVER_URL +
@@ -136,39 +132,20 @@ class VillagePage extends Component {
           stateId,
         {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         }
       )
-      .then(res => {
+      .then((res) => {
         this.setState({ getDistrict: res.data });
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
     if (this.state.values.addState) {
       this.setState({ stateSelected: true });
     }
-  }else{
-    this.setState({
-      values: { ...this.state.values, addState:'',addDistrict:'' }
-    });
-    console.log("jjjj",this.state.values)
-  }
   };
-
-  handleDistrictChange(event,value){
-    if (value !== null) {
-      this.setState({
-        values: { ...this.state.values, addDistrict: value.id }
-      });
-    }else{
-      this.setState({
-        values: { ...this.state.values, addDistrict:'' }
-      });
-    }
-
-  }
 
   validate = () => {
     const values = this.state.values;
@@ -184,7 +161,7 @@ class VillagePage extends Component {
     });
   };
 
-  hasError = field => {
+  hasError = (field) => {
     if (this.state.errors[field] !== undefined) {
       return Object.keys(this.state.errors).length > 0 &&
         this.state.errors[field].length > 0
@@ -193,7 +170,7 @@ class VillagePage extends Component {
     }
   };
 
-  handleSubmit = async e => {
+  handleSubmit = async (e) => {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
@@ -213,29 +190,36 @@ class VillagePage extends Component {
           {
             name: villageName,
             district: {
-              id: districtId
+              id: districtId,
             },
             state: {
-              id: stateId
-            }
+              id: stateId,
+            },
           },
           {
             headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
           }
         )
-        .then(res => {
-          console.log("res", res);
+        .then((res) => {
           this.setState({ formSubmitted: true });
           this.props.history.push({ pathname: "/villages", editData: true });
         })
-        .catch(error => {
+        .catch((error) => {
           this.setState({ formSubmitted: false });
-          if(error.response !== undefined){
-          this.setState({errorCode:error.response.data.statusCode+" Error- "+error.response.data.error+" Message- "+error.response.data.message+" Please try again!"})
-          }else{
-            this.setState({errorCode:"Network Error - Please try again!"});
+          if (error.response !== undefined) {
+            this.setState({
+              errorCode:
+                error.response.data.statusCode +
+                " Error- " +
+                error.response.data.error +
+                " Message- " +
+                error.response.data.message +
+                " Please try again!",
+            });
+          } else {
+            this.setState({ errorCode: "Network Error - Please try again!" });
           }
           console.log(error);
         });
@@ -248,31 +232,38 @@ class VillagePage extends Component {
           {
             name: villageName,
             district: {
-              id: districtId
+              id: districtId,
             },
             state: {
-              id: stateId
-            }
+              id: stateId,
+            },
           },
           {
             headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
           }
         )
-        .then(res => {
+        .then((res) => {
           this.setState({ formSubmitted: true });
 
           this.props.history.push({ pathname: "/villages", addData: true });
         })
-        .catch(error => {
+        .catch((error) => {
           this.setState({ formSubmitted: false });
-          if(error.response !== undefined){
-            this.setState({errorCode:error.response.data.statusCode+" Error- "+error.response.data.error+" Message- "+error.response.data.message+" Please try again!"})
-            }else{
-              this.setState({errorCode:"Network Error - Please try again!"});
-            }
-          console.log("formsubmitted", this.state.formSubmitted);
+          if (error.response !== undefined) {
+            this.setState({
+              errorCode:
+                error.response.data.statusCode +
+                " Error- " +
+                error.response.data.error +
+                " Message- " +
+                error.response.data.message +
+                " Please try again!",
+            });
+          } else {
+            this.setState({ errorCode: "Network Error - Please try again!" });
+          }
         });
     }
   };
@@ -281,16 +272,12 @@ class VillagePage extends Component {
     this.setState({
       values: {},
       formSubmitted: "",
-      stateSelected: false
+      stateSelected: false,
     });
     //routing code #route to village_list page
   };
 
   render() {
-    let states = this.state.getState;
-    let addState = this.state.values.addState;
-    let districts =this.state.getDistrict;
-    let addDistrict = this.state.values.addDistrict;
     return (
       <Layout
         breadcrumbs={
@@ -333,7 +320,6 @@ class VillagePage extends Component {
                   <Input
                     fullWidth
                     label="Village Name"
-                    margin="dense"
                     name="addVillage"
                     error={this.hasError("addVillage")}
                     helperText={
@@ -348,42 +334,7 @@ class VillagePage extends Component {
                 </Grid>
 
                 <Grid item md={6} xs={12}>
-                <Autocomplete
-                  id="combo-box-demo"
-                  options={states}
-                  name="addState"
-                  getOptionLabel={option => option.name}
-                  // onChange={this.handleStateChange}
-                  onChange={(event, value) => {
-                    this.handleStateChange( event, value);
-                  }}
-                  value={
-                    states[
-                      states.findIndex(function(item, i) {
-                        return item.id === addState;
-                      })
-                    ] || null
-                  }
-                  renderInput={params => (
-                    <Input
-                      {...params}
-                      fullWidth
-                      label="Select State"
-                      margin="dense"
-                      name="addState"
-                      value={this.state.values.addState || ""}
-                      error={this.hasError("addState")}
-                      helperText={
-                        this.hasError("addState")
-                          ? this.state.errors.addState[0]
-                          : null
-                      }
-                      variant="outlined"
-                     
-                    />
-                  )}
-                />
-                  {/* <Inputdelhi
+                  <Input
                     fullWidth
                     label="Select State"
                     name="addState"
@@ -398,54 +349,17 @@ class VillagePage extends Component {
                     value={this.state.values.addState || ""}
                     variant="outlined"
                   >
-                    {this.state.getState.map(states => (
+                    {this.state.getState.map((states) => (
                       <option value={states.id} key={states.id}>
                         {states.name}
                       </option>
                     ))}
-                  </Input> */}
+                  </Input>
                 </Grid>
                 <Grid item md={6} xs={12}>
-                <Autocomplete
-                  id="combo-box-demo"
-                  options={districts}
-                  name="addDistrict"
-                  getOptionLabel={option => option.name}
-                  // onChange={this.handleStateChange}
-                  onChange={(event, value) => {
-                    this.handleDistrictChange( event, value);
-                  }}
-                  value={
-                    districts[
-                      districts.findIndex(function(item, i) {
-                        return item.id === addDistrict;
-                      })
-                    ] || null
-                  }
-                  renderInput={params => (
-                    <Input
-                      {...params}
-                      fullWidth
-                      label="Select District"
-                      margin="dense"
-                      name="addDistrict"
-                      error={this.hasError("addDistrict")}
-                      helperText={
-                        this.hasError("addDistrict")
-                          ? this.state.errors.addDistrict[0]
-                          : this.state.stateSelected
-                          ? null
-                          : "Please select the state first"
-                      }
-                      variant="outlined"
-                     
-                    />
-                  )}
-                />
-                  {/* <Input
+                  <Input
                     fullWidth
                     label="Select District"
-                    margin="dense"
                     name="addDistrict"
                     onChange={this.handleChange}
                     select
@@ -460,21 +374,20 @@ class VillagePage extends Component {
                     value={this.state.values.addDistrict || ""}
                     variant="outlined"
                   >
-                    {this.state.getDistrict.map(district => (
+                    {this.state.getDistrict.map((district) => (
                       <option value={district.id} key={district.id}>
                         {district.name}
                       </option>
                     ))}
-                  </Input> */}
+                  </Input>
                 </Grid>
-              
               </Grid>
             </CardContent>
             <Divider />
             <CardActions>
               <Button type="submit">Save</Button>
               <Button
-                color="default"
+                color="secondary"
                 clicked={this.cancelForm}
                 component={Link}
                 to="/Villages"

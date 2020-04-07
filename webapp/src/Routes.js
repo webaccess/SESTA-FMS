@@ -20,7 +20,7 @@ import PgPage from "./containers/Pgs/PgPage";
 import states from "./containers/States/States";
 import StatesPage from "./containers/States/StatePage";
 import VillagePage from "./containers/Villages/VillagePage";
-import Vopage from "./containers/Vo/Vopage";
+import VoPage from "./containers/Vo/VoPage";
 import Vos from "./containers/Vo/Vos";
 import Account from "./containers/Account/Account";
 
@@ -39,12 +39,12 @@ function Routes() {
             />
             <PrivateRoute
               path="/village-organizations/add"
-              component={Vopage}
+              component={VoPage}
               exact
             />
             <PrivateRoute
               path="/village-organizations/edit/:id"
-              component={Vopage}
+              component={VoPage}
               exact
             />
             <PrivateRoute path="/village-organizations" component={Vos} exact />

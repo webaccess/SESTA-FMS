@@ -15,7 +15,7 @@ import CustomizedSwitches from "../../components/Switch/Switch";
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import Switch from '@material-ui/core/Switch';
+import Switch from '../../components/Switch/Switch';
 
 const useStyles = theme => ({
   root: {},
@@ -193,10 +193,10 @@ export class Villages extends React.Component {
     }
   };
 
-  handleActive = async (e, target, cellid) => {
-    let setActiveId = e.target.id;
-    let IsActive = e.target.checked;
-    await axios
+  handleActive = (event) => {
+    let setActiveId = event.target.id;
+    let IsActive = event.target.checked;
+    axios
       .put(
         process.env.REACT_APP_SERVER_URL +
         "states/" +
