@@ -139,7 +139,7 @@ export class Pgs extends React.Component {
     });
   };
   handleActive = async (e) => {
-    this.setState({ successCode: "",errorCode:"" });
+    this.setState({ successCode: "", errorCode: "" });
     let setActiveId = e.target.id;
     let IsActive = e.target.checked;
     await axios
@@ -154,16 +154,18 @@ export class Pgs extends React.Component {
           },
         }
       )
-      .then((res) => 
-      {
-        let isActive ="";
-        if(res.data.is_active){
-          isActive="Active";
-        }else{
-          isActive="Inactive";
+      .then((res) => {
+        let isActive = "";
+        if (res.data.is_active) {
+          isActive = "Active";
+        } else {
+          isActive = "Inactive";
         }
         this.setState({ formSubmitted: true });
-        this.setState({ successCode: "PG "+res.data.name+" is "+isActive+"." });
+        this.setState({
+          successCode:
+            "Producer group " + res.data.name + " is " + isActive + ".",
+        });
         this.componentDidMount();
         this.props.history.push({ pathname: "/pgs", editData: true });
       })
@@ -256,12 +258,16 @@ export class Pgs extends React.Component {
               </div>
             </div>
             {this.props.location.addData ? (
-              <Snackbar severity="success">PG added successfully.</Snackbar>
+              <Snackbar severity="success">
+                Producer Group added successfully.
+              </Snackbar>
             ) : this.props.location.editData ? (
               this.state.successCode !== "" ? (
                 <Snackbar severity="success">{this.state.successCode}</Snackbar>
               ) : (
-                <Snackbar severity="success">PG edited successfully.</Snackbar>
+                <Snackbar severity="success">
+                  Producer Group edited successfully.
+                </Snackbar>
               )
             ) : null}
             {this.state.singleDelete !== false &&
@@ -303,7 +309,7 @@ export class Pgs extends React.Component {
                   <Grid item md={12} xs={12}>
                     <Input
                       fullWidth
-                      label="PG Name"
+                      label="Producer Group Name"
                       name="filterPg"
                       variant="outlined"
                       onChange={(event) => {
