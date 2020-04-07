@@ -23,9 +23,7 @@ Sesta uses a technology solution to track the following:
 - Steps for project setup:
   - In terminal use commands below:
   
-    ``` cd backend ```
-    
-    ``` cd strapi ```
+    ``` cd backend/strapi ```
     
     ``` yarn install ```
     
