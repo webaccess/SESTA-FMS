@@ -173,7 +173,7 @@ function NavigationItems(props) {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "modules?module_null=true&displayNavigation=true&is_active=true&roles.id_in=" +
+            "modules?_sort=order:ASC&module_null=true&displayNavigation=true&is_active=true&roles.id_in=" +
             userInfo.role.id,
           {
             headers: {

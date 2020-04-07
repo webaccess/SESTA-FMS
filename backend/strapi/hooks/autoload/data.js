@@ -194,6 +194,7 @@ const modules = {
     slug: "home",
     displayNavigation: true,
     module: "", //slug
+    order: 1,
     roles: [
       "FPO Admin",
       "Sesta Admin",
@@ -208,6 +209,7 @@ const modules = {
     slug: "list_village",
     displayNavigation: true,
     module: "", //slug
+    order: 3,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
   },
   "Add Village": {
@@ -217,6 +219,7 @@ const modules = {
     slug: "add_village",
     displayNavigation: false,
     module: "", //slug
+    order: 0,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
   },
   "Edit Village": {
@@ -226,6 +229,7 @@ const modules = {
     slug: "edit_village",
     displayNavigation: false,
     module: "", //slug
+    order: 0,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
   },
   SHGs: {
@@ -235,6 +239,7 @@ const modules = {
     slug: "list_shg",
     displayNavigation: true,
     module: "", //slug
+    order: 4,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
   },
   "Village Organizations": {
@@ -244,6 +249,7 @@ const modules = {
     slug: "list_village_organizations",
     displayNavigation: true,
     module: "", //slug
+    order: 2,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
   },
   "Add Village Organization": {
@@ -253,6 +259,7 @@ const modules = {
     slug: "add_village_organizations",
     displayNavigation: false,
     module: "", //slug
+    order: 0,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
   },
   "Edit Village Organization": {
@@ -262,6 +269,7 @@ const modules = {
     slug: "edit_village_organizations",
     displayNavigation: false,
     module: "", //slug
+    order: 0,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"]
   },
   States: {
