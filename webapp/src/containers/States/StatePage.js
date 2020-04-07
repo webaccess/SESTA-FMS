@@ -262,7 +262,7 @@ class StatePage extends Component {
                 component={Link}
                 to="/states"
               >
-                Reset
+                Cancel
               </Button>
             </CardActions>
           </form>
@@ -271,4 +271,5 @@ class StatePage extends Component {
     );
   }
 }
+
 export default StatePage;
