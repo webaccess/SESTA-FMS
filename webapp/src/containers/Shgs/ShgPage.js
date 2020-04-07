@@ -32,7 +32,7 @@ class VillagePage extends Component {
       addState: "",
       addShg: "",
       addDistrict: "",
-      addVillage: "",
+      addVillage: [],
       getState: [],
       checkedB: false,
       getDistrict: [],
@@ -40,11 +40,11 @@ class VillagePage extends Component {
       getVillageOrganization: [],
       validations: {
         addShg: {
-          required: { value: "true", message: "Shg field required" }
+          required: { value: "true", message: "Shg name field required" }
         },
-        // addVillage: {
-        //   required: { value: "true", message: "Village field required" }
-        // },
+        addVillage: {
+          required: { value: "true", message: "Village field required" }
+        },
         addState: {
           required: { value: "true", message: "State field required" }
         },
@@ -56,40 +56,28 @@ class VillagePage extends Component {
             value: "true",
             message: "Village Organization field required"
           }
-        },
-        addAddress: {
-          required: {
-            value: "true",
-            message: "Address field required"
-          }
-        },
-        addPointOfContact: {
-          required: {
-            value: "true",
-            message: "Point of Contact field required"
-          }
-        },
-        addAccountName: {
-          required: {
-            value: "true",
-            message: "Bank Account Name field required"
-          }
-        },
-        addAccountNo: {
-          required: { value: "true", message: "Account Number field required" }
-        },
-        addBankName: {
-          required: { value: "true", message: "Bank Name field required" }
-        },
-        addBranch: {
-          required: { value: "true", message: "Branch field required" }
-        },
-        addIfsc: {
-          required: { value: "true", message: "IFSC field required" }
         }
+        // addAccountName: {
+        //   required: {
+        //     value: "true",
+        //     message: "Bank Account Name field required"
+        //   }
+        // },
+        // addAccountNo: {
+        //   required: { value: "true", message: "Account Number field required" }
+        // },
+        // addBankName: {
+        //   required: { value: "true", message: "Bank Name field required" }
+        // },
+        // addBranch: {
+        //   required: { value: "true", message: "Branch field required" }
+        // },
+        // addIfsc: {
+        //   required: { value: "true", message: "IFSC field required" }
+        // }
       },
       errors: {
-        // addVillage: [],
+        addVillage: [],
         addState: [],
         addDistrict: [],
         addVo: []
@@ -128,7 +116,7 @@ class VillagePage extends Component {
               addAddress: res.data[0].address,
               addPointOfContact: res.data[0].person_incharge,
               addDistrict: res.data[0].district.id,
-              addVillage: res.data[0].villages[0].id,
+              addVillage: res.data[0].villages,
               addState: res.data[0].state.id,
               addVo: res.data[0].village_organization.id
             }
@@ -203,6 +191,21 @@ class VillagePage extends Component {
       .catch(error => {
         console.log(error);
       });
+
+    //api call for village filter
+    await axios
+      .get(process.env.REACT_APP_SERVER_URL + "villages/", {
+        headers: {
+          Authorization: "Bearer " + auth.getToken() + ""
+        }
+      })
+      .then(res => {
+        console.log("villagedata", res.data);
+        this.setState({ getVillage: res.data });
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
 
   handleStateChange = async (event, value) => {
@@ -235,8 +238,7 @@ class VillagePage extends Component {
           ...this.state.values,
           addState: "",
           addDistrict: "",
-          filterVillage: "",
-          addVillage: ""
+          filterVillage: ""
         }
       });
     }
@@ -255,25 +257,25 @@ class VillagePage extends Component {
         values: { ...this.state.values, addDistrict: value.id }
       });
       let distId = value.id;
-      axios
-        .get(process.env.REACT_APP_SERVER_URL + "districts/" + distId, {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
-        })
-        .then(res => {
-          this.setState({ getVillage: res.data.villages });
-        })
-        .catch(error => {
-          console.log(error);
-        });
+      // axios
+      //   .get(process.env.REACT_APP_SERVER_URL + "districts/" + distId, {
+      //     headers: {
+      //       Authorization: "Bearer " + auth.getToken() + ""
+      //     }
+      //   })
+      //   .then(res => {
+      //     this.setState({ getVillage: res.data.villages });
+      //   })
+      //   .catch(error => {
+      //     console.log(error);
+      //   });
     } else {
       this.setState({
         values: {
           ...this.state.values,
           addDistrict: "",
           filterVillage: "",
-          addVillage: ""
+          addVillage: []
         }
       });
     }
@@ -281,9 +283,15 @@ class VillagePage extends Component {
 
   handleVillageChange(event, value) {
     let villageValue = [];
-    console.log("sddsfdfs", value.length);
+    console.log("handleVillageChange length==", value.length);
+    console.log("handleVillageChange value==", value);
+    console.log("handleVillageChange EVENt==", event);
+    villageValue = this.state.values.addVillage
+      ? [...this.state.values.addVillage]
+      : [];
+    console.log("villageValue", villageValue);
     for (let i in value) {
-      villageValue.push("id:" + value[i]["id"]);
+      if (villageValue.indexOf(value[i]) <= -1) villageValue.push(value[i]);
     }
     if (value !== null) {
       this.setState({
@@ -291,7 +299,7 @@ class VillagePage extends Component {
       });
     } else {
       this.setState({
-        addVillage: ""
+        addVillage: []
       });
     }
   }
@@ -373,6 +381,7 @@ class VillagePage extends Component {
   handleSubmit = async e => {
     e.preventDefault();
     this.validate();
+    console.log("errors", this.state.errors);
     if (this.state.checkedB) {
       this.bankValidate();
     }
@@ -402,11 +411,7 @@ class VillagePage extends Component {
             district: {
               id: shgDistrict
             },
-            villages: [
-              {
-                id: shgVillage
-              }
-            ],
+            villages: shgVillage,
             village_organization: {
               id: shgVo
             }
@@ -547,9 +552,36 @@ class VillagePage extends Component {
     let districtsFilter = this.state.getDistrict;
     let addDistrict = this.state.values.addDistrict;
     let villagesFilter = this.state.getVillage;
+    console.log("villagesFilter==", villagesFilter);
     let addVillage = this.state.values.addVillage;
+    const addVillageConst = addVillage
+      ? this.state.isCancel === true
+        ? []
+        : addVillage
+      : [];
     let isCancel = this.state.isCancel;
     let checked = this.state.checkedB;
+    console.log("addVillage", addVillage);
+    let addVillages = [];
+    map(addVillage, (village, key) => {
+      console.log("village===", village);
+      addVillages.push(
+        villagesFilter.findIndex(function(item, i) {
+          return item.id === village;
+        })
+      );
+    });
+
+    console.log("addVillages", addVillages);
+
+    let vtest =
+      villagesFilter[
+        villagesFilter.findIndex(function(item, i) {
+          return item.id === 12;
+        })
+      ];
+
+    console.log("vtest", vtest);
 
     return (
       <Layout
@@ -685,35 +717,32 @@ class VillagePage extends Component {
                     multiple={true}
                     variant="outlined"
                     label="Select Village"
-                    name="addVillage"
-                    getOptionLabel={option => option.name}
+                    // name="addVillage"
+                    getOptionLabel={option => (option ? option.name : "")}
                     onChange={(event, value) => {
                       this.handleVillageChange(event, value);
                     }}
+                    defaultValue={[]}
                     value={
                       addVillage
                         ? this.state.isCancel === true
-                          ? null
-                          : villagesFilter[
-                              villagesFilter.findIndex(function(item, i) {
-                                return item.id === addVillage;
-                              })
-                            ] || null
-                        : null
+                          ? []
+                          : addVillage
+                        : []
                     }
                     error={this.hasError("addVillage")}
-                    helperText={
-                      this.hasError("addVillage")
-                        ? this.state.errors.addVillage[0]
-                        : null
-                    }
                     renderInput={params => (
                       <Input
+                        {...params}
                         fullWidth
                         label="Select Village"
                         name="addVillage"
-                        value={this.state.Villagesdata || ""}
                         variant="outlined"
+                        helperText={
+                          this.hasError("addVillage")
+                            ? this.state.errors.addVillage[0]
+                            : null
+                        }
                       />
                     )}
                   />

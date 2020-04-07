@@ -17,7 +17,8 @@ import Villages from "./containers/Villages/Villages";
 import Shgs from "./containers/Shgs/Shgs";
 import ShgPage from "./containers/Shgs/ShgPage";
 import VillagePage from "./containers/Villages/VillagePage";
-
+import VoPage from "./containers/Vo/VoPage";
+import Vos from "./containers/Vo/Vos";
 import Account from "./containers/Account/Account";
 
 function Routes() {
@@ -33,11 +34,18 @@ function Routes() {
               component={VillagePage}
               exact
             />
+            <PrivateRoute path="/shgs/edit/:id" component={ShgPage} exact />
             <PrivateRoute
-              path="/shgs/edit/:id"
-              component={ShgPage}
+              path="/village-organizations/add"
+              component={VoPage}
               exact
             />
+            <PrivateRoute
+              path="/village-organizations/edit/:id"
+              component={VoPage}
+              exact
+            />
+            <PrivateRoute path="/village-organizations" component={Vos} exact />
             <PrivateRoute path="/villages" component={Villages} exact />
             <PrivateRoute path="/shgs" component={Shgs} exact />
             <PrivateRoute path="/shgs/add" component={ShgPage} exact />
