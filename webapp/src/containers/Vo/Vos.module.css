@@ -11,8 +11,18 @@
 
 .Districts {
   width: 150px;
+  height: 40px;
 }
 
 .Buttons {
   margin: 0px 10px 0px 0px;
+}
+:global(.MuiInputLabel-outlined) {
+  transform: translate(14px, 12px) scale(1) !important;
+}
+:global(.MuiInputLabel-outlined.MuiInputLabel-shrink) {
+  transform: translate(14px, -6px) scale(0.75) !important;
+}
+:global(.MuiInputBase-input) {
+  height: 0.188em !important;
 }
