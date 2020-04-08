@@ -30,12 +30,6 @@ class PgPage extends Component {
         addPg: {
           required: { value: "true", message: "Producer Group field required" }
         }
-        // addState: {
-        //   required: { value: "true", message: "State field required" }
-        // },
-        // addDistrict: {
-        //   required: { value: "true", message: "District field required" }
-        // }
       },
       errors: {
       
@@ -76,40 +70,8 @@ class PgPage extends Component {
         .catch(error => {
           console.log(error);
         });
-      // this.stateIds = this.state.values.addState;
-      // await axios
-      //   .get(
-      //     process.env.REACT_APP_SERVER_URL +
-      //       "districts?master_state.id=" +
-      //       this.state.values.addState,
-      //     {
-      //       headers: {
-      //         Authorization: "Bearer " + auth.getToken() + ""
-      //       }
-      //     }
-      //   )
-      //   .then(res => {
-      //     this.setState({ getDistrict: res.data });
-      //   })
-      //   .catch(error => {
-      //     console.log(error);
-      //   });
     }
-    // await axios
-    //   .get(process.env.REACT_APP_SERVER_URL + "states/", {
-    //     headers: {
-    //       Authorization: "Bearer " + auth.getToken() + ""
-    //     }
-    //   })
-    //   .then(res => {
-    //     this.setState({ getState: res.data });
-    //   })
-    //   .catch(error => {
-    //     console.log(error);
-    //   });
-    // if (this.state.values.addState) {
-    //   this.setState({ stateSelected: true });
-    // }
+ 
   }
 
   handleChange = ({ target }) => {
@@ -242,7 +204,6 @@ class PgPage extends Component {
       formSubmitted: "",
       stateSelected: false
     });
-    //routing code #route to village_list page
   };
 
   render() {

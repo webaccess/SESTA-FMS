@@ -297,11 +297,6 @@ export class Pgs extends React.Component {
                 {this.state.errorCode}
               </Snackbar>
             ) : null}
-            {/* {this.state.formSubmitted === true ? (
-              <Snackbar severity="success" Showbutton={false}>
-                {this.state.successCode}
-              </Snackbar>
-            ) : null} */}
             <br></br>
             <div className={classes.row}>
               <div className={classes.searchInput}>
