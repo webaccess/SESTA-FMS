@@ -231,7 +231,7 @@ class VoPage extends Component {
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
-                    label="Village Organization Name"
+                    label="Village Organization Name*"
                     name="addVo"
                     error={this.hasError("addVo")}
                     helperText={
