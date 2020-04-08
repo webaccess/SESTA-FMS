@@ -330,7 +330,7 @@ export class Pgs extends React.Component {
             </div>
             {data ? (
               <Table
-                title={"Villages"}
+                title={"Producer Group"}
                 showSearch={false}
                 filterData={true}
                 // noDataComponent={"No Records To be shown"}

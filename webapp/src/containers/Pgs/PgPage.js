@@ -68,7 +68,7 @@ class PgPage extends Component {
           this.setState({
             values: {
               addPg: res.data[0].name,
-              addDiscription: res.data[0].discription
+              addDescription: res.data[0].description
             }
           });
           this.setState({addIsActive:res.data[0].is_active})
@@ -154,7 +154,7 @@ class PgPage extends Component {
     if (Object.keys(this.state.errors).length > 0) return;
     let pgName = this.state.values.addPg;
     let isActive = this.state.addIsActive;
-    let pgDiscription = this.state.values.addDiscription;
+    let pgDescription = this.state.values.addDescription;
 
     if (this.state.editPage[0]) {
       // for edit data page
@@ -164,7 +164,7 @@ class PgPage extends Component {
           {
             name: pgName,
             is_active: isActive,
-            discription: pgDiscription
+            description: pgDescription
           },
           {
             headers: {
@@ -203,7 +203,7 @@ class PgPage extends Component {
           {
             name: pgName,
             is_active: isActive,
-            discription: pgDiscription
+            description: pgDescription
           },
           {
             headers: {
@@ -315,9 +315,9 @@ class PgPage extends Component {
                 <Grid item md={12} xs={12}>
                   <Input
                     fullWidth
-                    label="Discription"
-                    name="addDiscription"
-                    value={this.state.values.addDiscription || ""}
+                    label="Description"
+                    name="addDescription"
+                    value={this.state.values.addDescription || ""}
                     onChange={this.handleChange.bind(this)}
                     variant="outlined"
                   />
