@@ -225,7 +225,7 @@ class StatePage extends Component {
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
-                    label="State Name"
+                    label="State Name *"
                     name="addState"
                     error={this.hasError("addState")}
                     helperText={

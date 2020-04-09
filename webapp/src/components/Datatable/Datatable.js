@@ -47,7 +47,6 @@ import Modal from "../UI/Modal/Modal.js";
 import style from "./Datatable.module.css";
 import SearchInput from "../SearchInput";
 import differenceBy from "lodash/differenceBy";
-
 import { Card, Checkbox } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -102,7 +101,14 @@ const Table = props => {
 
   const handleDeleteAllEvent = () => {
     props.DeleteAll(row, DataID, setisDeleteShowing(!isDeleteShowing));
-    props.DeleteData(DataID, row, setToggleCleared(!toggleCleared));
+    props.DeleteData(DataID, row);
+  };
+
+   const handleActiveAllEvent = (event) => {
+    console.log("hsdhjsdsdhj",selected)
+    // props.handleA
+    props.ActiveAll(row, selected,setisDeleteShowing(!isDeleteShowing))
+    props.handleActive(selected,event);
   };
 
   const handleEditEvent = () => {
@@ -113,11 +119,17 @@ const Table = props => {
   const closeDeleteAllModalHandler = () => {
     setisDeleteAllShowing(!isDeleteAllShowing);
   };
+console.log("fdhjdsjhd",props.allIsActive)
+  const closeActiveAllModalHandler = () => {
+    setisActiveAllShowing(!isActiveAllShowing);
+  };
 
   let valueformodal = props.columnsvalue;
 
   const [isDeleteShowing, setisDeleteShowing] = React.useState(false);
+  const [isActiveShowing, setisActiveShowing] = React.useState(false);
   const [isDeleteAllShowing, setisDeleteAllShowing] = React.useState(false);
+  const [isActiveAllShowing, setisActiveAllShowing] = React.useState(false);
 
   const column = [
     {
@@ -198,7 +210,13 @@ const Table = props => {
       setisDeleteAllShowing(true);
       setData(differenceBy(data, selectedRows, "name"));
     };
+
+    const handleActive = () => {
+    setisActiveAllShowing(true);
+    setData(differenceBy(data, selectedRows, "name"));
+    };
     return (
+      <div>
       <Button
         key="delete"
         onClick={handledelete}
@@ -206,12 +224,30 @@ const Table = props => {
       >
         Delete
       </Button>
+       &nbsp;&nbsp;&nbsp;
+      {props.showSetAllActive ? 
+       (<Button
+         key="active"
+         onClick={handleActive}
+         style={{ backgroundColor: "primary", color: "white" }}
+        >
+          Active
+        </Button>)
+         : null}
+      
+      </div>
     );
   }, [data, selectedRows, toggleCleared]);
 
   let columns = [];
   if (props.column.length > 0) {
     columns = makeColumns(props.column);
+  }
+  console.log("scghjscghjsdgjsd",props.allIsActive)
+  if (props.allIsActive.indexOf("true") > -1){
+    console.log("true hai")
+  }else{
+    console.log("false hai")
   }
   return (
     <>
@@ -282,7 +318,34 @@ const Table = props => {
               {props.DeleteMessage} <b>{dataName}</b> ?
             </p>
           )}
-        </Modal>
+            </Modal>
+            <Modal
+              className="modal"
+              show={isActiveAllShowing}
+              close={closeActiveAllModalHandler}
+              displayCross={{ display: "none" }}
+              handleEventChange={true}
+              event={handleActiveAllEvent}
+              handleActiveAllEvent={handleActiveAllEvent}
+              footer={{
+                footerSaveName: "OKAY",
+                footerCloseName: "CLOSE",
+                displayClose: { display: "true" },
+                displaySave: { display: "true" }
+              }}
+            >
+              {props.allIsActive.indexOf("true") > -1 ? (
+                <p>
+                  {" "}
+                  Do you want to set selected <b>{props.title}</b> Active ?
+                </p>
+              ) : (
+                <p>
+                  {" "}
+                  {props.ActiveMessage} <b>{dataName}</b> Deactiveactive ?
+                </p>
+              )}
+            </Modal>
       </div>
     </>
   );
