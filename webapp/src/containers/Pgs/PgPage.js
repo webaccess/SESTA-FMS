@@ -266,7 +266,7 @@ class PgPage extends Component {
                         color="primary"
                       />
                     }
-                    label="Active*"
+                    label="Active"
                   />
                 </Grid>
 
