@@ -260,7 +260,7 @@ class StatePage extends Component {
                         color="primary"
                       />
                     }
-                    label="Active*"
+                    label="Active"
                   />
                 </Grid>
               </Grid>
