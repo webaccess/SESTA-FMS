@@ -21,6 +21,7 @@
     "mode": "block"
   },
   "cors": {
+    "origin": ["https://sestafms.wastaging.com", "https://sestafms-backend.wastaging.com"],
     "enabled": true
   },
   "ip": {

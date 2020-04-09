@@ -84,6 +84,22 @@ function addPermissionsToGivenRole(role, id) {
   });
 }
 
+function addRoleModule(role, moduleItem) {
+  bookshelf
+    .model("roleModule")
+    .forge({
+      role_id: role.id,
+      module_id: moduleItem.id,
+    })
+    .save()
+    .then((rr) => {
+      console.log("module " + moduleItem.name + " added!!!");
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
 module.exports = (strapi) => {
   const hook = {
     /**
@@ -246,15 +262,15 @@ module.exports = (strapi) => {
               const isModulePresent = response.find(
                 (r) => r.slug === modules[module]["slug"]
               );
-              if (!isModulePresent) {
-                const _roles = _allRoles.filter(
-                  (r) => modules[module]["roles"].indexOf(r.name) > -1
-                );
-                const _module = _allModules.find(
-                  (m) => modules[module]["module"] === m.name
-                );
-                var roleModules = [];
 
+              const _roles = _allRoles.filter(
+                (r) => modules[module]["roles"].indexOf(r.name) > -1
+              );
+              const _module = _allModules.find(
+                (m) => modules[module]["module"] === m.name
+              );
+              var roleModules = [];
+              if (!isModulePresent) {
                 // Creating module
                 bookshelf
                   .model("module")
@@ -266,28 +282,72 @@ module.exports = (strapi) => {
                     url: modules[module]["url"],
                     displayNavigation: modules[module]["displayNavigation"],
                     module: _module ? _module.id : null,
+                    order: modules[module]["order"],
                   })
                   .save()
                   .then((m) => {
                     const moduleItem = m.toJSON();
                     _roles.map((role) => {
                       //linking roles to modules
-                      bookshelf
-                        .model("roleModule")
-                        .forge({
-                          role_id: role.id,
-                          module_id: moduleItem.id,
-                        })
-                        .save()
-                        .then((rr) => {
-                          console.log(
-                            "module " + moduleItem.name + " added!!!"
-                          );
-                        })
-                        .catch((error) => {
-                          console.log(error);
-                        });
+                      addRoleModule(role, moduleItem);
                     });
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                  });
+              } else {
+                const roleMods = await bookshelf
+                  .model("roleModule")
+                  .query({ where: { module_id: isModulePresent.id } })
+                  .fetchAll()
+                  .then((res) => res.toJSON());
+                // updating module
+                bookshelf
+                  .model("module")
+                  .query({
+                    where: {
+                      slug: modules[module]["slug"],
+                    },
+                  })
+                  .save(
+                    {
+                      name: module,
+                      is_active: modules[module]["is_active"],
+                      icon_class: modules[module]["icon_class"],
+                      url: modules[module]["url"],
+                      displayNavigation: modules[module]["displayNavigation"],
+                      module: _module ? _module.id : null,
+                      order: modules[module]["order"],
+                    },
+                    { patch: true }
+                  )
+                  .then((m) => {
+                    const moduleItem = m.toJSON();
+                    if (roleMods.length > 0) {
+                      roleMods.map((role) => {
+                        bookshelf
+                          .model("roleModule")
+                          .where({
+                            role_id: role.id,
+                            module_id: isModulePresent.id,
+                          })
+                          .destroy()
+                          .then(async function rRoleMod() {
+                            console.log(
+                              `Deleting existing roles for module ${isModulePresent.name}\nAdding new roles\n`
+                            );
+                            addRoleModule(role, moduleItem);
+                          })
+                          .catch((error) => {
+                            console.log("error", error);
+                          });
+                      });
+                    } else {
+                      _roles.map((role) => {
+                        //linking roles to modules
+                        addRoleModule(role, moduleItem);
+                      });
+                    }
                   })
                   .catch((error) => {
                     console.log(error);
@@ -295,7 +355,7 @@ module.exports = (strapi) => {
               }
             })
             .catch((failed) => {
-              reject({ failed });
+              console.log("failed", failed);
             });
         });
       });
@@ -359,6 +419,63 @@ module.exports = (strapi) => {
                   .catch((error) => {
                     console.log(error);
                   });
+              } else {
+                const roleMods = await bookshelf
+                  .model("roleModule")
+                  .query({ where: { module_id: isModulePresent.id } })
+                  .fetchAll()
+                  .then((res) => res.toJSON());
+                // updating module
+                bookshelf
+                  .model("module")
+                  .query({
+                    where: {
+                      slug: modules[module]["slug"],
+                    },
+                  })
+                  .save(
+                    {
+                      name: module,
+                      is_active: modules[module]["is_active"],
+                      icon_class: modules[module]["icon_class"],
+                      url: modules[module]["url"],
+                      displayNavigation: modules[module]["displayNavigation"],
+                      module: _module ? _module.id : null,
+                      order: modules[module]["order"],
+                    },
+                    { patch: true }
+                  )
+                  .then((m) => {
+                    const moduleItem = m.toJSON();
+                    if (roleMods.length > 0) {
+                      roleMods.map((role) => {
+                        bookshelf
+                          .model("roleModule")
+                          .where({
+                            role_id: role.id,
+                            module_id: isModulePresent.id,
+                          })
+                          .destroy()
+                          .then(async function rRoleMod() {
+                            console.log(
+                              `Deleting existing roles for module ${isModulePresent.name}\nAdding new roles\n`
+                            );
+                            addRoleModule(role, moduleItem);
+                          })
+                          .catch((error) => {
+                            console.log("error", error);
+                          });
+                      });
+                    } else {
+                      _roles.map((role) => {
+                        //linking roles to modules
+                        addRoleModule(role, moduleItem);
+                      });
+                    }
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                  });
               }
               // } else {
               //   bookshelf
@@ -367,7 +484,8 @@ module.exports = (strapi) => {
               // }
             })
             .catch((failed) => {
-              reject({ failed });
+              // reject({ failed });
+              console.log("failed", failed);
             });
         });
       });

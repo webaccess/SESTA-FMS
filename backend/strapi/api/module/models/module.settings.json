@@ -36,7 +36,7 @@
     "slug": {
       "type": "string",
       "unique": true,
-      "required": false
+      "required": true
     },
     "displayNavigation": {
       "type": "boolean",
@@ -44,9 +44,12 @@
       "required": false
     },
     "roles": {
-      "via": "modules",
       "plugin": "users-permissions",
-      "collection": "role"
+      "collection": "role",
+      "via": "modules"
+    },
+    "order": {
+      "type": "integer"
     }
   }
 }
