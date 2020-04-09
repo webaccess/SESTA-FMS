@@ -5,18 +5,13 @@ import Layout from "../../hoc/Layout/Layout";
 import Button from "../../components/UI/Button/Button";
 import { withStyles, ThemeProvider } from "@material-ui/core/styles";
 import style from "./Vo.module.css";
-import { Redirect, Route } from "react-router-dom";
 import { Link } from "react-router-dom";
-import Spinner from "../../components/Spinner";
 import auth from "../../components/Auth/Auth.js";
 import Input from "../../components/UI/Input/Input";
 import AutoSuggest from "../../components/UI/Autosuggest/Autosuggest";
 import { Grid } from "@material-ui/core";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import Select from "@material-ui/core/Select";
-import PrivateRoute from "../../hoc/PrivateRoute/PrivateRoute";
-import Vopage from "./Vopage";
 
 import { createBrowserHistory } from "history";
 
@@ -63,7 +58,8 @@ export class Vos extends React.Component {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
-      fiterShg: "",
+      // fiterShg:"",
+      filterVo: "",
       Result: [],
       data: [],
       selectedid: 0,
@@ -74,8 +70,9 @@ export class Vos extends React.Component {
       getState: [],
       getDistrict: [],
       getVillage: [],
-      getShgs: [],
-      selectedShg: [],
+      getAPI: [],
+      // getShgs: [],
+      // selectedShg: [],
       isCancel: false,
       singleDelete: "",
       multipleDelete: ""
@@ -85,7 +82,6 @@ export class Vos extends React.Component {
   }
 
   async componentDidMount() {
-    let APIdata = [];
     await axios
       .get(
         process.env.REACT_APP_SERVER_URL +
@@ -101,23 +97,6 @@ export class Vos extends React.Component {
       });
     //api call for states filter
     await axios
-      .get(
-        "https://data.gov.in/resources/complete-villages-directory-indiastatedistrictsub-district-level-census-2011-assam/api#/Resource/get_resource_4e8f0544_6acb_4674_bdb0_da7d7e1b009b",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
-        }
-      )
-      .then(res => {
-        APIdata = res.data;
-        console.log("APIdata", APIdata);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-    //api call for states filter
-    await axios
       .get(process.env.REACT_APP_SERVER_URL + "states/", {
         headers: {
           Authorization: "Bearer " + auth.getToken() + ""
@@ -129,6 +108,7 @@ export class Vos extends React.Component {
       .catch(error => {
         console.log(error);
       });
+
     //api call for villages filter
     await axios
       .get(process.env.REACT_APP_SERVER_URL + "Villages/", {
@@ -142,30 +122,43 @@ export class Vos extends React.Component {
       .catch(error => {
         console.log(error);
       });
-    //api for shgs filter
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "shgs/", {
+      .get("http://www.goidirectory.gov.in/district.php", {
         headers: {
           Authorization: "Bearer " + auth.getToken() + ""
         }
       })
       .then(res => {
-        this.setState({ getShgs: res.data });
+        this.setState({ getAPI: res.data });
+        console.log("getAPI", this.state.getAPI);
       })
       .catch(error => {
         console.log(error);
       });
+    //api for shgs filter
+    // await axios
+    //   .get(process.env.REACT_APP_SERVER_URL + "shgs/", {
+    //     headers: {
+    //       Authorization: "Bearer " + auth.getToken() + ""
+    //     }
+    //   })
+    //   .then(res => {
+    //     this.setState({ getShgs: res.data });
+    //   })
+    //   .catch(error => {
+    //     console.log(error);
+    //   });
   }
-  onHandleChange = shgValue => {
-    // if (shgValue){
-    this.setState({
-      isCancel: false,
-      fiterShg: shgValue["id"]
-    });
-    this.setState({ selectedShg: shgValue });
-    // }
-  };
-  handleChange = (event, value) => {};
+  // onHandleChange = shgValue => {
+  // 	// if (shgValue){
+  // 		this.setState({
+  // 		isCancel: false,
+  // 		fiterShg:shgValue['id']
+  // 		});
+  // 		this.setState({ selectedShg: shgValue });
+  // 	// }
+  // };
+
   handleStateChange = async (event, value, method) => {
     if (value !== null) {
       this.setState({ filterState: value.id });
@@ -197,10 +190,14 @@ export class Vos extends React.Component {
         filterState: "",
         filterDistrict: "",
         filterVillage: "",
-        fiterShg: ""
+        getVillage: ""
+        // fiterShg:""
         // selectedShg:""
       });
     }
+  };
+  handleChange = (event, value) => {
+    this.setState({ filterVo: event.target.value });
   };
   handleDistrictChange(event, value) {
     if (value !== null) {
@@ -221,20 +218,20 @@ export class Vos extends React.Component {
     } else {
       this.setState({
         filterDistrict: "",
-        filterVillage: "",
-        fiterShg: ""
+        filterVillage: ""
+        // fiterShg:""
         // selectedShg:""
       });
     }
   }
   handleVillageChange(event, value) {
     if (value !== null) {
-      // this.state.filterVillage = value.id;
       this.setState({ filterVillage: value.id });
+      this.setState({ isCancel: false });
     } else {
       this.setState({
-        filterVillage: "",
-        fiterShg: ""
+        filterVillage: ""
+        // fiterShg:""
         // selectedShg:""
       });
     }
@@ -246,7 +243,7 @@ export class Vos extends React.Component {
   };
 
   DeleteData = (cellid, selectedId) => {
-    if (cellid.length !== null) {
+    if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
       axios
@@ -300,8 +297,9 @@ export class Vos extends React.Component {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
-      fiterShg: "",
-      // selectedShg: "",
+      filterVo: "",
+      //fiterShg:"",
+      //selectedShg: "",
       isCancel: true
     });
 
@@ -314,11 +312,16 @@ export class Vos extends React.Component {
       this.state.filterState ||
       this.state.filterDistrict ||
       this.state.filterDistrict ||
-      this.state.fiterShg
+      this.state.fiterVo
     )
       searchData = "?";
-    if (this.state.fiterShg) {
-      searchData += "shgs.id=" + this.state.fiterShg;
+    // if (this.state.fiterShg) {
+    //   searchData += "shgs.id=" + this.state.fiterShg;
+    // }
+    // let searchData = "";
+    if (this.state.filterVo) {
+      searchData = "?";
+      searchData += "name_contains=" + this.state.filterVo;
     }
     if (this.state.filterState) {
       searchData += searchData ? "&" : "";
@@ -332,7 +335,7 @@ export class Vos extends React.Component {
 
     if (this.state.filterVillage) {
       if (
-        !this.state.fiterShg &&
+        !this.state.filterVo &&
         !this.state.filterState &&
         !this.state.filterDistrict
       ) {
@@ -371,7 +374,7 @@ export class Vos extends React.Component {
 
     const Usercolumns = [
       {
-        name: "Name of the Village Organizations",
+        name: "Village Organization",
         selector: "name"
       }
     ];
@@ -394,7 +397,7 @@ export class Vos extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}> Manage Village organizations</h1>
+            <h1 className={style.title}> Manage Village Organizations</h1>
             <div className={classes.row}>
               <div className={classes.buttonRow}>
                 <Button
@@ -443,7 +446,21 @@ export class Vos extends React.Component {
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
-                    {/* <Autosuggest /> */}
+                    <Input
+                      fullWidth
+                      label="Village Organization"
+                      name="filterVo"
+                      id="combo-box-demo"
+                      value={this.state.filterVo || ""}
+                      onChange={this.handleChange.bind(this)}
+                      variant="outlined"
+                    />
+                  </Grid>
+                </div>
+              </div>
+              {/* <div className={classes.searchInput}>
+                <div className={style.Districts}>
+                  <Grid item md={12} xs={12}>
                     <AutoSuggest
                       data={this.state.getShgs}
                       margin="dense"
@@ -452,7 +469,7 @@ export class Vos extends React.Component {
                     />
                   </Grid>
                 </div>
-              </div>
+              </div> */}
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -479,7 +496,7 @@ export class Vos extends React.Component {
                         <Input
                           {...params}
                           fullWidth
-                          margin="dense"
+                          // margin="dense"
                           label="Select State"
                           name="addState"
                           variant="outlined"
@@ -515,7 +532,7 @@ export class Vos extends React.Component {
                         <Input
                           {...params}
                           fullWidth
-                          margin="dense"
+                          // margin="dense"
                           label="Select District"
                           name="filterDistrict"
                           variant="outlined"
@@ -551,9 +568,8 @@ export class Vos extends React.Component {
                         <Input
                           {...params}
                           fullWidth
-                          margin="dense"
                           label="Select Village"
-                          value={filterVillage}
+                          // value={filterVillage}
                           name="filterVillage"
                           variant="outlined"
                         />

@@ -21,8 +21,8 @@
       "via": "master_state"
     },
     "villages": {
-      "via": "state",
-      "collection": "village"
+      "collection": "village",
+      "via": "state"
     }
   }
 }

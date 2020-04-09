@@ -21,7 +21,7 @@ import {
 } from "./config";
 import { Link } from "react-router-dom";
 
-class Vopage extends Component {
+class VoPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -52,7 +52,6 @@ class Vopage extends Component {
   }
 
   async componentDidMount() {
-    console.log("token", auth.getToken());
     if (this.state.editPage[0]) {
       await axios
         .get(
@@ -78,7 +77,6 @@ class Vopage extends Component {
           console.log(error);
         });
       this.stateIds = this.state.values.addState;
-      console.log("this.stateIds", this.stateIds);
     }
   }
 
@@ -115,12 +113,10 @@ class Vopage extends Component {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
-    console.log("values", this.state.values);
     if (Object.keys(this.state.errors).length > 0) return;
     let voName = this.state.values.addVo;
     let voAddress = this.state.values.addVoAddress;
     let person = this.state.values.addPerson;
-    console.log("Handle submit ", voName, voAddress, person);
     let body = {
       name: voName,
       address: voAddress,
@@ -145,7 +141,6 @@ class Vopage extends Component {
           }
         )
         .then(res => {
-          console.log("res", res);
           this.setState({ formSubmitted: true });
           this.props.history.push({
             pathname: "/village-organizations",
@@ -179,7 +174,6 @@ class Vopage extends Component {
             pathname: "/village-organizations",
             addVoData: true
           });
-          console.log("resu", res);
         })
         .catch(error => {
           this.setState({ formSubmitted: false });
@@ -238,7 +232,6 @@ class Vopage extends Component {
                   <Input
                     fullWidth
                     label="Village Organization Name"
-                    // margin="dense"
                     name="addVo"
                     error={this.hasError("addVo")}
                     helperText={
@@ -253,7 +246,6 @@ class Vopage extends Component {
                   <Input
                     fullWidth
                     label="Address"
-                    // margin="dense"
                     name="addVoAddress"
                     error={this.hasError("addVoAddress")}
                     helperText={
@@ -270,7 +262,6 @@ class Vopage extends Component {
                   <Input
                     fullWidth
                     label="Point of Contact"
-                    // margin="dense"
                     name="addPerson"
                     error={this.hasError("addPerson")}
                     helperText={
@@ -317,4 +308,4 @@ class Vopage extends Component {
     );
   }
 }
-export default Vopage;
+export default VoPage;

@@ -9,35 +9,64 @@ async function allRoles() {
   return await bookshelf
     .model("role")
     .fetchAll()
-    .then(res => res.toJSON());
+    .then((res) => res.toJSON());
 }
 
 async function allModules() {
   return await bookshelf
     .model("module")
     .fetchAll()
-    .then(res => res.toJSON());
+    .then((res) => res.toJSON());
+}
+
+function allStates() {
+  return bookshelf
+    .model("state")
+    .fetchAll()
+    .then((res) => res.toJSON());
 }
 
 async function getRoleModules(roles, module) {
   return await bookshelf
     .model("roleModule")
-    .query(function(qb) {
+    .query(function (qb) {
       qb.where("role_id", "in", roles).andWhere("module_id", "=", module);
     })
     .fetchAll()
-    .then(res => res.toJSON());
+    .then((res) => res.toJSON());
+}
+
+const districts = _data.districts;
+
+function addStatestoDistrict() {
+  Object.keys(districts).forEach((district) => {
+    bookshelf
+      .model("state")
+      .where("name", "=", districts[district]["state_name"])
+      .fetch()
+      .then((model) => {
+        if (model) {
+          const response = model.toJSON();
+          // console.log(
+          //   "getState in addStatestoDistrict",
+          //   districts[district]["state_name"]
+          // );
+          districts[district]["master_state"] = response.id;
+          // console.log("response.id", response.id);
+        }
+      });
+  });
 }
 
 function addPermissionsToGivenRole(role, id) {
   /**
    * Creating permissions WRT to controllers and mapping to created role
    */
-  Object.keys(role.permissions || {}).forEach(type => {
-    Object.keys(role.permissions[type].controllers).forEach(controller => {
+  Object.keys(role.permissions || {}).forEach((type) => {
+    Object.keys(role.permissions[type].controllers).forEach((controller) => {
       console.log(`Adding permission for ${controller} for role ${role.name}`);
       Object.keys(role.permissions[type].controllers[controller]).forEach(
-        action => {
+        (action) => {
           bookshelf
             .model("permission")
             .forge({
@@ -45,7 +74,7 @@ function addPermissionsToGivenRole(role, id) {
               type: controller === "user" ? "users-permissions" : type,
               controller: controller,
               action: action.toLowerCase(),
-              ...role.permissions[type].controllers[controller][action]
+              ...role.permissions[type].controllers[controller][action],
             })
             .save();
         }
@@ -55,7 +84,7 @@ function addPermissionsToGivenRole(role, id) {
   });
 }
 
-module.exports = strapi => {
+module.exports = (strapi) => {
   const hook = {
     /**
      * Default options
@@ -72,7 +101,7 @@ module.exports = strapi => {
     async initialize() {
       let controllerActionWithoutUser = fs
         .readdirSync(apiFolder, { withFileTypes: true })
-        .filter(api => api.isDirectory())
+        .filter((api) => api.isDirectory())
         .reduce((acc, folder) => {
           const { name } = folder;
           const raw = fs.readFileSync(`./api/${name}/config/routes.json`);
@@ -93,15 +122,15 @@ module.exports = strapi => {
           create: { enabled: false },
           update: { enabled: false },
           destroy: { enabled: false },
-          me: { enabled: false }
-        }
+          me: { enabled: false },
+        },
       });
 
       const roles = _data.roles;
 
       var _allModules = await allModules();
 
-      const _roleRequestData = Object.keys(roles).map(r => {
+      const _roleRequestData = Object.keys(roles).map((r) => {
         const { controllers, grantAllPermissions, content } = roles[r];
         const updatedController = controllers.reduce((result, controller) => {
           const { name, action } = controller;
@@ -147,21 +176,21 @@ module.exports = strapi => {
           type: content.type ? content.type : r,
           permissions: {
             application: {
-              controllers: updatedController
-            }
-          }
+              controllers: updatedController,
+            },
+          },
         };
       });
 
-      var promise = new Promise(function(resolve, reject) {
-        _roleRequestData.forEach(role => {
+      var promise = new Promise(function (resolve, reject) {
+        _roleRequestData.forEach((role) => {
           bookshelf
             .model("role")
             .fetchAll()
-            .then(model => {
+            .then((model) => {
               const response = model.toJSON();
-              const isRolePresent = response.find(r => r.name === role.name);
-
+              const isRolePresent = response.find((r) => r.name === role.name);
+              bookshelf;
               if (!isRolePresent) {
                 // Creating role
                 bookshelf
@@ -169,7 +198,7 @@ module.exports = strapi => {
                   .forge({
                     name: role.name,
                     description: role.description,
-                    type: role.type
+                    type: role.type,
                   })
                   .save()
                   .then(async function rRoles(r) {
@@ -178,7 +207,7 @@ module.exports = strapi => {
                     addPermissionsToGivenRole(role, _role.id);
                     resolve();
                   })
-                  .catch(error => {
+                  .catch((error) => {
                     reject(error);
                   });
               } else {
@@ -193,12 +222,12 @@ module.exports = strapi => {
                     addPermissionsToGivenRole(role, isRolePresent.id);
                     resolve();
                   })
-                  .catch(error => {
+                  .catch((error) => {
                     reject(error);
                   });
               }
             })
-            .catch(failed => {
+            .catch((failed) => {
               reject({ failed });
             });
         });
@@ -206,23 +235,23 @@ module.exports = strapi => {
 
       const modules = _data.modules;
 
-      promise.then(async function() {
+      promise.then(async function () {
         var _allRoles = await allRoles();
-        Object.keys(modules).forEach(module => {
+        Object.keys(modules).forEach((module) => {
           bookshelf
             .model("module")
             .fetchAll()
             .then(async function getAllModules(model) {
               const response = model.toJSON();
               const isModulePresent = response.find(
-                r => r.slug === modules[module]["slug"]
+                (r) => r.slug === modules[module]["slug"]
               );
               if (!isModulePresent) {
                 const _roles = _allRoles.filter(
-                  r => modules[module]["roles"].indexOf(r.name) > -1
+                  (r) => modules[module]["roles"].indexOf(r.name) > -1
                 );
                 const _module = _allModules.find(
-                  m => modules[module]["module"] === m.name
+                  (m) => modules[module]["module"] === m.name
                 );
                 var roleModules = [];
 
@@ -236,41 +265,113 @@ module.exports = strapi => {
                     icon_class: modules[module]["icon_class"],
                     url: modules[module]["url"],
                     displayNavigation: modules[module]["displayNavigation"],
-                    module: _module ? _module.id : null
+                    module: _module ? _module.id : null,
                   })
                   .save()
-                  .then(m => {
+                  .then((m) => {
                     const moduleItem = m.toJSON();
-                    _roles.map(role => {
+                    _roles.map((role) => {
                       //linking roles to modules
                       bookshelf
                         .model("roleModule")
                         .forge({
                           role_id: role.id,
-                          module_id: moduleItem.id
+                          module_id: moduleItem.id,
                         })
                         .save()
-                        .then(rr => {
+                        .then((rr) => {
                           console.log(
                             "module " + moduleItem.name + " added!!!"
                           );
                         })
-                        .catch(error => {
+                        .catch((error) => {
                           console.log(error);
                         });
                     });
                   })
-                  .catch(error => {
+                  .catch((error) => {
                     console.log(error);
                   });
               }
             })
-            .catch(failed => {
+            .catch((failed) => {
               reject({ failed });
             });
         });
       });
-    }
+
+      const states = _data.states;
+
+      var prom = new Promise(function (resolve, reject) {
+        Object.keys(states).forEach((state) => {
+          bookshelf
+            .model("state")
+            .fetchAll()
+            .then(async function getAllStates(model) {
+              const response = model.toJSON();
+              const isStatePresent = response.find(
+                (r) => r.name === states[state]["name"]
+              );
+              // console.log("response in  state", response);
+              if (!isStatePresent) {
+                bookshelf
+                  .model("state")
+                  .forge({
+                    name: states[state]["name"],
+                    is_active: states[state]["is_active"],
+                  })
+                  .save()
+                  .then(addStatestoDistrict(), resolve());
+              }
+            })
+            .catch((failed) => {
+              reject({ failed });
+            });
+        });
+      });
+
+      prom.then(async function () {
+        Object.keys(districts).forEach((district) => {
+          bookshelf
+            .model("district")
+            .fetchAll()
+            .then(async function getAllStates(model) {
+              const response = model.toJSON();
+              const isDistPresent = response.find(
+                (r) => r.name === districts[district]["name"]
+                // && r.master_state === districts[district]["master_state"]
+              );
+              // const state_id
+              // console.log("response in district", response);
+
+              if (!isDistPresent) {
+                // bookshelf.model("district").destroy;
+                bookshelf
+                  .model("district")
+                  .forge({
+                    name: districts[district]["name"],
+                    is_active: districts[district]["is_active"],
+                    master_state: districts[district]["master_state"],
+                    // villages: states[state]["villages"],
+                  })
+                  .save()
+                  .then()
+                  .catch((error) => {
+                    console.log(error);
+                  });
+              }
+              // } else {
+              //   bookshelf
+              //     .model("district")
+              //     .where({ name: districts[district]["name"] }).destroy;
+              // }
+            })
+            .catch((failed) => {
+              reject({ failed });
+            });
+        });
+      });
+    },
   };
 
   return hook;
