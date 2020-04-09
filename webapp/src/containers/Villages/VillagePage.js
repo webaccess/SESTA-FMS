@@ -82,7 +82,7 @@ class VillagePage extends Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "districts?master_state.id=" +
+            "districts?is_sctive=true&&master_state.id=" +
             this.state.values.addState,
           {
             headers: {
@@ -98,7 +98,7 @@ class VillagePage extends Component {
         });
     }
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "states/", {
+      .get(process.env.REACT_APP_SERVER_URL + "states?is_active=true", {
         headers: {
           Authorization: "Bearer " + auth.getToken() + "",
         },
@@ -128,7 +128,7 @@ class VillagePage extends Component {
     await axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-          "districts?master_state.id=" +
+          "districts?is_active=true&&master_state.id=" +
           stateId,
         {
           headers: {
