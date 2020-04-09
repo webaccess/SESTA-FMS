@@ -17,7 +17,7 @@ import validateInput from "../../components/Validation/ValidateInput/ValidateInp
 import { ADD_VILLAGE_BREADCRUMBS, EDIT_VILLAGE_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autocomplete from "../../components/Autocomplete/Autocomplete";
 
 class VillagePage extends Component {
   constructor(props) {
@@ -278,6 +278,8 @@ class VillagePage extends Component {
   };
 
   render() {
+    let states = this.state.getState;
+    let addState = this.state.addState;
     return (
       <Layout
         breadcrumbs={
@@ -334,7 +336,37 @@ class VillagePage extends Component {
                 </Grid>
 
                 <Grid item md={6} xs={12}>
-                  <Input
+                  <Autocomplete
+                    options={states}
+                    name="addState"
+                    getOptionLabel={(option) => option.name}
+                    onChange={(event, value) => {
+                      this.handleStateChange(event, value);
+                    }}
+                    value={
+                      states[
+                        states.findIndex(function (item, i) {
+                          return item.id === addState;
+                        })
+                      ] || null
+                    }
+                    renderInput={(params) => (
+                      <Input
+                        {...params}
+                        fullWidth
+                        label="Select State"
+                        name="addState"
+                        error={this.hasError("addState")}
+                        helperText={
+                          this.hasError("addState")
+                            ? this.state.errors.addState[0]
+                            : null
+                        }
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                  {/* <Input
                     fullWidth
                     label="Select State"
                     name="addState"
@@ -354,7 +386,7 @@ class VillagePage extends Component {
                         {states.name}
                       </option>
                     ))}
-                  </Input>
+                  </Input> */}
                 </Grid>
                 <Grid item md={6} xs={12}>
                   <Input
