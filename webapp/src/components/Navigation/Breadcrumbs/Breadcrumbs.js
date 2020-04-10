@@ -21,17 +21,17 @@ function Breadcrumbs(props) {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "modules?is_active=true&roles.id_in=" +
+            "modules?_sort=order:ASC&is_active=true&roles.id_in=" +
             userInfo.role.id +
             "&slug_in=" +
             moduleStr,
           {
             headers: {
-              Authorization: "Bearer " + auth.getToken()
-            }
+              Authorization: "Bearer " + auth.getToken(),
+            },
           }
         )
-        .then(res => {
+        .then((res) => {
           if (mount) setModules(res.data);
         });
     };

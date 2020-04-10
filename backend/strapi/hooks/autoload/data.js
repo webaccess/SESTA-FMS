@@ -82,6 +82,11 @@ const roles = {
         name: "village-organization",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
+
+      {
+        name: "tag",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
     ],
     grantAllPermissions: false,
   },
@@ -129,6 +134,11 @@ const roles = {
       },
       {
         name: "village-organization",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+
+      {
+        name: "tag",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
     ],
@@ -180,6 +190,11 @@ const roles = {
         name: "village-organization",
         action: [],
       },
+
+      {
+        name: "tag",
+        action: [],
+      },
     ],
     grantAllPermissions: false,
   },
@@ -229,6 +244,11 @@ const roles = {
         name: "village-organization",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
+
+      {
+        name: "tag",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
     ],
     grantAllPermissions: false,
   },
@@ -257,7 +277,9 @@ const modules = {
     slug: "list_village",
     displayNavigation: true,
     module: "", //slug
-    order: 3,
+
+    order: 4,
+
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Add Village": {
@@ -267,7 +289,9 @@ const modules = {
     slug: "add_village",
     displayNavigation: false,
     module: "", //slug
-    order: 0,
+
+    order: 5,
+
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Edit Village": {
@@ -277,7 +301,9 @@ const modules = {
     slug: "edit_village",
     displayNavigation: false,
     module: "", //slug
-    order: 0,
+
+    order: 5,
+
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   SHGs: {
@@ -287,7 +313,9 @@ const modules = {
     slug: "list_shg",
     displayNavigation: true,
     module: "", //slug
-    order: 4,
+
+    order: 6,
+
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Village Organizations": {
@@ -307,7 +335,9 @@ const modules = {
     slug: "add_village_organizations",
     displayNavigation: false,
     module: "", //slug
-    order: 0,
+
+    order: 3,
+
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Edit Village Organization": {
@@ -317,25 +347,73 @@ const modules = {
     slug: "edit_village_organizations",
     displayNavigation: false,
     module: "", //slug
-    order: 0,
+
+    order: 3,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
-  "Add Shg": {
+  States: {
     is_active: true,
-    icon_class: "",
-    url: "/Shgs/add",
-    slug: "add_shg",
-    displayNavigation: false,
+    icon_class: "people",
+    url: "/states",
+    slug: "list_state",
+    displayNavigation: true,
     module: "", //slug
+    order: 7,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
-  "Edit Shg": {
+  "Add State": {
     is_active: true,
     icon_class: "",
-    url: "/shgs/edit/:id",
-    slug: "edit_shg",
+    url: "/states/add",
+    slug: "add_state",
     displayNavigation: false,
     module: "", //slug
+    order: 8,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Edit State": {
+    is_active: true,
+    icon_class: "",
+    url: "/states/edit/:id",
+    slug: "edit_state",
+    displayNavigation: false,
+    module: "", //slug
+    order: 8,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  Pgs: {
+    is_active: true,
+    icon_class: "people",
+    url: "/Pgs",
+    slug: "list_pg",
+    displayNavigation: true,
+    module: "", //slug
+    order: 9,
+
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Add Pg": {
+    is_active: true,
+    icon_class: "",
+    url: "/Pgs/add",
+    slug: "add_pg",
+    displayNavigation: false,
+    module: "", //slug
+
+    order: 10,
+
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Edit Pg": {
+    is_active: true,
+    icon_class: "",
+    url: "/Pgs/edit/:id",
+    slug: "edit_pg",
+    displayNavigation: false,
+    module: "", //slug
+
+    order: 10,
+
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
 };
