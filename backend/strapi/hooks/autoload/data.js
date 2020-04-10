@@ -67,7 +67,15 @@ const roles = {
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
-        name: "bank-detail",
+        name: "bankdetail",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "contact",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "organization",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
@@ -108,7 +116,15 @@ const roles = {
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
-        name: "bank-detail",
+        name: "bankdetail",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "contact",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "organization",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
@@ -149,7 +165,15 @@ const roles = {
         action: [],
       },
       {
-        name: "bank-detail",
+        name: "bankdetail",
+        action: [],
+      },
+      {
+        name: "contact",
+        action: [],
+      },
+      {
+        name: "organization",
         action: [],
       },
       {
@@ -190,7 +214,15 @@ const roles = {
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
-        name: "bank-detail",
+        name: "bankdetail",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "contact",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "organization",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {

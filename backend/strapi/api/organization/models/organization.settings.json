@@ -1,4 +1,6 @@
 {
+  "connection": "default",
+  "collectionName": "organizations",
   "info": {
     "name": "organization"
   },
@@ -19,17 +21,21 @@
     "person_incharge": {
       "type": "string"
     },
-    "block": {
-      "type": "string"
+    "bankdetail": {
+      "model": "bankdetail",
+      "via": "organization"
     },
-    "gp": {
-      "type": "string"
+    "vo": {
+      "model": "contact",
+      "via": "organization"
     },
-    "bank_detail": {
-      "model": "bank-detail",
+    "fpo": {
+      "model": "contact",
+      "via": "organization"
+    },
+    "contact": {
+      "model": "contact",
       "via": "organization"
     }
-  },
-  "connection": "default",
-  "collectionName": "organizations"
+  }
 }

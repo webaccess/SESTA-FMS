@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Lifecycle callbacks for the `bank-detail` model.
+ * Lifecycle callbacks for the `country` model.
  */
 
 module.exports = {

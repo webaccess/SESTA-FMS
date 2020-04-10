@@ -34,17 +34,11 @@
     "city": {
       "type": "string"
     },
-    "village": {
-      "type": "string"
-    },
     "district": {
       "model": "district"
     },
     "state": {
       "model": "state"
-    },
-    "country": {
-      "type": "string"
     },
     "pincode": {
       "type": "string"
@@ -62,6 +56,18 @@
       "plugin": "users-permissions",
       "model": "user",
       "via": "contact"
+    },
+    "country": {
+      "model": "country"
+    },
+    "villages": {
+      "collection": "village",
+      "via": "contacts",
+      "dominant": true
+    },
+    "organization": {
+      "via": "contact",
+      "model": "organization"
     }
   }
 }
