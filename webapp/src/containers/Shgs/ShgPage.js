@@ -30,9 +30,7 @@ class ShgPage extends Component {
     this.state = {
       values: {},
       bankValues: {},
-      addState: "",
       addShg: "",
-      addDistrict: "",
       addVillage: [],
       getState: [],
       checkedB: false,
@@ -46,12 +44,6 @@ class ShgPage extends Component {
         addVillage: {
           required: { value: "true", message: "Village field required" },
         },
-        addState: {
-          required: { value: "true", message: "State field required" },
-        },
-        addDistrict: {
-          required: { value: "true", message: "District field required" },
-        },
         addVo: {
           required: {
             value: "true",
@@ -61,8 +53,6 @@ class ShgPage extends Component {
       },
       errors: {
         addVillage: [],
-        addState: [],
-        addDistrict: [],
         addVo: [],
       },
       bankErrors: {},
@@ -83,7 +73,8 @@ class ShgPage extends Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "shgs?id=" +
+            JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
+            "s?id=" +
             this.state.editPage[1],
           {
             headers: {
@@ -92,27 +83,25 @@ class ShgPage extends Component {
           }
         )
         .then((res) => {
-          console.log("results", res.data);
+          console.log("results", res.data[0].contact.name);
           this.setState({
             values: {
-              addShg: res.data[0].name,
-              addAddress: res.data[0].address,
+              addShg: res.data[0].contact.name,
+              addAddress: res.data[0].contact.address_1,
               addPointOfContact: res.data[0].person_incharge,
-              addDistrict: res.data[0].district.id,
-              addVillage: res.data[0].villages,
-              addState: res.data[0].state.id,
-              addVo: res.data[0].village_organization.id,
+              addVillage: res.data[0].contact.villages,
+              addVo: res.data[0].vo.id,
             },
           });
-          if (res.data[0].bank_detail !== null) {
+          if (res.data[0].bankdetail !== null) {
             this.setState({
               bankValues: {
-                id: res.data[0].bank_detail.id,
-                addAccountName: res.data[0].bank_detail.account_name,
-                addBankName: res.data[0].bank_detail.bank_name,
-                addAccountNo: res.data[0].bank_detail.account_no,
-                addIfsc: res.data[0].bank_detail.ifsc_code,
-                addBranch: res.data[0].bank_detail.branch,
+                id: res.data[0].bankdetail.id,
+                addAccountName: res.data[0].bankdetail.account_name,
+                addBankName: res.data[0].bankdetail.bank_name,
+                addAccountNo: res.data[0].bankdetail.account_no,
+                addIfsc: res.data[0].bankdetail.ifsc_code,
+                addBranch: res.data[0].bankdetail.branch,
               },
             });
           } else {
@@ -126,41 +115,6 @@ class ShgPage extends Component {
         .catch((error) => {
           console.log(error);
         });
-
-      //api call 3 for  getting district list
-      await axios
-        .get(
-          process.env.REACT_APP_SERVER_URL +
-            "districts?master_state.id=" +
-            stateId, //value recovered from shg api call state value
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
-        )
-        .then((res) => {
-          this.setState({ getDistrict: res.data }); // district list data
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-
-    await axios
-      .get(process.env.REACT_APP_SERVER_URL + "states/", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
-      .then((res) => {
-        this.setState({ getState: res.data });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    if (this.state.values.addState) {
-      this.setState({ stateSelected: true });
     }
 
     await axios
@@ -192,42 +146,6 @@ class ShgPage extends Component {
       });
   }
 
-  handleStateChange = async (event, value) => {
-    if (value !== null) {
-      this.setState({
-        values: { ...this.state.values, addState: value.id },
-      });
-
-      let stateId = value.id;
-      await axios
-        .get(
-          process.env.REACT_APP_SERVER_URL +
-            "districts?master_state.id=" +
-            stateId,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
-        )
-        .then((res) => {
-          this.setState({ getDistrict: res.data });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else {
-      this.setState({
-        values: {
-          ...this.state.values,
-          addState: "",
-          addDistrict: "",
-          filterVillage: "",
-        },
-      });
-    }
-  };
-
   handleChange = ({ target }) => {
     this.setState({
       values: { ...this.state.values, [target.name]: target.value },
@@ -235,44 +153,8 @@ class ShgPage extends Component {
     });
   };
 
-  handleDistrictChange(event, value) {
-    if (value !== null) {
-      this.setState({
-        values: { ...this.state.values, addDistrict: value.id },
-      });
-      let distId = value.id;
-      // axios
-      //   .get(process.env.REACT_APP_SERVER_URL + "districts/" + distId, {
-      //     headers: {
-      //       Authorization: "Bearer " + auth.getToken() + ""
-      //     }
-      //   })
-      //   .then(res => {
-      //     this.setState({ getVillage: res.data.villages });
-      //   })
-      //   .catch(error => {
-      //     console.log(error);
-      //   });
-    } else {
-      this.setState({
-        values: {
-          ...this.state.values,
-          addDistrict: "",
-          filterVillage: "",
-          addVillage: [],
-        },
-      });
-    }
-  }
-
   handleVillageChange(event, value) {
     let villageValue = [];
-    console.log("handleVillageChange length==", value.length);
-    console.log("handleVillageChange value==", value);
-    console.log("handleVillageChange EVENt==", event);
-    // villageValue = this.state.values.addVillage
-    //   ? [...this.state.values.addVillage]
-    //   : [];
     let villageIds;
     console.log("villageValue", villageValue);
     for (let i in value) {
@@ -362,7 +244,16 @@ class ShgPage extends Component {
 
   handleCheckBox = (event) => {
     this.setState({ ...this.state, [event.target.name]: event.target.checked });
-    this.setState({ bankValues: { id: this.state.bankValues.id } });
+    this.setState({
+      bankValues: {
+        id: this.state.bankValues.id,
+        addAccountName: "",
+        addAccountNo: "",
+        addBankName: "",
+        addBranch: "",
+        addIfsc: "",
+      },
+    });
     this.setState({ hasBankError: "" });
     let allValidations;
     let allErrors;
@@ -428,8 +319,6 @@ class ShgPage extends Component {
     let shgName = this.state.values.addShg;
     let shgAddress = this.state.values.addAddress;
     let shgPersonInCharge = this.state.values.addPointOfContact;
-    let shgState = this.state.values.addState;
-    let shgDistrict = this.state.values.addDistrict;
     let shgVillage = this.state.values.addVillage;
     let shgVo = this.state.values.addVo;
 
@@ -438,21 +327,25 @@ class ShgPage extends Component {
       // let bankIds = "";
       await axios
         .put(
-          process.env.REACT_APP_SERVER_URL + "shgs/" + this.state.editPage[1],
+          process.env.REACT_APP_SERVER_URL +
+            "organizations/" +
+            this.state.editPage[1],
           {
             name: shgName,
-            address: shgAddress,
+            sub_type: "SHG",
+            address_1: shgAddress,
             person_incharge: shgPersonInCharge,
-            state: {
-              id: shgState,
-            },
-            district: {
-              id: shgDistrict,
-            },
+            contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
+              "Organization"
+            ][0],
             villages: shgVillage,
-            village_organization: {
-              id: shgVo,
-            },
+            vo: shgVo,
+            account_name: this.state.values.addAccountName,
+            account_no: this.state.values.addAccountNo,
+            bank_name: this.state.values.addBankName,
+            branch: this.state.values.addBranch,
+            ifsc_code: this.state.values.addIfsc,
+            hasBankDetails: this.state.checkedB,
           },
           {
             headers: {
@@ -466,53 +359,21 @@ class ShgPage extends Component {
           // bankIds = res.data.id;
           console.log("data added", res);
           //api call for edited values in bank
-          if (this.state.checkedB)
-            this.handleBankDetails(
-              process.env.REACT_APP_SERVER_URL +
-                "bank-details?shg=" +
-                res.data.id,
-              res.data.id
-            );
-          else
-            this.deleteBankDetails(
-              process.env.REACT_APP_SERVER_URL +
-                "bank-details/" +
-                this.state.bankValues.id
-            );
-
-          this.props.history.push({ pathname: "/shgs", editData: true });
-          // axios
-          //   .post(
+          // if (this.state.checkedB)
+          //   this.handleBankDetails(
           //     process.env.REACT_APP_SERVER_URL +
           //       "bank-details?shg=" +
-          //       res.data.id, //edit page shg  id will be here
+          //       res.data.id,
+          //     res.data.id
+          //   );
+          // else
+          //   this.deleteBankDetails(
+          //     process.env.REACT_APP_SERVER_URL +
+          //       "bank-details/" +
+          //       this.state.bankValues.id
+          //   );
 
-          //     {
-          //       account_name: this.state.values.addAccountName,
-          //       account_no: this.state.values.addAccountName,
-          //       bank_name: this.state.values.addBankName,
-          //       branch: this.state.values.addBranch,
-          //       ifsc_code: this.state.values.addIfsc,
-          //       shg: res.data.id,
-          //     },
-          //     {
-          //       headers: {
-          //         Authorization: "Bearer " + auth.getToken() + "",
-          //       },
-          //     }
-          //   )
-          //   .then((res) => {
-          //     console.log("hello ", res.data);
-          //     this.setState({ formSubmitted: true });
-          //     this.props.history.push({ pathname: "/Shgs", addData: true });
-          //     this.setState({ formSubmitted: true });
-          //     this.props.history.push({ pathname: "/Shgs", addData: true });
-          //   })
-          //   .catch((error) => {
-          //     this.setState({ formSubmitted: false });
-          //     console.log(error);
-          //     console.log("formsubmitted", this.state.formSubmitted);
-          //   });
+          this.props.history.push({ pathname: "/shgs", editData: true });
         })
         .catch((error) => {
           console.log(error);
@@ -520,22 +381,24 @@ class ShgPage extends Component {
     } else {
       await axios
         .post(
-          process.env.REACT_APP_SERVER_URL + "shgs/",
+          process.env.REACT_APP_SERVER_URL + "organizations/",
           {
             name: shgName,
-            address: shgAddress,
+            sub_type: "SHG",
+            address_1: shgAddress,
             person_incharge: shgPersonInCharge,
-            state: {
-              id: shgState,
-            },
-            district: {
-              id: shgDistrict,
-            },
 
+            contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
+              "Organization"
+            ][0],
             villages: shgVillage,
-            village_organization: {
-              id: shgVo,
-            },
+            vo: shgVo,
+
+            account_name: this.state.values.addAccountName,
+            account_no: this.state.values.addAccountNo,
+            bank_name: this.state.values.addBankName,
+            branch: this.state.values.addBranch,
+            ifsc_code: this.state.values.addIfsc,
           },
           {
             headers: {
@@ -548,11 +411,11 @@ class ShgPage extends Component {
           this.setState({ formSubmitted: true });
           let bankId = res.data.id;
           this.setState({ bankDeatilsId: bankId });
-          if (this.state.checkedB)
-            this.handleBankDetails(
-              process.env.REACT_APP_SERVER_URL + "bank-details",
-              res.data.id
-            );
+          // if (this.state.checkedB)
+          //   this.handleBankDetails(
+          //     process.env.REACT_APP_SERVER_URL + "bank-details",
+          //     res.data.id
+          //   );
           this.props.history.push({ pathname: "/shgs", addData: true });
         })
         .catch((error) => {
@@ -568,7 +431,7 @@ class ShgPage extends Component {
 
         {
           account_name: this.state.values.addAccountName,
-          account_no: this.state.values.addAccountName,
+          account_no: this.state.values.addAccountNo,
           bank_name: this.state.values.addBankName,
           branch: this.state.values.addBranch,
           ifsc_code: this.state.values.addIfsc,
@@ -621,9 +484,6 @@ class ShgPage extends Component {
     let statesFilter = this.state.getState;
     let voFilters = this.state.getVillageOrganization;
     let addVo = this.state.values.addVo;
-    let addState = this.state.values.addState;
-    let districtsFilter = this.state.getDistrict;
-    let addDistrict = this.state.values.addDistrict;
     let villagesFilter = this.state.getVillage;
     console.log("villagesFilter==", villagesFilter);
     let addVillage = this.state.values.addVillage;
@@ -706,81 +566,6 @@ class ShgPage extends Component {
                     value={this.state.values.addShg || ""}
                     onChange={this.handleChange}
                     variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Autotext
-                    id="combo-box-demo"
-                    options={statesFilter}
-                    label="Select State"
-                    variant="outlined"
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, value) => {
-                      this.handleStateChange(event, value);
-                    }}
-                    value={
-                      addState
-                        ? this.state.isCancel === true
-                          ? null
-                          : statesFilter[
-                              statesFilter.findIndex(function (item, i) {
-                                return item.id === addState;
-                              })
-                            ] || null
-                        : null
-                    }
-                    error={this.hasError("addState")}
-                    helperText={
-                      this.hasError("addState")
-                        ? this.state.errors.addState[0]
-                        : null
-                    }
-                    renderInput={(params) => (
-                      <Input
-                        fullWidth
-                        label="Select State"
-                        name="addState"
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Autotext
-                    id="combo-box-demo"
-                    options={districtsFilter}
-                    label="Select District"
-                    variant="outlined"
-                    name="addDistrict"
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, value) => {
-                      this.handleDistrictChange(event, value);
-                    }}
-                    value={
-                      addDistrict
-                        ? this.state.isCancel === true
-                          ? null
-                          : districtsFilter[
-                              districtsFilter.findIndex(function (item, i) {
-                                return item.id === addDistrict;
-                              })
-                            ] || null
-                        : null
-                    }
-                    error={this.hasError("addDistrict")}
-                    helperText={
-                      this.hasError("addDistrict")
-                        ? this.state.errors.addDistrict[0]
-                        : this.state.stateSelected
-                    }
-                    renderInput={(params) => (
-                      <Input
-                        fullWidth
-                        label="Select District"
-                        name="addDistrict"
-                        variant="outlined"
-                      />
-                    )}
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
