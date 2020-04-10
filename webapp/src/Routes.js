@@ -4,7 +4,7 @@ import {
   BrowserRouter as Router,
   Switch,
   useLocation,
-  Route
+  Route,
 } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import Aux from "./hoc/Auxiliary/Auxiliary.js";
@@ -23,6 +23,7 @@ import VillagePage from "./containers/Villages/VillagePage";
 import VoPage from "./containers/Vo/VoPage";
 import Vos from "./containers/Vo/Vos";
 import Account from "./containers/Account/Account";
+import ShgPage from "./containers/Shgs/ShgPage";
 
 function Routes() {
   return (
@@ -37,6 +38,7 @@ function Routes() {
               component={VillagePage}
               exact
             />
+            <PrivateRoute path="/shgs/edit/:id" component={ShgPage} exact />
             <PrivateRoute
               path="/village-organizations/add"
               component={VoPage}
@@ -51,20 +53,16 @@ function Routes() {
             <PrivateRoute path="/villages" component={Villages} exact />
             <PrivateRoute path="/shgs" component={Shgs} exact />
             <PrivateRoute path="/pgs" component={Pgs} exact />
-            <PrivateRoute
-              path="/pgs/add"
-              component={PgPage}
-              exact
-            />
-            <PrivateRoute
-              path="/pgs/edit/:id"
-              component={PgPage}
-              exact
-            />
+            <PrivateRoute path="/pgs/add" component={PgPage} exact />
+            <PrivateRoute path="/pgs/edit/:id" component={PgPage} exact />
 
             <PrivateRoute path="/states" component={states} exact />
             <PrivateRoute path="/states/add" component={StatesPage} exact />
-            <PrivateRoute path="/states/edit/:id" component={StatesPage} exact />
+            <PrivateRoute
+              path="/states/edit/:id"
+              component={StatesPage}
+              exact
+            />
             <PrivateRoute path="/my-account" component={Account} exact />
             <Route path="/404" component={NotFoundPage} />
             <AuthRoute path="/:authType/:id?" component={AuthPage} />
