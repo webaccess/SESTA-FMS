@@ -1,0 +1,35 @@
+{
+  "info": {
+    "name": "organization"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "sub_type": {
+      "type": "enumeration",
+      "enum": [
+        "FPO",
+        "VO",
+        "SHG"
+      ],
+      "required": true
+    },
+    "person_incharge": {
+      "type": "string"
+    },
+    "block": {
+      "type": "string"
+    },
+    "gp": {
+      "type": "string"
+    },
+    "bank_detail": {
+      "model": "bank-detail",
+      "via": "organization"
+    }
+  },
+  "connection": "default",
+  "collectionName": "organizations"
+}

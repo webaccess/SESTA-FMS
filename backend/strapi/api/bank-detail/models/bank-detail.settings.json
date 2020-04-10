@@ -32,6 +32,10 @@
     "shg": {
       "via": "bank_detail",
       "model": "shg"
+    },
+    "organization": {
+      "via": "bank_detail",
+      "model": "organization"
     }
   }
 }
