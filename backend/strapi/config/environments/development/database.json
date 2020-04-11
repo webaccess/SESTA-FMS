@@ -10,7 +10,7 @@
         "port": 5432,
         "username": "postgres",
         "password": "root",
-        "ssl": true
+        "ssl": false
       },
       "options": {}
     }
