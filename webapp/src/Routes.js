@@ -24,6 +24,7 @@ import VoPage from "./containers/Vo/VoPage";
 import Vos from "./containers/Vo/Vos";
 import Account from "./containers/Account/Account";
 import ShgPage from "./containers/Shgs/ShgPage";
+import FpoPage from "./containers/Fpos/FpoPage";
 
 function Routes() {
   return (
@@ -39,6 +40,8 @@ function Routes() {
               exact
             />
             <PrivateRoute path="/shgs/edit/:id" component={ShgPage} exact />
+            <PrivateRoute path="/shgs/add" component={ShgPage} exact />
+
             <PrivateRoute
               path="/village-organizations/add"
               component={VoPage}
@@ -63,6 +66,8 @@ function Routes() {
               component={StatesPage}
               exact
             />
+            <PrivateRoute path="/fpos/add" component={FpoPage} exact />
+            <PrivateRoute path="/fpos/edit/:id" component={FpoPage} exact />
             <PrivateRoute path="/my-account" component={Account} exact />
             <Route path="/404" component={NotFoundPage} />
             <AuthRoute path="/:authType/:id?" component={AuthPage} />
