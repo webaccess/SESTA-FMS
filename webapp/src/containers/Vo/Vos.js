@@ -83,7 +83,7 @@ export class Vos extends React.Component {
 
   async componentDidMount() {
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "organizations/?sub_type=VO/", {
+      .get(process.env.REACT_APP_SERVER_URL + "organizations/?sub_type='VO'"{
         headers: {
           Authorization: "Bearer " + auth.getToken() + "",
         },
@@ -93,11 +93,15 @@ export class Vos extends React.Component {
       });
     //api call for states filter
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "states?is_active=true", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+      .get(
+        process.env.REACT_APP_SERVER_URL +
+          "village-organizations/?_sort=name:ASC",
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + ""
+          }
+        }
+      )
       .then((res) => {
         this.setState({ getState: res.data });
       })

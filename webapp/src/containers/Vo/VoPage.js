@@ -166,7 +166,7 @@ class VoPage extends Component {
           console.log(error.response);
         });
     } else {
-      //for add Vo page
+      //for add VO page
       await axios
         .post(
           process.env.REACT_APP_SERVER_URL + "organizations/",
