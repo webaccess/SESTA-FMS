@@ -60,7 +60,8 @@ class VoPage extends Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "village-organizations?id=" +
+            JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
+            "s?sub_type=VO&id=" +
             this.state.editPage[1],
           {
             headers: {
@@ -69,13 +70,14 @@ class VoPage extends Component {
           }
         )
         .then((res) => {
+          console.log("results", res.data[0].contact.name);
           this.setState({
             values: {
-              addVo: res.data[0].name,
-              addVoAddress: res.data[0].address,
+              addVo: res.data[0].contact.name,
+              addVoAddress: res.data[0].contact.address,
               addPerson: res.data[0].person_incharge,
-              addBlock: res.data[0].block,
-              addGp: res.data[0].gp,
+              addBlock: res.data[0].contact.block,
+              addGp: res.data[0].contact.gp,
             },
           });
         })
@@ -125,17 +127,24 @@ class VoPage extends Component {
     let person = this.state.values.addPerson;
     let block = this.state.values.addBlock;
     let gp = this.state.values.addGp;
+
     if (this.state.editPage[0]) {
       // for edit Vo page
       await axios
         .put(
           process.env.REACT_APP_SERVER_URL +
-            "village-organizations/" +
+            "organizations/" +
             this.state.editPage[1],
           {
             name: voName,
-            address: voAddress,
+            sub_type: "VO",
+            address_1: voAddress,
             person_incharge: person,
+            contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
+              "Organization"
+            ][0],
+            name: voName,
+            address_1: voAddress,
             block: block,
             gp: gp,
           },
@@ -160,12 +169,18 @@ class VoPage extends Component {
       //for add Vo page
       await axios
         .post(
-          process.env.REACT_APP_SERVER_URL + "village-organizations",
+          process.env.REACT_APP_SERVER_URL + "organizations/",
 
           {
             name: voName,
+            sub_type: "VO",
             address: voAddress,
             person_incharge: person,
+            contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
+              "Organization"
+            ][0],
+            name: voName,
+            address_1: voAddress,
             block: block,
             gp: gp,
           },
