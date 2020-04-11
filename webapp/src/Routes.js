@@ -23,6 +23,7 @@ import VillagePage from "./containers/Villages/VillagePage";
 import VoPage from "./containers/Vo/VoPage";
 import Vos from "./containers/Vo/Vos";
 import Account from "./containers/Account/Account";
+import ShgPage from "./containers/Shgs/ShgPage";
 
 function Routes() {
   return (
@@ -49,6 +50,8 @@ function Routes() {
             />
             <PrivateRoute path="/village-organizations" component={Vos} exact />
             <PrivateRoute path="/villages" component={Villages} exact />
+            <PrivateRoute path="/shgs/add" component={ShgPage} exact />
+            <PrivateRoute path="/shgs/edit/:id" component={ShgPage} exact />
             <PrivateRoute path="/shgs" component={Shgs} exact />
             <PrivateRoute path="/pgs" component={Pgs} exact />
             <PrivateRoute path="/pgs/add" component={PgPage} exact />

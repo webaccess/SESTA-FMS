@@ -84,7 +84,7 @@ export class Villages extends React.Component {
       });
     //api call for states filter
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "states/", {
+      .get(process.env.REACT_APP_SERVER_URL + "states?is_active=true", {
         headers: {
           Authorization: "Bearer " + auth.getToken() + ""
         }
@@ -117,7 +117,7 @@ export class Villages extends React.Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "districts?master_state.id=" +
+            "districts?is_active=true&&master_state.id=" +
             stateId,
           {
             headers: {

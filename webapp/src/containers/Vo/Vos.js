@@ -11,7 +11,8 @@ import Input from "../../components/UI/Input/Input";
 import AutoSuggest from "../../components/UI/Autosuggest/Autosuggest";
 import { Grid } from "@material-ui/core";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+// import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autocomplete from "../../components/Autocomplete/Autocomplete.js";
 
 import { createBrowserHistory } from "history";
 
@@ -96,7 +97,7 @@ export class Vos extends React.Component {
       });
     //api call for states filter
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "states/", {
+      .get(process.env.REACT_APP_SERVER_URL + "states?is_active=true", {
         headers: {
           Authorization: "Bearer " + auth.getToken() + "",
         },
@@ -157,7 +158,7 @@ export class Vos extends React.Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "districts?master_state.id=" +
+            "districts?is_active=true&&master_state.id=" +
             stateId,
           {
             headers: {
@@ -175,8 +176,6 @@ export class Vos extends React.Component {
       this.setState({
         filterState: "",
         filterDistrict: "",
-        filterVillage: "",
-        getVillage: "",
         // fiterShg:""
         // selectedShg:""
       });
@@ -192,7 +191,6 @@ export class Vos extends React.Component {
     } else {
       this.setState({
         filterDistrict: "",
-        filterVillage: "",
         // fiterShg:""
         // selectedShg:""
       });
@@ -455,6 +453,7 @@ export class Vos extends React.Component {
                       onChange={(event, value) => {
                         this.handleStateChange(event, value);
                       }}
+                      defaultValue={[]}
                       value={
                         filterState
                           ? this.state.isCancel === true
@@ -491,6 +490,7 @@ export class Vos extends React.Component {
                       onChange={(event, value) => {
                         this.handleDistrictChange(event, value);
                       }}
+                      // defaultValue={[]}
                       value={
                         filterDistrict
                           ? this.state.isCancel === true
@@ -522,7 +522,7 @@ export class Vos extends React.Component {
                     <Autocomplete
                       id="combo-box-demo"
                       options={villagesFilter}
-                      name="filterVillage"
+                      // name="filterVillage"
                       getOptionLabel={(option) => option.name}
                       onChange={(event, value) => {
                         this.handleVillageChange(event, value);

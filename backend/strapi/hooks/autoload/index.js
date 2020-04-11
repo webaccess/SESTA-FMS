@@ -19,13 +19,6 @@ async function allModules() {
     .then((res) => res.toJSON());
 }
 
-function allStates() {
-  return bookshelf
-    .model("state")
-    .fetchAll()
-    .then((res) => res.toJSON());
-}
-
 async function getRoleModules(roles, module) {
   return await bookshelf
     .model("roleModule")
@@ -34,28 +27,6 @@ async function getRoleModules(roles, module) {
     })
     .fetchAll()
     .then((res) => res.toJSON());
-}
-
-const districts = _data.districts;
-
-function addStatestoDistrict() {
-  Object.keys(districts).forEach((district) => {
-    bookshelf
-      .model("state")
-      .where("name", "=", districts[district]["state_name"])
-      .fetch()
-      .then((model) => {
-        if (model) {
-          const response = model.toJSON();
-          // console.log(
-          //   "getState in addStatestoDistrict",
-          //   districts[district]["state_name"]
-          // );
-          districts[district]["master_state"] = response.id;
-          // console.log("response.id", response.id);
-        }
-      });
-  });
 }
 
 function addPermissionsToGivenRole(role, id) {
@@ -206,7 +177,7 @@ module.exports = (strapi) => {
             .then((model) => {
               const response = model.toJSON();
               const isRolePresent = response.find((r) => r.name === role.name);
-              bookshelf;
+
               if (!isRolePresent) {
                 // Creating role
                 bookshelf
@@ -355,136 +326,6 @@ module.exports = (strapi) => {
               }
             })
             .catch((failed) => {
-              console.log("failed", failed);
-            });
-        });
-      });
-
-      const states = _data.states;
-
-      var prom = new Promise(function (resolve, reject) {
-        Object.keys(states).forEach((state) => {
-          bookshelf
-            .model("state")
-            .fetchAll()
-            .then(async function getAllStates(model) {
-              const response = model.toJSON();
-              const isStatePresent = response.find(
-                (r) => r.name === states[state]["name"]
-              );
-              // console.log("response in  state", response);
-              if (!isStatePresent) {
-                bookshelf
-                  .model("state")
-                  .forge({
-                    name: states[state]["name"],
-                    is_active: states[state]["is_active"],
-                  })
-                  .save()
-                  .then(addStatestoDistrict(), resolve());
-              }
-            })
-            .catch((failed) => {
-              reject({ failed });
-            });
-        });
-      });
-
-      prom.then(async function () {
-        Object.keys(districts).forEach((district) => {
-          bookshelf
-            .model("district")
-            .fetchAll()
-            .then(async function getAllStates(model) {
-              const response = model.toJSON();
-              const isDistPresent = response.find(
-                (r) => r.name === districts[district]["name"]
-                // && r.master_state === districts[district]["master_state"]
-              );
-              // const state_id
-              // console.log("response in district", response);
-
-              if (!isDistPresent) {
-                // bookshelf.model("district").destroy;
-                bookshelf
-                  .model("district")
-                  .forge({
-                    name: districts[district]["name"],
-                    is_active: districts[district]["is_active"],
-                    master_state: districts[district]["master_state"],
-                    // villages: states[state]["villages"],
-                  })
-                  .save()
-                  .then()
-                  .catch((error) => {
-                    console.log(error);
-                  });
-              } else {
-                const roleMods = await bookshelf
-                  .model("roleModule")
-                  .query({ where: { module_id: isModulePresent.id } })
-                  .fetchAll()
-                  .then((res) => res.toJSON());
-                // updating module
-                bookshelf
-                  .model("module")
-                  .query({
-                    where: {
-                      slug: modules[module]["slug"],
-                    },
-                  })
-                  .save(
-                    {
-                      name: module,
-                      is_active: modules[module]["is_active"],
-                      icon_class: modules[module]["icon_class"],
-                      url: modules[module]["url"],
-                      displayNavigation: modules[module]["displayNavigation"],
-                      module: _module ? _module.id : null,
-                      order: modules[module]["order"],
-                    },
-                    { patch: true }
-                  )
-                  .then((m) => {
-                    const moduleItem = m.toJSON();
-                    if (roleMods.length > 0) {
-                      roleMods.map((role) => {
-                        bookshelf
-                          .model("roleModule")
-                          .where({
-                            role_id: role.id,
-                            module_id: isModulePresent.id,
-                          })
-                          .destroy()
-                          .then(async function rRoleMod() {
-                            console.log(
-                              `Deleting existing roles for module ${isModulePresent.name}\nAdding new roles\n`
-                            );
-                            addRoleModule(role, moduleItem);
-                          })
-                          .catch((error) => {
-                            console.log("error", error);
-                          });
-                      });
-                    } else {
-                      _roles.map((role) => {
-                        //linking roles to modules
-                        addRoleModule(role, moduleItem);
-                      });
-                    }
-                  })
-                  .catch((error) => {
-                    console.log(error);
-                  });
-              }
-              // } else {
-              //   bookshelf
-              //     .model("district")
-              //     .where({ name: districts[district]["name"] }).destroy;
-              // }
-            })
-            .catch((failed) => {
-              // reject({ failed });
               console.log("failed", failed);
             });
         });

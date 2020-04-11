@@ -63,6 +63,10 @@
     },
     "mobile": {
       "type": "string"
+    },
+    "contact": {
+      "via": "user",
+      "model": "contact"
     }
   }
 }

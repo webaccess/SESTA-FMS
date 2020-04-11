@@ -10,14 +10,14 @@ import {
   CardContent,
   CardActions,
   Divider,
-  Grid
+  Grid,
 } from "@material-ui/core";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
 import {
   ADD_VILLAGE_ORGANIZATIONS_BREADCRUMBS,
-  EDIT_VILLAGE_ORGANIZATIONS_BREADCRUMBS
+  EDIT_VILLAGE_ORGANIZATIONS_BREADCRUMBS,
 } from "./config";
 import { Link } from "react-router-dom";
 
@@ -30,24 +30,28 @@ class VoPage extends Component {
         addVo: {
           required: {
             value: "true",
-            message: " Village Organization Name is required"
-          }
+            message: " Village Organization Name is required",
+          },
         },
         addVoAddress: {},
-        addPerson: {}
+        addPerson: {},
+        addBlock: {},
+        addGp: {},
       },
       errors: {
         addVo: [],
         addVoAddress: [],
-        addPerson: []
+        addPerson: [],
+        addPerson: [],
+        addGp: [],
       },
       serverErrors: {},
       formSubmitted: "",
       stateSelected: false,
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
-        this.props.match.params.id
-      ]
+        this.props.match.params.id,
+      ],
     };
   }
 
@@ -60,20 +64,22 @@ class VoPage extends Component {
             this.state.editPage[1],
           {
             headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
           }
         )
-        .then(res => {
+        .then((res) => {
           this.setState({
             values: {
               addVo: res.data[0].name,
               addVoAddress: res.data[0].address,
-              addPerson: res.data[0].person_incharge
-            }
+              addPerson: res.data[0].person_incharge,
+              addBlock: res.data[0].block,
+              addGp: res.data[0].gp,
+            },
           });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
       this.stateIds = this.state.values.addState;
@@ -82,7 +88,7 @@ class VoPage extends Component {
 
   handleChange = ({ target }) => {
     this.setState({
-      values: { ...this.state.values, [target.name]: target.value }
+      values: { ...this.state.values, [target.name]: target.value },
     });
   };
 
@@ -100,7 +106,7 @@ class VoPage extends Component {
     });
   };
 
-  hasError = field => {
+  hasError = (field) => {
     if (this.state.errors[field] !== undefined) {
       return Object.keys(this.state.errors).length > 0 &&
         this.state.errors[field].length > 0
@@ -109,7 +115,7 @@ class VoPage extends Component {
     }
   };
 
-  handleSubmit = async e => {
+  handleSubmit = async (e) => {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
@@ -117,11 +123,15 @@ class VoPage extends Component {
     let voName = this.state.values.addVo;
     let voAddress = this.state.values.addVoAddress;
     let person = this.state.values.addPerson;
-    let body = {
-      name: voName,
-      address: voAddress,
-      person_incharge: person
-    };
+    let block = this.state.values.addBlock;
+    let gp = this.state.values.addGp;
+    // let body = {
+    //   name: voName,
+    //   address: voAddress,
+    //   person_incharge: person,
+    //   block: block,
+    //   gp: gp,
+    // };
     if (this.state.editPage[0]) {
       // for edit Vo page
       await axios
@@ -132,22 +142,24 @@ class VoPage extends Component {
           {
             name: voName,
             address: voAddress,
-            person_incharge: person
+            person_incharge: person,
+            block: block,
+            gp: gp,
           },
           {
             headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
           }
         )
-        .then(res => {
+        .then((res) => {
           this.setState({ formSubmitted: true });
           this.props.history.push({
             pathname: "/village-organizations",
-            editVoData: true
+            editVoData: true,
           });
         })
-        .catch(error => {
+        .catch((error) => {
           this.setState({ formSubmitted: false });
           console.log(error.response);
         });
@@ -160,22 +172,24 @@ class VoPage extends Component {
           {
             name: voName,
             address: voAddress,
-            person_incharge: person
+            person_incharge: person,
+            block: block,
+            gp: gp,
           },
           {
             headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
           }
         )
-        .then(res => {
+        .then((res) => {
           this.setState({ formSubmitted: true });
           this.props.history.push({
             pathname: "/village-organizations",
-            addVoData: true
+            addVoData: true,
           });
         })
-        .catch(error => {
+        .catch((error) => {
           this.setState({ formSubmitted: false });
           console.log(error.response);
         });
@@ -186,7 +200,7 @@ class VoPage extends Component {
     this.setState({
       values: {},
       formSubmitted: "",
-      stateSelected: false
+      stateSelected: false,
     });
   };
 
@@ -231,7 +245,7 @@ class VoPage extends Component {
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
-                    label="Village Organization Name"
+                    label="Village Organization Name*"
                     name="addVo"
                     error={this.hasError("addVo")}
                     helperText={
@@ -254,6 +268,36 @@ class VoPage extends Component {
                         : null
                     }
                     value={this.state.values.addVoAddress || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Block"
+                    name="addBlock"
+                    error={this.hasError("addBlock")}
+                    helperText={
+                      this.hasError("addBlock")
+                        ? this.state.errors.addBlock[0]
+                        : null
+                    }
+                    value={this.state.values.addBlock || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Gaon Panchayat"
+                    name="addGp"
+                    error={this.hasError("addGp")}
+                    helperText={
+                      this.hasError("addGp") ? this.state.errors.addGp[0] : null
+                    }
+                    value={this.state.values.addGp || ""}
                     onChange={this.handleChange}
                     variant="outlined"
                   />

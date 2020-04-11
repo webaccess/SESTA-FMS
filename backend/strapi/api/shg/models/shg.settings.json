@@ -29,13 +29,9 @@
     "district": {
       "model": "district"
     },
-    "bank_detail": {
-      "model": "bank-detail",
-      "via": "shg"
-    },
     "village_organization": {
-      "model": "village-organization",
-      "via": "shgs"
+      "via": "shgs",
+      "model": "village-organization"
     }
   }
 }

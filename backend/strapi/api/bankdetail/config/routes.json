@@ -1,0 +1,52 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/bankdetails",
+      "handler": "bankdetail.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/bankdetails/count",
+      "handler": "bankdetail.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/bankdetails/:id",
+      "handler": "bankdetail.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/bankdetails",
+      "handler": "bankdetail.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/bankdetails/:id",
+      "handler": "bankdetail.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/bankdetails/:id",
+      "handler": "bankdetail.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}
