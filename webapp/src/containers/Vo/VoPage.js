@@ -242,7 +242,7 @@ class VoPage extends Component {
                     </Snackbar>
                   ) : null}
                 </Grid>
-                <Grid item md={6} xs={12}>
+                <Grid item xs={12}>
                   <Input
                     fullWidth
                     label="Village Organization Name*"
@@ -256,7 +256,7 @@ class VoPage extends Component {
                     variant="outlined"
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
+                <Grid item xs={12}>
                   <Input
                     fullWidth
                     label="Address"
@@ -302,7 +302,7 @@ class VoPage extends Component {
                     variant="outlined"
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
+                <Grid item xs={12}>
                   <Input
                     fullWidth
                     label="Point of Contact"
