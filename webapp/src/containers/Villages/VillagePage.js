@@ -120,11 +120,13 @@ class VillagePage extends Component {
     });
   };
 
-  handleStateChange = async ({ target }) => {
+  handleStateChange = async (event,value) => {
+    console.log("event",event);
     this.setState({
-      values: { ...this.state.values, [target.name]: target.value },
+      values: { ...this.state.values, [event.target.name]: event.target.value },
     });
-    let stateId = target.value;
+    console.log("target values",event.target.name,event.target.value)
+    let stateId = event.target.value;
     await axios
       .get(
         process.env.REACT_APP_SERVER_URL +
@@ -279,7 +281,8 @@ class VillagePage extends Component {
 
   render() {
     let states = this.state.getState;
-    let addState = this.state.addState;
+    let addState = this.state.values.addState;
+    console.log("vishal",this.state.values.addState)
     return (
       <Layout
         breadcrumbs={
@@ -344,16 +347,18 @@ class VillagePage extends Component {
                       this.handleStateChange(event, value);
                     }}
                     value={
-                      states[
+                      states?[
                         states.findIndex(function (item, i) {
+                          console.log("return",addState,states,item.id);
                           return item.id === addState;
                         })
                       ] || null
+                      :null
                     }
+
                     renderInput={(params) => (
                       <Input
                         {...params}
-                        fullWidth
                         label="Select State"
                         name="addState"
                         error={this.hasError("addState")}
