@@ -125,13 +125,6 @@ class VoPage extends Component {
     let person = this.state.values.addPerson;
     let block = this.state.values.addBlock;
     let gp = this.state.values.addGp;
-    // let body = {
-    //   name: voName,
-    //   address: voAddress,
-    //   person_incharge: person,
-    //   block: block,
-    //   gp: gp,
-    // };
     if (this.state.editPage[0]) {
       // for edit Vo page
       await axios
