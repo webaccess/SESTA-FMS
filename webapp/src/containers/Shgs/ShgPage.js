@@ -74,7 +74,7 @@ class ShgPage extends Component {
         .get(
           process.env.REACT_APP_SERVER_URL +
             JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
-            "s?id=" +
+            "s?sub_type=SHG&id=" +
             this.state.editPage[1],
           {
             headers: {
