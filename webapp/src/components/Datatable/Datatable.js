@@ -243,12 +243,17 @@ console.log("fdhjdsjhd",props.allIsActive)
   if (props.column.length > 0) {
     columns = makeColumns(props.column);
   }
-  console.log("scghjscghjsdgjsd",props.allIsActive)
-  if (props.allIsActive.indexOf("true") > -1){
-    console.log("true hai")
-  }else{
-    console.log("false hai")
+  console.log("sdsdsd",selected)
+  let valuesSelected = [];
+  for (let i in selected){
+    valuesSelected.push(selected[i]['is_active'])
   }
+  if(valuesSelected.includes("true")){
+console.log('true')
+  }else{
+  console.log('false')
+}
+  console.log('fresh hove ka MAZA',valuesSelected)
   return (
     <>
       <div>
@@ -334,15 +339,17 @@ console.log("fdhjdsjhd",props.allIsActive)
                 displaySave: { display: "true" }
               }}
             >
-              {props.allIsActive.indexOf("true") > -1 ? (
+              {valuesSelected.indexOf("true") > -1 ? (
                 <p>
-                  {" "}
+                 {" "}
                   Do you want to set selected <b>{props.title}</b> Active ?
+                  
+                  
                 </p>
               ) : (
                 <p>
                   {" "}
-                  {props.ActiveMessage} <b>{dataName}</b> Deactiveactive ?
+                  {props.ActiveMessage} <b>{dataName}</b>?
                 </p>
               )}
             </Modal>
