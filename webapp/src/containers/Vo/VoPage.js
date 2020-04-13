@@ -74,7 +74,7 @@ class VoPage extends Component {
           this.setState({
             values: {
               addVo: res.data[0].contact.name,
-              addVoAddress: res.data[0].contact.address,
+              addVoAddress: res.data[0].contact.address_1,
               addPerson: res.data[0].person_incharge,
               addBlock: res.data[0].contact.block,
               addGp: res.data[0].contact.gp,
@@ -138,7 +138,7 @@ class VoPage extends Component {
           {
             name: voName,
             sub_type: "VO",
-            address_1: voAddress,
+            // address_1: voAddress,
             person_incharge: person,
             contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
               "Organization"
@@ -174,7 +174,7 @@ class VoPage extends Component {
           {
             name: voName,
             sub_type: "VO",
-            address: voAddress,
+            // address_1: voAddress,
             person_incharge: person,
             contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
               "Organization"
