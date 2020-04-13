@@ -56,6 +56,7 @@ class FpoPage extends Component {
       bankErrors: {},
       serverErrors: {},
       formSubmitted: "",
+      errorCode: "",
       stateSelected: false,
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
@@ -67,12 +68,11 @@ class FpoPage extends Component {
   async componentDidMount() {
     if (this.state.editPage[0]) {
       let stateId = "";
-      this.setState({ checkedB: true });
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
             JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
-            "s?sub_type=SHG&id=" +
+            "s?sub_type=FPO&id=" +
             this.state.editPage[1],
           {
             headers: {
@@ -84,31 +84,35 @@ class FpoPage extends Component {
           console.log("results", res.data[0].contact.name);
           this.setState({
             values: {
-              addFpo: res.data[0].contact.name,
+              addFpo: res.data[0].name,
               addAddress: res.data[0].contact.address_1,
               addPointOfContact: res.data[0].person_incharge,
-              addDistrict: res.data[0].contact.villages,
-              addState: res.data[0].vo.id,
+              addDistrict: res.data[0].contact.district.id,
+              addState: res.data[0].contact.state.id,
+              addBlock: res.data[0].contact.block,
+              addEmail: res.data[0].contact.email,
+              addPhone: res.data[0].contact.phone,
             },
           });
-          if (res.data[0].bankdetail !== null) {
-            this.setState({
-              bankValues: {
-                id: res.data[0].bankdetail.id,
-                addAccountName: res.data[0].bankdetail.account_name,
-                addBankName: res.data[0].bankdetail.bank_name,
-                addAccountNo: res.data[0].bankdetail.account_no,
-                addIfsc: res.data[0].bankdetail.ifsc_code,
-                addBranch: res.data[0].bankdetail.branch,
-              },
-            });
-          } else {
-            this.setState({
-              checkedB: false,
-            });
+          stateId = res.data[0].contact.state.id;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      console.log("state".stteId);
+      await axios
+        .get(
+          process.env.REACT_APP_SERVER_URL +
+            "districts?is_active=true&&master_state.id=" +
+            stateId,
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
           }
-
-          stateId = res.data[0].state.id;
+        )
+        .then((res) => {
+          this.setState({ getDistrict: res.data });
         })
         .catch((error) => {
           console.log(error);
@@ -218,11 +222,9 @@ class FpoPage extends Component {
     let fpoPersonInCharge = this.state.values.addPointOfContact;
     let fpoEmail = this.state.values.addEmail;
     let fpoPhone = this.state.values.addPhone;
-    console.log("res data",fpoName,fpoState,fpoDistrict,fpoAddress,fpoBlock,fpoPhone,fpoPersonInCharge,fpoEmail)
 
     if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
-      // let bankIds = "";
       await axios
         .put(
           process.env.REACT_APP_SERVER_URL +
@@ -251,10 +253,25 @@ class FpoPage extends Component {
         )
         .then((res) => {
           this.setState({ formSubmitted: true });
+          console.log("testing", res);
           // this.props.history.push({ pathname: "/fpos", editData: true });
         })
         .catch((error) => {
-          console.log(error);
+          this.setState({ formSubmitted: false });
+          if (error.response !== undefined) {
+            this.setState({
+              errorCode:
+                error.response.data.statusCode +
+                " Error- " +
+                error.response.data.error +
+                " Message- " +
+                error.response.data.message +
+                " Please try again!",
+            });
+          } else {
+            this.setState({ errorCode: "Network Error - Please try again!" });
+          }
+          console.log("error", error.response);
         });
     } else {
       await axios
@@ -286,6 +303,20 @@ class FpoPage extends Component {
           // this.props.history.push({ pathname: "/fpos", addData: true });
         })
         .catch((error) => {
+          this.setState({ formSubmitted: false });
+          if (error.response !== undefined) {
+            this.setState({
+              errorCode:
+                error.response.data.statusCode +
+                " Error- " +
+                error.response.data.error +
+                " Message- " +
+                error.response.data.message +
+                " Please try again!",
+            });
+          } else {
+            this.setState({ errorCode: "Network Error - Please try again!" });
+          }
           console.log("Error  ", error);
         });
     }
@@ -329,14 +360,9 @@ class FpoPage extends Component {
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item md={12} xs={12}>
-                  {this.state.formSubmitted === true ? (
-                    <Snackbar severity="success">
-                      FPO added successfully.
-                    </Snackbar>
-                  ) : null}
                   {this.state.formSubmitted === false ? (
                     <Snackbar severity="error" Showbutton={false}>
-                      Network Error - Please try again!
+                      {this.state.errorCode}
                     </Snackbar>
                   ) : null}
                 </Grid>
@@ -484,6 +510,7 @@ class FpoPage extends Component {
                   <Input
                     fullWidth
                     label="Phone"
+                    type="number"
                     name="addPhone"
                     error={this.hasError("addPhone")}
                     helperText={
@@ -522,7 +549,7 @@ class FpoPage extends Component {
                 color="secondary"
                 clicked={this.cancelForm}
                 component={Link}
-                to="/shgs"
+                to="/fpos"
               >
                 cancel
               </Button>
