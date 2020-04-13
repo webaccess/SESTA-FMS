@@ -39,6 +39,7 @@ function Routes() {
               exact
             />
             <PrivateRoute path="/shgs/edit/:id" component={ShgPage} exact />
+            <PrivateRoute path="/shgs/add" component={ShgPage} exact />
             <PrivateRoute
               path="/village-organizations/add"
               component={VoPage}
