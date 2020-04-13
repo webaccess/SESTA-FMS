@@ -20,7 +20,6 @@ import { ADD_FPO_BREADCRUMBS, EDIT_FPO_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 
-
 class FpoPage extends Component {
   constructor(props) {
     super(props);
@@ -35,15 +34,18 @@ class FpoPage extends Component {
 
       validations: {
         addFpo: {
-          required: { value: "true", message: "Shg name field required" },
+          required: {
+            value: "true",
+            message: "Farmer Producer Organization field required",
+          },
         },
         addDistrict: {
-          required: { value: "true", message: "Village field required" },
+          required: { value: "true", message: "State field required" },
         },
         addState: {
           required: {
             value: "true",
-            message: "Village Organization field required",
+            message: "District field required",
           },
         },
       },
@@ -206,15 +208,17 @@ class FpoPage extends Component {
   handleSubmit = async (e) => {
     e.preventDefault();
     this.validate();
-    // console.log("errors", this.state.errors);
-
     this.setState({ formSubmitted: "" });
     // if (Object.keys(this.state.errors).length > 0) return;
     let fpoName = this.state.values.addFpo;
-    let shgAddress = this.state.values.addAddress;
-    let shgPersonInCharge = this.state.values.addPointOfContact;
-    let shgVillage = this.state.values.addVillage;
     let fpoState = this.state.values.addState;
+    let fpoDistrict = this.state.values.addDistrict;
+    let fpoAddress = this.state.values.addAddress;
+    let fpoBlock = this.state.values.addBlock;
+    let fpoPersonInCharge = this.state.values.addPointOfContact;
+    let fpoEmail = this.state.values.addEmail;
+    let fpoPhone = this.state.values.addPhone;
+    console.log("res data",fpoName,fpoState,fpoDistrict,fpoAddress,fpoBlock,fpoPhone,fpoPersonInCharge,fpoEmail)
 
     if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
@@ -226,15 +230,18 @@ class FpoPage extends Component {
             this.state.editPage[1],
           {
             name: fpoName,
-            sub_type: "SHG",
-            address_1: shgAddress,
-            person_incharge: shgPersonInCharge,
+            sub_type: "FPO",
+            person_incharge: fpoPersonInCharge,
             contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
               "Organization"
             ][0],
-            villages: shgVillage,
-            vo: fpoState,
-        
+            name: fpoName,
+            address_1: fpoAddress,
+            state: fpoState,
+            district: fpoDistrict,
+            block: fpoBlock,
+            email: fpoEmail,
+            phone: fpoPhone,
           },
           {
             headers: {
@@ -244,10 +251,7 @@ class FpoPage extends Component {
         )
         .then((res) => {
           this.setState({ formSubmitted: true });
-
-   
-
-          this.props.history.push({ pathname: "/shgs", editData: true });
+          // this.props.history.push({ pathname: "/fpos", editData: true });
         })
         .catch((error) => {
           console.log(error);
@@ -258,16 +262,18 @@ class FpoPage extends Component {
           process.env.REACT_APP_SERVER_URL + "organizations/",
           {
             name: fpoName,
-            sub_type: "SHG",
-            address_1: shgAddress,
-            person_incharge: shgPersonInCharge,
-
+            sub_type: "FPO",
+            person_incharge: fpoPersonInCharge,
             contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
               "Organization"
             ][0],
-            villages: shgVillage,
-            vo: fpoState,
-
+            name: fpoName,
+            address_1: fpoAddress,
+            state: fpoState,
+            district: fpoDistrict,
+            block: fpoBlock,
+            email: fpoEmail,
+            phone: fpoPhone,
           },
           {
             headers: {
@@ -276,22 +282,14 @@ class FpoPage extends Component {
           }
         )
         .then((res) => {
-          console.log("add shg", res);
           this.setState({ formSubmitted: true });
-          let bankId = res.data.id;
-          this.setState({ bankDeatilsId: bankId });
-         
-          this.props.history.push({ pathname: "/shgs", addData: true });
+          // this.props.history.push({ pathname: "/fpos", addData: true });
         })
         .catch((error) => {
           console.log("Error  ", error);
         });
     }
   };
-
-
-
-
 
   cancelForm = () => {
     this.setState({
@@ -395,13 +393,12 @@ class FpoPage extends Component {
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <Autocomplete
+                  <Autotext
                     id="combo-box-demo"
                     options={districtFilter}
-                    // multiple={true}
                     variant="outlined"
                     label="Select District"
-                    // name="addDistrict"
+                    name="addDistrict"
                     getOptionLabel={(option) => option.name}
                     onChange={(event, value) => {
                       this.handleDistrictChange(event, value);
@@ -417,6 +414,13 @@ class FpoPage extends Component {
                         : null
                     }
                     error={this.hasError("addDistrict")}
+                    helperText={
+                      this.hasError("addDistrict")
+                        ? this.state.errors.addDistrict[0]
+                        : this.state.stateSelected
+                        ? null
+                        : "Please select the state first"
+                    }
                     renderInput={(params) => (
                       <Input
                         {...params}
@@ -424,13 +428,6 @@ class FpoPage extends Component {
                         label="Select District"
                         name="addDistrict"
                         variant="outlined"
-                        helperText={
-                          this.hasError("addDistrict")
-                            ? this.state.errors.addDistrict[0]
-                            : this.state.stateSelected
-                            ? null
-                            : "Please select the state first"
-                        }
                       />
                     )}
                   />
