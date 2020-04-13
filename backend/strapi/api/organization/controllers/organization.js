@@ -8,12 +8,14 @@ const { sanitizeEntity } = require("strapi-utils");
 module.exports = {
   async find(ctx) {
     let org;
+    console.log("query", ctx.query);
     if (ctx.query._q) {
+      console.log("case1");
       org = await strapi.services.organization.search(ctx.query);
     } else {
+      console.log("case2");
       org = await strapi.services.organization.find(ctx.query);
     }
-
     //for contact
     let contact = await strapi.services.contact.find({
       id: org[0].contact.id,
@@ -21,13 +23,15 @@ module.exports = {
     org[0].contact = contact[0];
 
     //for vo
-    let vo = await strapi.services.contact.find({
-      id: org[0].vo.id,
-    });
-    org[0].vo = vo[0];
+    if (org[0].vo) {
+      let vo = await strapi.services.contact.find({
+        id: org[0].vo.id,
+      });
+      org[0].vo = vo[0];
+    }
 
     //if fpo then add
-    if ("id" in org[0].fpo) {
+    if (org[0].fpo) {
       let fpo = await strapi.services.contact.find({
         id: org[0].fpo.id,
       });
@@ -102,6 +106,18 @@ module.exports = {
       { id: contact.organization.id },
       orgDetails
     );
+    return sanitizeEntity(org, { model: strapi.models.organization });
+  },
+
+  async delete(ctx) {
+    const contact = await strapi.services.contact.delete({
+      organization: ctx.params.id,
+    });
+    const bankdetail = await strapi.services.bankdetail.delete({
+      organization: ctx.params.id,
+    });
+    const org = await strapi.services.organization.delete(ctx.params);
+    console.log("org", org);
     return sanitizeEntity(org, { model: strapi.models.organization });
   },
 };
