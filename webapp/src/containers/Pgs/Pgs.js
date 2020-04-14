@@ -304,7 +304,7 @@ export class Pgs extends React.Component {
                   <Grid item md={12} xs={12}>
                     <Input
                       fullWidth
-                      label="Producer Group Name"
+                      label="Producer Group"
                       name="filterPg"
                       variant="outlined"
                       onChange={(event) => {
