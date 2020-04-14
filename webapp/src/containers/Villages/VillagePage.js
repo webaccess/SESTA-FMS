@@ -82,7 +82,7 @@ class VillagePage extends Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "districts?is_sctive=true&&master_state.id=" +
+            "districts?is_active=true&&master_state.id=" +
             this.state.values.addState,
           {
             headers: {

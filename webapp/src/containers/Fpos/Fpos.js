@@ -167,7 +167,7 @@ export class Fpos extends React.Component {
   };
 
   editData = (cellid) => {
-    this.props.history.push("/fpo/edit/" + cellid);
+    this.props.history.push("/fpos/edit/" + cellid);
   };
 
   DeleteData = (cellid, selectedId) => {
@@ -303,7 +303,7 @@ export class Fpos extends React.Component {
                 <Button
                   variant="contained"
                   component={Link}
-                  to="/fpo/add"
+                  to="/fpos/add"
                 >
                   Add FPO
                 </Button>
@@ -358,18 +358,6 @@ export class Fpos extends React.Component {
                   </Grid>
                 </div>
               </div>
-              {/* <div className={classes.searchInput}>
-                <div className={style.Districts}>
-                  <Grid item md={12} xs={12}>
-                    <AutoSuggest
-                      data={this.state.getShgs}
-                      margin="dense"
-                      onSelectShg={this.onHandleChange}
-                      onClearShg={this.state.isCancel}
-                    />
-                  </Grid>
-                </div>
-              </div> */}
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
