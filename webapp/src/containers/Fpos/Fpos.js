@@ -68,7 +68,6 @@ export class Fpos extends React.Component {
       properties: props,
       getState: [],
       getDistrict: [],
-      getVillage: [],
       isCancel: false,
       singleDelete: "",
       multipleDelete: "",
@@ -105,20 +104,19 @@ export class Fpos extends React.Component {
       .catch((error) => {
         console.log(error);
       });
+    };
 
-    //api call for villages filter
-    await axios
-      .get(process.env.REACT_APP_SERVER_URL + "Villages/", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
-      .then((res) => {
-        this.setState({ getVillage: res.data });
-      })
-      .catch((error) => {
-        console.log(error);
-      }); 
+  getData(result) {
+    for (let i in result) {
+      let district = [];
+      for (let j in result[i].contact.district) {
+        console.log("v==", result[i].contact.district[j].name);
+        district.push(result[i].contact.district[j].name + " ");
+      }
+      result[i]["contact"]["district"] = district;
+    }
+    console.log("hi ", result);
+    return result;
   };
 
   handleStateChange = async (event, value, method) => {
@@ -156,7 +154,7 @@ export class Fpos extends React.Component {
   };
 
   handleChange = (event, value) => {
-    this.setState({ fiterFpo: event.target.value });
+    this.setState({ filterFpo: event.target.value });
   };
 
   handleDistrictChange(event, value) {
@@ -168,7 +166,8 @@ export class Fpos extends React.Component {
         filterDistrict: ""
       });
     }
-  }
+  };
+
   handleVillageChange(event, value) {
     if (value !== null) {
       this.setState({ filterVillage: value.id });
@@ -177,9 +176,8 @@ export class Fpos extends React.Component {
       this.setState({
         filterVillage: ""
       });
-    }
-   
-  }
+    } 
+  };
 
   editData = (cellid) => {
     this.props.history.push("/fpo/edit/" + cellid);
@@ -188,9 +186,8 @@ export class Fpos extends React.Component {
   DeleteData = (cellid, selectedId) => {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-
       axios
-        .delete(
+         .delete(
           process.env.REACT_APP_SERVER_URL +
             JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
             "s/" +
@@ -211,6 +208,7 @@ export class Fpos extends React.Component {
         });
     }
   };
+
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
@@ -246,7 +244,7 @@ export class Fpos extends React.Component {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
-      filterVo: "",
+      filterFpo: "",
       isCancel: true,
     });
 
@@ -254,41 +252,32 @@ export class Fpos extends React.Component {
   };
 
   handleSearch() {
-    let searchData = "";
-    if (
-      this.state.filterState ||
-      this.state.filterDistrict ||
-      this.state.filterDistrict ||
-      this.state.fiterFpo
-    )
-      if (this.state.filterFpo) {
-        searchData += "name=" + this.state.filterVo + "&&";
-      }
+     let searchData = "";
     if (this.state.filterState) {
       searchData += "state.id=" + this.state.filterState + "&&";
     }
-
     if (this.state.filterDistrict) {
       searchData += "district.id=" + this.state.filterDistrict + "&&";
     }
-
-    //api call after search filter
+     if (this.state.filterFpo) {
+      searchData += "name_contains=" + this.state.filterFpo;
+    }
     axios
       .get(
         process.env.REACT_APP_SERVER_URL +
           "contacts?organization.sub_type=FPO&" +
           searchData +
-          "_sort=name:ASC",
+          "&_sort=name:ASC",
         {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
+            Authorization: "Bearer " + auth.getToken() + ""
+          }
         }
       )
-      .then((res) => {
+      .then(res => {
         this.setState({ data: res.data });
       })
-      .catch((err) => {
+      .catch(err => {
         console.log("err", err);
       });
   }
@@ -300,19 +289,11 @@ export class Fpos extends React.Component {
 
     const Usercolumns = [
       {
-        name: "Village Organization",
+        name: "Name of the  Organization",
         selector: "name",
+        sortable: true,
        },
-      {
-        name: "Districts",
-        selector: "contact.district.name",
-        sortable: true,
-      },
-      {
-        name: "States",
-        selector: "contact.state.name",
-        sortable: true,
-      }
+      
     ];
 
     let selectors = [];
@@ -326,9 +307,6 @@ export class Fpos extends React.Component {
     let filterState = this.state.filterState;
     let districtsFilter = this.state.getDistrict;
     let filterDistrict = this.state.filterDistrict;
-    let villagesFilter = this.state.getVillage;
-    let filterVillage = this.state.filterVillage;
-
     return (
       <Layout>
         <Grid>
@@ -345,20 +323,20 @@ export class Fpos extends React.Component {
                 </Button>
               </div>
             </div>
-            {this.props.location.addVoData ? (
+            {this.props.location.addFPO ? (
               <Snackbar severity="success">
-                Village organization added successfully.
+                FPO added successfully.
               </Snackbar>
-            ) : this.props.location.editVoData ? (
+            ) : this.props.location.editFPO ? (
               <Snackbar severity="success">
-                Village organization edited successfully.
+                FPO edited successfully.
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
             this.state.singleDelete !== "" &&
             this.state.singleDelete ? (
               <Snackbar severity="success" Showbutton={false}>
-                Village organization {this.state.singleDelete} deleted
+                FPO {this.state.singleDelete} deleted
                 successfully!
               </Snackbar>
             ) : null}
@@ -369,7 +347,7 @@ export class Fpos extends React.Component {
             ) : null}
             {this.state.multipleDelete === true ? (
               <Snackbar severity="success" Showbutton={false}>
-                Village organizations deleted successfully!
+                FPO deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.multipleDelete === false ? (
@@ -385,9 +363,9 @@ export class Fpos extends React.Component {
                     <Input
                       fullWidth
                       label="FPO Name"
-                      name="fiterFpo"
+                      name="filterFpo"
                       id="combo-box-demo"
-                      value={this.state.fiterFpo || ""}
+                      value={this.state.filterFpo || ""}
                       onChange={this.handleChange.bind(this)}
                       variant="outlined"
                     />
