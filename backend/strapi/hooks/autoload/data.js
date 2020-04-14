@@ -416,7 +416,7 @@ const modules = {
   Fpos: {
     is_active: true,
     icon_class: "people",
-    url: "/Fpos",
+    url: "/fpos",
     slug: "list_fpo",
     displayNavigation: true,
     module: "", //slug
@@ -426,7 +426,7 @@ const modules = {
   "Add Fpo": {
     is_active: true,
     icon_class: "",
-    url: "/Fpos/add",
+    url: "/fpos/add",
     slug: "add_fpo",
     displayNavigation: false,
     module: "", //slug
@@ -436,7 +436,7 @@ const modules = {
   "Edit Fpo": {
     is_active: true,
     icon_class: "",
-    url: "/Fpos/edit/:id",
+    url: "/fpos/edit/:id",
     slug: "edit_fpo",
     displayNavigation: false,
     module: "", //slug

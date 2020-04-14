@@ -16,27 +16,30 @@ module.exports = {
       console.log("case2");
       org = await strapi.services.organization.find(ctx.query);
     }
-    //for contact
-    let contact = await strapi.services.contact.find({
-      id: org[0].contact.id,
+
+    org.map(async (organization) => {
+      //for contact
+      let contact = await strapi.services.contact.find({
+        id: organization.contact.id,
+      });
+      organization.contact = contact[0];
+
+      //for vo
+      if (organization.vo) {
+        let vo = await strapi.services.contact.find({
+          id: organization.vo.id,
+        });
+        organization.vo = vo[0];
+      }
+
+      //if fpo then add
+      if (organization.fpo) {
+        let fpo = await strapi.services.contact.find({
+          id: organization.fpo.id,
+        });
+        organization.fpo = fpo[0];
+      }
     });
-    org[0].contact = contact[0];
-
-    //for vo
-    if (org[0].vo) {
-      let vo = await strapi.services.contact.find({
-        id: org[0].vo.id,
-      });
-      org[0].vo = vo[0];
-    }
-
-    //if fpo then add
-    if (org[0].fpo) {
-      let fpo = await strapi.services.contact.find({
-        id: org[0].fpo.id,
-      });
-      org[0].fpo = fpo[0];
-    }
 
     console.log("ctx.query", org);
     return org.map((entity) =>

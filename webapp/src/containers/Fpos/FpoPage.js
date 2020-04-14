@@ -74,20 +74,20 @@ class FpoPage extends Component {
           }
         )
         .then((res) => {
-          console.log("results", res.data[0].contact.name);
+          console.log("results", res.data[0]);
           this.setState({
             values: {
               addFpo: res.data[0].name,
               addAddress: res.data[0].contact.address_1,
               addPointOfContact: res.data[0].person_incharge,
-              addDistrict: res.data[0].contact.district.id,
-              addState: res.data[0].contact.state.id,
+              addDistrict: res.data[0].contact.district,
+              addState: res.data[0].contact.state,
               addBlock: res.data[0].contact.block,
               addEmail: res.data[0].contact.email,
               addPhone: res.data[0].contact.phone,
             },
           });
-          stateId = res.data[0].contact.state.id;
+          stateId = res.data[0].contact.state;
         })
         .catch((error) => {
           console.log(error);
@@ -323,10 +323,12 @@ class FpoPage extends Component {
   };
 
   render() {
+   
     let stateFilter = this.state.getState;
     let addState = this.state.values.addState;
     let districtFilter = this.state.getDistrict;
     let addDistrict = this.state.values.addDistrict;
+    console.log("values",addState,addDistrict,this.state.values.addState);
     return (
       <Layout
         breadcrumbs={
