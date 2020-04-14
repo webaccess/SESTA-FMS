@@ -399,7 +399,6 @@ const modules = {
     slug: "add_pg",
     displayNavigation: false,
     module: "", //slug
-
     order: 10,
 
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
@@ -411,9 +410,37 @@ const modules = {
     slug: "edit_pg",
     displayNavigation: false,
     module: "", //slug
-
     order: 10,
-
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  Fpos: {
+    is_active: true,
+    icon_class: "people",
+    url: "/Fpos",
+    slug: "list_fpo",
+    displayNavigation: true,
+    module: "", //slug
+    order: 11,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Add Fpo": {
+    is_active: true,
+    icon_class: "",
+    url: "/Fpos/add",
+    slug: "add_fpo",
+    displayNavigation: false,
+    module: "", //slug
+    order: 12,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Edit Fpo": {
+    is_active: true,
+    icon_class: "",
+    url: "/Fpos/edit/:id",
+    slug: "edit_fpo",
+    displayNavigation: false,
+    module: "", //slug
+    order: 12,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
 };
