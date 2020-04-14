@@ -17,7 +17,7 @@
       "type": "boolean",
       "required": true
     },
-    "discription": {
+    "description": {
       "type": "text"
     }
   }
