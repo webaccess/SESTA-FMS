@@ -71,7 +71,7 @@ module.exports = {
     console.log("body", ctx.request.body);
     // update contact
     let contact = await strapi.services.contact.update(
-      ctx.params,
+      { organization: ctx.params.id },
       ctx.request.body
     );
     console.log("contact", contact);
@@ -102,10 +102,7 @@ module.exports = {
     }
     //update org
     let orgDetails = Object.assign(orgOtherDetails, ctx.request.body);
-    let org = await strapi.services.organization.update(
-      { id: contact.organization.id },
-      orgDetails
-    );
+    let org = await strapi.services.organization.update(ctx.params, orgDetails);
     return sanitizeEntity(org, { model: strapi.models.organization });
   },
 
