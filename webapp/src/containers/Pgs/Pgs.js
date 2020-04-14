@@ -10,7 +10,8 @@ import { Grid } from "@material-ui/core";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import Switch from "../../components/Switch/Switch";
+import Switch from "../../components/UI/Switch/Switch";
+
 const useStyles = (theme) => ({
   root: {},
   row: {
