@@ -1,8 +1,8 @@
 {
   "connection": "default",
-  "collectionName": "tags",
+  "collectionName": "countries",
   "info": {
-    "name": "tag"
+    "name": "country"
   },
   "options": {
     "increments": true,
@@ -15,10 +15,17 @@
     },
     "is_active": {
       "type": "boolean",
+      "default": false,
       "required": true
     },
-    "description": {
-      "type": "text"
+    "abbreviation": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "identifier": {
+      "type": "string",
+      "unique": true
     }
   }
 }
