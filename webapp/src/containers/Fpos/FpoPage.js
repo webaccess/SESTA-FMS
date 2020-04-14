@@ -284,6 +284,7 @@ class FpoPage extends Component {
             contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
               "Organization"
             ][0],
+            contact:{
             name: fpoName,
             address_1: fpoAddress,
             state: fpoState,
@@ -291,6 +292,7 @@ class FpoPage extends Component {
             block: fpoBlock,
             email: fpoEmail,
             phone: fpoPhone,
+            }
           },
           {
             headers: {
