@@ -106,19 +106,6 @@ export class Fpos extends React.Component {
       });
     };
 
-  getData(result) {
-    for (let i in result) {
-      let district = [];
-      for (let j in result[i].contact.district) {
-        console.log("v==", result[i].contact.district[j].name);
-        district.push(result[i].contact.district[j].name + " ");
-      }
-      result[i]["contact"]["district"] = district;
-    }
-    console.log("hi ", result);
-    return result;
-  };
-
   handleStateChange = async (event, value, method) => {
     if (value !== null) {
       this.setState({ filterState: value.id });
@@ -233,7 +220,6 @@ export class Fpos extends React.Component {
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
-
             console.log("err", error);
           });
       }

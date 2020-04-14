@@ -53,7 +53,7 @@ const useStyles = theme => ({
   }
 });
 
-export class Villages extends React.Component {
+export class States extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -92,13 +92,14 @@ export class Villages extends React.Component {
       .then(res => {
         this.setState({ data: res.data });
       });
-  }
+  };
 
   StateFilter(event, value, target) {
     this.setState({
       values: { ...this.state.values, [event.target.name]: event.target.value }
     });
-  }
+  };
+
   getData(result) {
     for (let i in result) {
       let states = [];
@@ -108,7 +109,7 @@ export class Villages extends React.Component {
       result[i]["states"] = states;
     }
     return result;
-  }
+  };
 
   handleSearch() {
     let searchData = "";
@@ -133,7 +134,8 @@ export class Villages extends React.Component {
       .catch(err => {
         console.log("err", err);
       });
-  }
+  };
+
   editData = cellid => {
     this.props.history.push("/states/edit/" + cellid);
   };
@@ -195,7 +197,7 @@ export class Villages extends React.Component {
     }
   };
 
-    ActiveAll = (selectedId,selected) => {
+  ActiveAll = (selectedId,selected) => {
     if (selectedId.length !== 0) {
       let numberOfIsActive = [];
       for (let i in selected){
@@ -245,13 +247,13 @@ export class Villages extends React.Component {
 
   clearSelected = (selected) =>{
     let clearselected = '';
-  }
+  };
 
   confirmActive = (event) => {
     this.setState({isActiveAllShowing: true})
     this.setState({setActiveId: event.target.id});
     this.setState({IsActive: event.target.checked});
-  }
+  };
 
   handleActive = (event) => {
      this.setState({isActiveAllShowing: false})
@@ -448,4 +450,4 @@ export class Villages extends React.Component {
     );
   }
 }
-export default withStyles(useStyles)(Villages);
+export default withStyles(useStyles)(States);
