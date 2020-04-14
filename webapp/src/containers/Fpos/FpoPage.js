@@ -3,7 +3,6 @@ import Layout from "../../hoc/Layout/Layout";
 import axios from "axios";
 import auth from "../../components/Auth/Auth";
 import Button from "../../components/UI/Button/Button";
-import Autocomplete from "../../components/Autocomplete/Autocomplete.js";
 import Autotext from "../../components/Autotext/Autotext.js";
 import Input from "../../components/UI/Input/Input";
 import {
@@ -25,12 +24,8 @@ class FpoPage extends Component {
     super(props);
     this.state = {
       values: {},
-      bankValues: {},
-      addFpo: "",
       getState: [],
-      checkedB: false,
       getDistrict: [],
-      getVillage: [],
 
       validations: {
         addFpo: {
@@ -53,8 +48,6 @@ class FpoPage extends Component {
         addDistrict: [],
         addState: [],
       },
-      bankErrors: {},
-      serverErrors: {},
       formSubmitted: "",
       errorCode: "",
       stateSelected: false,
@@ -201,7 +194,6 @@ class FpoPage extends Component {
 
   hasError = (field) => {
     if (this.state.errors[field] !== undefined) {
-      // console.log("errors length", Object.keys(this.state.errors).length);
       return Object.keys(this.state.errors).length > 0 &&
         this.state.errors[field].length > 0
         ? true
@@ -254,7 +246,7 @@ class FpoPage extends Component {
         .then((res) => {
           this.setState({ formSubmitted: true });
           console.log("testing", res);
-          // this.props.history.push({ pathname: "/fpos", editData: true });
+          this.props.history.push({ pathname: "/fpos", editData: true });
         })
         .catch((error) => {
           this.setState({ formSubmitted: false });
@@ -284,7 +276,6 @@ class FpoPage extends Component {
             contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
               "Organization"
             ][0],
-            contact:{
             name: fpoName,
             address_1: fpoAddress,
             state: fpoState,
@@ -292,7 +283,6 @@ class FpoPage extends Component {
             block: fpoBlock,
             email: fpoEmail,
             phone: fpoPhone,
-            }
           },
           {
             headers: {
@@ -302,7 +292,7 @@ class FpoPage extends Component {
         )
         .then((res) => {
           this.setState({ formSubmitted: true });
-          // this.props.history.push({ pathname: "/fpos", addData: true });
+          this.props.history.push({ pathname: "/fpos", addData: true });
         })
         .catch((error) => {
           this.setState({ formSubmitted: false });
@@ -371,7 +361,7 @@ class FpoPage extends Component {
                 <Grid item md={12} xs={12}>
                   <Input
                     fullWidth
-                    label="Farmer Producer Organization Name"
+                    label="Farmer Producer Organization Name*"
                     name="addFpo"
                     error={this.hasError("addFpo")}
                     helperText={
@@ -389,7 +379,7 @@ class FpoPage extends Component {
                     id="combo-box-demo"
                     options={stateFilter}
                     variant="outlined"
-                    label="Select State"
+                    label="Select State*"
                     getOptionLabel={(option) => option.name}
                     onChange={(event, value) => {
                       this.handleStateChange(event, value);
@@ -413,7 +403,7 @@ class FpoPage extends Component {
                     renderInput={(params) => (
                       <Input
                         fullWidth
-                        label="Select State"
+                        label="Select State*"
                         name="addState"
                         variant="outlined"
                       />
@@ -425,7 +415,7 @@ class FpoPage extends Component {
                     id="combo-box-demo"
                     options={districtFilter}
                     variant="outlined"
-                    label="Select District"
+                    label="Select District*"
                     name="addDistrict"
                     getOptionLabel={(option) => option.name}
                     onChange={(event, value) => {
@@ -453,7 +443,7 @@ class FpoPage extends Component {
                       <Input
                         {...params}
                         fullWidth
-                        label="Select District"
+                        label="Select District*"
                         name="addDistrict"
                         variant="outlined"
                       />
