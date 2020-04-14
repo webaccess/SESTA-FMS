@@ -86,7 +86,7 @@ export class Vos extends React.Component {
       .get(
         process.env.REACT_APP_SERVER_URL +
           JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
-          "s?sub_type=VO&_sort=name:ASC",
+          "s?sub_type=VO",
         {
           headers: {
             Authorization: "Bearer " + auth.getToken() + "",
@@ -293,9 +293,11 @@ export class Vos extends React.Component {
       this.state.filterDistrict ||
       this.state.fiterVo
     )
-      if (this.state.filterVo) {
-        searchData += "name=" + this.state.filterVo + "&&";
-      }
+      searchData = "";
+
+    if (this.state.filterVo) {
+      searchData = "name_contains=" + this.state.filterVo + "&&";
+    }
     if (this.state.filterState) {
       searchData += "state.id=" + this.state.filterState + "&&";
     }
