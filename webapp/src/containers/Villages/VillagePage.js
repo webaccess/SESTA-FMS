@@ -17,7 +17,7 @@ import validateInput from "../../components/Validation/ValidateInput/ValidateInp
 import { ADD_VILLAGE_BREADCRUMBS, EDIT_VILLAGE_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import Autocomplete from "../../components/Autocomplete/Autocomplete";
+import Autotext from "../../components/Autotext/Autotext";
 
 class VillagePage extends Component {
   constructor(props) {
@@ -120,34 +120,55 @@ class VillagePage extends Component {
     });
   };
 
-  handleStateChange = async (event,value) => {
-    console.log("event",event);
-    this.setState({
-      values: { ...this.state.values, [event.target.name]: event.target.value },
-    });
-    console.log("target values",event.target.name,event.target.value)
-    let stateId = event.target.value;
-    await axios
-      .get(
-        process.env.REACT_APP_SERVER_URL +
-          "districts?is_active=true&&master_state.id=" +
-          stateId,
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
-      )
-      .then((res) => {
-        this.setState({ getDistrict: res.data });
-      })
-      .catch((error) => {
-        console.log(error);
+  handleStateChange(event, value) {
+    if (value !== null) {
+      this.setState({
+        values: { ...this.state.values, addState: value.id },
       });
-    if (this.state.values.addState) {
+      let stateId = value.id;
+      axios
+        .get(
+          process.env.REACT_APP_SERVER_URL +
+            "districts?is_active=true&&master_state.id=" +
+            stateId,
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
+          }
+        )
+        .then((res) => {
+          this.setState({ getDistrict: res.data });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
       this.setState({ stateSelected: true });
+    } else {
+      this.setState({
+        values: {
+          ...this.state.values,
+          addState: "",
+        },
+      });
+      this.setState({ stateSelected: false });
     }
-  };
+  }
+
+  handleDistrictChange(event, value) {
+    if (value !== null) {
+      this.setState({
+        values: { ...this.state.values, addDistrict: value.id },
+      });
+    } else {
+      this.setState({
+        values: {
+          ...this.state.values,
+          addDistrict: "",
+        },
+      });
+    }
+  }
 
   validate = () => {
     const values = this.state.values;
@@ -155,7 +176,6 @@ class VillagePage extends Component {
     map(validations, (validation, key) => {
       let value = values[key] ? values[key] : "";
       const errors = validateInput(value, validation);
-
       let errorset = this.state.errors;
       if (errors.length > 0) errorset[key] = errors;
       else delete errorset[key];
@@ -276,13 +296,13 @@ class VillagePage extends Component {
       formSubmitted: "",
       stateSelected: false,
     });
-    //routing code #route to village_list page
   };
 
   render() {
-    let states = this.state.getState;
+    let stateFilter = this.state.getState;
     let addState = this.state.values.addState;
-    console.log("vishal",this.state.values.addState)
+    let districtFilter = this.state.getDistrict;
+    let addDistrict = this.state.values.addDistrict;
     return (
       <Layout
         breadcrumbs={
@@ -310,11 +330,6 @@ class VillagePage extends Component {
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item md={12} xs={12}>
-                  {/* {this.state.formSubmitted === true ? (
-                    <Snackbar severity="success">
-                      Village added successfully.
-                    </Snackbar>
-                  ) : null} */}
                   {this.state.formSubmitted === false ? (
                     <Snackbar severity="error" Showbutton={false}>
                       {this.state.errorCode}
@@ -339,67 +354,62 @@ class VillagePage extends Component {
                 </Grid>
 
                 <Grid item md={6} xs={12}>
-                  <Autocomplete
-                    options={states}
-                    name="addState"
+                  <Autotext
+                    id="combo-box-demo"
+                    options={stateFilter}
+                    variant="outlined"
+                    label="Select State*"
                     getOptionLabel={(option) => option.name}
                     onChange={(event, value) => {
                       this.handleStateChange(event, value);
                     }}
+                    defaultValue={[]}
                     value={
-                      states?[
-                        states.findIndex(function (item, i) {
-                          console.log("return",addState,states,item.id);
-                          return item.id === addState;
-                        })
-                      ] || null
-                      :null
+                      addState
+                        ? stateFilter[
+                            stateFilter.findIndex(function (item, i) {
+                              return item.id === addState;
+                            })
+                          ] || null
+                        : null
                     }
-
-                    renderInput={(params) => (
-                      <Input
-                        {...params}
-                        label="Select State"
-                        name="addState"
-                        error={this.hasError("addState")}
-                        helperText={
-                          this.hasError("addState")
-                            ? this.state.errors.addState[0]
-                            : null
-                        }
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                  {/* <Input
-                    fullWidth
-                    label="Select State*"
-                    name="addState"
-                    onChange={this.handleStateChange}
-                    select
                     error={this.hasError("addState")}
                     helperText={
                       this.hasError("addState")
                         ? this.state.errors.addState[0]
                         : null
                     }
-                    value={this.state.values.addState || ""}
-                    variant="outlined"
-                  >
-                    {this.state.getState.map((states) => (
-                      <option value={states.id} key={states.id}>
-                        {states.name}
-                      </option>
-                    ))}
-                  </Input> */}
+                    renderInput={(params) => (
+                      <Input
+                        fullWidth
+                        label="Select State*"
+                        name="addState"
+                        variant="outlined"
+                      />
+                    )}
+                  />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
+                  <Autotext
+                    id="combo-box-demo"
+                    options={districtFilter}
+                    variant="outlined"
                     label="Select District*"
                     name="addDistrict"
-                    onChange={this.handleChange}
-                    select
+                    getOptionLabel={(option) => option.name}
+                    onChange={(event, value) => {
+                      this.handleDistrictChange(event, value);
+                    }}
+                    defaultValue={[]}
+                    value={
+                      addDistrict
+                        ? districtFilter[
+                            districtFilter.findIndex(function (item, i) {
+                              return item.id === addDistrict;
+                            })
+                          ] || null
+                        : null
+                    }
                     error={this.hasError("addDistrict")}
                     helperText={
                       this.hasError("addDistrict")
@@ -408,15 +418,16 @@ class VillagePage extends Component {
                         ? null
                         : "Please select the state first"
                     }
-                    value={this.state.values.addDistrict || ""}
-                    variant="outlined"
-                  >
-                    {this.state.getDistrict.map((district) => (
-                      <option value={district.id} key={district.id}>
-                        {district.name}
-                      </option>
-                    ))}
-                  </Input>
+                    renderInput={(params) => (
+                      <Input
+                        {...params}
+                        fullWidth
+                        label="Select District*"
+                        name="addDistrict"
+                        variant="outlined"
+                      />
+                    )}
+                  />
                 </Grid>
               </Grid>
             </CardContent>
