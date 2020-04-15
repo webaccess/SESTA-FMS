@@ -35,12 +35,12 @@ class FpoPage extends Component {
           },
         },
         addDistrict: {
-          required: { value: "true", message: "State field required" },
+          required: { value: "true", message: "District field required" },
         },
         addState: {
           required: {
             value: "true",
-            message: "District field required",
+            message: "State field required",
           },
         },
       },
@@ -323,12 +323,10 @@ class FpoPage extends Component {
   };
 
   render() {
-   
     let stateFilter = this.state.getState;
     let addState = this.state.values.addState;
     let districtFilter = this.state.getDistrict;
     let addDistrict = this.state.values.addDistrict;
-    console.log("values",addState,addDistrict,this.state.values.addState);
     return (
       <Layout
         breadcrumbs={
