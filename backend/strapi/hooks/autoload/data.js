@@ -67,9 +67,22 @@ const roles = {
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
+        name: "bankdetail",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "contact",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "organization",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
         name: "village-organization",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
+
       {
         name: "tag",
         action: ["find", "count", "findone", "create", "update", "delete"],
@@ -108,9 +121,22 @@ const roles = {
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
+        name: "bankdetail",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "contact",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "organization",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
         name: "village-organization",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
+
       {
         name: "tag",
         action: ["find", "count", "findone", "create", "update", "delete"],
@@ -149,9 +175,22 @@ const roles = {
         action: [],
       },
       {
+        name: "bankdetail",
+        action: [],
+      },
+      {
+        name: "contact",
+        action: [],
+      },
+      {
+        name: "organization",
+        action: [],
+      },
+      {
         name: "village-organization",
         action: [],
       },
+
       {
         name: "tag",
         action: [],
@@ -190,9 +229,22 @@ const roles = {
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
+        name: "bankdetail",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "contact",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "organization",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
         name: "village-organization",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
+
       {
         name: "tag",
         action: ["find", "count", "findone", "create", "update", "delete"],
@@ -225,7 +277,9 @@ const modules = {
     slug: "list_village",
     displayNavigation: true,
     module: "", //slug
+
     order: 4,
+
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Add Village": {
@@ -235,7 +289,9 @@ const modules = {
     slug: "add_village",
     displayNavigation: false,
     module: "", //slug
+
     order: 5,
+
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Edit Village": {
@@ -245,7 +301,9 @@ const modules = {
     slug: "edit_village",
     displayNavigation: false,
     module: "", //slug
+
     order: 5,
+
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   SHGs: {
@@ -255,7 +313,9 @@ const modules = {
     slug: "list_shg",
     displayNavigation: true,
     module: "", //slug
+
     order: 6,
+
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Village Organizations": {
@@ -275,7 +335,9 @@ const modules = {
     slug: "add_village_organizations",
     displayNavigation: false,
     module: "", //slug
+
     order: 3,
+
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Edit Village Organization": {
@@ -285,6 +347,7 @@ const modules = {
     slug: "edit_village_organizations",
     displayNavigation: false,
     module: "", //slug
+
     order: 3,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
@@ -326,6 +389,7 @@ const modules = {
     displayNavigation: true,
     module: "", //slug
     order: 9,
+
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Add Pg": {
@@ -336,6 +400,7 @@ const modules = {
     displayNavigation: false,
     module: "", //slug
     order: 10,
+
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Edit Pg": {
@@ -346,6 +411,36 @@ const modules = {
     displayNavigation: false,
     module: "", //slug
     order: 10,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  Fpos: {
+    is_active: true,
+    icon_class: "people",
+    url: "/fpos",
+    slug: "list_fpo",
+    displayNavigation: true,
+    module: "", //slug
+    order: 11,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Add Fpo": {
+    is_active: true,
+    icon_class: "",
+    url: "/fpos/add",
+    slug: "add_fpo",
+    displayNavigation: false,
+    module: "", //slug
+    order: 12,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Edit Fpo": {
+    is_active: true,
+    icon_class: "",
+    url: "/fpos/edit/:id",
+    slug: "edit_fpo",
+    displayNavigation: false,
+    module: "", //slug
+    order: 12,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
 };

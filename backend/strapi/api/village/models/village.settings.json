@@ -25,6 +25,10 @@
     "state": {
       "model": "state",
       "via": "villages"
+    },
+    "contacts": {
+      "via": "villages",
+      "collection": "contact"
     }
   }
 }

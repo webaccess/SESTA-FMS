@@ -82,7 +82,7 @@ class VillagePage extends Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "districts?is_sctive=true&&master_state.id=" +
+            "districts?is_active=true&&master_state.id=" +
             this.state.values.addState,
           {
             headers: {
@@ -324,7 +324,7 @@ class VillagePage extends Component {
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
-                    label="Village Name"
+                    label="Village Name*"
                     name="addVillage"
                     error={this.hasError("addVillage")}
                     helperText={
@@ -373,7 +373,7 @@ class VillagePage extends Component {
                   />
                   {/* <Input
                     fullWidth
-                    label="Select State"
+                    label="Select State*"
                     name="addState"
                     onChange={this.handleStateChange}
                     select
@@ -396,7 +396,7 @@ class VillagePage extends Component {
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
-                    label="Select District"
+                    label="Select District*"
                     name="addDistrict"
                     onChange={this.handleChange}
                     select
