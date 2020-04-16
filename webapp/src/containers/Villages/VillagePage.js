@@ -148,7 +148,7 @@ class VillagePage extends Component {
       this.setState({
         values: {
           ...this.state.values,
-          addState: "",
+          addState: "",addDistrict:"",
         },
       });
       this.setState({ stateSelected: false });
