@@ -26,6 +26,7 @@ import Account from "./containers/Account/Account";
 import ShgPage from "./containers/Shgs/ShgPage";
 import FpoPage from "./containers/Fpos/FpoPage";
 import Fpos from "./containers/Fpos/Fpos";
+import test from "./containers/test/test";
 
 function Routes() {
   return (
@@ -42,6 +43,7 @@ function Routes() {
             />
             <PrivateRoute path="/shgs/edit/:id" component={ShgPage} exact />
             <PrivateRoute path="/shgs/add" component={ShgPage} exact />
+            <PrivateRoute path="/test" component={test} exact />
             <PrivateRoute
               path="/village-organizations/add"
               component={VoPage}
