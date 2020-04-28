@@ -352,7 +352,7 @@ export class States extends React.Component {
               </Snackbar>
             ) : null}
             {this.props.location.editData ? (
-              <Snackbar open={this.state.open} onClick={this.handleClose} severity="success">
+              <Snackbar open={this.state.open} autoHideDuration = {3000} onClose={this.handleClose} severity="success">
                 State edited successfully.
               </Snackbar>
             ) : null}
