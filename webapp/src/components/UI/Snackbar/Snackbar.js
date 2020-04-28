@@ -67,14 +67,14 @@ export default function CustomizedSnackbars(props) {
         <p></p>
       )}
       <div className={!isDesktop ? "" : style.Hidden}>
-        <Snackbar open={props.open} autoHideDuration={props.autoHideDuration} onClose={props.onClick}>
+        <Snackbar open={props.open ? props.open : open} autoHideDuration={props.autoHideDuration ? props.autoHideDuration : 5000} onClose={props.onClose ? props.onClose : handleClose}>
           <Alert onClose={props.onClick} severity={props.severity}>
             {props.children}
           </Alert>
         </Snackbar>
       </div>
       <div className={isDesktop ? "" : style.Hidden}>
-        <Collapse in={props.open}>
+        <Collapse in={props.open ? props.open : open}>
           <Alert
             severity={props.severity}
             action={
@@ -82,7 +82,7 @@ export default function CustomizedSnackbars(props) {
                 aria-label="close"
                 color="inherit"
                 size="small"
-                onClick={props.onClick}
+                onClick={props.onClick ? props.onClick : handleClose}
               >
                 <CloseIcon fontSize="inherit" />
               </IconButton>
