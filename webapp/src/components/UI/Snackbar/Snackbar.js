@@ -67,7 +67,7 @@ export default function CustomizedSnackbars(props) {
         <p></p>
       )}
       <div className={!isDesktop ? "" : style.Hidden}>
-        <Snackbar open={props.open ? props.open : open} autoHideDuration={props.autoHideDuration ? props.autoHideDuration : 5000} onClose={props.onClose ? props.onClose : handleClose}>
+        <Snackbar open={props.open ? props.open : open} autoHideDuration={props.autoHideDuration ? props.autoHideDuration : 4000} onClose={props.onClose ? props.onClose : handleClose}>
           <Alert onClose={props.onClick} severity={props.severity}>
             {props.children}
           </Alert>

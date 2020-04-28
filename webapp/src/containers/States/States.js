@@ -347,12 +347,12 @@ export class States extends React.Component {
             </div>
             {console.log("Thunder",this.state.open)}
             {this.props.location.addData ? (
-              <Snackbar autoHideDuration={3000} severity="success">
+              <Snackbar severity="success">
                 State added successfully.
               </Snackbar>
             ) : null}
             {this.props.location.editData ? (
-              <Snackbar open={this.state.open} autoHideDuration={3000} onClick={this.handleClose} severity="success">
+              <Snackbar open={this.state.open} onClick={this.handleClose} severity="success">
                 State edited successfully.
               </Snackbar>
             ) : null}
@@ -360,12 +360,12 @@ export class States extends React.Component {
               this.state.singleDelete !== "" &&
               
               this.state.singleDelete ? (
-                <Snackbar autoHideDuration={3000} severity="success" Showbutton={false}>
+                <Snackbar severity="success" Showbutton={false}>
                   State {this.state.singleDelete} deleted successfully!
                 </Snackbar>
               ) : null}
             {this.state.singleDelete === false ? (
-              <Snackbar autoHideDuration={3000} severity="error" Showbutton={false}>
+              <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
