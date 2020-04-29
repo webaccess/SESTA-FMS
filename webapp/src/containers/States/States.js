@@ -203,7 +203,6 @@ export class States extends React.Component {
       for (let i in selected){
         numberOfIsActive.push(selected[0]['is_active'])
       }this.setState({allIsActive: numberOfIsActive})
-      console.log("hddhhjd",selected[0]['is_active'])
        let IsActive = '';
        if (selected[0]['is_active'] === true){
         IsActive = false;
@@ -327,8 +326,6 @@ export class States extends React.Component {
     let columnsvalue = selectors[0];
     const { classes } = this.props;
     let filters = this.state.values;
-    console.log("kaise soye",this.state.allIsActive )
-     console.log("ek baar ",this.state.IsActive,this.state.setActiveId)
     return (
       <Layout>
         <Grid>
