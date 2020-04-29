@@ -8,7 +8,7 @@ import style from "./Fpos.module.css";
 import { Link } from "react-router-dom";
 import auth from "../../components/Auth/Auth.js";
 import Input from "../../components/UI/Input/Input";
-import AutoSuggest from "../../components/UI/Autosuggest/Autosuggest";
+import { map } from "lodash";
 import { Grid } from "@material-ui/core";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autocomplete from "../../components/Autocomplete/Autocomplete.js";
@@ -108,7 +108,7 @@ export class Fpos extends React.Component {
 
   handleStateChange = async (event, value, method) => {
     if (value !== null) {
-      this.setState({ filterState: value.id });
+      this.setState({ filterState: value });
 
       this.setState({
         isCancel: false,
@@ -146,8 +146,7 @@ export class Fpos extends React.Component {
 
   handleDistrictChange(event, value) {
     if (value !== null) {
-      this.setState({ filterDistrict: value.id });
-      let distId = value.id;
+      this.setState({ filterDistrict: value });
     } else {
       this.setState({
         filterDistrict: ""
@@ -157,7 +156,7 @@ export class Fpos extends React.Component {
 
   handleVillageChange(event, value) {
     if (value !== null) {
-      this.setState({ filterVillage: value.id });
+      this.setState({ filterVillage: value });
       this.setState({ isCancel: false });
     } else {
       this.setState({
@@ -240,14 +239,15 @@ export class Fpos extends React.Component {
   handleSearch() {
      let searchData = "";
     if (this.state.filterState) {
-      searchData += "state.id=" + this.state.filterState + "&&";
+      searchData += "state.id=" + this.state.filterState.id + "&&";
     }
     if (this.state.filterDistrict) {
-      searchData += "district.id=" + this.state.filterDistrict + "&&";
+      searchData += "district.id=" + this.state.filterDistrict.id + "&&";
     }
      if (this.state.filterFpo) {
       searchData += "name_contains=" + this.state.filterFpo;
     }
+    console.log("fpo module",searchData)
     axios
       .get(
         process.env.REACT_APP_SERVER_URL +
@@ -293,6 +293,23 @@ export class Fpos extends React.Component {
     let filterState = this.state.filterState;
     let districtsFilter = this.state.getDistrict;
     let filterDistrict = this.state.filterDistrict;
+
+    let addStates = [];
+    map(filterState, (state, key) => {
+      addStates.push(
+       statesFilter.findIndex(function (item, i) {
+          return item.id === state;
+        })
+      );
+    });
+    let addDistricts = [];
+    map(filterDistrict, (district, key) => {
+      addDistricts.push(
+       districtsFilter.findIndex(function (item, i) {
+          return item.id === district;
+        })
+      );
+    });
     return (
       <Layout>
         <Grid>
@@ -372,13 +389,7 @@ export class Fpos extends React.Component {
                       defaultValue={[]}
                       value={
                         filterState
-                          ? this.state.isCancel === true
-                            ? null
-                            : statesFilter[
-                                statesFilter.findIndex(function (item, i) {
-                                  return item.id === filterState;
-                                })
-                              ] || null
+                          ? filterState
                           : null
                       }
                       renderInput={(params) => (
@@ -407,13 +418,7 @@ export class Fpos extends React.Component {
                       }}
                       value={
                         filterDistrict
-                          ? this.state.isCancel === true
-                            ? null
-                            : districtsFilter[
-                                districtsFilter.findIndex(function (item, i) {
-                                  return item.id === filterDistrict;
-                                })
-                              ] || null
+                          ? filterDistrict
                           : null
                       }
                       renderInput={(params) => (

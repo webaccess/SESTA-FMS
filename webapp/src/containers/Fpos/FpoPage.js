@@ -136,7 +136,7 @@ class FpoPage extends Component {
   handleStateChange(event, value) {
     if (value !== null) {
       this.setState({
-        values: { ...this.state.values, addState: value.id },
+        values: { ...this.state.values, addState: value },
       });
       let stateId = value.id;
       axios
@@ -161,7 +161,7 @@ class FpoPage extends Component {
       this.setState({
         values: {
           ...this.state.values,
-          addState: "",
+          addState: "",addDistrict:"",
         },
       });
       this.setState({ stateSelected: false });
@@ -171,11 +171,14 @@ class FpoPage extends Component {
   handleDistrictChange(event, value) {
     if (value !== null) {
       this.setState({
-        values: { ...this.state.values, addDistrict: value.id },
+        values: { ...this.state.values, addDistrict: value },
       });
     } else {
       this.setState({
-        addDistrict: [],
+        values: {
+          ...this.state.values,
+          addDistrict: "",
+        },
       });
     }
   }
@@ -328,7 +331,25 @@ class FpoPage extends Component {
     let addState = this.state.values.addState;
     let districtFilter = this.state.getDistrict;
     let addDistrict = this.state.values.addDistrict;
-    console.log("values",addState,addDistrict,this.state.values.addState);
+    // console.log("values",addState,addDistrict,this.state.values.addState);
+
+    let addStates = [];
+    map(addState, (state, key) => {
+      addStates.push(
+       stateFilter.findIndex(function (item, i) {
+          return item.id === state;
+        })
+      );
+    });
+    let addDistricts = [];
+    map(addDistrict, (district, key) => {
+      addDistricts.push(
+       districtFilter.findIndex(function (item, i) {
+          return item.id === district;
+        })
+      );
+    });
+
     return (
       <Layout
         breadcrumbs={
@@ -389,12 +410,8 @@ class FpoPage extends Component {
                     defaultValue={[]}
                     value={
                       addState
-                        ? stateFilter[
-                            stateFilter.findIndex(function (item, i) {
-                              return item.id === addState;
-                            })
-                          ] || null
-                        : null
+                        ?  addState
+                        : []
                     }
                     error={this.hasError("addState")}
                     helperText={
@@ -426,12 +443,8 @@ class FpoPage extends Component {
                     defaultValue={[]}
                     value={
                       addDistrict
-                        ? districtFilter[
-                            districtFilter.findIndex(function (item, i) {
-                              return item.id === addDistrict;
-                            })
-                          ] || null
-                        : null
+                        ? addDistrict
+                        : []
                     }
                     error={this.hasError("addDistrict")}
                     helperText={
