@@ -340,7 +340,7 @@ const Table = props => {
               ) : (
                 <p>
                   {" "}
-                  {props.ActiveMessage} <b>{dataName}</b>?
+                  {props.ActiveMessage} <b>{dataName}</b>
                 </p>
               )}
             </Modal>

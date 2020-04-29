@@ -428,7 +428,10 @@ export class States extends React.Component {
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 DeleteMessage={"Are you Sure you want to Delete"}
-                ActiveMessage={"Are you Sure you want to set selected State Active"}
+                ActiveMessage={<p>
+                  {" "}
+                  Do you want to set selected <b>states</b> Active ?
+                </p>}
               />
             ) : (
                 <h1>Loading...</h1>
