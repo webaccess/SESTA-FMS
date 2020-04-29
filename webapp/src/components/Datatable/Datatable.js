@@ -332,17 +332,10 @@ const Table = props => {
                 displaySave: { display: "true" }
               }}
             >
-              {count.true > 0  ? (
                 <p>
                  {" "}
-                  Do you want to set selected <b>{props.title}</b> InActive ? 
+                  Are you sure you want to toggle the status ?
                 </p>
-              ) : (
-                <p>
-                  {" "}
-                  {props.ActiveMessage} <b>{dataName}</b>
-                </p>
-              )}
             </Modal>
       </div>
     </>

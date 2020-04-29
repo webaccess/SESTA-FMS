@@ -410,7 +410,6 @@ export class States extends React.Component {
                 showSearch={false}
                 filterData={true}
                 allIsActive={this.state.allIsActive}
-                // noDataComponent={"No Records To be shown"}
                 Searchplaceholder={"Search by State Name"}
                 filterBy={["name"]}
                 filters={filters}
@@ -425,10 +424,6 @@ export class States extends React.Component {
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 DeleteMessage={"Are you Sure you want to Delete"}
-                ActiveMessage={<p>
-                  {" "}
-                  Do you want to set selected <b>states</b> Active ?
-                </p>}
               />
             ) : (
                 <h1>Loading...</h1>
