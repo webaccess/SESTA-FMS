@@ -255,6 +255,10 @@ export class States extends React.Component {
     this.setState({IsActive: event.target.checked});
   };
 
+  handleClose = () => {
+   this.setState({ open: false })
+  };
+
   handleActive = (event) => {
      this.setState({isActiveAllShowing: false})
     let setActiveId = this.state.setActiveId;
@@ -275,6 +279,7 @@ export class States extends React.Component {
       )
       .then(res => {
         this.setState({ formSubmitted: true });
+        this.setState({ open: true })
         this.componentDidMount({ editData: true });
         this.props.history.push({ pathname: "/states", editData: true });
       })
@@ -340,18 +345,20 @@ export class States extends React.Component {
                 </Button>
               </div>
             </div>
+            {console.log("Thunder",this.state.open)}
             {this.props.location.addData ? (
               <Snackbar severity="success">
                 State added successfully.
               </Snackbar>
             ) : null}
             {this.props.location.editData ? (
-              <Snackbar severity="success">
+              <Snackbar open={this.state.open} autoHideDuration = {3000} onClose={this.handleClose} severity="success">
                 State edited successfully.
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
               this.state.singleDelete !== "" &&
+              
               this.state.singleDelete ? (
                 <Snackbar severity="success" Showbutton={false}>
                   State {this.state.singleDelete} deleted successfully!
@@ -421,7 +428,7 @@ export class States extends React.Component {
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 DeleteMessage={"Are you Sure you want to Delete"}
-                ActiveMessage={"Are you Sure you want to Deactivate selected State"}
+                ActiveMessage={"Are you Sure you want to set selected State Active"}
               />
             ) : (
                 <h1>Loading...</h1>

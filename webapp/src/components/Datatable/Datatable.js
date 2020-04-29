@@ -95,7 +95,6 @@ const Table = props => {
   let DataID = cellId;
 
   const editData = id => {
-    console.log("id==", id);
     props.editData(id);
   };
 
@@ -105,8 +104,6 @@ const Table = props => {
   };
 
    const handleActiveAllEvent = (event) => {
-    console.log("hsdhjsdsdhj",selected)
-    // props.handleA
     props.ActiveAll(row, selected,setisDeleteShowing(!isDeleteShowing))
     props.handleActive(selected,event);
   };
@@ -119,7 +116,7 @@ const Table = props => {
   const closeDeleteAllModalHandler = () => {
     setisDeleteAllShowing(!isDeleteAllShowing);
   };
-console.log("fdhjdsjhd",props.allIsActive)
+
   const closeActiveAllModalHandler = () => {
     setisActiveAllShowing(!isActiveAllShowing);
   };
@@ -243,17 +240,13 @@ console.log("fdhjdsjhd",props.allIsActive)
   if (props.column.length > 0) {
     columns = makeColumns(props.column);
   }
-  console.log("sdsdsd",selected)
   let valuesSelected = [];
   for (let i in selected){
     valuesSelected.push(selected[i]['is_active'])
   }
-  if(valuesSelected.includes("true")){
-console.log('true')
-  }else{
-  console.log('false')
-}
-  console.log('fresh hove ka MAZA',valuesSelected)
+  var count = {};
+  valuesSelected.forEach(function(i) { count[i] = (count[i]||0) + 1;});
+
   return (
     <>
       <div>
@@ -339,12 +332,10 @@ console.log('true')
                 displaySave: { display: "true" }
               }}
             >
-              {valuesSelected.indexOf("true") > -1 ? (
+              {count.true > 0  ? (
                 <p>
                  {" "}
-                  Do you want to set selected <b>{props.title}</b> Active ?
-                  
-                  
+                  Do you want to set selected <b>{props.title}</b> InActive ? 
                 </p>
               ) : (
                 <p>
