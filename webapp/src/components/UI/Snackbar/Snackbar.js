@@ -24,74 +24,82 @@ import style from "./Snackbar.module.css";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import Collapse from "@material-ui/core/Collapse";
+import { withStyles } from "@material-ui/core/styles";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="standard" {...props} />;
 }
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    width: "100%",
-    "& > * + *": {
-      marginTop: theme.spacing(2)
-    }
+const isDesktop = window.innerWidth > 500;
+
+export class CustomizedSnackbars extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      open: true,
+    };
   }
-}));
 
-export default function CustomizedSnackbars(props) {
-  const theme = useTheme();
-  const isDesktop = useMediaQuery(theme.breakpoints.up("lg"), {
-    defaultMatches: true
-  });
-  const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
-  const [showMobileSnackbar, setshowMobileSnackbar] = React.useState(true);
-  const openMobileSnackbar = isDesktop ? false : showMobileSnackbar;
-  const handleClick = () => {
-    setOpen(true);
+  handleClick = () => {
+    this.setState({ open: true });
   };
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpen(false);
+  handleClose = (event) => {
+    // if (reason === "clickaway") {
+    //   return;
+    // }
+    this.setState({ open: false });
   };
 
-  return (
-    <div className={classes.root}>
-      {props.Showbutton ? (
-        <Button variant="outlined" Showbutton={false} onClick={handleClick}>
-          {props.buttonMessage}
-        </Button>
-      ) : (
-        <p></p>
-      )}
-      <div className={!isDesktop ? "" : style.Hidden}>
-        <Snackbar open={props.open ? props.open : open} autoHideDuration={props.autoHideDuration ? props.autoHideDuration : 4000} onClose={props.onClose ? props.onClose : handleClose}>
-          <Alert onClose={props.onClick} severity={props.severity}>
-            {props.children}
-          </Alert>
-        </Snackbar>
-      </div>
-      <div className={isDesktop ? "" : style.Hidden}>
-        <Collapse in={props.open ? props.open : open}>
-          <Alert
-            severity={props.severity}
-            action={
-              <IconButton
-                aria-label="close"
-                color="inherit"
-                size="small"
-                onClick={props.onClick ? props.onClick : handleClose}
-              >
-                <CloseIcon fontSize="inherit" />
-              </IconButton>
-            }
+  render() {
+    const { classes } = this.props;
+    return (
+      <div>
+        {this.props.Showbutton ? (
+          <Button
+            variant="outlined"
+            Showbutton={false}
+            onClick={this.handleClick}
           >
-            {props.children}
-          </Alert>
-        </Collapse>
+            {this.props.buttonMessage}
+          </Button>
+        ) : (
+          <p></p>
+        )}
+        <div className={!isDesktop ? "" : style.Hidden}>
+          <Snackbar
+            open={this.state.open}
+            autoHideDuration={
+              this.props.autoHideDuration ? this.props.autoHideDuration : 3000
+            }
+            onClose={this.handleClose}
+          >
+            <Alert onClose={this.handleClose} severity={this.props.severity}>
+              {this.props.children}
+            </Alert>
+          </Snackbar>
+        </div>
+        <div className={isDesktop ? "" : style.Hidden}>
+          <Collapse in={this.state.open}>
+            <Alert
+              severity={this.props.severity}
+              action={
+                <IconButton
+                  aria-label="close"
+                  color="inherit"
+                  size="small"
+                  onClick={this.handleClose}
+                >
+                  <CloseIcon fontSize="inherit" />
+                </IconButton>
+              }
+            >
+              {this.props.children}
+            </Alert>
+          </Collapse>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
+
+export default CustomizedSnackbars;
