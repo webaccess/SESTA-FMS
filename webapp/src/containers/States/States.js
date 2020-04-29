@@ -205,7 +205,6 @@ export class States extends React.Component {
         numberOfIsActive.push(selected[0]["is_active"]);
       }
       this.setState({ allIsActive: numberOfIsActive });
-      console.log("hddhhjd", selected[0]["is_active"]);
       let IsActive = "";
       if (selected[0]["is_active"] === true) {
         IsActive = false;
@@ -228,8 +227,8 @@ export class States extends React.Component {
           )
           .then((res) => {
             this.setState({ formSubmitted: true });
-            this.componentDidMount({ editData: true });
-            this.props.history.push({ pathname: "/states", editData: true });
+            this.componentDidMount({ updateData: true });
+            this.props.history.push({ pathname: "/states", updateData: true });
             this.clearSelected(selected);
           })
           .catch((error) => {
@@ -286,8 +285,12 @@ export class States extends React.Component {
       .then((res) => {
         this.setState({ formSubmitted: true });
         this.setState({ open: true });
-        this.componentDidMount({ editData: true });
-        this.props.history.push({ pathname: "/states", editData: true });
+        this.componentDidMount({ updateData: true });
+        this.props.history.push({ pathname: "/states", updateData: true });
+         if (this.props.location.updateData && this.snackbar.current !== null) {
+      
+      this.snackbar.current.handleClick();
+    }
       })
       .catch((error) => {
         this.setState({ formSubmitted: false });
@@ -349,12 +352,8 @@ export class States extends React.Component {
     let columnsvalue = selectors[0];
     const { classes } = this.props;
     let filters = this.state.values;
-    console.log("kaise soye", this.state.allIsActive);
-    console.log("ek baar ", this.state.IsActive, this.state.setActiveId);
-    console.log("editData", this.props.location.editData);
-    if (this.props.location.editData && this.snackbar.current !== null) {
-      this.snackbar.current.handleClick();
-    }
+    console.log("editData", this.snackbar.current);
+
 
     return (
       <Layout>
@@ -368,11 +367,13 @@ export class States extends React.Component {
                 </Button>
               </div>
             </div>
-            {console.log("Thunder", this.state.open)}
             {this.props.location.addData ? (
               <Snackbar severity="success">State added successfully.</Snackbar>
             ) : null}
             {this.props.location.editData ? (
+              <Snackbar severity="success">State edited successfully.</Snackbar>
+            ) : null}
+            {this.props.location.updateData ? (
               <Snackbar
                 ref={this.snackbar}
                 open={true}
