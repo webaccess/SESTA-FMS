@@ -7,7 +7,8 @@ import { withStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
 import style from "./Villages.module.css";
 import { Grid } from "@material-ui/core";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autotext from "../../components/Autotext/Autotext";
+// import Autocomplete from "@material-ui/lab/Autocomplete";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
@@ -368,9 +369,11 @@ export class Villages extends React.Component {
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
-                    <Autocomplete
+                    <Autotext
                       id="combo-box-demo"
                       options={statesFilter}
+                      variant="outlined"
+                      label="Select State"
                       getOptionLabel={(option) => option.name}
                       onChange={(event, value) => {
                         this.handleStateChange(event, value);
@@ -390,7 +393,7 @@ export class Villages extends React.Component {
                         <Input
                           {...params}
                           fullWidth
-                          label="Select State"
+                          
                           name="addState"
                           variant="outlined"
                         />
@@ -402,10 +405,12 @@ export class Villages extends React.Component {
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
-                    <Autocomplete
+                    <Autotext
                       id="combo-box-demo"
+                      variant="outlined"
                       options={districtsFilter}
                       name="filterDistrict"
+                      label="Select District"
                       getOptionLabel={(option) => option.name}
                       onChange={(event, value) => {
                         this.handleDistrictChange(event, value);
@@ -425,7 +430,7 @@ export class Villages extends React.Component {
                         <Input
                           {...params}
                           fullWidth
-                          label="Select District"
+                          
                           name="filterDistrict"
                           variant="outlined"
                         />
