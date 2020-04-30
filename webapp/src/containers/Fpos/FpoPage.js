@@ -502,6 +502,7 @@ class FpoPage extends Component {
                   <Input
                     fullWidth
                     label="Email"
+                    type="email"
                     name="addEmail"
                     error={this.hasError("addEmail")}
                     helperText={
@@ -518,6 +519,7 @@ class FpoPage extends Component {
                   <Input
                     fullWidth
                     label="Phone"
+                    type="tel"
                     name="addPhone"
                     error={this.hasError("addPhone")}
                     helperText={
