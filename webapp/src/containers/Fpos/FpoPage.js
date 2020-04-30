@@ -210,13 +210,14 @@ class FpoPage extends Component {
     this.setState({ formSubmitted: "" });
     // if (Object.keys(this.state.errors).length > 0) return;
     let fpoName = this.state.values.addFpo;
-    let fpoState = this.state.values.addState;
-    let fpoDistrict = this.state.values.addDistrict;
+    let fpoState = this.state.values.addState["id"];
+    let fpoDistrict = this.state.values.addDistrict["id"];
     let fpoAddress = this.state.values.addAddress;
     let fpoBlock = this.state.values.addBlock;
     let fpoPersonInCharge = this.state.values.addPointOfContact;
     let fpoEmail = this.state.values.addEmail;
     let fpoPhone = this.state.values.addPhone;
+    console.log("fpo val",this.state.values.addState,this.state.values.addDistrict);
 
     if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {

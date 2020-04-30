@@ -128,6 +128,7 @@ export class Fpos extends React.Component {
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
+          console.log("getDistrict  data",res.data);
         })
         .catch((error) => {
           console.log(error);
