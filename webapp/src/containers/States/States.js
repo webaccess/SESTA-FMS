@@ -266,6 +266,10 @@ export class States extends React.Component {
     this.setState({ open: false });
   };
 
+  handleClose = () => {
+   this.setState({ open: false })
+  };
+
   handleActive = (event) => {
     this.setState({ isActiveAllShowing: false });
     let setActiveId = this.state.setActiveId;
@@ -287,10 +291,9 @@ export class States extends React.Component {
         this.setState({ open: true });
         this.componentDidMount({ updateData: true });
         this.props.history.push({ pathname: "/states", updateData: true });
-         if (this.props.location.updateData && this.snackbar.current !== null) {
-      
-      this.snackbar.current.handleClick();
-    }
+          if (this.props.location.updateData && this.snackbar.current !== null) {
+            this.snackbar.current.handleClick();
+          }
       })
       .catch((error) => {
         this.setState({ formSubmitted: false });
@@ -314,6 +317,7 @@ export class States extends React.Component {
   closeActiveAllModalHandler = (event) => {
     this.setState({ isActiveAllShowing: false });
   };
+  
   handleCheckBox = (event) => {
     this.setState({ [event.target.name]: event.target.checked });
     this.setState({ addIsActive: true });
@@ -377,7 +381,7 @@ export class States extends React.Component {
               <Snackbar
                 ref={this.snackbar}
                 open={true}
-                autoHideDuration={3000}
+                autoHideDuration={4000}
                 severity="success"
               >
                 State updated successfully.
@@ -439,7 +443,6 @@ export class States extends React.Component {
                 showSearch={false}
                 filterData={true}
                 allIsActive={this.state.allIsActive}
-                // noDataComponent={"No Records To be shown"}
                 Searchplaceholder={"Search by State Name"}
                 filterBy={["name"]}
                 filters={filters}

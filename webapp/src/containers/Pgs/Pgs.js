@@ -9,6 +9,7 @@ import style from "./Pgs.module.css";
 import { Grid } from "@material-ui/core";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
+import Modal from "../../components/UI/Modal/Modal.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Switch from "../../components/UI/Switch/Switch";
 
@@ -55,12 +56,14 @@ export class Pgs extends React.Component {
       values: {},
       data: [],
       DeleteData: false,
+      isActiveAllShowing: false,
       isCancel: false,
       singleDelete: "",
       multipleDelete: "",
       errorCode: "",
       successCode: "",
     };
+    this.snackbar = React.createRef();
   }
   async componentDidMount() {
     await axios
@@ -139,10 +142,18 @@ export class Pgs extends React.Component {
       values: { ...this.state.values, [target.name]: target.value },
     });
   };
+
+  confirmActive = (event) => {
+    this.setState({ isActiveAllShowing: true });
+    this.setState({ setActiveId: event.target.id });
+    this.setState({ IsActive: event.target.checked });
+  };
+
   handleActive = async (e) => {
+     this.setState({ isActiveAllShowing: false });
     this.setState({ successCode: "", errorCode: "" });
-    let setActiveId = e.target.id;
-    let IsActive = e.target.checked;
+    let setActiveId = this.state.setActiveId;
+    let IsActive = this.state.IsActive;
     await axios
       .put(
         process.env.REACT_APP_SERVER_URL + "tags/" + setActiveId,
@@ -168,7 +179,10 @@ export class Pgs extends React.Component {
             "Producer group " + res.data.name + " is " + isActive + ".",
         });
         this.componentDidMount();
-        this.props.history.push({ pathname: "/pgs", editData: true });
+        this.props.history.push({ pathname: "/pgs", updateData: true });
+        if (this.props.location.updateData && this.snackbar.current !== null) {
+            this.snackbar.current.handleClick();
+        }
       })
       .catch((error) => {
         this.setState({ formSubmitted: false });
@@ -188,6 +202,11 @@ export class Pgs extends React.Component {
         console.log(error);
       });
   };
+
+   closeActiveAllModalHandler = (event) => {
+    this.setState({ isActiveAllShowing: false });
+  };
+
   handleSearch() {
     let searchData = "";
     if (this.state.values.filterPg) {
@@ -227,7 +246,7 @@ export class Pgs extends React.Component {
           <Switch
             id={cell.id}
             onChange={(e) => {
-              this.handleActive(e);
+              this.confirmActive(e);
             }}
             defaultChecked={cell.is_active}
             Small={true}
@@ -258,18 +277,21 @@ export class Pgs extends React.Component {
                 </Button>
               </div>
             </div>
-            {this.props.location.addData ? (
-              <Snackbar severity="success">
-                Producer Group added successfully.
+           {this.props.location.addData ? (
+              <Snackbar severity="success">Producer Group added successfully.</Snackbar>
+            ) : null}
+            {this.props.location.editData ? (
+              <Snackbar severity="success">Producer Group edited successfully.</Snackbar>
+            ) : null}
+            {this.props.location.updateData ? (
+              <Snackbar
+                ref={this.snackbar}
+                open={true}
+                autoHideDuration={4000}
+                severity="success"
+              >
+                State updated successfully.
               </Snackbar>
-            ) : this.props.location.editData ? (
-              this.state.successCode !== "" ? (
-                <Snackbar severity="success">{this.state.successCode}</Snackbar>
-              ) : (
-                <Snackbar severity="success">
-                  Producer Group edited successfully.
-                </Snackbar>
-              )
             ) : null}
             {this.state.singleDelete !== false &&
             this.state.singleDelete !== "" &&
@@ -345,6 +367,24 @@ export class Pgs extends React.Component {
             ) : (
               <h1>Loading...</h1>
             )}
+             <Modal
+              className="modal"
+              show={this.state.isActiveAllShowing}
+              close={this.closeActiveAllModalHandler}
+              displayCross={{ display: "none" }}
+              handleEventChange={true}
+              event={this.handleActive}
+              footer={{
+                footerSaveName: "OKAY",
+                footerCloseName: "CLOSE",
+                displayClose: { display: "true" },
+                displaySave: { display: "true" },
+              }}
+            >
+              {this.state.IsActive
+                ? " Do you want to set selected Active ?"
+                : "Do you want to Deactivate selected State.?"}
+            </Modal>
           </div>
         </Grid>
       </Layout>
