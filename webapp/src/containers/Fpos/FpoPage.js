@@ -136,7 +136,7 @@ class FpoPage extends Component {
   handleStateChange(event, value) {
     if (value !== null) {
       this.setState({
-        values: { ...this.state.values, addState: value },
+        values: { ...this.state.values, addState: value.id },
       });
       let stateId = value.id;
       axios
@@ -161,7 +161,7 @@ class FpoPage extends Component {
       this.setState({
         values: {
           ...this.state.values,
-          addState: "",addDistrict:"",
+          addState: "",
         },
       });
       this.setState({ stateSelected: false });
@@ -171,14 +171,11 @@ class FpoPage extends Component {
   handleDistrictChange(event, value) {
     if (value !== null) {
       this.setState({
-        values: { ...this.state.values, addDistrict: value },
+        values: { ...this.state.values, addDistrict: value.id },
       });
     } else {
       this.setState({
-        values: {
-          ...this.state.values,
-          addDistrict: "",
-        },
+        addDistrict: [],
       });
     }
   }
@@ -210,14 +207,13 @@ class FpoPage extends Component {
     this.setState({ formSubmitted: "" });
     // if (Object.keys(this.state.errors).length > 0) return;
     let fpoName = this.state.values.addFpo;
-    let fpoState = this.state.values.addState["id"];
-    let fpoDistrict = this.state.values.addDistrict["id"];
+    let fpoState = this.state.values.addState;
+    let fpoDistrict = this.state.values.addDistrict;
     let fpoAddress = this.state.values.addAddress;
     let fpoBlock = this.state.values.addBlock;
     let fpoPersonInCharge = this.state.values.addPointOfContact;
     let fpoEmail = this.state.values.addEmail;
     let fpoPhone = this.state.values.addPhone;
-    console.log("fpo val",this.state.values.addState,this.state.values.addDistrict);
 
     if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
@@ -332,25 +328,7 @@ class FpoPage extends Component {
     let addState = this.state.values.addState;
     let districtFilter = this.state.getDistrict;
     let addDistrict = this.state.values.addDistrict;
-    // console.log("values",addState,addDistrict,this.state.values.addState);
-
-    let addStates = [];
-    map(addState, (state, key) => {
-      addStates.push(
-       stateFilter.findIndex(function (item, i) {
-          return item.id === state;
-        })
-      );
-    });
-    let addDistricts = [];
-    map(addDistrict, (district, key) => {
-      addDistricts.push(
-       districtFilter.findIndex(function (item, i) {
-          return item.id === district;
-        })
-      );
-    });
-
+    console.log("values",addState,addDistrict,this.state.values.addState);
     return (
       <Layout
         breadcrumbs={
@@ -411,8 +389,12 @@ class FpoPage extends Component {
                     defaultValue={[]}
                     value={
                       addState
-                        ?  addState
-                        : []
+                        ? stateFilter[
+                            stateFilter.findIndex(function (item, i) {
+                              return item.id === addState;
+                            })
+                          ] || null
+                        : null
                     }
                     error={this.hasError("addState")}
                     helperText={
@@ -444,8 +426,12 @@ class FpoPage extends Component {
                     defaultValue={[]}
                     value={
                       addDistrict
-                        ? addDistrict
-                        : []
+                        ? districtFilter[
+                            districtFilter.findIndex(function (item, i) {
+                              return item.id === addDistrict;
+                            })
+                          ] || null
+                        : null
                     }
                     error={this.hasError("addDistrict")}
                     helperText={

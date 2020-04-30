@@ -7,12 +7,13 @@ import { withStyles, ThemeProvider } from "@material-ui/core/styles";
 import style from "./Vos.module.css";
 import { Redirect, Route } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { map } from "lodash";
 import auth from "../../components/Auth/Auth.js";
 import Input from "../../components/UI/Input/Input";
 import AutoSuggest from "../../components/UI/Autosuggest/Autosuggest";
 import { Grid } from "@material-ui/core";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autocomplete from "../../components/Autocomplete/Autocomplete";
 
 import { createBrowserHistory } from "history";
 
@@ -148,10 +149,9 @@ export class Vos extends React.Component {
 
   handleStateChange = async (event, value, method) => {
     if (value !== null) {
-      this.setState({ filterState: value.id });
-
+      this.setState({ filterState: value});
       this.setState({
-        isCancel: false
+        isCancel: false,filterDistrict:'',
       });
 
       let stateId = value.id;
@@ -181,6 +181,7 @@ export class Vos extends React.Component {
         // fiterShg:""
         // selectedShg:""
       });
+      this.componentDidMount();
     }
   };
   handleChange = (event, value) => {
@@ -188,7 +189,7 @@ export class Vos extends React.Component {
   };
   handleDistrictChange(event, value) {
     if (value !== null) {
-      this.setState({ filterDistrict: value.id });
+      this.setState({ filterDistrict: value});
       let distId = value.id;
     } else {
       this.setState({
@@ -197,11 +198,12 @@ export class Vos extends React.Component {
         // fiterShg:""
         // selectedShg:""
       });
+      this.componentDidMount();
     }
   }
   handleVillageChange(event, value) {
     if (value !== null) {
-      this.setState({ filterVillage: value.id });
+      this.setState({ filterVillage: value });
       this.setState({ isCancel: false });
     } else {
       this.setState({
@@ -300,12 +302,12 @@ export class Vos extends React.Component {
     }
     if (this.state.filterState) {
       searchData += searchData ? "&" : "";
-      searchData += "shgs.state=" + this.state.filterState;
+      searchData += "shgs.state=" + this.state.filterState.id;
     }
 
     if (this.state.filterDistrict) {
       searchData += searchData ? "&" : "";
-      searchData += "shgs.district=" + this.state.filterDistrict;
+      searchData += "shgs.district=" + this.state.filterDistrict.id;
     }
 
     if (this.state.filterVillage) {
@@ -318,7 +320,7 @@ export class Vos extends React.Component {
       } else {
         searchData += searchData ? "&" : "";
       }
-      searchData += "shgs.villages=" + this.state.filterVillage;
+      searchData += "shgs.villages=" + this.state.filterVillage.id;
     }
     // } else {
     //   searchData += "shgs.villages=" + this.state.filterVillage;
@@ -367,6 +369,30 @@ export class Vos extends React.Component {
     let filterDistrict = this.state.filterDistrict;
     let villagesFilter = this.state.getVillage;
     let filterVillage = this.state.filterVillage;
+    let addStates = [];
+    map(filterState, (state, key) => {
+      addStates.push(
+        statesFilter.findIndex(function (item, i) {
+          return item.id === state;
+        })
+      );
+    });
+    let addDistricts = [];
+    map(filterDistrict, (district, key) => {
+      addDistricts.push(
+        districtsFilter.findIndex(function (item, i) {
+          return item.id === district;
+        })
+      );
+      let addVillages = [];
+      map(filterVillage, (village, key) => {
+        addVillages.push(
+          villagesFilter.findIndex(function (item, i) {
+            return item.id === village;
+          })
+        );
+      });
+    });
 
     return (
       <Layout>
@@ -460,11 +486,7 @@ export class Vos extends React.Component {
                         filterState
                           ? this.state.isCancel === true
                             ? null
-                            : statesFilter[
-                                statesFilter.findIndex(function(item, i) {
-                                  return item.id === filterState;
-                                })
-                              ] || null
+                            : filterState
                           : null
                       }
                       renderInput={params => (
@@ -496,11 +518,7 @@ export class Vos extends React.Component {
                         filterDistrict
                           ? this.state.isCancel === true
                             ? null
-                            : districtsFilter[
-                                districtsFilter.findIndex(function(item, i) {
-                                  return item.id === filterDistrict;
-                                })
-                              ] || null
+                            : filterDistrict
                           : null
                       }
                       renderInput={params => (
@@ -531,12 +549,8 @@ export class Vos extends React.Component {
                       value={
                         filterVillage
                           ? this.state.isCancel === true
-                            ? null
-                            : villagesFilter[
-                                villagesFilter.findIndex(function(item, i) {
-                                  return item.id === filterVillage;
-                                })
-                              ] || null
+                          ? null
+                          :filterVillage
                           : null
                       }
                       renderInput={params => (

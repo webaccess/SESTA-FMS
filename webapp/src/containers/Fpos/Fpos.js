@@ -104,14 +104,14 @@ export class Fpos extends React.Component {
       .catch((error) => {
         console.log(error);
       });
-    };
+  }
 
   handleStateChange = async (event, value, method) => {
     if (value !== null) {
       this.setState({ filterState: value });
-
       this.setState({
         isCancel: false,
+        filterDistrict: "",
       });
 
       let stateId = value.id;
@@ -128,7 +128,6 @@ export class Fpos extends React.Component {
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
-          console.log("getDistrict  data",res.data);
         })
         .catch((error) => {
           console.log(error);
@@ -150,10 +149,10 @@ export class Fpos extends React.Component {
       this.setState({ filterDistrict: value });
     } else {
       this.setState({
-        filterDistrict: ""
+        filterDistrict: "",
       });
     }
-  };
+  }
 
   handleVillageChange(event, value) {
     if (value !== null) {
@@ -161,10 +160,10 @@ export class Fpos extends React.Component {
       this.setState({ isCancel: false });
     } else {
       this.setState({
-        filterVillage: ""
+        filterVillage: "",
       });
-    } 
-  };
+    }
+  }
 
   editData = (cellid) => {
     this.props.history.push("/fpos/edit/" + cellid);
@@ -174,7 +173,7 @@ export class Fpos extends React.Component {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       axios
-         .delete(
+        .delete(
           process.env.REACT_APP_SERVER_URL +
             JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
             "s/" +
@@ -238,17 +237,16 @@ export class Fpos extends React.Component {
   };
 
   handleSearch() {
-     let searchData = "";
+    let searchData = "";
     if (this.state.filterState) {
       searchData += "state.id=" + this.state.filterState.id + "&&";
     }
     if (this.state.filterDistrict) {
       searchData += "district.id=" + this.state.filterDistrict.id + "&&";
     }
-     if (this.state.filterFpo) {
+    if (this.state.filterFpo) {
       searchData += "name_contains=" + this.state.filterFpo;
     }
-    console.log("fpo module",searchData)
     axios
       .get(
         process.env.REACT_APP_SERVER_URL +
@@ -257,14 +255,14 @@ export class Fpos extends React.Component {
           "&_sort=name:ASC",
         {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         }
       )
-      .then(res => {
+      .then((res) => {
         this.setState({ data: res.data });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log("err", err);
       });
   }
@@ -279,8 +277,7 @@ export class Fpos extends React.Component {
         name: "Name of the  Organization",
         selector: "name",
         sortable: true,
-       },
-      
+      },
     ];
 
     let selectors = [];
@@ -298,7 +295,7 @@ export class Fpos extends React.Component {
     let addStates = [];
     map(filterState, (state, key) => {
       addStates.push(
-       statesFilter.findIndex(function (item, i) {
+        statesFilter.findIndex(function (item, i) {
           return item.id === state;
         })
       );
@@ -306,7 +303,7 @@ export class Fpos extends React.Component {
     let addDistricts = [];
     map(filterDistrict, (district, key) => {
       addDistricts.push(
-       districtsFilter.findIndex(function (item, i) {
+        districtsFilter.findIndex(function (item, i) {
           return item.id === district;
         })
       );
@@ -315,33 +312,26 @@ export class Fpos extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-           <h1 className={style.title}>Manage Farmers Producer Organization</h1>
+            <h1 className={style.title}>
+              Manage Farmers Producer Organization
+            </h1>
             <div className={classes.row}>
               <div className={classes.buttonRow}>
-                <Button
-                  variant="contained"
-                  component={Link}
-                  to="/fpos/add"
-                >
+                <Button variant="contained" component={Link} to="/fpos/add">
                   Add FPO
                 </Button>
               </div>
             </div>
             {this.props.location.addFPO ? (
-              <Snackbar severity="success">
-                FPO added successfully.
-              </Snackbar>
+              <Snackbar severity="success">FPO added successfully.</Snackbar>
             ) : this.props.location.editFPO ? (
-              <Snackbar severity="success">
-                FPO edited successfully.
-              </Snackbar>
+              <Snackbar severity="success">FPO edited successfully.</Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
             this.state.singleDelete !== "" &&
             this.state.singleDelete ? (
               <Snackbar severity="success" Showbutton={false}>
-                FPO {this.state.singleDelete} deleted
-                successfully!
+                FPO {this.state.singleDelete} deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.singleDelete === false ? (
@@ -390,7 +380,9 @@ export class Fpos extends React.Component {
                       defaultValue={[]}
                       value={
                         filterState
-                          ? filterState
+                          ? this.state.isCancel === true
+                            ? null
+                            : filterState
                           : null
                       }
                       renderInput={(params) => (
@@ -419,7 +411,9 @@ export class Fpos extends React.Component {
                       }}
                       value={
                         filterDistrict
-                          ? filterDistrict
+                          ? this.state.isCancel === true
+                            ? null
+                            : filterDistrict
                           : null
                       }
                       renderInput={(params) => (
