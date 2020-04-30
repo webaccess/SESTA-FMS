@@ -10,7 +10,8 @@ import { Grid } from "@material-ui/core";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import Switch from "../../components/Switch/Switch";
+import Switch from "../../components/UI/Switch/Switch";
+
 const useStyles = (theme) => ({
   root: {},
   row: {
@@ -253,7 +254,8 @@ export class Pgs extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>Manage Producer Group
+            <h1 className={style.title}>
+              Manage Producer Group
               <div className={classes.floatRow}>
                 <div className={classes.buttonRow}>
                   <Button variant="contained" component={Link} to="/Pgs/add">
@@ -302,18 +304,14 @@ export class Pgs extends React.Component {
                 {this.state.errorCode}
               </Snackbar>
             ) : null}
-            {/* {this.state.formSubmitted === true ? (
-              <Snackbar severity="success" Showbutton={false}>
-                {this.state.successCode}
-              </Snackbar>
-            ) : null} */}
+            <br></br>
             <div className={classes.row}>
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
                     <Input
                       fullWidth
-                      label="Producer Group Name"
+                      label="Producer Group"
                       name="filterPg"
                       variant="outlined"
                       onChange={(event) => {
@@ -334,7 +332,7 @@ export class Pgs extends React.Component {
             </div>
             {data ? (
               <Table
-                title={"Villages"}
+                title={"Producer Group"}
                 showSearch={false}
                 filterData={true}
                 // noDataComponent={"No Records To be shown"}

@@ -1,8 +1,8 @@
 {
   "connection": "default",
-  "collectionName": "bank_details",
+  "collectionName": "bankdetails",
   "info": {
-    "name": "bank detail"
+    "name": "bankdetail"
   },
   "options": {
     "increments": true,
@@ -29,9 +29,9 @@
       "type": "string",
       "required": true
     },
-    "shg": {
-      "via": "bank_detail",
-      "model": "shg"
+    "organization": {
+      "via": "bankdetail",
+      "model": "organization"
     }
   }
 }
