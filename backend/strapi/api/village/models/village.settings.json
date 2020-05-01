@@ -23,8 +23,8 @@
       "via": "villages"
     },
     "state": {
-      "model": "state",
-      "via": "villages"
+      "via": "villages",
+      "model": "state"
     },
     "contacts": {
       "via": "villages",
