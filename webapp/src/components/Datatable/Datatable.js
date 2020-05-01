@@ -95,7 +95,7 @@ const Table = props => {
   let DataID = cellId;
 
   const editData = id => {
-    props.editData(id);
+    props.editData(id); 
   };
 
   const handleDeleteAllEvent = () => {
@@ -155,8 +155,8 @@ const Table = props => {
   ];
 
   const makeColumns = columns => {
-    for (let i in column) {
-      columns.push(column[i]);
+    for (let Usercolumns in column) {
+      columns.push(column[Usercolumns]);
     }
   };
 
@@ -166,12 +166,12 @@ const Table = props => {
   let filteredData = [];
   const [data, setData] = React.useState(props.filterBy);
   if (props.filterData) {
-    for (let i in data) {
+    for (let values in data) {
       filteredItems.push(
         props.data.filter(
           item =>
-            item[data[i]] &&
-            item[data[i]].toLowerCase().includes(filterText.toLowerCase())
+            item[data[values]] &&
+            item[data[values]].toLowerCase().includes(filterText.toLowerCase())
         )
       );
     }
@@ -179,9 +179,9 @@ const Table = props => {
       filteredData = filteredData.concat(filteredItems[i]);
     }
     let temp = [];
-    for (let i in filteredData) {
-      if (temp.indexOf(filteredData[i]) <= -1) {
-        temp.push(filteredData[i]);
+    for (let values in filteredData) {
+      if (temp.indexOf(filteredData[values]) <= -1) {
+        temp.push(filteredData[values]);
       }
     }
     filteredData = temp;
@@ -191,8 +191,8 @@ const Table = props => {
   const [resetPaginationToggle, setResetPaginationToggle] = React.useState();
 
   let selectedId = [];
-  for (let i in selected) {
-    selectedId.push(selected[i]["id"]);
+  for (let values in selected) {
+    selectedId.push(selected[values]["id"]);
   }
   let SelectedId = selectedId.join("");
   let SelectedIds = SelectedId.substring(0, SelectedId.length - 1);
@@ -241,8 +241,8 @@ const Table = props => {
     columns = makeColumns(props.column);
   }
   let valuesSelected = [];
-  for (let i in selected){
-    valuesSelected.push(selected[i]['is_active'])
+  for (let values in selected){
+    valuesSelected.push(selected[values]['is_active'])
   }
   var count = {};
   valuesSelected.forEach(function(i) { count[i] = (count[i]||0) + 1;});
