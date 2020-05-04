@@ -342,7 +342,6 @@ export class States extends React.Component {
                 </Button>
               </div>
             </div>
-            {console.log("Thunder",this.state.open)}
             {this.props.location.addData ? (
               <Snackbar severity="success">
                 State added successfully.
