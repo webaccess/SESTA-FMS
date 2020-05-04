@@ -105,7 +105,6 @@ const Table = props => {
 
    const handleActiveAllEvent = (event) => {
     props.ActiveAll(row, selected,setisDeleteShowing(!isDeleteShowing))
-    props.handleActive(selected,event);
   };
 
   const handleEditEvent = () => {
@@ -124,7 +123,6 @@ const Table = props => {
   let valueformodal = props.columnsvalue;
 
   const [isDeleteShowing, setisDeleteShowing] = React.useState(false);
-  const [isActiveShowing, setisActiveShowing] = React.useState(false);
   const [isDeleteAllShowing, setisDeleteAllShowing] = React.useState(false);
   const [isActiveAllShowing, setisActiveAllShowing] = React.useState(false);
 
@@ -161,7 +159,6 @@ const Table = props => {
   };
 
   const [filterText, setFilterText] = React.useState("");
-  const [noHeader, setNoHeader] = React.useState(true);
   let filteredItems = [];
   let filteredData = [];
   const [data, setData] = React.useState(props.filterBy);

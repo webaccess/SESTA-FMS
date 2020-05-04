@@ -7,13 +7,9 @@ import { withStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
 import style from "./States.module.css";
 import { Grid } from "@material-ui/core";
-import Autocomplete from "@material-ui/lab/Autocomplete";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Modal from "../../components/UI/Modal/Modal.js";
 import Switch from '../../components/UI/Switch/Switch';
 
@@ -202,14 +198,14 @@ export class States extends React.Component {
       let numberOfIsActive = [];
       for (let i in selected){
         numberOfIsActive.push(selected[0]['is_active'])
-      }this.setState({allIsActive: numberOfIsActive})
+      }
+      this.setState({allIsActive: numberOfIsActive})
        let IsActive = '';
        if (selected[0]['is_active'] === true){
         IsActive = false;
        }else{
         IsActive = true;
        }
-      let setActiveId = selectedId;
       for (let i in selectedId) {
       axios
         .put(
@@ -229,7 +225,6 @@ export class States extends React.Component {
           this.setState({ formSubmitted: true });
           this.componentDidMount({ editData: true });
           this.props.history.push({ pathname: "/states", editData: true });
-          this.clearSelected(selected);
         })
         .catch(error => {
           this.setState({ formSubmitted: false });
@@ -244,10 +239,6 @@ export class States extends React.Component {
     }
   };
 
-  clearSelected = (selected) =>{
-    let clearselected = '';
-  };
-
   confirmActive = (event) => {
     this.setState({isActiveAllShowing: true})
     this.setState({setActiveId: event.target.id});
@@ -259,7 +250,7 @@ export class States extends React.Component {
   };
 
   handleActive = (event) => {
-     this.setState({isActiveAllShowing: false})
+    this.setState({isActiveAllShowing: false})
     let setActiveId = this.state.setActiveId;
     let IsActive = this.state.IsActive;
     axios
@@ -293,7 +284,7 @@ export class States extends React.Component {
       });
   };
 
-   closeActiveAllModalHandler = (event) => {
+  closeActiveAllModalHandler = (event) => {
     this.setState({isActiveAllShowing: false});
    
   };
