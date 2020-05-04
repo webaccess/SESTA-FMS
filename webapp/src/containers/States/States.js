@@ -200,12 +200,7 @@ export class States extends React.Component {
         numberOfIsActive.push(selected[0]['is_active'])
       }
       this.setState({allIsActive: numberOfIsActive})
-       let IsActive = '';
-       if (selected[0]['is_active'] === true){
-        IsActive = false;
-       }else{
-        IsActive = true;
-       }
+       let IsActive = !(selected[0]['is_active']);
       for (let i in selectedId) {
       axios
         .put(
@@ -238,6 +233,9 @@ export class States extends React.Component {
       }
     }
   };
+  clearSelected = (selected) => {
+    selected =[];
+  }
 
   confirmActive = (event) => {
     this.setState({isActiveAllShowing: true})
