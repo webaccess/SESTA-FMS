@@ -104,10 +104,10 @@ const Table = props => {
     setSelectedRows([]);
   };
 
-   const handleActiveAllEvent = () => {
+   const handleActiveAllEvent = (event) => {
     props.ActiveAll(row, selected, setisDeleteShowing(!isDeleteShowing))
     setSelectedRows([]);
-  };
+ };
 
   const handleEditEvent = () => {
     setisDeleteShowing(!isDeleteShowing);
