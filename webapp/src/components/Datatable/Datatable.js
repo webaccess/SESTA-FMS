@@ -53,34 +53,34 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import { makeStyles } from "@material-ui/styles";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   editIcon: {
     color: "#028941",
     "&:hover": {
-      color: "#026430"
+      color: "#026430",
     },
     "&:active": {
-      color: "#03b053"
-    }
+      color: "#03b053",
+    },
   },
   deleteIcon: {
     color: "#e60000",
     "&:hover": {
-      color: "#b30000"
+      color: "#b30000",
     },
     "&:active": {
-      color: "#ff1a1a"
-    }
-  }
+      color: "#ff1a1a",
+    },
+  },
 }));
 
-const Table = props => {
+const Table = (props) => {
   const classes = useStyles();
   const [selectedRows, setSelectedRows] = React.useState([]);
-  const row = selectedRows.map(r => r.id);
+  const row = selectedRows.map((r) => r.id);
   const [cellId, setcellId] = React.useState([]);
   const [cellName, setcellName] = React.useState([]);
-  const handleChange = React.useCallback(state => {
+  const handleChange = React.useCallback((state) => {
     setSelectedRows(state.selectedRows);
   }, []);
   const deleteDataModal = (id, value) => {
@@ -94,8 +94,7 @@ const Table = props => {
   let dataName = cellName;
   let DataID = cellId;
 
-  const editData = id => {
-    console.log("id==", id);
+  const editData = (id) => {
     props.editData(id);
   };
 
@@ -104,11 +103,9 @@ const Table = props => {
     props.DeleteData(DataID, row);
   };
 
-   const handleActiveAllEvent = (event) => {
-    console.log("hsdhjsdsdhj",selected)
-    // props.handleA
-    props.ActiveAll(row, selected,setisDeleteShowing(!isDeleteShowing))
-    props.handleActive(selected,event);
+  const handleActiveAllEvent = (event) => {
+    props.ActiveAll(row, selected, setisDeleteShowing(!isDeleteShowing));
+    setSelectedRows([]);
   };
 
   const handleEditEvent = () => {
@@ -119,7 +116,7 @@ const Table = props => {
   const closeDeleteAllModalHandler = () => {
     setisDeleteAllShowing(!isDeleteAllShowing);
   };
-console.log("fdhjdsjhd",props.allIsActive)
+
   const closeActiveAllModalHandler = () => {
     setisActiveAllShowing(!isActiveAllShowing);
   };
@@ -127,25 +124,24 @@ console.log("fdhjdsjhd",props.allIsActive)
   let valueformodal = props.columnsvalue;
 
   const [isDeleteShowing, setisDeleteShowing] = React.useState(false);
-  const [isActiveShowing, setisActiveShowing] = React.useState(false);
   const [isDeleteAllShowing, setisDeleteAllShowing] = React.useState(false);
   const [isActiveAllShowing, setisActiveAllShowing] = React.useState(false);
 
   const column = [
     {
-      cell: cell => (
-        <div onClick={event => editData(cell.id)} id={cell.id}>
+      cell: (cell) => (
+        <div onClick={(event) => editData(cell.id)} id={cell.id}>
           <IconButton aria-label="edit" value={cell[valueformodal]}>
             <EditIcon className={classes.editIcon} />
           </IconButton>
         </div>
       ),
-      button: true
+      button: true,
     },
     {
-      cell: cell => (
+      cell: (cell) => (
         <div
-          onClick={event => deleteDataModal(cell.id, cell[valueformodal])}
+          onClick={(event) => deleteDataModal(cell.id, cell[valueformodal])}
           id={cell.id}
         >
           <IconButton aria-label="delete">
@@ -153,28 +149,27 @@ console.log("fdhjdsjhd",props.allIsActive)
           </IconButton>
         </div>
       ),
-      button: true
-    }
+      button: true,
+    },
   ];
 
-  const makeColumns = columns => {
-    for (let i in column) {
-      columns.push(column[i]);
+  const makeColumns = (columns) => {
+    for (let Usercolumns in column) {
+      columns.push(column[Usercolumns]);
     }
   };
 
   const [filterText, setFilterText] = React.useState("");
-  const [noHeader, setNoHeader] = React.useState(true);
   let filteredItems = [];
   let filteredData = [];
   const [data, setData] = React.useState(props.filterBy);
   if (props.filterData) {
-    for (let i in data) {
+    for (let values in data) {
       filteredItems.push(
         props.data.filter(
-          item =>
-            item[data[i]] &&
-            item[data[i]].toLowerCase().includes(filterText.toLowerCase())
+          (item) =>
+            item[data[values]] &&
+            item[data[values]].toLowerCase().includes(filterText.toLowerCase())
         )
       );
     }
@@ -182,9 +177,9 @@ console.log("fdhjdsjhd",props.allIsActive)
       filteredData = filteredData.concat(filteredItems[i]);
     }
     let temp = [];
-    for (let i in filteredData) {
-      if (temp.indexOf(filteredData[i]) <= -1) {
-        temp.push(filteredData[i]);
+    for (let values in filteredData) {
+      if (temp.indexOf(filteredData[values]) <= -1) {
+        temp.push(filteredData[values]);
       }
     }
     filteredData = temp;
@@ -194,13 +189,13 @@ console.log("fdhjdsjhd",props.allIsActive)
   const [resetPaginationToggle, setResetPaginationToggle] = React.useState();
 
   let selectedId = [];
-  for (let i in selected) {
-    selectedId.push(selected[i]["id"]);
+  for (let values in selected) {
+    selectedId.push(selected[values]["id"]);
   }
   let SelectedId = selectedId.join("");
   let SelectedIds = SelectedId.substring(0, SelectedId.length - 1);
 
-  const onFilter = e => {
+  const onFilter = (e) => {
     setFilterText(e.target.value);
   };
 
@@ -212,29 +207,28 @@ console.log("fdhjdsjhd",props.allIsActive)
     };
 
     const handleActive = () => {
-    setisActiveAllShowing(true);
-    setData(differenceBy(data, selectedRows, "name"));
+      setisActiveAllShowing(true);
+      setData(differenceBy(data, selectedRows, "name"));
     };
     return (
       <div>
-      <Button
-        key="delete"
-        onClick={handledelete}
-        style={{ backgroundColor: "#d63447", color: "white" }}
-      >
-        Delete
-      </Button>
-       &nbsp;&nbsp;&nbsp;
-      {props.showSetAllActive ? 
-       (<Button
-         key="active"
-         onClick={handleActive}
-         style={{ backgroundColor: "primary", color: "white" }}
+        <Button
+          key="delete"
+          onClick={handledelete}
+          style={{ backgroundColor: "#d63447", color: "white" }}
         >
-          Active
-        </Button>)
-         : null}
-      
+          Delete
+        </Button>
+        &nbsp;&nbsp;&nbsp;
+        {props.showSetAllActive ? (
+          <Button
+            key="active"
+            onClick={handleActive}
+            style={{ backgroundColor: "primary", color: "white" }}
+          >
+            Active
+          </Button>
+        ) : null}
       </div>
     );
   }, [data, selectedRows, toggleCleared]);
@@ -243,17 +237,15 @@ console.log("fdhjdsjhd",props.allIsActive)
   if (props.column.length > 0) {
     columns = makeColumns(props.column);
   }
-  console.log("sdsdsd",selected)
   let valuesSelected = [];
-  for (let i in selected){
-    valuesSelected.push(selected[i]['is_active'])
+  for (let values in selected) {
+    valuesSelected.push(selected[values]["is_active"]);
   }
-  if(valuesSelected.includes("true")){
-console.log('true')
-  }else{
-  console.log('false')
-}
-  console.log('fresh hove ka MAZA',valuesSelected)
+  var count = {};
+  valuesSelected.forEach(function (i) {
+    count[i] = (count[i] || 0) + 1;
+  });
+
   return (
     <>
       <div>
@@ -309,7 +301,7 @@ console.log('true')
             footerSaveName: "OKAY",
             footerCloseName: "CLOSE",
             displayClose: { display: "true" },
-            displaySave: { display: "true" }
+            displaySave: { display: "true" },
           }}
         >
           {selectedRows.length > 1 ? (
@@ -323,36 +315,24 @@ console.log('true')
               {props.DeleteMessage} <b>{dataName}</b> ?
             </p>
           )}
-            </Modal>
-            <Modal
-              className="modal"
-              show={isActiveAllShowing}
-              close={closeActiveAllModalHandler}
-              displayCross={{ display: "none" }}
-              handleEventChange={true}
-              event={handleActiveAllEvent}
-              handleActiveAllEvent={handleActiveAllEvent}
-              footer={{
-                footerSaveName: "OKAY",
-                footerCloseName: "CLOSE",
-                displayClose: { display: "true" },
-                displaySave: { display: "true" }
-              }}
-            >
-              {valuesSelected.indexOf("true") > -1 ? (
-                <p>
-                 {" "}
-                  Do you want to set selected <b>{props.title}</b> Active ?
-                  
-                  
-                </p>
-              ) : (
-                <p>
-                  {" "}
-                  {props.ActiveMessage} <b>{dataName}</b>?
-                </p>
-              )}
-            </Modal>
+        </Modal>
+        <Modal
+          className="modal"
+          show={isActiveAllShowing}
+          close={closeActiveAllModalHandler}
+          displayCross={{ display: "none" }}
+          handleEventChange={true}
+          event={handleActiveAllEvent}
+          handleActiveAllEvent={handleActiveAllEvent}
+          footer={{
+            footerSaveName: "OKAY",
+            footerCloseName: "CLOSE",
+            displayClose: { display: "true" },
+            displaySave: { display: "true" },
+          }}
+        >
+          <p> Are you sure you want to toggle the status ?</p>
+        </Modal>
       </div>
     </>
   );

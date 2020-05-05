@@ -196,14 +196,12 @@ export class Countries extends React.Component {
         numberOfIsActive.push(selected[0]["is_active"]);
       }
       this.setState({ allIsActive: numberOfIsActive });
-      console.log("hddhhjd", selected[0]["is_active"]);
       let IsActive = "";
       if (selected[0]["is_active"] === true) {
         IsActive = false;
       } else {
         IsActive = true;
       }
-      let setActiveId = selectedId;
       for (let i in selectedId) {
         axios
           .put(
@@ -221,7 +219,6 @@ export class Countries extends React.Component {
             this.setState({ formSubmitted: true });
             this.componentDidMount({ editData: true });
             this.props.history.push({ pathname: "/countries", editData: true });
-            this.clearSelected(selected);
           })
           .catch((error) => {
             this.setState({ formSubmitted: false });
@@ -244,14 +241,14 @@ export class Countries extends React.Component {
     }
   };
 
-  clearSelected = (selected) => {
-    let clearselected = "";
-  };
-
   confirmActive = (event) => {
     this.setState({ isActiveAllShowing: true });
     this.setState({ setActiveId: event.target.id });
     this.setState({ IsActive: event.target.checked });
+  };
+
+  handleClose = () => {
+    this.setState({ open: false });
   };
 
   handleActive = (event) => {
@@ -272,6 +269,7 @@ export class Countries extends React.Component {
       )
       .then((res) => {
         this.setState({ formSubmitted: true });
+        this.setState({ open: true });
         this.componentDidMount({ editData: true });
         this.props.history.push({ pathname: "/countries", editData: true });
       })
@@ -297,6 +295,7 @@ export class Countries extends React.Component {
   closeActiveAllModalHandler = (event) => {
     this.setState({ isActiveAllShowing: false });
   };
+
   handleCheckBox = (event) => {
     this.setState({ [event.target.name]: event.target.checked });
     this.setState({ addIsActive: true });
