@@ -6,7 +6,6 @@ import Button from "../../components/UI/Button/Button";
 import Input from "../../components/UI/Input/Input";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-
 import {
   Card,
   CardHeader,
@@ -25,6 +24,7 @@ class StatePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      addIsActive: false,
       values: {},
       validations: {
         addState: {
@@ -57,11 +57,12 @@ class StatePage extends Component {
           }
         )
         .then((res) => {
-          console.log(res.data);
           this.setState({
             values: {
               addState: res.data[0].name,
               active: res.data[0].is_active,
+              addAbbreviation: res.data[0].Abbreviation,
+              addIdentifier: res.data[0].Identifier
             },
           });
         })
@@ -69,7 +70,6 @@ class StatePage extends Component {
           console.log(error);
         });
     }
-    this.stateIds = this.state.values.addState;
   }
 
   handleChange = ({ target, event }) => {
@@ -155,6 +155,8 @@ class StatePage extends Component {
           {
             name: stateName,
             is_active: IsActive,
+            Abbreviation: abbreviation,
+            Identifier: identifier
           },
           {
             headers: {
