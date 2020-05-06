@@ -14,7 +14,6 @@ import {
 } from "@material-ui/core";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Autocomplete from "../../components/Autocomplete/Autocomplete.js";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
 import { ADD_VILLAGE_BREADCRUMBS, EDIT_VILLAGE_BREADCRUMBS } from "./config";
@@ -30,7 +29,6 @@ class VillagePage extends Component {
         addIsActive: false,
       },
       getState: [],
-      getContact:[],
       getDistrict: [],
       validations: {
         addVillage: {
@@ -81,7 +79,6 @@ class VillagePage extends Component {
               addIsActive: res.data[0].is_active,
               addDistrict: res.data[0].district.id,
               addState: res.data[0].state.id,
-              addContact:res.data[0].contacts
             },
           });
         })
@@ -122,20 +119,6 @@ class VillagePage extends Component {
     if (this.state.values.addState) {
       this.setState({ stateSelected: true });
     }
-    //api call for contacts filter
-    await axios
-    .get(process.env.REACT_APP_SERVER_URL + "contacts/", {
-      headers: {
-        Authorization: "Bearer " + auth.getToken() + "",
-      },
-    })
-    .then((res) => {
-      console.log("contactdata", res.data);
-      this.setState({ getContact: res.data });
-    })
-    .catch((error) => {
-      console.log(error);
-    });
   }
 
   handleChange = ({ target }) => {
@@ -203,25 +186,7 @@ class VillagePage extends Component {
     }
   }
 
-  handleContactChange(event, value) {
-    let contactValue = [];
-    let contactIds;
-    for (let i in value) {
-      contactIds = map(contactValue, (contact, key) => {
-        return contact.id;
-      });
-      if (contactIds.indexOf(value[i].id) <= -1) contactValue.push(value[i]);
-    }
-    if (value !== null) {
-      this.setState({
-        values: { ...this.state.values, addContact: contactValue },
-      });
-    } else {
-      this.setState({
-        values:{ ...this.state.values,addVillage: []}
-      });
-    }
-  }
+ 
 
   validate = () => {
     const values = this.state.values;
@@ -257,7 +222,6 @@ class VillagePage extends Component {
     let isActive = this.state.values.addIsActive;
     let districtId = this.state.values.addDistrict;
     let stateId = this.state.values.addState;
-    let contacts = this.state.values.addContact;
 
     if (this.state.editPage[0]) {
       // for edit data page
@@ -277,7 +241,6 @@ class VillagePage extends Component {
             state: {
               id: stateId,
             },
-            contacts:contacts,
           },
           {
             headers: {
@@ -322,7 +285,6 @@ class VillagePage extends Component {
             state: {
               id: stateId,
             },
-            contacts:contacts
           },
           {
             headers: {
@@ -367,19 +329,9 @@ class VillagePage extends Component {
     let addState = this.state.values.addState;
     let districtFilter = this.state.getDistrict;
     let addDistrict = this.state.values.addDistrict;
-    let addContact = this.state.values.addContact;
-    let contactsFilter = this.state.getContact;
 
-    let addContacts = [];
-    // if(addContact){
-    map(addContact, (contact, key) => {
-      addContacts.push(
-        contactsFilter.findIndex(function (item, i) {
-          return item.id === contact;
-        })
-      );
-    });
-  // }
+   
+  
     return (
       <Layout
         breadcrumbs={
@@ -551,43 +503,7 @@ class VillagePage extends Component {
                     )}
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
-                  <Autocomplete
-                    id="combo-box-demo"
-                    options={contactsFilter}
-                    multiple={true}
-                    variant="outlined"
-                    label="Select contacts"
-                    // name="addContact"
-                    getOptionLabel={(option) => (option ? option.name : "")}
-                    onChange={(event, value) => {
-                      this.handleContactChange(event, value);
-                    }}
-                    defaultValue={[]}
-                    value={
-                      addContact
-                        ? this.state.isCancel === true
-                          ? []
-                          : addContact
-                        : []
-                    }
-                    error={this.hasError("addContact")}
-                    renderInput={(params) => (
-                      <Input
-                        {...params}
-                        fullWidth
-                        label="Select Contacts"
-                        name="addContact"
-                        variant="outlined"
-                        helperText={
-                          this.hasError("addContact")
-                            ? this.state.errors.addContact[0]
-                            : null
-                        }
-                      />
-                    )}
-                  />
-                </Grid>
+                
               </Grid>
             </CardContent>
             <Divider />
