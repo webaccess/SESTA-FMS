@@ -238,7 +238,7 @@ class VillagePage extends Component {
             },
             state: {
               id: stateId,
-            },
+            }
           },
           {
             headers: {
@@ -282,7 +282,7 @@ class VillagePage extends Component {
             },
             state: {
               id: stateId,
-            },
+            }
           },
           {
             headers: {
