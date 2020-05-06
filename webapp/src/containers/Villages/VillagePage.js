@@ -32,13 +32,13 @@ class VillagePage extends Component {
       getDistrict: [],
       validations: {
         addVillage: {
-          required: { value: "true", message: "Village field required" },
+          required: { value: "true", message: "Village field is required" },
         },
         addState: {
-          required: { value: "true", message: "State field required" },
+          required: { value: "true", message: "State field is required" },
         },
         addDistrict: {
-          required: { value: "true", message: "District field required" },
+          required: { value: "true", message: "District field is required" },
         },
       },
       errors: {
@@ -186,8 +186,6 @@ class VillagePage extends Component {
     }
   }
 
- 
-
   validate = () => {
     const values = this.state.values;
     const validations = this.state.validations;
@@ -330,8 +328,6 @@ class VillagePage extends Component {
     let districtFilter = this.state.getDistrict;
     let addDistrict = this.state.values.addDistrict;
 
-   
-  
     return (
       <Layout
         breadcrumbs={
@@ -365,7 +361,7 @@ class VillagePage extends Component {
                     </Snackbar>
                   ) : null}
                 </Grid>
-                <Grid item md={6} xs={12}>
+                <Grid item md={12} xs={12}>
                   <Input
                     fullWidth
                     label="Village Name*"
@@ -411,19 +407,6 @@ class VillagePage extends Component {
                     value={this.state.values.addIdentifier || ""}
                     onChange={this.handleChange}
                     variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={this.state.values.addIsActive}
-                        onChange={this.handleCheckBox}
-                        name="addIsActive"
-                        color="primary"
-                      />
-                    }
-                    label="Active"
                   />
                 </Grid>
 
@@ -503,7 +486,19 @@ class VillagePage extends Component {
                     )}
                   />
                 </Grid>
-                
+                <Grid item md={6} xs={12}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={this.state.values.addIsActive}
+                        onChange={this.handleCheckBox}
+                        name="addIsActive"
+                        color="primary"
+                      />
+                    }
+                    label="Active"
+                  />
+                </Grid>
               </Grid>
             </CardContent>
             <Divider />
