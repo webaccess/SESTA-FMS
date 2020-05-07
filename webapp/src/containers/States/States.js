@@ -25,13 +25,6 @@ const useStyles = theme => ({
     height: "42px",
     marginTop: theme.spacing(1)
   },
-  spacer: {
-    flexGrow: 1
-  },
-  addButton: {
-    float: "right",
-    marginRight: theme.spacing(1)
-  },
   searchInput: {
     marginRight: theme.spacing(1)
   },
@@ -43,9 +36,6 @@ const useStyles = theme => ({
   },
   Search: {
     marginRight: theme.spacing(1)
-  },
-  Cancel: {
-    marginRight: theme.spacing(1)
   }
 });
 
@@ -55,25 +45,14 @@ export class States extends React.Component {
     this.state = {
       values: {},
       FilterState: "",
-      Result: [],
-      TestData: [],
       data: [],
-      selectedid: 0,
-      open: false,
-      isSetActive: false,
-      isSetInActive: false,
       isActiveAllShowing: false,
       columnsvalue: [],
       DeleteData: false,
-      properties: props,
-      getState: [],
-      getDistrict: [],
-      getVillage: [],
       isCancel: false,
       dataCellId: [],
       singleDelete: "",
       multipleDelete: "",
-      active: {},
       allIsActive: []
     };
   }
