@@ -66,8 +66,8 @@
       "dominant": true
     },
     "organization": {
-      "via": "contact",
-      "model": "organization"
+      "model": "organization",
+      "via": "contact"
     }
   }
 }

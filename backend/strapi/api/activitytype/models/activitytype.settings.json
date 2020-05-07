@@ -16,12 +16,6 @@
     "is_active": {
       "type": "boolean",
       "default": true
-    },
-    "remuneration": {
-      "type": "decimal"
-    },
-    "contact": {
-      "model": "contact"
     }
   }
 }

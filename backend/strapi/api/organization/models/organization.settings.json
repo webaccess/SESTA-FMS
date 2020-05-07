@@ -34,8 +34,8 @@
       "via": "organization"
     },
     "contact": {
-      "model": "contact",
-      "via": "organization"
+      "via": "organization",
+      "model": "contact"
     },
     "name": {
       "type": "string",

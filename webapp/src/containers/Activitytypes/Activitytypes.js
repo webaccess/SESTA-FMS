@@ -54,7 +54,7 @@ export class Activitytypes extends React.Component {
     super(props);
     this.state = {
       values: {},
-      filterCountry: "",
+      filterActivitytype: "",
       Result: [],
       data: [],
       selectedid: 0,
@@ -105,8 +105,8 @@ export class Activitytypes extends React.Component {
 
   handleSearch() {
     let searchData = "";
-    if (this.state.values.filterCountry) {
-      searchData += "name_contains=" + this.state.values.filterCountry;
+    if (this.state.values.filterActivitytype) {
+      searchData += "name_contains=" + this.state.values.filterActivitytype;
     }
     axios
       .get(
@@ -134,7 +134,7 @@ export class Activitytypes extends React.Component {
 
   cancelForm = () => {
     this.setState({
-      filterCountry: "",
+      filterActivitytype: "",
       values: {},
       formSubmitted: "",
       stateSelected: false,
@@ -308,7 +308,7 @@ export class Activitytypes extends React.Component {
     let data = this.state.data;
     const Usercolumns = [
       {
-        name: "Activity type",
+        name: "Activity Type",
         selector: "name",
         sortable: true,
       },
@@ -341,7 +341,7 @@ export class Activitytypes extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>Manage Activity types</h1>
+            <h1 className={style.title}>Manage Activity Types</h1>
             <div className={classes.row}>
               <div className={classes.buttonRow}>
                 <Button
@@ -349,7 +349,7 @@ export class Activitytypes extends React.Component {
                   component={Link}
                   to="/activitytypes/add"
                 >
-                  Add Activity type
+                  Add Activity Type
                 </Button>
               </div>
             </div>
@@ -377,7 +377,7 @@ export class Activitytypes extends React.Component {
             ) : null}
             {this.state.multipleDelete === true ? (
               <Snackbar severity="success" Showbutton={false}>
-                Activitytypes deleted successfully!
+                Activity types deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.multipleDelete === false ? (
@@ -392,13 +392,13 @@ export class Activitytypes extends React.Component {
                   <Grid item md={12} xs={12}>
                     <Input
                       fullWidth
-                      label="Activity type Name"
-                      name="filterCountry"
+                      label="Activity Type"
+                      name="filterActivitytype"
                       variant="outlined"
                       onChange={(event, value) => {
                         this.StateFilter(event, value);
                       }}
-                      value={this.state.values.filterCountry || ""}
+                      value={this.state.values.filterActivitytype || ""}
                     />
                   </Grid>
                 </div>
@@ -419,7 +419,7 @@ export class Activitytypes extends React.Component {
                 showSearch={false}
                 filterData={true}
                 allIsActive={this.state.allIsActive}
-                Searchplaceholder={"Search by Activitytype Name"}
+                Searchplaceholder={"Search by Activity Type Name"}
                 filterBy={["name"]}
                 filters={filters}
                 data={data}
@@ -434,7 +434,7 @@ export class Activitytypes extends React.Component {
                 columnsvalue={columnsvalue}
                 DeleteMessage={"Are you Sure you want to Delete"}
                 ActiveMessage={
-                  "Are you Sure you want to Deactivate selected Activity type"
+                  "Are you Sure you want to deactivate selected Activity type"
                 }
               />
             ) : (
