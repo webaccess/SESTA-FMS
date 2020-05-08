@@ -1,0 +1,26 @@
+{
+  "info": {
+    "name": "activity"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "start_datetime": {
+      "type": "datetime"
+    },
+    "end_datetime": {
+      "type": "datetime"
+    },
+    "description": {
+      "type": "text"
+    }
+  },
+  "connection": "default",
+  "collectionName": "activities"
+}
