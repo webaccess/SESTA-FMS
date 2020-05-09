@@ -8,12 +8,10 @@ import {
   MuiPickersUtilsProvider,
   KeyboardTimePicker,
 } from '@material-ui/pickers';
-import style from "./DatePicker.module.css";
 
 const TimnPicker = ({...props}) => {
   
   return (
-
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
        <Grid container>
           <KeyboardTimePicker
@@ -30,13 +28,14 @@ const TimnPicker = ({...props}) => {
     </MuiPickersUtilsProvider>
   );
 }
-     TimnPicker.propTypes = {
-      classes: PropTypes.object.isRequired,
-      labelText: PropTypes.node,
-      labelProps: PropTypes.object,
-      id: PropTypes.string.isRequired,
-      control: PropTypes.object,
-      onChange: PropTypes.func.isRequired,
-      variant: PropTypes.oneOf(['standard', 'outlined', 'filled']),
+ TimnPicker.propTypes = {
+  classes: PropTypes.object.isRequired,
+  labelText: PropTypes.node,
+  labelProps: PropTypes.object,
+  id: PropTypes.string.isRequired,
+  control: PropTypes.object,
+  onChange: PropTypes.func.isRequired,
+  variant: PropTypes.oneOf(['standard', 'outlined', 'filled']),
 };
+
 export default TimnPicker;
