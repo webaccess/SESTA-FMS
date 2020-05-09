@@ -6,7 +6,7 @@ import { withStyles } from "@material-ui/core/styles";
 import DateFnsUtils from '@date-io/date-fns';
 import {
   MuiPickersUtilsProvider,
-  KeyboardDatePicker,
+  KeyboardTimePicker,
 } from '@material-ui/pickers';
 import style from "./DatePicker.module.css";
 
