@@ -443,6 +443,42 @@ const modules = {
     order: 12,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
+   Activities: {
+    is_active: true,
+    icon_class: "people",
+    url: "/activities",
+    slug: "list_activity",
+    displayNavigation: true,
+    module: "", //slug
+
+    order: 4,
+
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Add Activity": {
+    is_active: true,
+    icon_class: "",
+    url: "/activity/add",
+    slug: "add_activity",
+    displayNavigation: false,
+    module: "", //slug
+
+    order: 5,
+
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Edit Activity": {
+    is_active: true,
+    icon_class: "",
+    url: "/activity/edit/:id",
+    slug: "edit_activity",
+    displayNavigation: false,
+    module: "", //slug
+
+    order: 5,
+
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
 };
 
 module.exports = Object.freeze({
