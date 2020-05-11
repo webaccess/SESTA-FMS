@@ -1,4 +1,6 @@
 {
+  "connection": "default",
+  "collectionName": "activities",
   "info": {
     "name": "activity"
   },
@@ -19,8 +21,10 @@
     },
     "description": {
       "type": "text"
+    },
+    "activitytype": {
+      "model": "activitytype",
+      "via": "activity"
     }
-  },
-  "connection": "default",
-  "collectionName": "activities"
+  }
 }
