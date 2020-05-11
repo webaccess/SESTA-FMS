@@ -1,0 +1,25 @@
+{
+  "connection": "default",
+  "collectionName": "activitytypes",
+  "info": {
+    "name": "Activitytype"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "is_active": {
+      "type": "boolean",
+      "required": true
+    },
+    "activity": {
+      "via": "activitytype",
+      "model": "activity"
+    }
+  }
+}
