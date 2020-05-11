@@ -82,9 +82,16 @@ const roles = {
         name: "village-organization",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
-
       {
         name: "tag",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "activity",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "activitytype",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
     ],
@@ -136,9 +143,16 @@ const roles = {
         name: "village-organization",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
-
       {
         name: "tag",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "activity",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "activitytype",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
     ],
@@ -190,9 +204,16 @@ const roles = {
         name: "village-organization",
         action: [],
       },
-
       {
         name: "tag",
+        action: [],
+      },
+      {
+        name: "activity",
+        action: [],
+      },
+      {
+        name: "activitytype",
         action: [],
       },
     ],
@@ -247,6 +268,14 @@ const roles = {
 
       {
         name: "tag",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "activity",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "activitytype",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
     ],
@@ -443,40 +472,34 @@ const modules = {
     order: 12,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
-   Activities: {
+  Activities: {
     is_active: true,
     icon_class: "people",
     url: "/activities",
     slug: "list_activity",
     displayNavigation: true,
     module: "", //slug
-
-    order: 4,
-
+    order: 13,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Add Activity": {
     is_active: true,
     icon_class: "",
-    url: "/activity/add",
+    url: "/activities/add",
     slug: "add_activity",
     displayNavigation: false,
     module: "", //slug
-
-    order: 5,
-
+    order: 14,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Edit Activity": {
     is_active: true,
     icon_class: "",
-    url: "/activity/edit/:id",
+    url: "/activities/edit/:id",
     slug: "edit_activity",
     displayNavigation: false,
     module: "", //slug
-
-    order: 5,
-
+    order: 14,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
 };

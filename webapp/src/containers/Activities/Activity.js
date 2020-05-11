@@ -245,7 +245,7 @@ export class Activity extends React.Component {
             <h1 className={style.title}>Manage Activities</h1>
             <div className={classes.row}>
               <div className={classes.buttonRow}>
-                <Button variant="contained" component={Link} to="/activity/add">
+                <Button variant="contained" component={Link} to="/activities/add">
                   Add Activity
                 </Button>
               </div>

@@ -26,7 +26,10 @@ import Account from "./containers/Account/Account";
 import ShgPage from "./containers/Shgs/ShgPage";
 import FpoPage from "./containers/Fpos/FpoPage";
 import Fpos from "./containers/Fpos/Fpos";
-import Activity from "./containers/Activity/Activity";
+import Activity from "./containers/Activities/Activity";
+import ActivityPage from "./containers/Activities/ActivityPage";
+
+
 
 function Routes() {
   return (
@@ -57,6 +60,12 @@ function Routes() {
             <PrivateRoute path="/village-organizations" component={Vos} exact />
             <PrivateRoute path="/villages" component={Villages} exact />
             <PrivateRoute path="/activities" component={Activity} exact />
+            <PrivateRoute path="/activities/add" component={ActivityPage} exact />
+            <PrivateRoute
+              path="/activities/edit/:id"
+              component={ActivityPage}
+              exact
+            />
             <PrivateRoute path="/shgs" component={Shgs} exact />
             <PrivateRoute path="/pgs" component={Pgs} exact />
             <PrivateRoute path="/pgs/add" component={PgPage} exact />
