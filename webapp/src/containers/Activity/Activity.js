@@ -3,6 +3,7 @@ import { Grid } from "@material-ui/core";
 import Layout from "../../hoc/Layout/Layout";
 import axios from "axios";
 import Table from "../../components/Datatable/Datatable.js";
+import { withStyles } from "@material-ui/core/styles";
 import Autocomplete from "../../components/Autocomplete/Autocomplete.js";
 import auth from "../../components/Auth/Auth.js";
 import style from "./Activity.module.css";
@@ -57,7 +58,7 @@ export class Activity extends React.Component {
       filterActivitytype:"",
       selectedDate: new Date(),
     };
-  }
+  };
 
    async componentDidMount() {
     await axios
@@ -68,7 +69,6 @@ export class Activity extends React.Component {
       })
       .then((res) => {
         this.setState({ data: res.data });
-        console.log("Result from Activites",res.data)
       });
        await axios
         .get(
@@ -86,7 +86,7 @@ export class Activity extends React.Component {
         .catch((error) => {
           console.log(error);
         });
-  }
+  };
 
   handleActivitytype = async (event, value) => {
     if (value !== null) {
@@ -102,7 +102,7 @@ export class Activity extends React.Component {
     this.setState({
       values: { ...this.state.values, [event.target.name]: event.target.value },
     });
-  }
+  };
 
   editData = (cellid) => {
     this.props.history.push("/activity/edit/" + cellid);
@@ -128,8 +128,8 @@ export class Activity extends React.Component {
           console.log(error);
         });
     }
-    // }
   };
+
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
@@ -155,6 +155,38 @@ export class Activity extends React.Component {
     }
   };
 
+  handleSearch(){
+    console.log("Handle Search")
+    let searchData = "";
+    if (this.state.filterActivitytype) {
+      searchData += "activitytype.id=" + this.state.filterActivitytype + "&&";
+    }
+    if (this.state.selectedDate) {
+      searchData += "start_datetime=" + this.state.selectedDate + "&&";
+    }
+    if (this.state.values.FilterActivity) {
+      searchData += "title_contains=" + this.state.values.FilterActivity;
+    }
+    console.log("Search",searchData)
+    axios
+      .get(
+        process.env.REACT_APP_SERVER_URL +
+          "activities?" +
+          searchData ,
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
+        }
+      )
+      .then((res) => {
+        this.setState({ data: res.data });
+      })
+      .catch((err) => {
+        console.log("err", err);
+      });
+  };
+
   cancelForm = () => {
     this.setState({
       filterActivitytype: "",
@@ -164,13 +196,7 @@ export class Activity extends React.Component {
       isCancel: true,
     });
     this.componentDidMount();
-    //routing code #route to village_list page
-  };
-
-
-  handleSearch(){
-    console.log("Handle Search")
-  }
+  };  
 
   render() {
 
@@ -188,7 +214,7 @@ export class Activity extends React.Component {
       },
       {
         name: "Date",
-        selector: "activitytype.name",
+        selector: "start_datetime",
         sortable: true,
       },
       {
@@ -202,7 +228,7 @@ export class Activity extends React.Component {
     for (let keys in Usercolumns) {
       selectors.push(Usercolumns[keys]["selector"]);
     }
-    const  classes  = this.props;
+    const  {classes}  = this.props;
     let columnsvalue = selectors[0];
     let ActivityTypeFilter = this.state.getActivitytype;
     let filterActivitytype = this.state.filterActivitytype;
@@ -211,6 +237,7 @@ export class Activity extends React.Component {
     let villagesFilter = this.state.getVillage;
     let filterVillage = this.state.filterVillage;
     let filters = this.state.values;
+    console.log("start_datetime",this.state.selectedDate)
     return (
      <Layout>
         <Grid>
@@ -246,7 +273,7 @@ export class Activity extends React.Component {
             ) : null}
             {this.state.multipleDelete === true ? (
               <Snackbar severity="success" Showbutton={false}>
-                Villages deleted successfully!
+                Activities deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.multipleDelete === false ? (
@@ -309,9 +336,10 @@ export class Activity extends React.Component {
                <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
-                   <DatePicker
-                   value={this.state.selectedDate}
-                   />
+                    <DatePicker
+                    value={this.state.selectedDate}
+                    onChange={value => this.setState({ selectedDate: value })}
+                  />
                   </Grid>
                   </div>
                   </div>
@@ -346,4 +374,4 @@ export class Activity extends React.Component {
     );
   }
 }
-export default Activity;
+export default withStyles(useStyles)(Activity);
