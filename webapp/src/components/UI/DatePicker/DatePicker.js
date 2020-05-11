@@ -21,7 +21,7 @@ const DatePicker = ({...props}) => {
           <KeyboardDatePicker
             id="date-picker-dialog"
             label="Date"
-            format="MM/dd/yyyy"
+            format={props.format ? props.format : "MM/dd/yyyy"}
             value={props.value ? props.value : selectedDate }
             inputVariant="outlined"
             onChange={props.onChange}
