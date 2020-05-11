@@ -69,6 +69,8 @@ export class Activity extends React.Component {
       })
       .then((res) => {
         this.setState({ data: res.data });
+        let d = new Date(res.data[0]["start_datetime"]);
+          console.log("dfjfajdfhsdf",d)
       });
        await axios
         .get(
@@ -156,13 +158,9 @@ export class Activity extends React.Component {
   };
 
   handleSearch(){
-    console.log("Handle Search")
     let searchData = "";
     if (this.state.filterActivitytype) {
       searchData += "activitytype.id=" + this.state.filterActivitytype + "&&";
-    }
-    if (this.state.selectedDate) {
-      searchData += "start_datetime=" + this.state.selectedDate + "&&";
     }
     if (this.state.values.FilterActivity) {
       searchData += "title_contains=" + this.state.values.FilterActivity;
@@ -213,13 +211,15 @@ export class Activity extends React.Component {
         sortable: true,
       },
       {
-        name: "Date",
+        name: "Start Date/Time",
         selector: "start_datetime",
+        format: row => `${row.start_datetime.slice(0, 10)} ${row.start_datetime.slice(11,16)}`,
         sortable: true,
       },
       {
-        name: "Time",
-        selector: "activitytype.name",
+        name: "End Date/Time",
+        selector: "end_datetime",
+        format: row => `${row.end_datetime.slice(0, 10)} ${row.end_datetime.slice(11,16)}`,
         sortable: true,
       },
     ];
@@ -333,26 +333,7 @@ export class Activity extends React.Component {
                   </Grid>
                 </div>
               </div>
-               <div className={classes.searchInput}>
-                <div className={style.Districts}>
-                  <Grid item md={12} xs={12}>
-                    <DatePicker
-                    value={this.state.selectedDate}
-                    onChange={value => this.setState({ selectedDate: value })}
-                  />
-                  </Grid>
-                </div>
-              </div>
-              <div className={classes.searchInput}>
-                <div className={style.Districts}>
-                  <Grid item md={12} xs={12}>
-                    <TimePicker
-                    value={this.state.selectedDate}
-                    onChange={value => this.setState({ selectedDate: value })}
-                  />
-                  </Grid>
-                </div>
-              </div>
+              
               <div className={classes.searchInput}></div>
               <br></br>
               <Button onClick={this.handleSearch.bind(this)}>Search</Button>
