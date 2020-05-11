@@ -10,7 +10,9 @@ import {
 } from '@material-ui/pickers';
 
 const TimnPicker = ({...props}) => {
-  
+
+  const [selectedTime, setSelectedDate] = React.useState(new Date());
+
   return (
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
        <Grid container>
@@ -18,7 +20,7 @@ const TimnPicker = ({...props}) => {
             id="time-picker"
             label="Time"
             inputVariant="outlined"
-            value={props.value}
+            value={props.value ? props.value : selectedTime}
             onChange={props.onChange}
             KeyboardButtonProps={{
               'aria-label': 'change time',
