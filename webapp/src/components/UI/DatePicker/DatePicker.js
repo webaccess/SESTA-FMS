@@ -11,7 +11,6 @@ import {
 import style from "./DatePicker.module.css";
 
 const DatePicker = ({...props}) => {
-
   const [selectedDate, setSelectedDate] = React.useState(new Date());
   
   return (
