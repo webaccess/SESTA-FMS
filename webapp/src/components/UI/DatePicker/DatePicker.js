@@ -11,6 +11,8 @@ import {
 import style from "./DatePicker.module.css";
 
 const DatePicker = ({...props}) => {
+
+  const [selectedDate, setSelectedDate] = React.useState(new Date());
   
   return (
     
@@ -20,7 +22,7 @@ const DatePicker = ({...props}) => {
             id="date-picker-dialog"
             label="Date"
             format="MM/dd/yyyy"
-            value={props.value}
+            value={props.value ? props.value : selectedDate }
             inputVariant="outlined"
             onChange={props.onChange}
             KeyboardButtonProps={{
