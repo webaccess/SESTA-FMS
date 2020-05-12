@@ -7,32 +7,28 @@ import DateFnsUtils from '@date-io/date-fns';
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
+  DateTimePicker
 } from '@material-ui/pickers';
-import style from "./DatePicker.module.css";
+import style from "./DateTimepicker.module.css";
 
-const DatePicker = ({...props}) => {
+const DateTimepicker = ({...props}) => {
   const [selectedDate, setSelectedDate] = React.useState(new Date());
   
   return (
     
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
       <Grid container>
-          <KeyboardDatePicker
-            id="date-picker-dialog"
-            label="Date"
-            format={props.format ? props.format : "MM/dd/yyyy"}
-            value={props.value ? props.value : selectedDate }
-            inputVariant="outlined"
-            onChange={props.onChange}
-            KeyboardButtonProps={{
-              'aria-label': 'change date',
-            }}
-          />
+        <DateTimePicker
+          label="DateTimePicker"
+          inputVariant="outlined"
+          value={props.value ? props.value : selectedDate }
+          onChange={props.onChange}
+        />
        </Grid>
     </MuiPickersUtilsProvider>
   );
 }
-     DatePicker.propTypes = {
+     DateTimepicker.propTypes = {
       classes: PropTypes.object.isRequired,
       labelText: PropTypes.node,
       labelProps: PropTypes.object,
@@ -41,4 +37,4 @@ const DatePicker = ({...props}) => {
       onChange: PropTypes.func.isRequired,
       variant: PropTypes.oneOf(['standard', 'outlined', 'filled']),
 };
-export default DatePicker;
+export default DateTimepicker;

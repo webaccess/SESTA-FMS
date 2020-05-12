@@ -11,8 +11,7 @@ import { Link } from "react-router-dom";
 import Input from "../../components/UI/Input/Input";
 import Button from "../../components/UI/Button/Button";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import DatePicker from "../../components/UI/DatePicker/DatePicker.js"
-import TimePicker from "../../components/UI/TimePicker/TimePicker.js"
+import DateTimepicker from "../../components/UI/DateTimepicker/DateTimepicker.js"
 
 const useStyles = (theme) => ({
   root: {},
@@ -258,7 +257,7 @@ export class Activity extends React.Component {
             <h1 className={style.title}>Manage Activities</h1>
             <div className={classes.row}>
               <div className={classes.buttonRow}>
-                <Button variant="contained" component={Link} to="/activities/add">
+                <Button variant="contained" component={Link} to="/activity/add">
                   Add Activity
                 </Button>
               </div>
@@ -346,7 +345,16 @@ export class Activity extends React.Component {
                   </Grid>
                 </div>
               </div>
-              
+              <div className={classes.searchInput}>
+                <div className={style.Districts}>
+                  <Grid item md={12} xs={12}>
+                    <DateTimepicker
+                      value={this.state.selectedDate}
+                      onChange={value => this.setState({ selectedDate: value })}
+                    />
+                    </Grid>
+                    </div>
+                    </div>
               <div className={classes.searchInput}></div>
               <br></br>
               <Button onClick={this.handleSearch.bind(this)}>Search</Button>
