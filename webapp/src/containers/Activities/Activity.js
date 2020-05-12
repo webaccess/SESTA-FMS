@@ -162,6 +162,9 @@ export class Activity extends React.Component {
     if (this.state.filterActivitytype) {
       searchData += "activitytype.id=" + this.state.filterActivitytype + "&&";
     }
+    if (this.state.selectedDate) {
+      searchData += "start_datetime=" + this.state.selectedDate.toISOString() + "&&";
+    }
     if (this.state.values.FilterActivity) {
       searchData += "title_contains=" + this.state.values.FilterActivity;
     }
@@ -190,6 +193,7 @@ export class Activity extends React.Component {
       filterActivitytype: "",
       values: {},
       formSubmitted: "",
+      selectedDate: new Date,
       stateSelected: false,
       isCancel: true,
     });
@@ -250,6 +254,7 @@ export class Activity extends React.Component {
     let villagesFilter = this.state.getVillage;
     let filterVillage = this.state.filterVillage;
     let filters = this.state.values;
+    console.log("Date/time",this.state.selectedDate)
     return (
      <Layout>
         <Grid>
@@ -347,8 +352,9 @@ export class Activity extends React.Component {
               </div>
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
-                  <Grid item md={12} xs={12}>
+                  <Grid item md={12} xs={14}>
                     <DateTimepicker
+                      label= "Date/Time"
                       value={this.state.selectedDate}
                       onChange={value => this.setState({ selectedDate: value })}
                     />

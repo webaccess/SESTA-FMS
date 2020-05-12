@@ -17,14 +17,12 @@ const DateTimepicker = ({...props}) => {
   return (
     
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
-      <Grid container>
-        <DateTimePicker
-          label="DateTimePicker"
-          inputVariant="outlined"
-          value={props.value ? props.value : selectedDate }
-          onChange={props.onChange}
-        />
-       </Grid>
+      <DateTimePicker
+        label={props.label}
+        inputVariant="outlined"
+        value={props.value ? props.value : selectedDate }
+        onChange={props.onChange}
+      />
     </MuiPickersUtilsProvider>
   );
 }
