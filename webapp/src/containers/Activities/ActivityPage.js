@@ -18,6 +18,7 @@ import { ADD_ACTIVITY_BREADCRUMBS, EDIT_ACTIVITY_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autotext from "../../components/Autotext/Autotext";
+import DateTimepicker from "../../components/UI/DateTimepicker/DateTimepicker.js";
 
 class ActivityPage extends Component {
   constructor(props) {
@@ -67,7 +68,7 @@ class ActivityPage extends Component {
           this.setState({
             values: {
               addTitle: res.data[0].title,
-              addActivitytype: res.data[0].activitytype,
+              addActivitytype: res.data[0].activitytype.id,
               addDescription: res.data[0].description,
               addStartDate: res.data[0].start_datetime,
               addEndDate: res.data[0].end_datetime,
@@ -79,7 +80,7 @@ class ActivityPage extends Component {
         });
     }
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "activitytypes/", {
+      .get(process.env.REACT_APP_SERVER_URL + "activitytypes?is_active=true", {
         headers: {
           Authorization: "Bearer " + auth.getToken() + "",
         },
@@ -144,6 +145,8 @@ class ActivityPage extends Component {
     let activityTitle = this.state.values.addTitle;
     let activityType = this.state.values.addActivitytype;
     let activityDescription = this.state.values.addDescription;
+    let activityStartDate = this.state.values.addStartDate.toISOString();
+    let activityEndDate = this.state.values.addEndDate.toISOString();
 
     if (this.state.editPage[0]) {
       // for edit data page
@@ -154,8 +157,11 @@ class ActivityPage extends Component {
             this.state.editPage[1],
           {
             title: activityTitle,
-            activitytype: activityType,
+            start_datetime:activityStartDate,
+            end_datetime:activityEndDate,
             description: activityDescription,
+            activitytype: activityType,
+           
           },
           {
             headers: {
@@ -165,7 +171,7 @@ class ActivityPage extends Component {
         )
         .then((res) => {
           this.setState({ formSubmitted: true });
-          this.props.history.push({ pathname: "/villages", editData: true });
+          this.props.history.push({ pathname: "/activities", editData: true });
         })
         .catch((error) => {
           this.setState({ formSubmitted: false });
@@ -186,14 +192,17 @@ class ActivityPage extends Component {
         });
     } else {
       //for add data page
+      console.log("add page",activityType,activityStartDate,activityEndDate)
       await axios
         .post(
           process.env.REACT_APP_SERVER_URL + "activities",
 
           {
             title: activityTitle,
-            activitytype: activityType,
+            start_datetime:activityStartDate,
+            end_datetime:activityEndDate,
             description: activityDescription,
+            activitytype: activityType,
           },
           {
             headers: {
@@ -204,7 +213,7 @@ class ActivityPage extends Component {
         .then((res) => {
           this.setState({ formSubmitted: true });
 
-          this.props.history.push({ pathname: "/villages", addData: true });
+          this.props.history.push({ pathname: "/activities", addData: true });
         })
         .catch((error) => {
           this.setState({ formSubmitted: false });
@@ -283,6 +292,22 @@ class ActivityPage extends Component {
                     value={this.state.values.addTitle || ""}
                     onChange={this.handleChange}
                     variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={3} xs={12}>
+                  <DateTimepicker
+                    label="Start Date/Time"
+                    name="addStartDate"
+                    value={this.state.values.addStartDate}
+                    onChange={value => this.setState({   values: { ...this.state.values, addStartDate: value}, })}
+                  />
+                </Grid>
+                <Grid item md={3} xs={12}>
+                  <DateTimepicker
+                    label="End Date/Time"
+                    name="addEndDate"
+                    value={this.state.values.addEndDate}
+                    onChange={value => this.setState({   values: { ...this.state.values, addEndDate: value}, })}
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
