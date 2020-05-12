@@ -70,7 +70,8 @@ export class Activity extends React.Component {
       .then((res) => {
         this.setState({ data: res.data });
         let d = new Date(res.data[0]["start_datetime"]);
-          console.log("dfjfajdfhsdf",d)
+        console.log(this.formatAMPM(d ));
+
       });
        await axios
         .get(
@@ -194,10 +195,23 @@ export class Activity extends React.Component {
       isCancel: true,
     });
     this.componentDidMount();
-  };  
+  };
+
+  formatAMPM(date) {
+  var hours = date.getHours();
+  console.log("SFs",hours)
+  var minutes = date.getMinutes();
+  var ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12;
+  hours = hours ? hours : 12 || 0; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  var strTime = hours + ':' + minutes + ' ' + ampm;
+  return strTime;
+}
+
 
   render() {
-
+    
     let data = this.state.data;
      const Usercolumns = [
       {
@@ -237,7 +251,6 @@ export class Activity extends React.Component {
     let villagesFilter = this.state.getVillage;
     let filterVillage = this.state.filterVillage;
     let filters = this.state.values;
-    console.log("start_datetime",this.state.selectedDate)
     return (
      <Layout>
         <Grid>
