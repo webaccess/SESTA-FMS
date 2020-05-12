@@ -50,16 +50,16 @@ const useStyles = (theme) => ({
 });
 
 export class Activity extends React.Component {
- constructor(props) {
+  constructor(props) {
     super(props);
     this.state = {
       values: {},
       data: [],
-      filterActivitytype:"",
+      filterActivitytype: "",
     };
   };
 
-   async componentDidMount() {
+  async componentDidMount() {
     await axios
       .get(process.env.REACT_APP_SERVER_URL + "activities", {
         headers: {
@@ -69,33 +69,31 @@ export class Activity extends React.Component {
       .then((res) => {
         this.setState({ data: res.data });
         let d = new Date(res.data[0]["start_datetime"]);
-        console.log(this.formatAMPM(d ));
-
       });
-       await axios
-        .get(
-          process.env.REACT_APP_SERVER_URL +
-            "activitytypes?is_active=true",
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
-        )
-        .then((res) => {
-          this.setState({ getActivitytype: res.data });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+    await axios
+      .get(
+        process.env.REACT_APP_SERVER_URL +
+        "activitytypes?is_active=true",
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
+        }
+      )
+      .then((res) => {
+        this.setState({ getActivitytype: res.data });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   handleActivitytype = async (event, value) => {
     if (value !== null) {
       this.setState({ filterActivitytype: value.id });
-    }else {
+    } else {
       this.setState({
-      filterActivitytype: "",
+        filterActivitytype: "",
       });
     }
   };
@@ -157,23 +155,22 @@ export class Activity extends React.Component {
     }
   };
 
-  handleSearch(){
+  handleSearch() {
     let searchData = "";
     if (this.state.filterActivitytype) {
       searchData += "activitytype.id=" + this.state.filterActivitytype + "&&";
     }
-    if (this.state.selectedDate) {
-      searchData += "start_datetime=" + this.state.selectedDate.toISOString() + "&&";
+    if (this.state.selectedStartDate) {
+      searchData += "start_datetime=" + this.state.selectedStartDateselectedStartDate.toISOString() + "&&";
     }
     if (this.state.values.FilterActivity) {
       searchData += "title_contains=" + this.state.values.FilterActivity;
     }
-    console.log("Search",searchData)
     axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-          "activities?" +
-          searchData ,
+        "activities?" +
+        searchData,
         {
           headers: {
             Authorization: "Bearer " + auth.getToken() + "",
@@ -193,7 +190,7 @@ export class Activity extends React.Component {
       filterActivitytype: "",
       values: {},
       formSubmitted: "",
-      selectedDate: new Date,
+      selectedStartDate: new Date,
       stateSelected: false,
       isCancel: true,
     });
@@ -201,22 +198,21 @@ export class Activity extends React.Component {
   };
 
   formatAMPM(date) {
-  var hours = date.getHours();
-  console.log("SFs",hours)
-  var minutes = date.getMinutes();
-  var ampm = hours >= 12 ? 'pm' : 'am';
-  hours = hours % 12;
-  hours = hours ? hours : 12 || 0; // the hour '0' should be '12'
-  minutes = minutes < 10 ? '0'+minutes : minutes;
-  var strTime = hours + ':' + minutes + ' ' + ampm;
-  return strTime;
-}
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12;
+    hours = hours ? hours : 12 || 0; // the hour '0' should be '12'
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    var strTime = hours + ':' + minutes + ' ' + ampm;
+    return strTime;
+  }
 
 
   render() {
-    
+
     let data = this.state.data;
-     const Usercolumns = [
+    const Usercolumns = [
       {
         name: "Activity",
         selector: "title",
@@ -230,13 +226,13 @@ export class Activity extends React.Component {
       {
         name: "Start Date/Time",
         selector: "start_datetime",
-        format: row => `${row.start_datetime.slice(0, 10)} ${row.start_datetime.slice(11,16)}`,
+        format: row => `${row.start_datetime.slice(0, 10)} ${row.start_datetime.slice(11, 16)}`,
         sortable: true,
       },
       {
         name: "End Date/Time",
         selector: "end_datetime",
-        format: row => `${row.end_datetime.slice(0, 10)} ${row.end_datetime.slice(11,16)}`,
+        format: row => `${row.end_datetime.slice(0, 10)} ${row.end_datetime.slice(11, 16)}`,
         sortable: true,
       },
     ];
@@ -245,18 +241,13 @@ export class Activity extends React.Component {
     for (let keys in Usercolumns) {
       selectors.push(Usercolumns[keys]["selector"]);
     }
-    const  {classes}  = this.props;
+    const { classes } = this.props;
     let columnsvalue = selectors[0];
     let ActivityTypeFilter = this.state.getActivitytype;
     let filterActivitytype = this.state.filterActivitytype;
-    let districtsFilter = this.state.getDistrict;
-    let filterDistrict = this.state.filterDistrict;
-    let villagesFilter = this.state.getVillage;
-    let filterVillage = this.state.filterVillage;
     let filters = this.state.values;
-    console.log("Date/time",this.state.selectedDate)
     return (
-     <Layout>
+      <Layout>
         <Grid>
           <div className="App">
             <h1 className={style.title}>Manage Activities</h1>
@@ -277,12 +268,12 @@ export class Activity extends React.Component {
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
-            this.state.singleDelete !== "" &&
-            this.state.singleDelete ? (
-              <Snackbar severity="success" Showbutton={false}>
-                Activity {this.state.singleDelete} deleted successfully!
-              </Snackbar>
-            ) : null}
+              this.state.singleDelete !== "" &&
+              this.state.singleDelete ? (
+                <Snackbar severity="success" Showbutton={false}>
+                  Activity {this.state.singleDelete} deleted successfully!
+                </Snackbar>
+              ) : null}
             {this.state.singleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
@@ -308,7 +299,7 @@ export class Activity extends React.Component {
                       label="Activity"
                       name="FilterActivity"
                       variant="outlined"
-                       onChange={(event, value) => {
+                      onChange={(event, value) => {
                         this.handleActiveChange(event, value);
                       }}
                       value={this.state.values.FilterActivity || ""}
@@ -331,10 +322,10 @@ export class Activity extends React.Component {
                           ? this.state.isCancel === true
                             ? null
                             : ActivityTypeFilter[
-                                ActivityTypeFilter.findIndex(function (item, i) {
-                                  return item.id === filterActivitytype;
-                                })
-                              ] || null
+                            ActivityTypeFilter.findIndex(function (item, i) {
+                              return item.id === filterActivitytype;
+                            })
+                            ] || null
                           : null
                       }
                       renderInput={(params) => (
@@ -354,13 +345,24 @@ export class Activity extends React.Component {
                 <div className={style.Districts}>
                   <Grid item md={12} xs={14}>
                     <DateTimepicker
-                      label= "Date/Time"
-                      value={this.state.selectedDate}
-                      onChange={value => this.setState({ selectedDate: value })}
+                      label="Start Date/Time"
+                      value={this.state.selectedStartDate}
+                      onChange={value => this.setState({ selectedStartDate: value })}
                     />
-                    </Grid>
-                    </div>
-                    </div>
+                  </Grid>
+                </div>
+              </div>
+              <div className={classes.searchInput}>
+                <div className={style.Districts}>
+                  <Grid item md={12} xs={14}>
+                    <DateTimepicker
+                      label="End Date/Time"
+                      value={this.state.selectedEndDate}
+                      onChange={value => this.setState({ selectedEndDate: value })}
+                    />
+                  </Grid>
+                </div>
+              </div>
               <div className={classes.searchInput}></div>
               <br></br>
               <Button onClick={this.handleSearch.bind(this)}>Search</Button>
@@ -369,7 +371,7 @@ export class Activity extends React.Component {
                 reset
               </Button>
             </div>
-           {data ? (
+            {data ? (
               <Table
                 title={"Activities"}
                 showSearch={false}
@@ -384,8 +386,8 @@ export class Activity extends React.Component {
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (
-              <h1>Loading...</h1>
-            )}
+                <h1>Loading...</h1>
+              )}
           </div>
         </Grid>
       </Layout>
