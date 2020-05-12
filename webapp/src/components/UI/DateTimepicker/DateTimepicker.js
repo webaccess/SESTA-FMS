@@ -12,9 +12,10 @@ import {
 import style from "./DateTimepicker.module.css";
 
 const DateTimepicker = ({ ...props }) => {
-  const [selectedDate, setSelectedDate] = React.useState(new Date());
+  const [selectedDate, setSelectedDate] = React.useState();
 
   return (
+
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
       <DateTimePicker
         label="DateTimePicker"
@@ -24,7 +25,7 @@ const DateTimepicker = ({ ...props }) => {
       />
     </MuiPickersUtilsProvider>
   );
-};
+}
 DateTimepicker.propTypes = {
   classes: PropTypes.object.isRequired,
   labelText: PropTypes.node,
@@ -32,6 +33,7 @@ DateTimepicker.propTypes = {
   id: PropTypes.string.isRequired,
   control: PropTypes.object,
   onChange: PropTypes.func.isRequired,
-  variant: PropTypes.oneOf(["standard", "outlined", "filled"]),
+  variant: PropTypes.oneOf(['standard', 'outlined', 'filled']),
 };
+
 export default DateTimepicker;
