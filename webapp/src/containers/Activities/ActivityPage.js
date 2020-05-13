@@ -65,11 +65,6 @@ class ActivityPage extends Component {
           }
         )
         .then((res) => {
-          let rawStartDate = res.data[0].start_datetime;
-          let rawEndDate = res.data[0].end_datetime;
-          rawStartDate = rawStartDate.toISOString();
-          rawEndDate = rawEndDate.toUTCString();
-          console.log("raw dates", rawStartDate, rawEndDate);
           this.setState({
             values: {
               addTitle: res.data[0].title,
@@ -150,9 +145,30 @@ class ActivityPage extends Component {
     let activityTitle = this.state.values.addTitle;
     let activityType = this.state.values.addActivitytype;
     let activityDescription = this.state.values.addDescription;
-    let activityStartDate = this.state.values.addStartDate.toISOString();
-    let activityEndDate = this.state.values.addEndDate.toISOString();
-
+    const dateRegx = new RegExp(
+      "d{4}-[01]{1}d{1}-[0-3]{1}d{1}T[0-2]{1}d{1}:[0-6]{1}d{1}:[0-6]{1}d{1}Z"
+    );
+    let rawStartDate = new Date(this.state.values.addStartDate);
+    let rawEndDate = new Date(this.state.values.addEndDate);
+    let activityStartDate;
+    let activityEndDate;
+    if (
+      !dateRegx.test(this.state.values.addStartDate) &&
+      !dateRegx.test(this.state.values.addEndDate)
+    ) {
+      console.log("activityStartDate", rawStartDate);
+      activityStartDate = rawStartDate.toUTCString();
+      activityEndDate = rawEndDate.toUTCString();
+      console.log("activityStartDate  2", activityStartDate, activityEndDate);
+    } else if (!dateRegx.test(this.state.values.addEndDate)) {
+      console.log("activityEndDate", rawEndDate);
+      activityEndDate = rawEndDate.toUTCString();
+      console.log("activityEndDate  2", activityEndDate);
+    } else {
+      console.log("else dates", rawEndDate);
+      activityStartDate = this.state.values.addStartDate.toISOString();
+      activityEndDate = this.state.values.addEndDate.toISOString();
+    }
     if (this.state.editPage[0]) {
       // for edit data page
       await axios

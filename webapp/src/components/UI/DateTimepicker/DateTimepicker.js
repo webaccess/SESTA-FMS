@@ -12,15 +12,17 @@ import {
 import style from "./DateTimepicker.module.css";
 
 const DateTimepicker = ({ ...props }) => {
+  const [clearedDate, handleClearedDateChange] = React.useState(null);
   const [selectedDate, setSelectedDate] = React.useState();
 
   return (
 
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
       <DateTimePicker
-        label="label"
+        clearable
+        label={props.label}
         inputVariant="outlined"
-        value={props.value ? props.value : selectedDate}
+        value={props.value ? props.value : clearedDate}
         onChange={props.onChange}
       />
     </MuiPickersUtilsProvider>
