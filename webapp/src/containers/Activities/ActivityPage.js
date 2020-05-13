@@ -65,6 +65,11 @@ class ActivityPage extends Component {
           }
         )
         .then((res) => {
+          let rawStartDate = res.data[0].start_datetime;
+          let rawEndDate = res.data[0].end_datetime;
+          rawStartDate = rawStartDate.toISOString();
+          rawEndDate = rawEndDate.toUTCString();
+          console.log("raw dates", rawStartDate, rawEndDate);
           this.setState({
             values: {
               addTitle: res.data[0].title,
@@ -157,11 +162,10 @@ class ActivityPage extends Component {
             this.state.editPage[1],
           {
             title: activityTitle,
-            start_datetime:activityStartDate,
-            end_datetime:activityEndDate,
+            start_datetime: activityStartDate,
+            end_datetime: activityEndDate,
             description: activityDescription,
             activitytype: activityType,
-           
           },
           {
             headers: {
@@ -192,15 +196,14 @@ class ActivityPage extends Component {
         });
     } else {
       //for add data page
-      console.log("add page",activityType,activityStartDate,activityEndDate)
       await axios
         .post(
           process.env.REACT_APP_SERVER_URL + "activities",
 
           {
             title: activityTitle,
-            start_datetime:activityStartDate,
-            end_datetime:activityEndDate,
+            start_datetime: activityStartDate,
+            end_datetime: activityEndDate,
             description: activityDescription,
             activitytype: activityType,
           },
@@ -299,7 +302,11 @@ class ActivityPage extends Component {
                     label="Start Date/Time"
                     name="addStartDate"
                     value={this.state.values.addStartDate}
-                    onChange={value => this.setState({   values: { ...this.state.values, addStartDate: value}, })}
+                    onChange={(value) =>
+                      this.setState({
+                        values: { ...this.state.values, addStartDate: value },
+                      })
+                    }
                   />
                 </Grid>
                 <Grid item md={3} xs={12}>
@@ -307,7 +314,11 @@ class ActivityPage extends Component {
                     label="End Date/Time"
                     name="addEndDate"
                     value={this.state.values.addEndDate}
-                    onChange={value => this.setState({   values: { ...this.state.values, addEndDate: value}, })}
+                    onChange={(value) =>
+                      this.setState({
+                        values: { ...this.state.values, addEndDate: value },
+                      })
+                    }
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
@@ -339,7 +350,7 @@ class ActivityPage extends Component {
                     renderInput={(params) => (
                       <Input
                         fullWidth
-                        label="Select State*"
+                        label="Select Activity Type*"
                         name="addActivitytype"
                         variant="outlined"
                       />
