@@ -17,9 +17,9 @@
       "type": "boolean",
       "required": true
     },
-    "activity": {
+    "activities": {
       "via": "activitytype",
-      "model": "activity"
+      "collection": "activity"
     }
   }
 }
