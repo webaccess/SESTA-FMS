@@ -18,7 +18,7 @@ const DateTimepicker = ({ ...props }) => {
 
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
       <DateTimePicker
-        label="DateTimePicker"
+        label="label"
         inputVariant="outlined"
         value={props.value ? props.value : selectedDate}
         onChange={props.onChange}
