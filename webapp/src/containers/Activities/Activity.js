@@ -160,9 +160,6 @@ export class Activity extends React.Component {
     if (this.state.filterActivitytype) {
       searchData += "activitytype.id=" + this.state.filterActivitytype + "&&";
     }
-    if (this.state.selectedStartDate) {
-      searchData += "start_datetime=" + this.state.selectedStartDateselectedStartDate.toISOString() + "&&";
-    }
     if (this.state.values.FilterActivity) {
       searchData += "title_contains=" + this.state.values.FilterActivity;
     }
@@ -190,24 +187,11 @@ export class Activity extends React.Component {
       filterActivitytype: "",
       values: {},
       formSubmitted: "",
-      selectedStartDate: new Date,
       stateSelected: false,
       isCancel: true,
     });
     this.componentDidMount();
   };
-
-  formatAMPM(date) {
-    var hours = date.getHours();
-    var minutes = date.getMinutes();
-    var ampm = hours >= 12 ? 'pm' : 'am';
-    hours = hours % 12;
-    hours = hours ? hours : 12 || 0; // the hour '0' should be '12'
-    minutes = minutes < 10 ? '0' + minutes : minutes;
-    var strTime = hours + ':' + minutes + ' ' + ampm;
-    return strTime;
-  }
-
 
   render() {
 
@@ -226,13 +210,13 @@ export class Activity extends React.Component {
       {
         name: "Start Date/Time",
         selector: "start_datetime",
-        format: row => `${row.start_datetime.slice(0, 10)} ${row.start_datetime.slice(11, 16)}`,
+        format: row => `${new Date(row.start_datetime).toLocaleString()}`,
         sortable: true,
       },
       {
         name: "End Date/Time",
         selector: "end_datetime",
-        format: row => `${row.end_datetime.slice(0, 10)} ${row.end_datetime.slice(11, 16)}`,
+        format: row => `${new Date(row.end_datetime).toLocaleString()}`,
         sortable: true,
       },
     ];
@@ -341,28 +325,6 @@ export class Activity extends React.Component {
                           variant="outlined"
                         />
                       )}
-                    />
-                  </Grid>
-                </div>
-              </div>
-              <div className={classes.searchInput}>
-                <div className={style.Districts}>
-                  <Grid item md={12} xs={14}>
-                    <DateTimepicker
-                      label="Start Date/Time"
-                      value={this.state.selectedStartDate}
-                      onChange={value => this.setState({ selectedStartDate: value })}
-                    />
-                  </Grid>
-                </div>
-              </div>
-              <div className={classes.searchInput}>
-                <div className={style.Districts}>
-                  <Grid item md={12} xs={14}>
-                    <DateTimepicker
-                      label="End Date/Time"
-                      value={this.state.selectedEndDate}
-                      onChange={value => this.setState({ selectedEndDate: value })}
                     />
                   </Grid>
                 </div>

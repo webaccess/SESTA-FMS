@@ -12,7 +12,7 @@ import {
 import style from "./DateTimepicker.module.css";
 
 const DateTimepicker = ({ ...props }) => {
-   const [clearedDate, handleClearedDateChange] = React.useState(null);
+  const [clearedDate, handleClearedDateChange] = React.useState(null);
   const [selectedDate, setSelectedDate] = React.useState();
 
   return (
