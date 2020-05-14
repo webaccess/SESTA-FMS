@@ -72,8 +72,8 @@ class ActivityPage extends Component {
               addTitle: res.data[0].title,
               addActivitytype: res.data[0].activitytype.id,
               addDescription: res.data[0].description,
-              addStartDate: startDate.toUTCString(),
-              addEndDate: endDate.toUTCString(),
+              addStartDate: startDate,
+              addEndDate: endDate,
             },
           });
         })
@@ -147,11 +147,12 @@ class ActivityPage extends Component {
     let activityTitle = this.state.values.addTitle;
     let activityType = this.state.values.addActivitytype;
     let activityDescription = this.state.values.addDescription;
-    let activityStartDate ;
-    let activityEndDate;
-    if(this.state.values.addStartDate && this.state.values.addEndDate){
-     activityStartDate = new Date(this.state.values.addStartDate).toISOString();
-     activityEndDate = new Date(this.state.values.addEndDate).toISOString();
+    let activityStartDate = new Date(
+      this.state.values.addStartDate
+    ).toISOString();
+    let activityEndDate = null;
+    if (this.state.values.addEndDate !== undefined) {
+      activityEndDate = new Date(this.state.values.addEndDate).toISOString();
     }
     if (this.state.editPage[0]) {
       // for edit data page
