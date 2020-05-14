@@ -69,15 +69,13 @@ class ActivityPage extends Component {
           }
         )
         .then((res) => {
-          const startDate = new Date(res.data[0].start_datetime);
-          const endDate = new Date(res.data[0].end_datetime);
           this.setState({
             values: {
               addTitle: res.data[0].title,
               addActivitytype: res.data[0].activitytype.id,
               addDescription: res.data[0].description,
-              addStartDate: startDate,
-              addEndDate: endDate,
+              addStartDate: res.data[0].start_datetime,
+              addEndDate: res.data[0].end_datetime,
             },
           });
         })
@@ -121,6 +119,7 @@ class ActivityPage extends Component {
   }
 
   validate = () => {
+    const startDateTime = this.state.values.addStartDate;
     const values = this.state.values;
     const validations = this.state.validations;
     map(validations, (validation, key) => {
