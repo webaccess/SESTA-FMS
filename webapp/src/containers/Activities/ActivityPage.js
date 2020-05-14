@@ -39,6 +39,8 @@ class ActivityPage extends Component {
             message: "Activity type field is required",
           },
         },
+        
+        
       },
       errors: {
         addTitle: [],
@@ -140,6 +142,13 @@ class ActivityPage extends Component {
         : false;
     }
   };
+  dateValidation(actStart,actEnd){
+    if(actStart<=actEnd){
+      return true;
+    }else{
+      return false;
+    }
+  }
 
   handleSubmit = async (e) => {
     e.preventDefault();
@@ -157,6 +166,7 @@ class ActivityPage extends Component {
     if (this.state.values.addEndDate !== undefined) {
       activityEndDate = new Date(this.state.values.addEndDate).toISOString();
     }
+    if(this.dateValidation(activityStartDate,activityEndDate)){
     if (this.state.editPage[0]) {
       // for edit data page
       await axios
@@ -239,6 +249,10 @@ class ActivityPage extends Component {
           }
         });
     }
+  }else{
+    this.setState({ errorCode: "End date should be greater than start date." });
+    // alert("End date should be greater than start date.");
+  }
   };
 
   cancelForm = () => {
@@ -303,7 +317,7 @@ class ActivityPage extends Component {
                 </Grid>
                 <Grid item md={3} xs={12}>
                   <DateTimepicker
-                    label="Start Date/Time"
+                    label="Start Date/Time*"
                     name="addStartDate"
                     error={this.hasError("addStartDate")}
                     helperText={
