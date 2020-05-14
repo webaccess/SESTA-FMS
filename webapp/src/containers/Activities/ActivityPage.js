@@ -26,12 +26,16 @@ class ActivityPage extends Component {
     this.state = {
       values: {},
       getActivitytype: [],
+      dateValidation: false,
       validations: {
         addTitle: {
           required: { value: "true", message: "Action name field is required" },
         },
         addStartDate: {
-          required: { value: "true", message: "Start Date/Time field is required" },
+          required: {
+            value: "true",
+            message: "Start Date/Time field is required",
+          },
         },
         addActivitytype: {
           required: {
@@ -39,8 +43,13 @@ class ActivityPage extends Component {
             message: "Activity type field is required",
           },
         },
-        
-        
+        addEndDate: {
+          validateDate: {
+            value: this.state.dateValidation,
+            message:
+              "Activity end date must be greater or equal to start date.",
+          },
+        },
       },
       errors: {
         addTitle: [],
@@ -142,23 +151,16 @@ class ActivityPage extends Component {
         : false;
     }
   };
-  dateValidation(actStart,actEnd){
-    if(actStart<=actEnd){
-      return true;
-    }else{
-      return false;
+  dateValidation(actStart, actEnd) {
+    if (actStart <= actEnd) {
+      this.setState({ validateDate: true });
+    } else {
+      this.setState({ validateDate: false });
     }
   }
 
   handleSubmit = async (e) => {
     e.preventDefault();
-    this.validate();
-    this.setState({ formSubmitted: "" });
-
-    if (Object.keys(this.state.errors).length > 0) return;
-    let activityTitle = this.state.values.addTitle;
-    let activityType = this.state.values.addActivitytype;
-    let activityDescription = this.state.values.addDescription;
     let activityStartDate = new Date(
       this.state.values.addStartDate
     ).toISOString();
@@ -166,7 +168,16 @@ class ActivityPage extends Component {
     if (this.state.values.addEndDate !== undefined) {
       activityEndDate = new Date(this.state.values.addEndDate).toISOString();
     }
-    if(this.dateValidation(activityStartDate,activityEndDate)){
+    this.dateValidation(activityStartDate, activityEndDate);
+    this.validate();
+    this.setState({ formSubmitted: "" });
+
+    if (Object.keys(this.state.errors).length > 0) return;
+    let activityTitle = this.state.values.addTitle;
+    let activityType = this.state.values.addActivitytype;
+    let activityDescription = this.state.values.addDescription;
+
+    // if(this.dateValidation(activityStartDate,activityEndDate)){
     if (this.state.editPage[0]) {
       // for edit data page
       await axios
@@ -249,10 +260,10 @@ class ActivityPage extends Component {
           }
         });
     }
-  }else{
-    this.setState({ errorCode: "End date should be greater than start date." });
-    // alert("End date should be greater than start date.");
-  }
+    // }else{
+    //   this.setState({ errorCode: "End date should be greater than start date." });
+    //   // alert("End date should be greater than start date.");
+    // }
   };
 
   cancelForm = () => {

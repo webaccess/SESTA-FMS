@@ -55,6 +55,11 @@ const validateInput = (value, inputValidations = {}, type = "text") => {
           errors.push(validationValue.message);
         }
         break;
+        case "validateDate":
+          if(value===false){
+            errors.push(validationValue.message);
+          }
+          break;
       default:
         errors = [];
     }
