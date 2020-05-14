@@ -30,6 +30,9 @@ class ActivityPage extends Component {
         addTitle: {
           required: { value: "true", message: "Action name field is required" },
         },
+        addStartDate: {
+          required: { value: "true", message: "Start Date/Time field is required" },
+        },
         addActivitytype: {
           required: {
             value: "true",
@@ -39,6 +42,7 @@ class ActivityPage extends Component {
       },
       errors: {
         addTitle: [],
+        addStartDate: [],
         addActivitytype: [],
       },
       serverErrors: {},
@@ -302,7 +306,13 @@ class ActivityPage extends Component {
                   <DateTimepicker
                     label="Start Date/Time"
                     name="addStartDate"
-                    value={this.state.values.addStartDate}
+                    error={this.hasError("addStartDate")}
+                    helperText={
+                      this.hasError("addStartDate")
+                        ? this.state.errors.addStartDate[0]
+                        : null
+                    }
+                    value={this.state.values.addStartDate || null}
                     onChange={(value) =>
                       this.setState({
                         values: { ...this.state.values, addStartDate: value },

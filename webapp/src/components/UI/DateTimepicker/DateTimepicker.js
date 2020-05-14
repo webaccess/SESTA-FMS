@@ -21,6 +21,8 @@ const DateTimepicker = ({ ...props }) => {
       <DateTimePicker
         clearable
         label={props.label}
+        error={props.error ? props.error : false}
+        helperText={props.helperText ? props.helperText : null}
         inputVariant="outlined"
         value={props.value ? props.value : clearedDate}
         onChange={props.onChange}

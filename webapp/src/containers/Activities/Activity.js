@@ -55,7 +55,7 @@ export class Activity extends React.Component {
     this.state = {
       values: {},
       data: [],
-      filterActivitytype: "",
+      getActivitytype: []
     };
   }
 
@@ -68,7 +68,6 @@ export class Activity extends React.Component {
       })
       .then((res) => {
         this.setState({ data: res.data });
-        let d = new Date(res.data[0]["start_datetime"]);
       });
     await axios
       .get(
@@ -93,7 +92,7 @@ export class Activity extends React.Component {
       this.setState({ filterActivitytype: value.id });
     } else {
       this.setState({
-        filterActivitytype: "",
+        filterActivitytype: [],
       });
     }
   };
@@ -133,10 +132,10 @@ export class Activity extends React.Component {
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-      for (let i in selectedId) {
+      for (let id in selectedId) {
         axios
           .delete(
-            process.env.REACT_APP_SERVER_URL + "activities/" + selectedId[i],
+            process.env.REACT_APP_SERVER_URL + "activities/" + selectedId[id],
             {
               headers: {
                 Authorization: "Bearer " + auth.getToken() + "",
@@ -157,11 +156,11 @@ export class Activity extends React.Component {
 
   handleSearch() {
     let searchData = "";
-    if (this.state.filterActivitytype) {
-      searchData += "activitytype.id=" + this.state.filterActivitytype + "&&";
-    }
     if (this.state.values.FilterActivity) {
-      searchData += "title_contains=" + this.state.values.FilterActivity;
+      searchData += "title_contains=" + this.state.values.FilterActivity + "&&";
+    }
+     if (this.state.filterActivitytype) {
+      searchData += "activitytype.id=" + this.state.filterActivitytype;
     }
     axios
       .get(
@@ -184,11 +183,8 @@ export class Activity extends React.Component {
 
   cancelForm = () => {
     this.setState({
-      filterActivitytype: "",
-      values: {},
-      formSubmitted: "",
-      stateSelected: false,
-      isCancel: true,
+      filterActivitytype: null,
+      values: {}
     });
     this.componentDidMount();
   };
@@ -210,13 +206,13 @@ export class Activity extends React.Component {
       {
         name: "Start Date/Time",
         selector: "start_datetime",
-        format: row => `${new Date(row.start_datetime).toLocaleString()}`,
+        format: row => `${(row.start_datetime != null) ? new Date(row.start_datetime).toLocaleString() : ""}`,
         sortable: true,
       },
       {
         name: "End Date/Time",
         selector: "end_datetime",
-        format: row => `${new Date(row.end_datetime).toLocaleString()}`,
+        format: row => `${(row.end_datetime != null) ? new Date(row.end_datetime).toLocaleString() : ""}`,
         sortable: true,
       },
     ];
