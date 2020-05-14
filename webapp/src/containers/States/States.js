@@ -53,7 +53,6 @@ export class States extends React.Component {
       dataCellId: [],
       singleDelete: "",
       multipleDelete: "",
-      allIsActive: []
     };
   }
 
@@ -172,62 +171,59 @@ export class States extends React.Component {
     }
   };
 
-  ActiveAll = (selectedId,selected) => {
+  ActiveAll = (selectedId, selected, numberOfIsActive) => {
     if (selectedId.length !== 0) {
-      let numberOfIsActive = [];
-      for (let i in selected){
-        numberOfIsActive.push(selected[0]['is_active'])
-      }
-      this.setState({allIsActive: numberOfIsActive})
-       let IsActive = !(selected[0]['is_active']);
-      for (let i in selectedId) {
-      axios
-        .put(
-          process.env.REACT_APP_SERVER_URL +
-          "states/" +
-         selectedId[i],
-          {
-            is_active: IsActive
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
+      for (let is_active in numberOfIsActive){
+      let IsActive = !(numberOfIsActive[is_active]);
+      for (let id in selectedId) {
+        axios
+          .put(
+            process.env.REACT_APP_SERVER_URL +
+            "states/" +
+            selectedId[id],
+            {
+              is_active: IsActive
+            },
+            {
+              headers: {
+                Authorization: "Bearer " + auth.getToken() + ""
+              }
             }
-          }
-        )
-        .then(res => {
-          this.setState({ formSubmitted: true });
-          this.componentDidMount({ editData: true });
-          this.props.history.push({ pathname: "/states", editData: true });
-        })
-        .catch(error => {
-          this.setState({ formSubmitted: false });
-          if (error.response !== undefined) {
-            this.setState({ errorCode: error.response.data.statusCode + " Error- " + error.response.data.error + " Message- " + error.response.data.message + " Please try again!" })
-          } else {
-            this.setState({ errorCode: "Network Error - Please try again!" });
-          }
-          console.log(error);
-        });
+          )
+          .then(res => {
+            this.setState({ formSubmitted: true });
+            this.componentDidMount({ editData: true });
+            this.props.history.push({ pathname: "/states", editData: true });
+          })
+          .catch(error => {
+            this.setState({ formSubmitted: false });
+            if (error.response !== undefined) {
+              this.setState({ errorCode: error.response.data.statusCode + " Error- " + error.response.data.error + " Message- " + error.response.data.message + " Please try again!" })
+            } else {
+              this.setState({ errorCode: "Network Error - Please try again!" });
+            }
+            console.log(error);
+          });
       }
     }
+  }
   };
   clearSelected = (selected) => {
-    selected =[];
+    selected = [];
   }
 
   confirmActive = (event) => {
-    this.setState({isActiveAllShowing: true})
-    this.setState({setActiveId: event.target.id});
-    this.setState({IsActive: event.target.checked});
+    this.setState({ isActiveAllShowing: true })
+    this.setState({ setActiveId: event.target.id });
+    this.setState({ IsActive: event.target.checked });
   };
 
   handleClose = () => {
-   this.setState({ open: false })
+    this.setState({ open: false })
   };
 
   handleActive = (event) => {
-    this.setState({isActiveAllShowing: false})
+    this.setState({ isActiveAllShowing: false })
     let setActiveId = this.state.setActiveId;
     let IsActive = this.state.IsActive;
     axios
@@ -262,8 +258,8 @@ export class States extends React.Component {
   };
 
   closeActiveAllModalHandler = (event) => {
-    this.setState({isActiveAllShowing: false});
-   
+    this.setState({ isActiveAllShowing: false });
+
   };
   handleCheckBox = (event) => {
     this.setState({ [event.target.name]: event.target.checked });
@@ -280,7 +276,7 @@ export class States extends React.Component {
       },
       {
         name: "Active",
-        cell: cell => (<Switch id={cell.id} onChange={e => { this.confirmActive(e) }} defaultChecked={cell.is_active} Small={true} />),
+        cell: cell => (<Switch id={cell.id} name={cell.name} onChange={event => { this.confirmActive(event) }} defaultChecked={cell.is_active} Small={true} />),
         sortable: true,
         button: true
       }
@@ -316,13 +312,13 @@ export class States extends React.Component {
               </Snackbar>
             ) : null}
             {this.props.location.editData ? (
-              <Snackbar open={this.state.open} autoHideDuration = {3000} onClose={this.handleClose} severity="success">
+              <Snackbar open={this.state.open} autoHideDuration={3000} onClose={this.handleClose} severity="success">
                 State edited successfully.
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
               this.state.singleDelete !== "" &&
-              
+
               this.state.singleDelete ? (
                 <Snackbar severity="success" Showbutton={false}>
                   State {this.state.singleDelete} deleted successfully!
@@ -343,7 +339,7 @@ export class States extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-             <br></br>
+            <br></br>
             <div className={classes.row}>
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
@@ -376,7 +372,6 @@ export class States extends React.Component {
                 title={"States"}
                 showSearch={false}
                 filterData={true}
-                allIsActive={this.state.allIsActive}
                 Searchplaceholder={"Search by State Name"}
                 filterBy={["name"]}
                 filters={filters}
@@ -395,24 +390,24 @@ export class States extends React.Component {
             ) : (
                 <h1>Loading...</h1>
               )}
-              <Modal
-                className="modal"
-                show={this.state.isActiveAllShowing}
-                close={this.closeActiveAllModalHandler}
-                displayCross={{ display: "none" }}
-                handleEventChange={true}
-                event={this.handleActive}
-                footer={{
-                  footerSaveName: "OKAY",
-                  footerCloseName: "CLOSE",
-                  displayClose: { display: "true" },
-                  displaySave: { display: "true" }
-                }}
-              >
-              {this.state.IsActive ? (" Do you want to set selected Active ?")
-                : ("Do you want to Deactivate selected State.?")
+            <Modal
+              className="modal"
+              show={this.state.isActiveAllShowing}
+              close={this.closeActiveAllModalHandler}
+              displayCross={{ display: "none" }}
+              handleEventChange={true}
+              event={this.handleActive}
+              footer={{
+                footerSaveName: "OKAY",
+                footerCloseName: "CLOSE",
+                displayClose: { display: "true" },
+                displaySave: { display: "true" }
+              }}
+            >
+              {this.state.IsActive ? (<p>Do you want to set selected Active ?{this.state.data.name}</p>
+               ) : (<p>Do you want to Deactivate selected State.?</p>)
               }
-              </Modal>
+            </Modal>
           </div>
         </Grid>
       </Layout>

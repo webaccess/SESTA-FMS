@@ -105,7 +105,11 @@ const Table = props => {
   };
 
    const handleActiveAllEvent = (event) => {
-    props.ActiveAll(row, selected, setisDeleteShowing(!isDeleteShowing))
+     let numberOfIsActive = [];
+    for (let id in selected){
+      numberOfIsActive.push(selected[id]['is_active'])
+    }
+    props.ActiveAll(row, selected, numberOfIsActive, setisDeleteShowing(!isDeleteShowing))
     setSelectedRows([]);
  };
 
@@ -187,7 +191,6 @@ const Table = props => {
   } else {
     filteredData = props.data;
   }
-  const [resetPaginationToggle, setResetPaginationToggle] = React.useState();
 
   let selectedId = [];
   for (let values in selected) {
@@ -196,8 +199,8 @@ const Table = props => {
   let SelectedId = selectedId.join("");
   let SelectedIds = SelectedId.substring(0, SelectedId.length - 1);
 
-  const onFilter = e => {
-    setFilterText(e.target.value);
+  const onFilter = event => {
+    setFilterText(event.target.value);
   };
 
   const [toggleCleared, setToggleCleared] = React.useState(false);
@@ -266,7 +269,6 @@ const Table = props => {
             title={props.title}
             columns={props.column}
             pagination
-            paginationResetDefaultPage={resetPaginationToggle}
             selectableRowsComponent={Checkbox}
             contextActions={contextActions}
             actions={handleEditEvent}
