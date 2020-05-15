@@ -67,7 +67,6 @@ const validateInput = (value, inputValidations = {}, type = "text") => {
   if (includes(errors, requiredError)) {
     errors = reject(errors, error => error !== requiredError);
   }
-
   return errors;
 };
 

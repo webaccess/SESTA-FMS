@@ -61,8 +61,8 @@ class ActivityPage extends Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "activities?id=" +
-            this.state.editPage[1],
+          "activities?id=" +
+          this.state.editPage[1],
           {
             headers: {
               Authorization: "Bearer " + auth.getToken() + "",
@@ -160,93 +160,93 @@ class ActivityPage extends Component {
     let startDate = this.state.values.addStartDate;
     let endDate = this.state.values.addEndDate;
     if (new Date(startDate).getTime() > new Date(endDate).getTime()) {
-      this.setState({DateTimepickerError: true})
+      this.setState({ DateTimepickerError: true })
     } else {
-      this.setState({DateTimepickerError: false})
-    
-    if (this.state.editPage[0]) {
-      // for edit data page
-      await axios
-        .put(
-          process.env.REACT_APP_SERVER_URL +
+      this.setState({ DateTimepickerError: false })
+
+      if (this.state.editPage[0]) {
+        // for edit data page
+        await axios
+          .put(
+            process.env.REACT_APP_SERVER_URL +
             "activities/" +
             this.state.editPage[1],
-          {
-            title: activityTitle,
-            start_datetime: activityStartDate,
-            end_datetime: activityEndDate,
-            description: activityDescription,
-            activitytype: activityType,
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
+            {
+              title: activityTitle,
+              start_datetime: activityStartDate,
+              end_datetime: activityEndDate,
+              description: activityDescription,
+              activitytype: activityType,
             },
-          }
-        )
-        .then((res) => {
-          this.setState({ formSubmitted: true });
-          this.props.history.push({ pathname: "/activities", editData: true });
-        })
-        .catch((error) => {
-          this.setState({ formSubmitted: false });
-          if (error.response !== undefined) {
-            this.setState({
-              errorCode:
-                error.response.data.statusCode +
-                " Error- " +
-                error.response.data.error +
-                " Message- " +
-                error.response.data.message +
-                " Please try again!",
-            });
-          } else {
-            this.setState({ errorCode: "Network Error - Please try again!" });
-          }
-          console.log(error);
-        });
-    } else {
-      //for add data page
-      await axios
-        .post(
-          process.env.REACT_APP_SERVER_URL + "activities",
+            {
+              headers: {
+                Authorization: "Bearer " + auth.getToken() + "",
+              },
+            }
+          )
+          .then((res) => {
+            this.setState({ formSubmitted: true });
+            this.props.history.push({ pathname: "/activities", editData: true });
+          })
+          .catch((error) => {
+            this.setState({ formSubmitted: false });
+            if (error.response !== undefined) {
+              this.setState({
+                errorCode:
+                  error.response.data.statusCode +
+                  " Error- " +
+                  error.response.data.error +
+                  " Message- " +
+                  error.response.data.message +
+                  " Please try again!",
+              });
+            } else {
+              this.setState({ errorCode: "Network Error - Please try again!" });
+            }
+            console.log(error);
+          });
+      } else {
+        //for add data page
+        await axios
+          .post(
+            process.env.REACT_APP_SERVER_URL + "activities",
 
-          {
-            title: activityTitle,
-            start_datetime: activityStartDate,
-            end_datetime: activityEndDate,
-            description: activityDescription,
-            activitytype: activityType,
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
+            {
+              title: activityTitle,
+              start_datetime: activityStartDate,
+              end_datetime: activityEndDate,
+              description: activityDescription,
+              activitytype: activityType,
             },
-          }
-        )
-        .then((res) => {
-          this.setState({ formSubmitted: true });
+            {
+              headers: {
+                Authorization: "Bearer " + auth.getToken() + "",
+              },
+            }
+          )
+          .then((res) => {
+            this.setState({ formSubmitted: true });
 
-          this.props.history.push({ pathname: "/activities", addData: true });
-        })
-        .catch((error) => {
-          this.setState({ formSubmitted: false });
-          if (error.response !== undefined) {
-            this.setState({
-              errorCode:
-                error.response.data.statusCode +
-                " Error- " +
-                error.response.data.error +
-                " Message- " +
-                error.response.data.message +
-                " Please try again!",
-            });
-          } else {
-            this.setState({ errorCode: "Network Error - Please try again!" });
-          }
-        });
+            this.props.history.push({ pathname: "/activities", addData: true });
+          })
+          .catch((error) => {
+            this.setState({ formSubmitted: false });
+            if (error.response !== undefined) {
+              this.setState({
+                errorCode:
+                  error.response.data.statusCode +
+                  " Error- " +
+                  error.response.data.error +
+                  " Message- " +
+                  error.response.data.message +
+                  " Please try again!",
+              });
+            } else {
+              this.setState({ errorCode: "Network Error - Please try again!" });
+            }
+          });
+      }
     }
-  }
   };
 
   cancelForm = () => {
@@ -360,10 +360,10 @@ class ActivityPage extends Component {
                     value={
                       addActivitytype
                         ? activitytypeFilter[
-                            activitytypeFilter.findIndex(function (item, i) {
-                              return item.id === addActivitytype;
-                            })
-                          ] || null
+                        activitytypeFilter.findIndex(function (item, i) {
+                          return item.id === addActivitytype;
+                        })
+                        ] || null
                         : null
                     }
                     error={this.hasError("addActivitytype")}
