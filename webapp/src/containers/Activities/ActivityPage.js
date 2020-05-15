@@ -154,7 +154,7 @@ class ActivityPage extends Component {
       this.state.values.addStartDate
     ).toISOString();
     let activityEndDate = null;
-    if (this.state.values.addEndDate !== null) {
+    if (this.state.values.addEndDate != null) {
       activityEndDate = new Date(this.state.values.addEndDate).toISOString();
     }
     let startDate = this.state.values.addStartDate;
@@ -163,7 +163,6 @@ class ActivityPage extends Component {
       this.setState({ DateTimepickerError: true })
     } else {
       this.setState({ DateTimepickerError: false })
-
       if (this.state.editPage[0]) {
         // for edit data page
         await axios
