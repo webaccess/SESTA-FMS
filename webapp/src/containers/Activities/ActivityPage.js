@@ -12,6 +12,7 @@ import {
   Divider,
   Grid,
 } from "@material-ui/core";
+import TextField from '@material-ui/core/TextField';
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
 import { ADD_ACTIVITY_BREADCRUMBS, EDIT_ACTIVITY_BREADCRUMBS } from "./config";
@@ -300,6 +301,42 @@ class ActivityPage extends Component {
                   ) : null}
                 </Grid>
                 <Grid item md={6} xs={12}>
+                  <Autotext
+                    id="combo-box-demo"
+                    options={activitytypeFilter}
+                    variant="outlined"
+                    label="Select Activitytype*"
+                    getOptionLabel={(option) => option.name}
+                    onChange={(event, value) => {
+                      this.handleActivitytypeChange(event, value);
+                    }}
+                    defaultValue={[]}
+                    value={
+                      addActivitytype
+                        ? activitytypeFilter[
+                        activitytypeFilter.findIndex(function (item, i) {
+                          return item.id === addActivitytype;
+                        })
+                        ] || null
+                        : null
+                    }
+                    error={this.hasError("addActivitytype")}
+                    helperText={
+                      this.hasError("addActivitytype")
+                        ? this.state.errors.addActivitytype[0]
+                        : null
+                    }
+                    renderInput={(params) => (
+                      <Input
+                        fullWidth
+                        label="Select Activity Type*"
+                        name="addActivitytype"
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                </Grid>
+                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
                     label="Activity Title*"
@@ -345,46 +382,13 @@ class ActivityPage extends Component {
                     }
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
-                  <Autotext
-                    id="combo-box-demo"
-                    options={activitytypeFilter}
-                    variant="outlined"
-                    label="Select Activitytype*"
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, value) => {
-                      this.handleActivitytypeChange(event, value);
-                    }}
-                    defaultValue={[]}
-                    value={
-                      addActivitytype
-                        ? activitytypeFilter[
-                        activitytypeFilter.findIndex(function (item, i) {
-                          return item.id === addActivitytype;
-                        })
-                        ] || null
-                        : null
-                    }
-                    error={this.hasError("addActivitytype")}
-                    helperText={
-                      this.hasError("addActivitytype")
-                        ? this.state.errors.addActivitytype[0]
-                        : null
-                    }
-                    renderInput={(params) => (
-                      <Input
-                        fullWidth
-                        label="Select Activity Type*"
-                        name="addActivitytype"
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
+                <Grid item md={12} xs={12}>
+                  <TextField
+                   id="outlined-multiline-static"
                     fullWidth
-                    label="Description"
+                    label="Status / Comments"
+                    multiline
+                    rows={10} 
                     name="addDescription"
                     value={this.state.values.addDescription || ""}
                     onChange={this.handleChange}
