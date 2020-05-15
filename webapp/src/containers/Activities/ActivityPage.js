@@ -25,6 +25,7 @@ class ActivityPage extends Component {
     super(props);
     this.state = {
       values: {},
+      DateTimepickerError: null,
       getActivitytype: [],
       validations: {
         addTitle: {
@@ -39,8 +40,6 @@ class ActivityPage extends Component {
             message: "Activity type field is required",
           },
         },
-        
-        
       },
       errors: {
         addTitle: [],
@@ -142,19 +141,11 @@ class ActivityPage extends Component {
         : false;
     }
   };
-  dateValidation(actStart,actEnd){
-    if(actStart<=actEnd){
-      return true;
-    }else{
-      return false;
-    }
-  }
 
   handleSubmit = async (e) => {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
-
     if (Object.keys(this.state.errors).length > 0) return;
     let activityTitle = this.state.values.addTitle;
     let activityType = this.state.values.addActivitytype;
@@ -163,10 +154,16 @@ class ActivityPage extends Component {
       this.state.values.addStartDate
     ).toISOString();
     let activityEndDate = null;
-    if (this.state.values.addEndDate !== undefined) {
+    if (this.state.values.addEndDate !== null) {
       activityEndDate = new Date(this.state.values.addEndDate).toISOString();
     }
-    if(this.dateValidation(activityStartDate,activityEndDate)){
+    let startDate = this.state.values.addStartDate;
+    let endDate = this.state.values.addEndDate;
+    if (new Date(startDate).getTime() > new Date(endDate).getTime()) {
+      this.setState({DateTimepickerError: true})
+    } else {
+      this.setState({DateTimepickerError: false})
+    
     if (this.state.editPage[0]) {
       // for edit data page
       await axios
@@ -249,9 +246,6 @@ class ActivityPage extends Component {
           }
         });
     }
-  }else{
-    this.setState({ errorCode: "End date should be greater than start date." });
-    // alert("End date should be greater than start date.");
   }
   };
 
@@ -296,6 +290,13 @@ class ActivityPage extends Component {
                   {this.state.formSubmitted === false ? (
                     <Snackbar severity="error" Showbutton={false}>
                       {this.state.errorCode}
+                    </Snackbar>
+                  ) : null}
+                </Grid>
+                <Grid item md={12} xs={12}>
+                  {this.state.DateTimepickerError === true ? (
+                    <Snackbar severity="error" Showbutton={false}>
+                      "Start Date Cannot be Greater than End Date"
                     </Snackbar>
                   ) : null}
                 </Grid>
