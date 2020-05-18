@@ -173,14 +173,17 @@ export class States extends React.Component {
 
   ActiveAll = (selectedId, selected, numberOfIsActive) => {
     if (selectedId.length !== 0) {
-      for (let is_active in numberOfIsActive){
-      let IsActive = !(numberOfIsActive[is_active]);
-      for (let id in selectedId) {
+      for (let i in numberOfIsActive){
+        console.log("number of i",i)
+      let IsActive = !(numberOfIsActive[i]);
+      console.log("looo maoi aagaya",numberOfIsActive,IsActive)
+      // for (let id in selectedId) {
+         console.log("selectedId maoi aagaya",IsActive)
         axios
           .put(
             process.env.REACT_APP_SERVER_URL +
             "states/" +
-            selectedId[id],
+            selectedId[i],
             {
               is_active: IsActive
             },
@@ -204,7 +207,7 @@ export class States extends React.Component {
             }
             console.log(error);
           });
-      }
+      // }
     }
   }
   };
