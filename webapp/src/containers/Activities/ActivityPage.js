@@ -305,7 +305,7 @@ class ActivityPage extends Component {
                     id="combo-box-demo"
                     options={activitytypeFilter}
                     variant="outlined"
-                    label="Select Activitytype*"
+                    label="Select Activity Type*"
                     getOptionLabel={(option) => option.name}
                     onChange={(event, value) => {
                       this.handleActivitytypeChange(event, value);
