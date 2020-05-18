@@ -12,7 +12,7 @@ import {
   Divider,
   Grid,
 } from "@material-ui/core";
-import TextField from '@material-ui/core/TextField';
+import TextField from "@material-ui/core/TextField";
 import AuthPage from "../AuthPage/AuthPage.js";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
@@ -36,7 +36,10 @@ class ActivityPage extends Component {
           required: { value: "true", message: "Action name field is required" },
         },
         addStartDate: {
-          required: { value: "true", message: "Start Date/Time field is required" },
+          required: {
+            value: "true",
+            message: "Start Date/Time field is required",
+          },
         },
         addActivitytype: {
           required: {
@@ -61,16 +64,16 @@ class ActivityPage extends Component {
   }
   userdata = (userInfo) => {
     let Info = auth.getUserInfo();
-    this.setState({UserRole: Info.role.name})
-  }
+    this.setState({ UserRole: Info.role.name });
+  };
 
   async componentDidMount() {
     if (this.state.editPage[0]) {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-          "activities?id=" +
-          this.state.editPage[1],
+            "activities?id=" +
+            this.state.editPage[1],
           {
             headers: {
               Authorization: "Bearer " + auth.getToken() + "",
@@ -105,7 +108,7 @@ class ActivityPage extends Component {
       .catch((error) => {
         console.log(error);
       });
-      await axios
+    await axios
       .get(process.env.REACT_APP_SERVER_URL + "contacts", {
         headers: {
           Authorization: "Bearer " + auth.getToken() + "",
@@ -133,7 +136,8 @@ class ActivityPage extends Component {
     } else {
       this.setState({
         values: {
-          ...this.state.values, addActivitytype: [],
+          ...this.state.values,
+          addActivitytype: [],
         },
       });
     }
@@ -147,7 +151,8 @@ class ActivityPage extends Component {
     } else {
       this.setState({
         values: {
-          ...this.state.values, addcontact: [],
+          ...this.state.values,
+          addcontact: [],
         },
       });
     }
@@ -184,6 +189,7 @@ class ActivityPage extends Component {
     let activityTitle = this.state.values.addTitle;
     let activityType = this.state.values.addActivitytype;
     let activityDescription = this.state.values.addDescription;
+    let activityContact = this.state.values.addcontact;
     let activityStartDate = new Date(
       this.state.values.addStartDate
     ).toISOString();
@@ -194,22 +200,23 @@ class ActivityPage extends Component {
     let startDate = this.state.values.addStartDate;
     let endDate = this.state.values.addEndDate;
     if (new Date(startDate).getTime() > new Date(endDate).getTime()) {
-      this.setState({ DateTimepickerError: true })
+      this.setState({ DateTimepickerError: true });
     } else {
-      this.setState({ DateTimepickerError: false })
+      this.setState({ DateTimepickerError: false });
       if (this.state.editPage[0]) {
         // for edit data page
         await axios
           .put(
             process.env.REACT_APP_SERVER_URL +
-            "activities/" +
-            this.state.editPage[1],
+              "activities/" +
+              this.state.editPage[1],
             {
               title: activityTitle,
               start_datetime: activityStartDate,
               end_datetime: activityEndDate,
               description: activityDescription,
               activitytype: activityType,
+              contacts: [activityContact],
             },
             {
               headers: {
@@ -219,7 +226,10 @@ class ActivityPage extends Component {
           )
           .then((res) => {
             this.setState({ formSubmitted: true });
-            this.props.history.push({ pathname: "/activities", editData: true });
+            this.props.history.push({
+              pathname: "/activities",
+              editData: true,
+            });
           })
           .catch((error) => {
             this.setState({ formSubmitted: false });
@@ -250,6 +260,7 @@ class ActivityPage extends Component {
               end_datetime: activityEndDate,
               description: activityDescription,
               activitytype: activityType,
+              contacts: [activityContact],
             },
             {
               headers: {
@@ -290,7 +301,6 @@ class ActivityPage extends Component {
     });
   };
 
-  
   render() {
     let contactFilter = this.state.getcontact;
     let activitytypeFilter = this.state.getActivitytype;
@@ -350,10 +360,10 @@ class ActivityPage extends Component {
                     value={
                       addActivitytype
                         ? activitytypeFilter[
-                        activitytypeFilter.findIndex(function (item, i) {
-                          return item.id === addActivitytype;
-                        })
-                        ] || null
+                            activitytypeFilter.findIndex(function (item, i) {
+                              return item.id === addActivitytype;
+                            })
+                          ] || null
                         : null
                     }
                     error={this.hasError("addActivitytype")}
@@ -372,7 +382,7 @@ class ActivityPage extends Component {
                     )}
                   />
                 </Grid>
-                 <Grid item md={6} xs={12}>
+                <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
                     label="Activity Title*"
@@ -418,46 +428,45 @@ class ActivityPage extends Component {
                     }
                   />
                 </Grid>
-                {this.state.UserRole === "FPO Admin"? 
-                 <Grid item md={6} xs={12}>
-                  <Autotext
-                    id="combo-box-demo"
-                    options={contactFilter}
-                    variant="outlined"
-                    label="Contact"
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, value) => {
-                      this.handleContactChange(event, value);
-                    }}
-                    defaultValue={[]}
-                    value={
-                      addcontact
-                        ? contactFilter[
-                        contactFilter.findIndex(function (item, i) {
-                          return item.id === addcontact;
-                        })
-                        ] || null
-                        : null
-                    }
-                    renderInput={(params) => (
-                      <Input
-                        fullWidth
-                        label="Contact"
-                        name="addcontact"
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                </Grid>
-                  : null
-                }
+                {this.state.UserRole === "FPO Admin" ? (
+                  <Grid item md={6} xs={12}>
+                    <Autotext
+                      id="combo-box-demo"
+                      options={contactFilter}
+                      variant="outlined"
+                      label="Contact"
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handleContactChange(event, value);
+                      }}
+                      defaultValue={[]}
+                      value={
+                        addcontact
+                          ? contactFilter[
+                              contactFilter.findIndex(function (item, i) {
+                                return item.id === addcontact;
+                              })
+                            ] || null
+                          : null
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          fullWidth
+                          label="Contact"
+                          name="addcontact"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                ) : null}
                 <Grid item md={12} xs={12}>
                   <TextField
-                   id="outlined-multiline-static"
+                    id="outlined-multiline-static"
                     fullWidth
                     label="Status / Comments"
                     multiline
-                    rows={10} 
+                    rows={10}
                     name="addDescription"
                     value={this.state.values.addDescription || ""}
                     onChange={this.handleChange}
