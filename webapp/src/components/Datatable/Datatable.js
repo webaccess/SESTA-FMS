@@ -19,15 +19,15 @@
     },
   ];
   <Table
-    title={"Villages"}
-    showSearch={false}
-    filterData={true}
-    noDataComponent={"No Records To be shown"}
-    Searchplaceholder={"Seacrh by Village Name"}
-    filterBy={["name"]}
+    title={STRING}
+    showSearch={BOOLEAN}
+    filterData={BOOLEAN}
+    noDataComponent={STRING}
+    Searchplaceholder={"Seacrh by Name"}
+    filterBy={PASS ARRAY OF SELECTORS}
     data={data}
     column={Usercolumns}
-    DeleteMessage={"Are you Sure you want to Delete"}
+    DeleteMessage={STRING}
   />
 |*****************************************************************************|
 |*** Example for CallBack Function for delete data modal on Parent Component**| 
@@ -95,7 +95,7 @@ const Table = props => {
   let DataID = cellId;
 
   const editData = id => {
-    props.editData(id); 
+    props.editData(id);
   };
 
   const handleDeleteAllEvent = () => {
@@ -104,14 +104,14 @@ const Table = props => {
     setSelectedRows([]);
   };
 
-   const handleActiveAllEvent = (event) => {
-     let numberOfIsActive = [];
-    for (let id in selected){
+  const handleActiveAllEvent = (event) => {
+    let numberOfIsActive = [];
+    for (let id in selected) {
       numberOfIsActive.push(selected[id]['is_active'])
     }
     props.ActiveAll(row, selected, numberOfIsActive, setisDeleteShowing(!isDeleteShowing))
     setSelectedRows([]);
- };
+  };
 
   const handleEditEvent = () => {
     setisDeleteShowing(!isDeleteShowing);
@@ -211,29 +211,29 @@ const Table = props => {
     };
 
     const handleActive = () => {
-    setisActiveAllShowing(true);
-    setData(differenceBy(data, selectedRows, "name"));
+      setisActiveAllShowing(true);
+      setData(differenceBy(data, selectedRows, "name"));
     };
     return (
       <div>
-      <Button
-        key="delete"
-        onClick={handledelete}
-        style={{ backgroundColor: "#d63447", color: "white" }}
-      >
-        Delete
+        <Button
+          key="delete"
+          onClick={handledelete}
+          style={{ backgroundColor: "#d63447", color: "white" }}
+        >
+          Delete
       </Button>
        &nbsp;&nbsp;&nbsp;
-      {props.showSetAllActive ? 
-       (<Button
-         key="active"
-         onClick={handleActive}
-         style={{ backgroundColor: "primary", color: "white" }}
-        >
-          Active
-        </Button>)
-         : null}
-      
+        {props.showSetAllActive ?
+          (<Button
+            key="active"
+            onClick={handleActive}
+            style={{ backgroundColor: "primary", color: "white" }}
+          >
+            Active
+          </Button>)
+          : null}
+
       </div>
     );
   }, [data, selectedRows, toggleCleared]);
@@ -242,12 +242,12 @@ const Table = props => {
   if (props.column.length > 0) {
     columns = makeColumns(props.column);
   }
-  let valuesSelected = [];
-  for (let values in selected){
-    valuesSelected.push(selected[values]['is_active'])
-  }
-  var count = {};
-  valuesSelected.forEach(function(i) { count[i] = (count[i]||0) + 1;});
+  // let valuesSelected = [];
+  // for (let values in selected) {
+  //   valuesSelected.push(selected[values]['is_active'])
+  // }
+  // var count = {};
+  // valuesSelected.forEach(function (i) { count[i] = (count[i] || 0) + 1; });
 
   return (
     <>
@@ -261,8 +261,8 @@ const Table = props => {
             />
           </div>
         ) : (
-          <p></p>
-        )}
+            <p></p>
+          )}
         <Card>
           <DataTable
             data={filteredData}
@@ -283,10 +283,10 @@ const Table = props => {
               props.noDataComponent ? (
                 props.noDataComponent
               ) : (
-                <p>
-                  There are no records to display in <b>{props.title}</b>
-                </p>
-              )
+                  <p>
+                    There are no records to display in <b>{props.title}</b>
+                  </p>
+                )
             }
             noHeader={selected.length === 0 || selected.length < 2}
           />
@@ -312,32 +312,32 @@ const Table = props => {
               Do you want to delete selected <b>{props.title}</b>
             </p>
           ) : (
-            <p>
-              {" "}
-              {props.DeleteMessage} <b>{dataName}</b> ?
-            </p>
-          )}
-            </Modal>
-            <Modal
-              className="modal"
-              show={isActiveAllShowing}
-              close={closeActiveAllModalHandler}
-              displayCross={{ display: "none" }}
-              handleEventChange={true}
-              event={handleActiveAllEvent}
-              handleActiveAllEvent={handleActiveAllEvent}
-              footer={{
-                footerSaveName: "OKAY",
-                footerCloseName: "CLOSE",
-                displayClose: { display: "true" },
-                displaySave: { display: "true" }
-              }}
-            >
-                <p>
-                 {" "}
-                  Are you sure you want to toggle the status ?
-                </p>
-            </Modal>
+              <p>
+                {" "}
+                {props.DeleteMessage} <b>{dataName}</b> ?
+              </p>
+            )}
+        </Modal>
+        <Modal
+          className="modal"
+          show={isActiveAllShowing}
+          close={closeActiveAllModalHandler}
+          displayCross={{ display: "none" }}
+          handleEventChange={true}
+          event={handleActiveAllEvent}
+          handleActiveAllEvent={handleActiveAllEvent}
+          footer={{
+            footerSaveName: "OKAY",
+            footerCloseName: "CLOSE",
+            displayClose: { display: "true" },
+            displaySave: { display: "true" }
+          }}
+        >
+          <p>
+            {" "}
+            Are you sure you want to toggle the status ?
+          </p>
+        </Modal>
       </div>
     </>
   );
