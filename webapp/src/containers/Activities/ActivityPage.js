@@ -13,6 +13,7 @@ import {
   Grid,
 } from "@material-ui/core";
 import TextField from '@material-ui/core/TextField';
+import AuthPage from "../AuthPage/AuthPage.js";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
 import { ADD_ACTIVITY_BREADCRUMBS, EDIT_ACTIVITY_BREADCRUMBS } from "./config";
@@ -26,8 +27,10 @@ class ActivityPage extends Component {
     super(props);
     this.state = {
       values: {},
+      UserRole: null,
       DateTimepickerError: null,
       getActivitytype: [],
+      getcontact: [],
       validations: {
         addTitle: {
           required: { value: "true", message: "Action name field is required" },
@@ -55,6 +58,10 @@ class ActivityPage extends Component {
         this.props.match.params.id,
       ],
     };
+  }
+  userdata = (userInfo) => {
+    let Info = auth.getUserInfo();
+    this.setState({UserRole: Info.role.name})
   }
 
   async componentDidMount() {
@@ -93,6 +100,19 @@ class ActivityPage extends Component {
       })
       .then((res) => {
         this.setState({ getActivitytype: res.data });
+        this.userdata();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+      await axios
+      .get(process.env.REACT_APP_SERVER_URL + "contacts", {
+        headers: {
+          Authorization: "Bearer " + auth.getToken() + "",
+        },
+      })
+      .then((res) => {
+        this.setState({ getcontact: res.data });
       })
       .catch((error) => {
         console.log(error);
@@ -105,7 +125,7 @@ class ActivityPage extends Component {
     });
   };
 
-  handleActivitytypeChange(event, value) {
+  handleAutocompleteChange(event, value) {
     if (value !== null) {
       this.setState({
         values: { ...this.state.values, addActivitytype: value.id },
@@ -113,8 +133,21 @@ class ActivityPage extends Component {
     } else {
       this.setState({
         values: {
-          ...this.state.values,
-          addActivitytype: "",
+          ...this.state.values, addActivitytype: [],
+        },
+      });
+    }
+  }
+
+  handleContactChange(event, value) {
+    if (value !== null) {
+      this.setState({
+        values: { ...this.state.values, addcontact: value.id },
+      });
+    } else {
+      this.setState({
+        values: {
+          ...this.state.values, addcontact: [],
         },
       });
     }
@@ -257,8 +290,11 @@ class ActivityPage extends Component {
     });
   };
 
+  
   render() {
+    let contactFilter = this.state.getcontact;
     let activitytypeFilter = this.state.getActivitytype;
+    let addcontact = this.state.values.addcontact;
     let addActivitytype = this.state.values.addActivitytype;
     return (
       <Layout
@@ -308,7 +344,7 @@ class ActivityPage extends Component {
                     label="Select Activity Type*"
                     getOptionLabel={(option) => option.name}
                     onChange={(event, value) => {
-                      this.handleActivitytypeChange(event, value);
+                      this.handleAutocompleteChange(event, value);
                     }}
                     defaultValue={[]}
                     value={
@@ -382,6 +418,39 @@ class ActivityPage extends Component {
                     }
                   />
                 </Grid>
+                {this.state.UserRole === "FPO Admin"? 
+                 <Grid item md={6} xs={12}>
+                  <Autotext
+                    id="combo-box-demo"
+                    options={contactFilter}
+                    variant="outlined"
+                    label="Contact"
+                    getOptionLabel={(option) => option.name}
+                    onChange={(event, value) => {
+                      this.handleContactChange(event, value);
+                    }}
+                    defaultValue={[]}
+                    value={
+                      addcontact
+                        ? contactFilter[
+                        contactFilter.findIndex(function (item, i) {
+                          return item.id === addcontact;
+                        })
+                        ] || null
+                        : null
+                    }
+                    renderInput={(params) => (
+                      <Input
+                        fullWidth
+                        label="Contact"
+                        name="addcontact"
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                </Grid>
+                  : null
+                }
                 <Grid item md={12} xs={12}>
                   <TextField
                    id="outlined-multiline-static"
