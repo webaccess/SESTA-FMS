@@ -174,11 +174,7 @@ export class States extends React.Component {
   ActiveAll = (selectedId, selected, numberOfIsActive) => {
     if (selectedId.length !== 0) {
       for (let i in numberOfIsActive){
-        console.log("number of i",i)
       let IsActive = !(numberOfIsActive[i]);
-      console.log("looo maoi aagaya",numberOfIsActive,IsActive)
-      // for (let id in selectedId) {
-         console.log("selectedId maoi aagaya",IsActive)
         axios
           .put(
             process.env.REACT_APP_SERVER_URL +
