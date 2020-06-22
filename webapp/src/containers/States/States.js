@@ -11,32 +11,39 @@ import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Modal from "../../components/UI/Modal/Modal.js";
-import Switch from '../../components/UI/Switch/Switch';
+import Switch from "../../components/UI/Switch/Switch";
 
-const useStyles = theme => ({
+const useStyles = (theme) => ({
   root: {},
   row: {
     height: "42px",
     display: "flex",
     alignItems: "center",
-    marginTop: theme.spacing(1)
+    marginTop: theme.spacing(1),
+  },
+  floatRow: {
+    height: "40px",
+    float: "right",
   },
   buttonRow: {
     height: "42px",
-    marginTop: theme.spacing(1)
+    float: "right",
   },
   searchInput: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   Districts: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   States: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   Search: {
-    marginRight: theme.spacing(1)
-  }
+    marginRight: theme.spacing(1),
+  },
+  Cancel: {
+    marginRight: theme.spacing(1),
+  },
 });
 
 export class States extends React.Component {
@@ -60,19 +67,19 @@ export class States extends React.Component {
     await axios
       .get(process.env.REACT_APP_SERVER_URL + "states/?_sort=name:ASC", {
         headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
+          Authorization: "Bearer " + auth.getToken() + "",
+        },
       })
-      .then(res => {
+      .then((res) => {
         this.setState({ data: res.data });
       });
-  };
+  }
 
   StateFilter(event, value, target) {
     this.setState({
-      values: { ...this.state.values, [event.target.name]: event.target.value }
+      values: { ...this.state.values, [event.target.name]: event.target.value },
     });
-  };
+  }
 
   getData(result) {
     for (let i in result) {
@@ -83,7 +90,7 @@ export class States extends React.Component {
       result[i]["states"] = states;
     }
     return result;
-  };
+  }
 
   handleSearch() {
     let searchData = "";
@@ -93,24 +100,24 @@ export class States extends React.Component {
     axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-        "states?" +
-        searchData +
-        "&&_sort=name:ASC",
+          "states?" +
+          searchData +
+          "&&_sort=name:ASC",
         {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         }
       )
-      .then(res => {
+      .then((res) => {
         this.setState({ data: this.getData(res.data) });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log("err", err);
       });
-  };
+  }
 
-  editData = cellid => {
+  editData = (cellid) => {
     this.props.history.push("/states/edit/" + cellid);
   };
 
@@ -120,7 +127,7 @@ export class States extends React.Component {
       values: {},
       formSubmitted: "",
       stateSelected: false,
-      isCancel: true
+      isCancel: true,
     });
     this.componentDidMount();
   };
@@ -131,22 +138,22 @@ export class States extends React.Component {
       axios
         .delete(process.env.REACT_APP_SERVER_URL + "states/" + cellid, {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         })
-        .then(res => {
+        .then((res) => {
           this.setState({ singleDelete: res.data.name });
           this.setState({ dataCellId: "" });
           this.componentDidMount();
         })
-        .catch(error => {
+        .catch((error) => {
           this.setState({ singleDelete: false });
           console.log(error);
         });
     }
   };
 
-  DeleteAll = selectedId => {
+  DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       for (let i in selectedId) {
@@ -155,15 +162,15 @@ export class States extends React.Component {
             process.env.REACT_APP_SERVER_URL + "states/" + selectedId[i],
             {
               headers: {
-                Authorization: "Bearer " + auth.getToken() + ""
-              }
+                Authorization: "Bearer " + auth.getToken() + "",
+              },
             }
           )
-          .then(res => {
+          .then((res) => {
             this.setState({ multipleDelete: true });
             this.componentDidMount();
           })
-          .catch(error => {
+          .catch((error) => {
             this.setState({ multipleDelete: false });
             console.log("err", error);
           });
@@ -171,7 +178,7 @@ export class States extends React.Component {
     }
   };
 
-  ActiveAll = (selectedId, selected, numberOfIsActive) => {
+ActiveAll = (selectedId, selected, numberOfIsActive) => {
     if (selectedId.length !== 0) {
       for (let i in numberOfIsActive){
       let IsActive = !(numberOfIsActive[i]);
@@ -207,11 +214,12 @@ export class States extends React.Component {
     }
   }
   };
+
   clearSelected = (selected) => {
     selected = [];
   }
 
-  confirmActive = (event) => {
+confirmActive = (event) => {
     this.setState({ isActiveAllShowing: true })
     this.setState({ setActiveId: event.target.id });
     this.setState({ IsActive: event.target.checked });

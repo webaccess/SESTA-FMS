@@ -21,8 +21,13 @@ const useStyles = (theme) => ({
     alignItems: "center",
     marginTop: theme.spacing(1),
   },
+  floatRow: {
+    height: "40px",
+    float: "right",
+  },
   buttonRow: {
     height: "42px",
+    float: "right",
     marginTop: theme.spacing(1),
   },
   spacer: {
@@ -358,19 +363,21 @@ export class Shgs extends React.Component {
     return (
       <Layout>
         <div className="App">
-          <h1 className={style.title}>Manage Self Help Group</h1>
-          <div className={classes.row}>
-            <div className={style.addButton}>
-              <Button
-                color="primary"
-                variant="contained"
-                component={Link}
-                to="/Shgs/add"
-              >
-                Add SHG
-              </Button>
+          <h1 className={style.title}>
+            Manage Self Help Group
+            <div className={classes.floatRow}>
+              <div className={style.addButton}>
+                <Button
+                  color="primary"
+                  variant="contained"
+                  component={Link}
+                  to="/Shgs/add"
+                >
+                  Add SHG
+                </Button>
+              </div>
             </div>
-          </div>
+          </h1>
           {this.props.location.addData ? (
             <Snackbar severity="success">SHG added successfully.</Snackbar>
           ) : this.props.location.editData ? (
@@ -398,8 +405,6 @@ export class Shgs extends React.Component {
               An error occured - Please try again!
             </Snackbar>
           ) : null}
-
-          <br></br>
           <div className={classes.row}>
             <div className={classes.searchInput}>
               <div className={style.Districts}>
