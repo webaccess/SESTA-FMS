@@ -42,7 +42,6 @@ class VoPage extends Component {
         addVo: [],
         addVoAddress: [],
         addPerson: [],
-        addPerson: [],
         addGp: [],
       },
       serverErrors: {},
@@ -70,7 +69,6 @@ class VoPage extends Component {
           }
         )
         .then((res) => {
-          console.log("results", res.data[0].contact.name);
           this.setState({
             values: {
               addVo: res.data[0].contact.name,
