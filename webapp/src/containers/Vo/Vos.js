@@ -89,7 +89,8 @@ export class Vos extends React.Component {
     await axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-          "village-organizations/?_sort=name:ASC",
+          JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
+          "s?sub_type=VO",
         {
           headers: {
             Authorization: "Bearer " + auth.getToken() + "",
@@ -224,7 +225,10 @@ export class Vos extends React.Component {
 
       axios
         .delete(
-          process.env.REACT_APP_SERVER_URL + "village-organizations/" + cellid,
+          process.env.REACT_APP_SERVER_URL +
+            JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
+            "s/" +
+            cellid,
           {
             headers: {
               Authorization: "Bearer " + auth.getToken() + "",
@@ -248,7 +252,10 @@ export class Vos extends React.Component {
         axios
           .delete(
             process.env.REACT_APP_SERVER_URL +
-              "village-organizations/" +
+              JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
+                "Organization"
+              ][0] +
+              "s/" +
               selectedId[i],
             {
               headers: {
@@ -290,45 +297,30 @@ export class Vos extends React.Component {
       this.state.filterDistrict ||
       this.state.fiterVo
     )
-      searchData = "?";
-    // if (this.state.fiterShg) {
-    //   searchData += "shgs.id=" + this.state.fiterShg;
-    // }
-    // let searchData = "";
+      searchData = "";
+
     if (this.state.filterVo) {
-      searchData = "?";
-      searchData += "name_contains=" + this.state.filterVo;
+      searchData = "name_contains=" + this.state.filterVo + "&&";
     }
     if (this.state.filterState) {
-      searchData += searchData ? "&" : "";
-      searchData += "shgs.state=" + this.state.filterState;
+      searchData += "state.id=" + this.state.filterState + "&&";
     }
 
     if (this.state.filterDistrict) {
-      searchData += searchData ? "&" : "";
-      searchData += "shgs.district=" + this.state.filterDistrict;
+      searchData += "district.id=" + this.state.filterDistrict + "&&";
     }
 
     if (this.state.filterVillage) {
-      if (
-        !this.state.filterVo &&
-        !this.state.filterState &&
-        !this.state.filterDistrict
-      ) {
-        searchData = "?";
-      } else {
-        searchData += searchData ? "&" : "";
-      }
-      searchData += "shgs.villages=" + this.state.filterVillage;
+      searchData += "villages=" + this.state.filterVillage + "&&";
     }
-    // } else {
-    //   searchData += "shgs.villages=" + this.state.filterVillage;
-    // }
 
     //api call after search filter
     axios
       .get(
-        process.env.REACT_APP_SERVER_URL + "village-organizations" + searchData,
+        process.env.REACT_APP_SERVER_URL +
+          "contacts?organization.sub_type=VO&" +
+          searchData +
+          "_sort=name:ASC",
         {
           headers: {
             Authorization: "Bearer " + auth.getToken() + "",
@@ -547,7 +539,6 @@ export class Vos extends React.Component {
                           {...params}
                           fullWidth
                           label="Select Village"
-                          // value={filterVillage}
                           name="filterVillage"
                           variant="outlined"
                         />

@@ -136,7 +136,7 @@ class VoPage extends Component {
           {
             name: voName,
             sub_type: "VO",
-            address_1: voAddress,
+            address: voAddress,
             person_incharge: person,
             contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
               "Organization"
@@ -308,7 +308,7 @@ class VoPage extends Component {
                     variant="outlined"
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
                     label="Point of Contact"
