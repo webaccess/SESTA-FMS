@@ -50,12 +50,10 @@ export default function CustomizedSnackbars(props) {
   const handleClick = () => {
     setOpen(true);
   };
-
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
-
     setOpen(false);
   };
 
@@ -69,14 +67,14 @@ export default function CustomizedSnackbars(props) {
         <p></p>
       )}
       <div className={!isDesktop ? "" : style.Hidden}>
-        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-          <Alert onClose={handleClose} severity={props.severity}>
+        <Snackbar open={props.open ? props.open : open} autoHideDuration={props.autoHideDuration ? props.autoHideDuration : 4000} onClose={props.onClose ? props.onClose : handleClose}>
+          <Alert onClose={props.onClick} severity={props.severity}>
             {props.children}
           </Alert>
         </Snackbar>
       </div>
       <div className={isDesktop ? "" : style.Hidden}>
-        <Collapse in={open}>
+        <Collapse in={props.open ? props.open : open}>
           <Alert
             severity={props.severity}
             action={
@@ -84,9 +82,7 @@ export default function CustomizedSnackbars(props) {
                 aria-label="close"
                 color="inherit"
                 size="small"
-                onClick={() => {
-                  setOpen(false);
-                }}
+                onClick={props.onClick ? props.onClick : handleClose}
               >
                 <CloseIcon fontSize="inherit" />
               </IconButton>

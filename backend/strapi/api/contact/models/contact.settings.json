@@ -61,8 +61,8 @@
       "model": "country"
     },
     "villages": {
-      "collection": "village",
       "via": "contacts",
+      "collection": "village",
       "dominant": true
     },
     "organization": {

@@ -14,8 +14,8 @@
       "required": true
     },
     "shgs": {
-      "via": "villages",
       "collection": "shg",
+      "via": "villages",
       "dominant": true
     },
     "district": {
@@ -23,12 +23,24 @@
       "via": "villages"
     },
     "state": {
-      "model": "state",
-      "via": "villages"
+      "via": "villages",
+      "model": "state"
     },
     "contacts": {
-      "via": "villages",
-      "collection": "contact"
+      "collection": "contact",
+      "via": "villages"
+    },
+    "abbreviation": {
+      "type": "string",
+      "unique": true
+    },
+    "identifier": {
+      "type": "string",
+      "unique": true
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
     }
   }
 }

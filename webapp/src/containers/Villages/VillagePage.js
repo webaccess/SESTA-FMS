@@ -12,29 +12,33 @@ import {
   Divider,
   Grid,
 } from "@material-ui/core";
+import Checkbox from "@material-ui/core/Checkbox";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
 import { ADD_VILLAGE_BREADCRUMBS, EDIT_VILLAGE_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autotext from "../../components/Autotext/Autotext";
 
 class VillagePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      values: {},
+      values: {
+        addIsActive: false,
+      },
       getState: [],
       getDistrict: [],
       validations: {
         addVillage: {
-          required: { value: "true", message: "Village field required" },
+          required: { value: "true", message: "Village field is required" },
         },
         addState: {
-          required: { value: "true", message: "State field required" },
+          required: { value: "true", message: "State field is required" },
         },
         addDistrict: {
-          required: { value: "true", message: "District field required" },
+          required: { value: "true", message: "District field is required" },
         },
       },
       errors: {
@@ -70,6 +74,9 @@ class VillagePage extends Component {
           this.setState({
             values: {
               addVillage: res.data[0].name,
+              addAbbreviation: res.data[0].abbreviation,
+              addIdentifier: res.data[0].identifier,
+              addIsActive: res.data[0].is_active,
               addDistrict: res.data[0].district.id,
               addState: res.data[0].state.id,
             },
@@ -119,33 +126,65 @@ class VillagePage extends Component {
       values: { ...this.state.values, [target.name]: target.value },
     });
   };
-
-  handleStateChange = async ({ target }) => {
+  handleCheckBox = (event) => {
     this.setState({
-      values: { ...this.state.values, [target.name]: target.value },
+      values: {
+        ...this.state.values,
+        [event.target.name]: event.target.checked,
+      },
     });
-    let stateId = target.value;
-    await axios
-      .get(
-        process.env.REACT_APP_SERVER_URL +
-          "districts?is_active=true&&master_state.id=" +
-          stateId,
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
-      )
-      .then((res) => {
-        this.setState({ getDistrict: res.data });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    if (this.state.values.addState) {
-      this.setState({ stateSelected: true });
-    }
   };
+
+  handleStateChange(event, value) {
+    if (value !== null) {
+      this.setState({
+        values: { ...this.state.values, addState: value.id },
+      });
+      let stateId = value.id;
+      axios
+        .get(
+          process.env.REACT_APP_SERVER_URL +
+            "districts?is_active=true&&master_state.id=" +
+            stateId,
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
+          }
+        )
+        .then((res) => {
+          this.setState({ getDistrict: res.data });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      this.setState({ stateSelected: true });
+    } else {
+      this.setState({
+        values: {
+          ...this.state.values,
+          addState: "",
+          addDistrict: "",
+        },
+      });
+      this.setState({ stateSelected: false });
+    }
+  }
+
+  handleDistrictChange(event, value) {
+    if (value !== null) {
+      this.setState({
+        values: { ...this.state.values, addDistrict: value.id },
+      });
+    } else {
+      this.setState({
+        values: {
+          ...this.state.values,
+          addDistrict: "",
+        },
+      });
+    }
+  }
 
   validate = () => {
     const values = this.state.values;
@@ -153,7 +192,6 @@ class VillagePage extends Component {
     map(validations, (validation, key) => {
       let value = values[key] ? values[key] : "";
       const errors = validateInput(value, validation);
-
       let errorset = this.state.errors;
       if (errors.length > 0) errorset[key] = errors;
       else delete errorset[key];
@@ -177,6 +215,9 @@ class VillagePage extends Component {
 
     if (Object.keys(this.state.errors).length > 0) return;
     let villageName = this.state.values.addVillage;
+    let abbreviation = this.state.values.addAbbreviation;
+    let identifier = this.state.values.addIdentifier;
+    let isActive = this.state.values.addIsActive;
     let districtId = this.state.values.addDistrict;
     let stateId = this.state.values.addState;
 
@@ -189,12 +230,15 @@ class VillagePage extends Component {
             this.state.editPage[1],
           {
             name: villageName,
+            abbreviation: abbreviation,
+            identifier: identifier,
+            is_active: isActive,
             district: {
               id: districtId,
             },
             state: {
               id: stateId,
-            },
+            }
           },
           {
             headers: {
@@ -228,15 +272,17 @@ class VillagePage extends Component {
       await axios
         .post(
           process.env.REACT_APP_SERVER_URL + "villages",
-
           {
             name: villageName,
+            abbreviation: abbreviation,
+            identifier: identifier,
+            is_active: isActive,
             district: {
               id: districtId,
             },
             state: {
               id: stateId,
-            },
+            }
           },
           {
             headers: {
@@ -274,10 +320,14 @@ class VillagePage extends Component {
       formSubmitted: "",
       stateSelected: false,
     });
-    //routing code #route to village_list page
   };
 
   render() {
+    let stateFilter = this.state.getState;
+    let addState = this.state.values.addState;
+    let districtFilter = this.state.getDistrict;
+    let addDistrict = this.state.values.addDistrict;
+
     return (
       <Layout
         breadcrumbs={
@@ -305,18 +355,13 @@ class VillagePage extends Component {
             <CardContent>
               <Grid container spacing={3}>
                 <Grid item md={12} xs={12}>
-                  {/* {this.state.formSubmitted === true ? (
-                    <Snackbar severity="success">
-                      Village added successfully.
-                    </Snackbar>
-                  ) : null} */}
                   {this.state.formSubmitted === false ? (
                     <Snackbar severity="error" Showbutton={false}>
                       {this.state.errorCode}
                     </Snackbar>
                   ) : null}
                 </Grid>
-                <Grid item md={6} xs={12}>
+                <Grid item md={12} xs={12}>
                   <Input
                     fullWidth
                     label="Village Name*"
@@ -332,37 +377,96 @@ class VillagePage extends Component {
                     variant="outlined"
                   />
                 </Grid>
-
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
+                    label="Abbreviation"
+                    name="addAbbreviation"
+                    error={this.hasError("addAbbreviation")}
+                    helperText={
+                      this.hasError("addAbbreviation")
+                        ? this.state.errors.addVAbbreviation[0]
+                        : null
+                    }
+                    value={this.state.values.addAbbreviation || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Identifier"
+                    name="addIdentifier"
+                    error={this.hasError("addIdentifier")}
+                    helperText={
+                      this.hasError("addIdentifier")
+                        ? this.state.errors.addIdentifier[0]
+                        : null
+                    }
+                    value={this.state.values.addIdentifier || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+
+                <Grid item md={6} xs={12}>
+                  <Autotext
+                    id="combo-box-demo"
+                    options={stateFilter}
+                    variant="outlined"
                     label="Select State*"
-                    name="addState"
-                    onChange={this.handleStateChange}
-                    select
+                    getOptionLabel={(option) => option.name}
+                    onChange={(event, value) => {
+                      this.handleStateChange(event, value);
+                    }}
+                    defaultValue={[]}
+                    value={
+                      addState
+                        ? stateFilter[
+                            stateFilter.findIndex(function (item, i) {
+                              return item.id === addState;
+                            })
+                          ] || null
+                        : null
+                    }
                     error={this.hasError("addState")}
                     helperText={
                       this.hasError("addState")
                         ? this.state.errors.addState[0]
                         : null
                     }
-                    value={this.state.values.addState || ""}
-                    variant="outlined"
-                  >
-                    {this.state.getState.map((states) => (
-                      <option value={states.id} key={states.id}>
-                        {states.name}
-                      </option>
-                    ))}
-                  </Input>
+                    renderInput={(params) => (
+                      <Input
+                        fullWidth
+                        label="Select State*"
+                        name="addState"
+                        variant="outlined"
+                      />
+                    )}
+                  />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
+                  <Autotext
+                    id="combo-box-demo"
+                    options={districtFilter}
+                    variant="outlined"
                     label="Select District*"
                     name="addDistrict"
-                    onChange={this.handleChange}
-                    select
+                    getOptionLabel={(option) => option.name}
+                    onChange={(event, value) => {
+                      this.handleDistrictChange(event, value);
+                    }}
+                    defaultValue={[]}
+                    value={
+                      addDistrict
+                        ? districtFilter[
+                            districtFilter.findIndex(function (item, i) {
+                              return item.id === addDistrict;
+                            })
+                          ] || null
+                        : null
+                    }
                     error={this.hasError("addDistrict")}
                     helperText={
                       this.hasError("addDistrict")
@@ -371,15 +475,29 @@ class VillagePage extends Component {
                         ? null
                         : "Please select the state first"
                     }
-                    value={this.state.values.addDistrict || ""}
-                    variant="outlined"
-                  >
-                    {this.state.getDistrict.map((district) => (
-                      <option value={district.id} key={district.id}>
-                        {district.name}
-                      </option>
-                    ))}
-                  </Input>
+                    renderInput={(params) => (
+                      <Input
+                        {...params}
+                        fullWidth
+                        label="Select District*"
+                        name="addDistrict"
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={this.state.values.addIsActive}
+                        onChange={this.handleCheckBox}
+                        name="addIsActive"
+                        color="primary"
+                      />
+                    }
+                    label="Active"
+                  />
                 </Grid>
               </Grid>
             </CardContent>
