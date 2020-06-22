@@ -49,6 +49,7 @@ export class Shgs extends React.Component {
       filterDistrict: "",
       filterVillage: "",
       filterShg: "",
+      filterVo: "",
       Result: [],
       TestData: [],
       data: [],
@@ -78,7 +79,6 @@ export class Shgs extends React.Component {
         }
       )
       .then((res) => {
-        console.log("api result village", res.data);
         this.setState({ data: this.getData(res.data) });
       });
     //api call for states filter
@@ -102,7 +102,6 @@ export class Shgs extends React.Component {
         },
       })
       .then((res) => {
-        console.log("villagedata", res.data);
         this.setState({ getVillage: res.data });
       })
       .catch((error) => {
@@ -119,7 +118,6 @@ export class Shgs extends React.Component {
 
       result[i]["contact"]["villages"] = villages;
     }
-    console.log("hi ", result);
     return result;
   }
   handleStateChange = async (event, value) => {
@@ -158,13 +156,12 @@ export class Shgs extends React.Component {
     }
   };
   handleChange(event) {
-    this.setState({ filterShg: event.target.value });
+    this.setState({ [event.target.name]: event.target.value });
   }
 
   handleDistrictChange(event, value) {
     if (value !== null) {
       this.setState({ filterDistrict: value.id });
-      console.log("District", this.state.filterDistrict);
       let distId = value.id;
       axios
         .get(process.env.REACT_APP_SERVER_URL + "districts/" + distId, {
@@ -173,7 +170,6 @@ export class Shgs extends React.Component {
           },
         })
         .then((res) => {
-          console.log("villagedata", res.data.villages);
           this.setState({ getVillage: res.data.villages });
         })
         .catch((error) => {
@@ -207,7 +203,6 @@ export class Shgs extends React.Component {
 
   DeleteData = (cellid, selectedId) => {
     if (cellid.length !== null && selectedId < 1) {
-      console.log("delete", cellid);
       this.setState({ singleDelete: "", multipleDelete: "" });
 
       axios
@@ -223,7 +218,6 @@ export class Shgs extends React.Component {
           }
         )
         .then((res) => {
-          console.log("deleted data res", res.data);
           this.setState({ singleDelete: res.data.name });
           this.componentDidMount();
         })
@@ -252,7 +246,6 @@ export class Shgs extends React.Component {
             }
           )
           .then((res) => {
-            console.log("deleted data res", res.data);
             this.setState({ multipleDelete: true });
             this.componentDidMount();
           })
@@ -269,6 +262,7 @@ export class Shgs extends React.Component {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
+      filterVo: "",
       filterShg: "",
 
       isCancel: true,
@@ -277,10 +271,13 @@ export class Shgs extends React.Component {
     //routing code #route to village_list page
   };
   handleSearch() {
-    console.log("kkk", this.state);
     let searchData = "";
     if (this.state.filterShg) {
       searchData += "name_contains=" + this.state.filterShg + "&&";
+    }
+    if (this.state.filterVo) {
+      searchData +=
+        "village_organization.name_contains=" + this.state.filterVo + "&&";
     }
     if (this.state.filterState) {
       searchData += "state.id=" + this.state.filterState + "&&";
@@ -300,7 +297,6 @@ export class Shgs extends React.Component {
         },
       })
       .then((res) => {
-        console.log("api 222222", res.data);
         this.setState({ data: this.getData(res.data) });
       })
       .catch((err) => {
@@ -313,10 +309,30 @@ export class Shgs extends React.Component {
 
     const Usercolumns = [
       {
-        name: "SHG Name",
+        name: "SHG",
         selector: "name",
         sortable: true,
       },
+      {
+        name: "Village Organization",
+        selector: "village_organization.name",
+        sortable: true
+      },
+      {
+        name: "Village",
+        selector: "villages",
+        sortable: true
+      },
+      {
+        name: "District",
+        selector: "district.name",
+        sortable: true
+      },
+      {
+        name: "State",
+        selector: "state.name",
+        sortable: true
+      }
       // {
       //   name: "Village Name",
       //   selector: "contact.villages",
@@ -339,7 +355,6 @@ export class Shgs extends React.Component {
     let villagesFilter = this.state.getVillage;
     let filterVillage = this.state.filterVillage;
     let isCancel = this.state.isCancel;
-    console.log(this.state);
     return (
       <Layout>
         <div className="App">
@@ -395,6 +410,21 @@ export class Shgs extends React.Component {
                     name="filterShg"
                     id="combo-box-demo"
                     value={this.state.filterShg || ""}
+                    onChange={this.handleChange.bind(this)}
+                    variant="outlined"
+                  />
+                </Grid>
+              </div>
+            </div>
+            <div className={classes.searchInput}>
+              <div className={style.Districts}>
+                <Grid item md={12} xs={12}>
+                  <Input
+                    fullWidth
+                    label="VO Name"
+                    name="filterVo"
+                    id="combo-box-demo"
+                    value={this.state.filterVo || ""}
                     onChange={this.handleChange.bind(this)}
                     variant="outlined"
                   />
@@ -510,7 +540,7 @@ export class Shgs extends React.Component {
             <Button onClick={this.handleSearch.bind(this)}>Search</Button>
             &nbsp;&nbsp;&nbsp;&nbsp;
             <Button color="secondary" clicked={this.cancelForm}>
-              cancel
+              reset
             </Button>
           </div>
           {data ? (
