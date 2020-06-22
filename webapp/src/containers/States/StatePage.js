@@ -6,7 +6,6 @@ import Button from "../../components/UI/Button/Button";
 import Input from "../../components/UI/Input/Input";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-
 import {
   Card,
   CardHeader,
@@ -25,10 +24,8 @@ class StatePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      values: {},
-      getState: [],
-      getDistrict: [],
       addIsActive: false,
+      values: {},
       validations: {
         addState: {
           required: { value: "true", message: "State field required" },
@@ -37,10 +34,8 @@ class StatePage extends Component {
       errors: {
         addState: [],
       },
-      serverErrors: {},
       formSubmitted: "",
       errorCode: "",
-      stateSelected: false,
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
@@ -62,11 +57,12 @@ class StatePage extends Component {
           }
         )
         .then((res) => {
-          console.log(res.data);
           this.setState({
             values: {
               addState: res.data[0].name,
               active: res.data[0].is_active,
+              addAbbreviation: res.data[0].Abbreviation,
+              addIdentifier: res.data[0].Identifier
             },
           });
         })
@@ -74,7 +70,6 @@ class StatePage extends Component {
           console.log(error);
         });
     }
-    this.stateIds = this.state.values.addState;
   }
 
   handleChange = ({ target, event }) => {
@@ -111,6 +106,8 @@ class StatePage extends Component {
     this.setState({ formSubmitted: "" });
     if (Object.keys(this.state.errors).length > 0) return;
     let stateName = this.state.values.addState;
+    let abbreviation = this.state.values.addAbbreviation;
+    let identifier = this.state.values.addIdentifier;
     let IsActive = this.state.addIsActive;
     if (this.state.editPage[0]) {
       // Code for Edit Data Page
@@ -120,6 +117,8 @@ class StatePage extends Component {
           {
             name: stateName,
             is_active: IsActive,
+            Abbreviation: abbreviation,
+            Identifier: identifier
           },
           {
             headers: {
@@ -156,6 +155,8 @@ class StatePage extends Component {
           {
             name: stateName,
             is_active: IsActive,
+            Abbreviation: abbreviation,
+            Identifier: identifier
           },
           {
             headers: {
@@ -246,6 +247,38 @@ class StatePage extends Component {
                         : null
                     }
                     value={this.state.values.addState || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Identifier"
+                    name="addIdentifier"
+                    error={this.hasError("addIdentifier")}
+                    helperText={
+                      this.hasError("addIdentifier")
+                        ? this.state.errors.addIdentifier[0]
+                        : null
+                    }
+                    value={this.state.values.addIdentifier || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Abbreviation"
+                    name="addAbbreviation"
+                    error={this.hasError("addAbbreviation")}
+                    helperText={
+                      this.hasError("addAbbreviation")
+                        ? this.state.errors.addAbbreviation[0]
+                        : null
+                    }
+                    value={this.state.values.addAbbreviation || ""}
                     onChange={this.handleChange}
                     variant="outlined"
                   />

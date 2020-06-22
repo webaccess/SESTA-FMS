@@ -7,13 +7,9 @@ import { withStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
 import style from "./States.module.css";
 import { Grid } from "@material-ui/core";
-import Autocomplete from "@material-ui/lab/Autocomplete";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import FormGroup from "@material-ui/core/FormGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Checkbox from "@material-ui/core/Checkbox";
 import Modal from "../../components/UI/Modal/Modal.js";
 import Switch from "../../components/UI/Switch/Switch";
 
@@ -32,13 +28,6 @@ const useStyles = (theme) => ({
   buttonRow: {
     height: "42px",
     float: "right",
-  },
-  spacer: {
-    flexGrow: 1,
-  },
-  addButton: {
-    float: "right",
-    marginRight: theme.spacing(1),
   },
   searchInput: {
     marginRight: theme.spacing(1),
@@ -63,26 +52,14 @@ export class States extends React.Component {
     this.state = {
       values: {},
       FilterState: "",
-      Result: [],
-      TestData: [],
       data: [],
-      selectedid: 0,
-      open: false,
-      isSetActive: false,
-      isSetInActive: false,
       isActiveAllShowing: false,
       columnsvalue: [],
       DeleteData: false,
-      properties: props,
-      getState: [],
-      getDistrict: [],
-      getVillage: [],
       isCancel: false,
       dataCellId: [],
       singleDelete: "",
       multipleDelete: "",
-      active: {},
-      allIsActive: [],
     };
   }
 
@@ -201,104 +178,85 @@ export class States extends React.Component {
     }
   };
 
-  ActiveAll = (selectedId, selected) => {
+ActiveAll = (selectedId, selected, numberOfIsActive) => {
     if (selectedId.length !== 0) {
-      let numberOfIsActive = [];
-      for (let i in selected) {
-        numberOfIsActive.push(selected[0]["is_active"]);
-      }
-      this.setState({ allIsActive: numberOfIsActive });
-      console.log("hddhhjd", selected[0]["is_active"]);
-      let IsActive = "";
-      if (selected[0]["is_active"] === true) {
-        IsActive = false;
-      } else {
-        IsActive = true;
-      }
-      let setActiveId = selectedId;
-      for (let i in selectedId) {
+      for (let i in numberOfIsActive){
+      let IsActive = !(numberOfIsActive[i]);
         axios
           .put(
-            process.env.REACT_APP_SERVER_URL + "states/" + selectedId[i],
+            process.env.REACT_APP_SERVER_URL +
+            "states/" +
+            selectedId[i],
             {
-              is_active: IsActive,
+              is_active: IsActive
             },
             {
               headers: {
-                Authorization: "Bearer " + auth.getToken() + "",
-              },
+                Authorization: "Bearer " + auth.getToken() + ""
+              }
             }
           )
-          .then((res) => {
+          .then(res => {
             this.setState({ formSubmitted: true });
             this.componentDidMount({ editData: true });
             this.props.history.push({ pathname: "/states", editData: true });
-            this.clearSelected(selected);
           })
-          .catch((error) => {
+          .catch(error => {
             this.setState({ formSubmitted: false });
             if (error.response !== undefined) {
-              this.setState({
-                errorCode:
-                  error.response.data.statusCode +
-                  " Error- " +
-                  error.response.data.error +
-                  " Message- " +
-                  error.response.data.message +
-                  " Please try again!",
-              });
+              this.setState({ errorCode: error.response.data.statusCode + " Error- " + error.response.data.error + " Message- " + error.response.data.message + " Please try again!" })
             } else {
               this.setState({ errorCode: "Network Error - Please try again!" });
             }
             console.log(error);
           });
-      }
+      // }
     }
+  }
   };
 
   clearSelected = (selected) => {
-    let clearselected = "";
-  };
+    selected = [];
+  }
 
-  confirmActive = (event) => {
-    this.setState({ isActiveAllShowing: true });
+confirmActive = (event) => {
+    this.setState({ isActiveAllShowing: true })
     this.setState({ setActiveId: event.target.id });
     this.setState({ IsActive: event.target.checked });
   };
 
+  handleClose = () => {
+    this.setState({ open: false })
+  };
+
   handleActive = (event) => {
-    this.setState({ isActiveAllShowing: false });
+    this.setState({ isActiveAllShowing: false })
     let setActiveId = this.state.setActiveId;
     let IsActive = this.state.IsActive;
     axios
       .put(
-        process.env.REACT_APP_SERVER_URL + "states/" + setActiveId,
+        process.env.REACT_APP_SERVER_URL +
+        "states/" +
+        setActiveId,
         {
-          is_active: IsActive,
+          is_active: IsActive
         },
         {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
+            Authorization: "Bearer " + auth.getToken() + ""
+          }
         }
       )
-      .then((res) => {
+      .then(res => {
         this.setState({ formSubmitted: true });
+        this.setState({ open: true })
         this.componentDidMount({ editData: true });
         this.props.history.push({ pathname: "/states", editData: true });
       })
-      .catch((error) => {
+      .catch(error => {
         this.setState({ formSubmitted: false });
         if (error.response !== undefined) {
-          this.setState({
-            errorCode:
-              error.response.data.statusCode +
-              " Error- " +
-              error.response.data.error +
-              " Message- " +
-              error.response.data.message +
-              " Please try again!",
-          });
+          this.setState({ errorCode: error.response.data.statusCode + " Error- " + error.response.data.error + " Message- " + error.response.data.message + " Please try again!" })
         } else {
           this.setState({ errorCode: "Network Error - Please try again!" });
         }
@@ -308,10 +266,11 @@ export class States extends React.Component {
 
   closeActiveAllModalHandler = (event) => {
     this.setState({ isActiveAllShowing: false });
+
   };
   handleCheckBox = (event) => {
     this.setState({ [event.target.name]: event.target.checked });
-    this.setState({ addIsActive: true });
+    this.setState({ addIsActive: true })
   };
 
   render() {
@@ -324,19 +283,10 @@ export class States extends React.Component {
       },
       {
         name: "Active",
-        cell: (cell) => (
-          <Switch
-            id={cell.id}
-            onChange={(e) => {
-              this.confirmActive(e);
-            }}
-            defaultChecked={cell.is_active}
-            Small={true}
-          />
-        ),
+        cell: cell => (<Switch id={cell.id} name={cell.name} onChange={event => { this.confirmActive(event) }} defaultChecked={cell.is_active} Small={true} />),
         sortable: true,
-        button: true,
-      },
+        button: true
+      }
     ];
 
     let selectors = [];
@@ -347,36 +297,40 @@ export class States extends React.Component {
     let columnsvalue = selectors[0];
     const { classes } = this.props;
     let filters = this.state.values;
-    console.log("kaise soye", this.state.allIsActive);
-    console.log("ek baar ", this.state.IsActive, this.state.setActiveId);
     return (
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>
-              Manage States
-              <div className={classes.floatRow}>
-                <div className={classes.buttonRow}>
-                  <Button variant="contained" component={Link} to="/states/add">
-                    Add State
-                  </Button>
-                </div>
+            <h1 className={style.title}>Manage States</h1>
+            <div className={classes.row}>
+              <div className={classes.buttonRow}>
+                <Button
+                  variant="contained"
+                  component={Link}
+                  to="/states/add"
+                >
+                  Add State
+                </Button>
               </div>
-            </h1>
-
+            </div>
             {this.props.location.addData ? (
-              <Snackbar severity="success">State added successfully.</Snackbar>
-            ) : null}
-            {this.props.location.editData ? (
-              <Snackbar severity="success">State edited successfully.</Snackbar>
-            ) : null}
-            {this.state.singleDelete !== false &&
-            this.state.singleDelete !== "" &&
-            this.state.singleDelete ? (
-              <Snackbar severity="success" Showbutton={false}>
-                State {this.state.singleDelete} deleted successfully!
+              <Snackbar severity="success">
+                State added successfully.
               </Snackbar>
             ) : null}
+            {this.props.location.editData ? (
+              <Snackbar open={this.state.open} autoHideDuration={3000} onClose={this.handleClose} severity="success">
+                State edited successfully.
+              </Snackbar>
+            ) : null}
+            {this.state.singleDelete !== false &&
+              this.state.singleDelete !== "" &&
+
+              this.state.singleDelete ? (
+                <Snackbar severity="success" Showbutton={false}>
+                  State {this.state.singleDelete} deleted successfully!
+                </Snackbar>
+              ) : null}
             {this.state.singleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
@@ -412,10 +366,10 @@ export class States extends React.Component {
               </div>
               <div className={classes.searchInput}>
                 <Button onClick={this.handleSearch.bind(this)}>Search</Button>
-                &nbsp;&nbsp;&nbsp;
-                <Button color="secondary" clicked={this.cancelForm}>
+               &nbsp;&nbsp;&nbsp;
+              <Button color="secondary" clicked={this.cancelForm}>
                   Reset
-                </Button>
+              </Button>
               </div>
             </div>
             <br></br>
@@ -425,8 +379,6 @@ export class States extends React.Component {
                 title={"States"}
                 showSearch={false}
                 filterData={true}
-                allIsActive={this.state.allIsActive}
-                // noDataComponent={"No Records To be shown"}
                 Searchplaceholder={"Search by State Name"}
                 filterBy={["name"]}
                 filters={filters}
@@ -441,13 +393,10 @@ export class States extends React.Component {
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 DeleteMessage={"Are you Sure you want to Delete"}
-                ActiveMessage={
-                  "Are you Sure you want to Deactivate selected State"
-                }
               />
             ) : (
-              <h1>Loading...</h1>
-            )}
+                <h1>Loading...</h1>
+              )}
             <Modal
               className="modal"
               show={this.state.isActiveAllShowing}
@@ -459,12 +408,12 @@ export class States extends React.Component {
                 footerSaveName: "OKAY",
                 footerCloseName: "CLOSE",
                 displayClose: { display: "true" },
-                displaySave: { display: "true" },
+                displaySave: { display: "true" }
               }}
             >
-              {this.state.IsActive
-                ? " Do you want to set selected Active ?"
-                : "Do you want to Deactivate selected State.?"}
+              {this.state.IsActive ? (<p>Do you want to set selected Active ?{this.state.data.name}</p>
+               ) : (<p>Do you want to Deactivate selected State.?</p>)
+              }
             </Modal>
           </div>
         </Grid>
