@@ -10,11 +10,13 @@
   },
   "attributes": {
     "name": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "is_active": {
       "type": "boolean",
-      "default": true
+      "default": true,
+      "required": true
     },
     "master_districts": {
       "collection": "district",
@@ -23,6 +25,18 @@
     "villages": {
       "collection": "village",
       "via": "state"
+    },
+    "Identifier": {
+      "type": "string",
+      "unique": true
+    },
+    "Abbreviation": {
+      "type": "string",
+      "unique": true
+    },
+    "country": {
+      "model": "country",
+      "via": "master_states"
     }
   }
 }

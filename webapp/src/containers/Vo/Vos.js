@@ -24,9 +24,13 @@ const useStyles = (theme) => ({
     alignItems: "center",
     marginTop: theme.spacing(1),
   },
+  floatRow: {
+    height: "40px",
+    float: "right",
+  },
   buttonRow: {
     height: "42px",
-    marginTop: theme.spacing(1),
+    float: "right",
   },
   spacer: {
     flexGrow: 1,
@@ -361,18 +365,19 @@ export class Vos extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}> Manage Village Organizations</h1>
-            <div className={classes.row}>
-              <div className={classes.buttonRow}>
-                <Button
-                  variant="contained"
-                  component={Link}
-                  to="/Village-organizations/add"
-                >
-                  Add Village Organization
-                </Button>
+            <h1 className={style.title}> Manage Village Organizations
+              <div className={classes.floatRow}>
+                <div className={classes.buttonRow}>
+                  <Button
+                    variant="contained"
+                    component={Link}
+                    to="/Village-organizations/add"
+                  >
+                    Add Village Organization
+                  </Button>
+                </div>
               </div>
-            </div>
+            </h1>
             {this.props.location.addVoData ? (
               <Snackbar severity="success">
                 Village organization added successfully.
@@ -405,7 +410,6 @@ export class Vos extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            <br></br>
             <div className={classes.row}>
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
@@ -482,6 +486,7 @@ export class Vos extends React.Component {
                       onChange={(event, value) => {
                         this.handleDistrictChange(event, value);
                       }}
+                      // defaultValue={[]}
                       value={
                         filterDistrict
                           ? this.state.isCancel === true

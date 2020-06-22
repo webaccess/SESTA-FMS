@@ -20,8 +20,8 @@
       "type": "string"
     },
     "villages": {
-      "collection": "village",
-      "via": "shgs"
+      "via": "shgs",
+      "collection": "village"
     },
     "state": {
       "model": "state"
