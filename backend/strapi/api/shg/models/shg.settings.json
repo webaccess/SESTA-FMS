@@ -30,8 +30,8 @@
       "model": "district"
     },
     "village_organization": {
-      "model": "village-organization",
-      "via": "shgs"
+      "via": "shgs",
+      "model": "village-organization"
     }
   }
 }

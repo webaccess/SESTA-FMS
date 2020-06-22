@@ -5,24 +5,24 @@ import Layout from "../../hoc/Layout/Layout";
 import Button from "../../components/UI/Button/Button";
 import { withStyles, ThemeProvider } from "@material-ui/core/styles";
 import style from "./Vos.module.css";
-import { Redirect, Route } from "react-router-dom";
 import { Link } from "react-router-dom";
 import auth from "../../components/Auth/Auth.js";
 import Input from "../../components/UI/Input/Input";
 import AutoSuggest from "../../components/UI/Autosuggest/Autosuggest";
 import { Grid } from "@material-ui/core";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+// import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autocomplete from "../../components/Autocomplete/Autocomplete.js";
 
 import { createBrowserHistory } from "history";
 
-const useStyles = theme => ({
+const useStyles = (theme) => ({
   root: {},
   row: {
     height: "42px",
     display: "flex",
     alignItems: "center",
-    marginTop: theme.spacing(1)
+    marginTop: theme.spacing(1),
   },
   floatRow: {
     height: "40px",
@@ -33,27 +33,27 @@ const useStyles = theme => ({
     float: "right",
   },
   spacer: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   addButton: {
     float: "right",
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   searchInput: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   Districts: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   States: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   Search: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   Cancel: {
-    marginRight: theme.spacing(1)
-  }
+    marginRight: theme.spacing(1),
+  },
 });
 
 export class Vos extends React.Component {
@@ -79,7 +79,7 @@ export class Vos extends React.Component {
       // selectedShg: [],
       isCancel: false,
       singleDelete: "",
-      multipleDelete: ""
+      multipleDelete: "",
     };
 
     let history = props;
@@ -92,24 +92,24 @@ export class Vos extends React.Component {
           "village-organizations/?_sort=name:ASC",
         {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         }
       )
-      .then(res => {
+      .then((res) => {
         this.setState({ data: res.data });
       });
     //api call for states filter
     await axios
       .get(process.env.REACT_APP_SERVER_URL + "states?is_active=true", {
         headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
+          Authorization: "Bearer " + auth.getToken() + "",
+        },
       })
-      .then(res => {
+      .then((res) => {
         this.setState({ getState: res.data });
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
 
@@ -117,13 +117,13 @@ export class Vos extends React.Component {
     await axios
       .get(process.env.REACT_APP_SERVER_URL + "Villages/", {
         headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
+          Authorization: "Bearer " + auth.getToken() + "",
+        },
       })
-      .then(res => {
+      .then((res) => {
         this.setState({ getVillage: res.data });
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
     //api for shgs filter
@@ -155,7 +155,7 @@ export class Vos extends React.Component {
       this.setState({ filterState: value.id });
 
       this.setState({
-        isCancel: false
+        isCancel: false,
       });
 
       let stateId = value.id;
@@ -166,22 +166,20 @@ export class Vos extends React.Component {
             stateId,
           {
             headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
           }
         )
-        .then(res => {
+        .then((res) => {
           this.setState({ getDistrict: res.data });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     } else {
       this.setState({
         filterState: "",
         filterDistrict: "",
-        filterVillage: "",
-        getVillage: ""
         // fiterShg:""
         // selectedShg:""
       });
@@ -197,7 +195,6 @@ export class Vos extends React.Component {
     } else {
       this.setState({
         filterDistrict: "",
-        filterVillage: ""
         // fiterShg:""
         // selectedShg:""
       });
@@ -209,7 +206,7 @@ export class Vos extends React.Component {
       this.setState({ isCancel: false });
     } else {
       this.setState({
-        filterVillage: ""
+        filterVillage: "",
         // fiterShg:""
         // selectedShg:""
       });
@@ -217,7 +214,7 @@ export class Vos extends React.Component {
     // this.setState({ selectedShg: "" });
   }
 
-  editData = cellid => {
+  editData = (cellid) => {
     this.props.history.push("/village-organizations/edit/" + cellid);
   };
 
@@ -230,21 +227,21 @@ export class Vos extends React.Component {
           process.env.REACT_APP_SERVER_URL + "village-organizations/" + cellid,
           {
             headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
           }
         )
-        .then(res => {
+        .then((res) => {
           this.setState({ singleDelete: res.data.name });
           this.componentDidMount();
         })
-        .catch(error => {
+        .catch((error) => {
           this.setState({ singleDelete: false });
           console.log(error.response);
         });
     }
   };
-  DeleteAll = selectedId => {
+  DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       for (let i in selectedId) {
@@ -255,15 +252,15 @@ export class Vos extends React.Component {
               selectedId[i],
             {
               headers: {
-                Authorization: "Bearer " + auth.getToken() + ""
-              }
+                Authorization: "Bearer " + auth.getToken() + "",
+              },
             }
           )
-          .then(res => {
+          .then((res) => {
             this.setState({ multipleDelete: true });
             this.componentDidMount();
           })
-          .catch(error => {
+          .catch((error) => {
             this.setState({ multipleDelete: false });
 
             console.log("err", error);
@@ -279,7 +276,7 @@ export class Vos extends React.Component {
       filterVo: "",
       //fiterShg:"",
       //selectedShg: "",
-      isCancel: true
+      isCancel: true,
     });
 
     this.componentDidMount();
@@ -334,14 +331,14 @@ export class Vos extends React.Component {
         process.env.REACT_APP_SERVER_URL + "village-organizations" + searchData,
         {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         }
       )
-      .then(res => {
+      .then((res) => {
         this.setState({ data: res.data });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log("err", err);
       });
   }
@@ -354,8 +351,8 @@ export class Vos extends React.Component {
     const Usercolumns = [
       {
         name: "Village Organization",
-        selector: "name"
-      }
+        selector: "name",
+      },
     ];
 
     let selectors = [];
@@ -456,22 +453,23 @@ export class Vos extends React.Component {
                       width="150px"
                       id="combo-box-demo"
                       options={statesFilter}
-                      getOptionLabel={option => option.name}
+                      getOptionLabel={(option) => option.name}
                       onChange={(event, value) => {
                         this.handleStateChange(event, value);
                       }}
+                      defaultValue={[]}
                       value={
                         filterState
                           ? this.state.isCancel === true
                             ? null
                             : statesFilter[
-                                statesFilter.findIndex(function(item, i) {
+                                statesFilter.findIndex(function (item, i) {
                                   return item.id === filterState;
                                 })
                               ] || null
                           : null
                       }
-                      renderInput={params => (
+                      renderInput={(params) => (
                         <Input
                           {...params}
                           fullWidth
@@ -492,22 +490,23 @@ export class Vos extends React.Component {
                       id="combo-box-demo"
                       options={districtsFilter}
                       name="filterDistrict"
-                      getOptionLabel={option => option.name}
+                      getOptionLabel={(option) => option.name}
                       onChange={(event, value) => {
                         this.handleDistrictChange(event, value);
                       }}
+                      // defaultValue={[]}
                       value={
                         filterDistrict
                           ? this.state.isCancel === true
                             ? null
                             : districtsFilter[
-                                districtsFilter.findIndex(function(item, i) {
+                                districtsFilter.findIndex(function (item, i) {
                                   return item.id === filterDistrict;
                                 })
                               ] || null
                           : null
                       }
-                      renderInput={params => (
+                      renderInput={(params) => (
                         <Input
                           {...params}
                           fullWidth
@@ -527,8 +526,8 @@ export class Vos extends React.Component {
                     <Autocomplete
                       id="combo-box-demo"
                       options={villagesFilter}
-                      name="filterVillage"
-                      getOptionLabel={option => option.name}
+                      // name="filterVillage"
+                      getOptionLabel={(option) => option.name}
                       onChange={(event, value) => {
                         this.handleVillageChange(event, value);
                       }}
@@ -537,13 +536,13 @@ export class Vos extends React.Component {
                           ? this.state.isCancel === true
                             ? null
                             : villagesFilter[
-                                villagesFilter.findIndex(function(item, i) {
+                                villagesFilter.findIndex(function (item, i) {
                                   return item.id === filterVillage;
                                 })
                               ] || null
                           : null
                       }
-                      renderInput={params => (
+                      renderInput={(params) => (
                         <Input
                           {...params}
                           fullWidth

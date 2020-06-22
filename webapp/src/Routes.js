@@ -40,8 +40,6 @@ function Routes() {
               component={VillagePage}
               exact
             />
-            <PrivateRoute path="/shgs/edit/:id" component={ShgPage} exact />
-            <PrivateRoute path="/shgs/add" component={ShgPage} exact />
             <PrivateRoute
               path="/village-organizations/add"
               component={VoPage}
@@ -55,6 +53,8 @@ function Routes() {
             
             <PrivateRoute path="/village-organizations" component={Vos} exact />
             <PrivateRoute path="/villages" component={Villages} exact />
+            <PrivateRoute path="/shgs/add" component={ShgPage} exact />
+            <PrivateRoute path="/shgs/edit/:id" component={ShgPage} exact />
             <PrivateRoute path="/shgs" component={Shgs} exact />
             <PrivateRoute path="/pgs" component={Pgs} exact />
             <PrivateRoute path="/pgs/add" component={PgPage} exact />
