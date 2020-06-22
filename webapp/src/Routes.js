@@ -26,6 +26,8 @@ import Account from "./containers/Account/Account";
 import ShgPage from "./containers/Shgs/ShgPage";
 import FpoPage from "./containers/Fpos/FpoPage";
 import Fpos from "./containers/Fpos/Fpos";
+import countries from "./containers/Countries/Countries";
+import CountryPage from "./containers/Countries/CountryPage";
 
 function Routes() {
   return (
@@ -50,7 +52,7 @@ function Routes() {
               component={VoPage}
               exact
             />
-            
+
             <PrivateRoute path="/village-organizations" component={Vos} exact />
             <PrivateRoute path="/villages" component={Villages} exact />
             <PrivateRoute path="/shgs/add" component={ShgPage} exact />
@@ -66,10 +68,17 @@ function Routes() {
               component={StatesPage}
               exact
             />
-             <PrivateRoute path="/fpos" component={Fpos} exact/>
+            <PrivateRoute path="/fpos" component={Fpos} exact />
             <PrivateRoute path="/fpos/add" component={FpoPage} exact />
             <PrivateRoute path="/fpos/edit/:id" component={FpoPage} exact />
             <PrivateRoute path="/my-account" component={Account} exact />
+            <PrivateRoute path="/countries" component={countries} exact />
+            <PrivateRoute path="/countries/add" component={CountryPage} exact />
+            <PrivateRoute
+              path="/countries/edit/:id"
+              component={CountryPage}
+              exact
+            />
             <Route path="/404" component={NotFoundPage} />
             <AuthRoute path="/:authType/:id?" component={AuthPage} />
           </Switch>
