@@ -4,16 +4,15 @@ import axios from "axios";
 import auth from "../../components/Auth/Auth";
 import Button from "../../components/UI/Button/Button";
 import Input from "../../components/UI/Input/Input";
-import Checkbox from '@material-ui/core/Checkbox';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-
+import Checkbox from "@material-ui/core/Checkbox";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 import {
   Card,
   CardHeader,
   CardContent,
   CardActions,
   Divider,
-  Grid
+  Grid,
 } from "@material-ui/core";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
@@ -25,26 +24,22 @@ class StatePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      values: {},
-      getState: [],
-      getDistrict: [],
       addIsActive: false,
+      values: {},
       validations: {
         addState: {
-          required: { value: "true", message: "State field required" }
+          required: { value: "true", message: "State field required" },
         },
       },
       errors: {
         addState: [],
       },
-      serverErrors: {},
       formSubmitted: "",
       errorCode: "",
-      stateSelected: false,
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
-        this.props.match.params.id
-      ]
+        this.props.match.params.id,
+      ],
     };
   }
 
@@ -53,35 +48,34 @@ class StatePage extends Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-          "states?id=" +
-          this.state.editPage[1],
+            "states?id=" +
+            this.state.editPage[1],
           {
             headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
           }
         )
-        .then(res => {
-          console.log(res.data)
+        .then((res) => {
           this.setState({
             values: {
               addState: res.data[0].name,
-              active: res.data[0].is_active
-            }
+              active: res.data[0].is_active,
+              addAbbreviation: res.data[0].Abbreviation,
+              addIdentifier: res.data[0].Identifier
+            },
           });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     }
-    this.stateIds = this.state.values.addState;
-  };
+  }
 
   handleChange = ({ target, event }) => {
     this.setState({
       values: { ...this.state.values, [target.name]: target.value },
     });
-
   };
 
   validate = () => {
@@ -97,7 +91,7 @@ class StatePage extends Component {
     });
   };
 
-  hasError = field => {
+  hasError = (field) => {
     if (this.state.errors[field] !== undefined) {
       return Object.keys(this.state.errors).length > 0 &&
         this.state.errors[field].length > 0
@@ -106,38 +100,48 @@ class StatePage extends Component {
     }
   };
 
-  handleSubmit = async e => {
+  handleSubmit = async (e) => {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
     if (Object.keys(this.state.errors).length > 0) return;
     let stateName = this.state.values.addState;
+    let abbreviation = this.state.values.addAbbreviation;
+    let identifier = this.state.values.addIdentifier;
     let IsActive = this.state.addIsActive;
     if (this.state.editPage[0]) {
       // Code for Edit Data Page
       await axios
         .put(
-          process.env.REACT_APP_SERVER_URL +
-          "states/" +
-          this.state.editPage[1],
+          process.env.REACT_APP_SERVER_URL + "states/" + this.state.editPage[1],
           {
             name: stateName,
-            is_active: IsActive
+            is_active: IsActive,
+            Abbreviation: abbreviation,
+            Identifier: identifier
           },
           {
             headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
           }
         )
-        .then(res => {
+        .then((res) => {
           this.setState({ formSubmitted: true });
           this.props.history.push({ pathname: "/states", editData: true });
         })
-        .catch(error => {
+        .catch((error) => {
           this.setState({ formSubmitted: false });
           if (error.response !== undefined) {
-            this.setState({ errorCode: error.response.data.statusCode + " Error- " + error.response.data.error + " Message- " + error.response.data.message + " Please try again!" })
+            this.setState({
+              errorCode:
+                error.response.data.statusCode +
+                " Error- " +
+                error.response.data.error +
+                " Message- " +
+                error.response.data.message +
+                " Please try again!",
+            });
           } else {
             this.setState({ errorCode: "Network Error - Please try again!" });
           }
@@ -150,23 +154,33 @@ class StatePage extends Component {
           process.env.REACT_APP_SERVER_URL + "states",
           {
             name: stateName,
-            is_active: IsActive
+            is_active: IsActive,
+            Abbreviation: abbreviation,
+            Identifier: identifier
           },
           {
             headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
           }
         )
-        .then(res => {
+        .then((res) => {
           this.setState({ formSubmitted: true });
           this.props.history.push({ pathname: "/states", addData: true });
           this.handleActive();
         })
-        .catch(error => {
+        .catch((error) => {
           this.setState({ formSubmitted: false });
           if (error.response !== undefined) {
-            this.setState({ errorCode: error.response.data.statusCode + " Error- " + error.response.data.error + " Message- " + error.response.data.message + " Please try again!" })
+            this.setState({
+              errorCode:
+                error.response.data.statusCode +
+                " Error- " +
+                error.response.data.error +
+                " Message- " +
+                error.response.data.message +
+                " Please try again!",
+            });
           } else {
             this.setState({ errorCode: "Network Error - Please try again!" });
           }
@@ -176,14 +190,13 @@ class StatePage extends Component {
 
   handleCheckBox = (event) => {
     this.setState({ [event.target.name]: event.target.checked });
-
   };
 
   cancelForm = () => {
     this.setState({
       values: {},
       formSubmitted: "",
-      stateSelected: false
+      stateSelected: false,
     });
     // Routing code #route to state_list page
   };
@@ -225,7 +238,7 @@ class StatePage extends Component {
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
-                    label="State Name"
+                    label="State Name*"
                     name="addState"
                     error={this.hasError("addState")}
                     helperText={
@@ -234,6 +247,38 @@ class StatePage extends Component {
                         : null
                     }
                     value={this.state.values.addState || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Identifier"
+                    name="addIdentifier"
+                    error={this.hasError("addIdentifier")}
+                    helperText={
+                      this.hasError("addIdentifier")
+                        ? this.state.errors.addIdentifier[0]
+                        : null
+                    }
+                    value={this.state.values.addIdentifier || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Abbreviation"
+                    name="addAbbreviation"
+                    error={this.hasError("addAbbreviation")}
+                    helperText={
+                      this.hasError("addAbbreviation")
+                        ? this.state.errors.addAbbreviation[0]
+                        : null
+                    }
+                    value={this.state.values.addAbbreviation || ""}
                     onChange={this.handleChange}
                     variant="outlined"
                   />

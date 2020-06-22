@@ -19,15 +19,15 @@
     },
   ];
   <Table
-    title={"Villages"}
-    showSearch={false}
-    filterData={true}
-    noDataComponent={"No Records To be shown"}
-    Searchplaceholder={"Seacrh by Village Name"}
-    filterBy={["name"]}
+    title={STRING}
+    showSearch={BOOLEAN}
+    filterData={BOOLEAN}
+    noDataComponent={STRING}
+    Searchplaceholder={"Seacrh by Name"}
+    filterBy={PASS ARRAY OF SELECTORS}
     data={data}
     column={Usercolumns}
-    DeleteMessage={"Are you Sure you want to Delete"}
+    DeleteMessage={STRING}
   />
 |*****************************************************************************|
 |*** Example for CallBack Function for delete data modal on Parent Component**| 
@@ -47,7 +47,6 @@ import Modal from "../UI/Modal/Modal.js";
 import style from "./Datatable.module.css";
 import SearchInput from "../SearchInput";
 import differenceBy from "lodash/differenceBy";
-
 import { Card, Checkbox } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -96,13 +95,22 @@ const Table = props => {
   let DataID = cellId;
 
   const editData = id => {
-    console.log("id==", id);
     props.editData(id);
   };
 
   const handleDeleteAllEvent = () => {
     props.DeleteAll(row, DataID, setisDeleteShowing(!isDeleteShowing));
-    props.DeleteData(DataID, row, setToggleCleared(!toggleCleared));
+    props.DeleteData(DataID, row);
+    setSelectedRows([]);
+  };
+
+  const handleActiveAllEvent = (event) => {
+    let numberOfIsActive = [];
+    for (let id in selected) {
+      numberOfIsActive.push(selected[id]['is_active'])
+    }
+    props.ActiveAll(row, selected, numberOfIsActive, setisDeleteShowing(!isDeleteShowing))
+    setSelectedRows([]);
   };
 
   const handleEditEvent = () => {
@@ -114,10 +122,15 @@ const Table = props => {
     setisDeleteAllShowing(!isDeleteAllShowing);
   };
 
+  const closeActiveAllModalHandler = () => {
+    setisActiveAllShowing(!isActiveAllShowing);
+  };
+
   let valueformodal = props.columnsvalue;
 
   const [isDeleteShowing, setisDeleteShowing] = React.useState(false);
   const [isDeleteAllShowing, setisDeleteAllShowing] = React.useState(false);
+  const [isActiveAllShowing, setisActiveAllShowing] = React.useState(false);
 
   const column = [
     {
@@ -146,23 +159,22 @@ const Table = props => {
   ];
 
   const makeColumns = columns => {
-    for (let i in column) {
-      columns.push(column[i]);
+    for (let Usercolumns in column) {
+      columns.push(column[Usercolumns]);
     }
   };
 
   const [filterText, setFilterText] = React.useState("");
-  const [noHeader, setNoHeader] = React.useState(true);
   let filteredItems = [];
   let filteredData = [];
   const [data, setData] = React.useState(props.filterBy);
   if (props.filterData) {
-    for (let i in data) {
+    for (let values in data) {
       filteredItems.push(
         props.data.filter(
           item =>
-            item[data[i]] &&
-            item[data[i]].toLowerCase().includes(filterText.toLowerCase())
+            item[data[values]] &&
+            item[data[values]].toLowerCase().includes(filterText.toLowerCase())
         )
       );
     }
@@ -170,26 +182,25 @@ const Table = props => {
       filteredData = filteredData.concat(filteredItems[i]);
     }
     let temp = [];
-    for (let i in filteredData) {
-      if (temp.indexOf(filteredData[i]) <= -1) {
-        temp.push(filteredData[i]);
+    for (let values in filteredData) {
+      if (temp.indexOf(filteredData[values]) <= -1) {
+        temp.push(filteredData[values]);
       }
     }
     filteredData = temp;
   } else {
     filteredData = props.data;
   }
-  const [resetPaginationToggle, setResetPaginationToggle] = React.useState();
 
   let selectedId = [];
-  for (let i in selected) {
-    selectedId.push(selected[i]["id"]);
+  for (let values in selected) {
+    selectedId.push(selected[values]["id"]);
   }
   let SelectedId = selectedId.join("");
   let SelectedIds = SelectedId.substring(0, SelectedId.length - 1);
 
-  const onFilter = e => {
-    setFilterText(e.target.value);
+  const onFilter = event => {
+    setFilterText(event.target.value);
   };
 
   const [toggleCleared, setToggleCleared] = React.useState(false);
@@ -198,14 +209,32 @@ const Table = props => {
       setisDeleteAllShowing(true);
       setData(differenceBy(data, selectedRows, "name"));
     };
+
+    const handleActive = () => {
+      setisActiveAllShowing(true);
+      setData(differenceBy(data, selectedRows, "name"));
+    };
     return (
-      <Button
-        key="delete"
-        onClick={handledelete}
-        style={{ backgroundColor: "#d63447", color: "white" }}
-      >
-        Delete
+      <div>
+        <Button
+          key="delete"
+          onClick={handledelete}
+          style={{ backgroundColor: "#d63447", color: "white" }}
+        >
+          Delete
       </Button>
+       &nbsp;&nbsp;&nbsp;
+        {props.showSetAllActive ?
+          (<Button
+            key="active"
+            onClick={handleActive}
+            style={{ backgroundColor: "primary", color: "white" }}
+          >
+            Active
+          </Button>)
+          : null}
+
+      </div>
     );
   }, [data, selectedRows, toggleCleared]);
 
@@ -213,6 +242,13 @@ const Table = props => {
   if (props.column.length > 0) {
     columns = makeColumns(props.column);
   }
+  // let valuesSelected = [];
+  // for (let values in selected) {
+  //   valuesSelected.push(selected[values]['is_active'])
+  // }
+  // var count = {};
+  // valuesSelected.forEach(function (i) { count[i] = (count[i] || 0) + 1; });
+
   return (
     <>
       <div>
@@ -225,15 +261,14 @@ const Table = props => {
             />
           </div>
         ) : (
-          <p></p>
-        )}
+            <p></p>
+          )}
         <Card>
           <DataTable
             data={filteredData}
             title={props.title}
             columns={props.column}
             pagination
-            paginationResetDefaultPage={resetPaginationToggle}
             selectableRowsComponent={Checkbox}
             contextActions={contextActions}
             actions={handleEditEvent}
@@ -248,10 +283,10 @@ const Table = props => {
               props.noDataComponent ? (
                 props.noDataComponent
               ) : (
-                <p>
-                  There are no records to display in <b>{props.title}</b>
-                </p>
-              )
+                  <p>
+                    There are no records to display in <b>{props.title}</b>
+                  </p>
+                )
             }
             noHeader={selected.length === 0 || selected.length < 2}
           />
@@ -277,11 +312,31 @@ const Table = props => {
               Do you want to delete selected <b>{props.title}</b>
             </p>
           ) : (
-            <p>
-              {" "}
-              {props.DeleteMessage} <b>{dataName}</b> ?
-            </p>
-          )}
+              <p>
+                {" "}
+                {props.DeleteMessage} <b>{dataName}</b> ?
+              </p>
+            )}
+        </Modal>
+        <Modal
+          className="modal"
+          show={isActiveAllShowing}
+          close={closeActiveAllModalHandler}
+          displayCross={{ display: "none" }}
+          handleEventChange={true}
+          event={handleActiveAllEvent}
+          handleActiveAllEvent={handleActiveAllEvent}
+          footer={{
+            footerSaveName: "OKAY",
+            footerCloseName: "CLOSE",
+            displayClose: { display: "true" },
+            displaySave: { display: "true" }
+          }}
+        >
+          <p>
+            {" "}
+            Are you sure you want to toggle the status ?
+          </p>
         </Modal>
       </div>
     </>

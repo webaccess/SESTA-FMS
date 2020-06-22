@@ -5,46 +5,47 @@ import Layout from "../../hoc/Layout/Layout";
 import Button from "../../components/UI/Button/Button";
 import { withStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
+import { map } from "lodash";
 import style from "./Villages.module.css";
 import { Grid } from "@material-ui/core";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autocomplete from "../../components/Autocomplete/Autocomplete";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-const useStyles = theme => ({
+const useStyles = (theme) => ({
   root: {},
   row: {
     height: "42px",
     display: "flex",
     alignItems: "center",
-    marginTop: theme.spacing(1)
+    marginTop: theme.spacing(1),
   },
   buttonRow: {
     height: "42px",
-    marginTop: theme.spacing(1)
+    marginTop: theme.spacing(1),
   },
   spacer: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   addButton: {
     float: "right",
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   searchInput: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   Districts: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   States: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   Search: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   Cancel: {
-    marginRight: theme.spacing(1)
-  }
+    marginRight: theme.spacing(1),
+  },
 });
 
 export class Villages extends React.Component {
@@ -69,30 +70,30 @@ export class Villages extends React.Component {
       isCancel: false,
       dataCellId: [],
       singleDelete: "",
-      multipleDelete: ""
+      multipleDelete: "",
     };
   }
   async componentDidMount() {
     await axios
       .get(process.env.REACT_APP_SERVER_URL + "villages/?_sort=name:ASC", {
         headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
+          Authorization: "Bearer " + auth.getToken() + "",
+        },
       })
-      .then(res => {
+      .then((res) => {
         this.setState({ data: this.getData(res.data) });
       });
     //api call for states filter
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "states/", {
+      .get(process.env.REACT_APP_SERVER_URL + "states?is_active=true", {
         headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
+          Authorization: "Bearer " + auth.getToken() + "",
+        },
       })
-      .then(res => {
+      .then((res) => {
         this.setState({ getState: res.data });
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   }
@@ -108,67 +109,67 @@ export class Villages extends React.Component {
   }
   handleStateChange = async (event, value) => {
     if (value !== null) {
-      this.setState({ filterState: value.id });
+      this.setState({ filterState: value });
 
       this.setState({
-        isCancel: false
+        isCancel: false,filterDistrict:""
       });
       let stateId = value.id;
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "districts?master_state.id=" +
+            "districts?is_active=true&&master_state.id=" +
             stateId,
           {
             headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
           }
         )
-        .then(res => {
+        .then((res) => {
           this.setState({ getDistrict: res.data });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     } else {
       this.setState({
         filterState: "",
         filterDistrict: "",
-        filterVillage: ""
+        filterVillage: "",
       });
     }
   };
   handleDistrictChange(event, value) {
     if (value !== null) {
-      this.setState({ filterDistrict: value.id });
+      this.setState({ filterDistrict: value });
 
       let distId = value.id;
       axios
         .get(process.env.REACT_APP_SERVER_URL + "districts/" + distId, {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         })
-        .then(res => {
+        .then((res) => {
           this.setState({ getVillage: res.data.villages });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     } else {
       this.setState({
         filterDistrict: "",
-        filterVillage: ""
+        filterVillage: "",
       });
     }
   }
   handleVillageChange(event, value, target) {
     this.setState({
-      values: { ...this.state.values, [event.target.name]: event.target.value }
+      values: { ...this.state.values, [event.target.name]: event.target.value },
     });
   }
-  editData = cellid => {
+  editData = (cellid) => {
     this.props.history.push("/villages/edit/" + cellid);
   };
 
@@ -179,22 +180,22 @@ export class Villages extends React.Component {
       axios
         .delete(process.env.REACT_APP_SERVER_URL + "villages/" + cellid, {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         })
-        .then(res => {
+        .then((res) => {
           this.setState({ singleDelete: res.data.name });
           this.setState({ dataCellId: "" });
           this.componentDidMount();
         })
-        .catch(error => {
+        .catch((error) => {
           this.setState({ singleDelete: false });
           console.log(error);
         });
     }
     // }
   };
-  DeleteAll = selectedId => {
+  DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       for (let i in selectedId) {
@@ -203,15 +204,15 @@ export class Villages extends React.Component {
             process.env.REACT_APP_SERVER_URL + "villages/" + selectedId[i],
             {
               headers: {
-                Authorization: "Bearer " + auth.getToken() + ""
-              }
+                Authorization: "Bearer " + auth.getToken() + "",
+              },
             }
           )
-          .then(res => {
+          .then((res) => {
             this.setState({ multipleDelete: true });
             this.componentDidMount();
           })
-          .catch(error => {
+          .catch((error) => {
             this.setState({ multipleDelete: false });
             console.log("err", error);
           });
@@ -227,7 +228,7 @@ export class Villages extends React.Component {
       values: {},
       formSubmitted: "",
       stateSelected: false,
-      isCancel: true
+      isCancel: true,
     });
     this.componentDidMount();
     //routing code #route to village_list page
@@ -235,17 +236,17 @@ export class Villages extends React.Component {
 
   handleChange = ({ target }) => {
     this.setState({
-      values: { ...this.state.values, [target.name]: target.value }
+      values: { ...this.state.values, [target.name]: target.value },
     });
   };
 
   handleSearch() {
     let searchData = "";
     if (this.state.filterState) {
-      searchData += "state.id=" + this.state.filterState + "&&";
+      searchData += "state.id=" + this.state.filterState.id + "&&";
     }
     if (this.state.filterDistrict) {
-      searchData += "district.id=" + this.state.filterDistrict + "&&";
+      searchData += "district.id=" + this.state.filterDistrict.id + "&&";
     }
     if (this.state.values.addVillage) {
       searchData += "name_contains=" + this.state.values.addVillage;
@@ -258,14 +259,14 @@ export class Villages extends React.Component {
           "&&_sort=name:ASC",
         {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         }
       )
-      .then(res => {
+      .then((res) => {
         this.setState({ data: this.getData(res.data) });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log("err", err);
       });
   }
@@ -276,18 +277,18 @@ export class Villages extends React.Component {
       {
         name: "Village",
         selector: "name",
-        sortable: true
+        sortable: true,
       },
       {
         name: "District",
         selector: "district.name",
-        sortable: true
+        sortable: true,
       },
       {
         name: "State",
         selector: "state.name",
-        sortable: true
-      }
+        sortable: true,
+      },
     ];
 
     let selectors = [];
@@ -304,6 +305,25 @@ export class Villages extends React.Component {
     let villagesFilter = this.state.getVillage;
     let filterVillage = this.state.filterVillage;
     let filters = this.state.values;
+
+    let addStates = [];
+    map(filterState, (state, key) => {
+      addStates.push(
+        statesFilter.findIndex(function (item, i) {
+          return item.id === state;
+        })
+      );
+    });
+    let addDistricts = [];
+    map(filterDistrict, (district, key) => {
+      addDistricts.push(
+        districtsFilter.findIndex(function (item, i) {
+          return item.id === district;
+        })
+      );
+    });
+      
+
     return (
       <Layout>
         <Grid>
@@ -371,7 +391,7 @@ export class Villages extends React.Component {
                     <Autocomplete
                       id="combo-box-demo"
                       options={statesFilter}
-                      getOptionLabel={option => option.name}
+                      getOptionLabel={(option) => option.name}
                       onChange={(event, value) => {
                         this.handleStateChange(event, value);
                       }}
@@ -379,14 +399,10 @@ export class Villages extends React.Component {
                         filterState
                           ? this.state.isCancel === true
                             ? null
-                            : statesFilter[
-                                statesFilter.findIndex(function(item, i) {
-                                  return item.id === filterState;
-                                })
-                              ] || null
+                            :filterState
                           : null
                       }
-                      renderInput={params => (
+                      renderInput={(params) => (
                         <Input
                           {...params}
                           fullWidth
@@ -406,7 +422,7 @@ export class Villages extends React.Component {
                       id="combo-box-demo"
                       options={districtsFilter}
                       name="filterDistrict"
-                      getOptionLabel={option => option.name}
+                      getOptionLabel={(option) => option.name}
                       onChange={(event, value) => {
                         this.handleDistrictChange(event, value);
                       }}
@@ -414,14 +430,10 @@ export class Villages extends React.Component {
                         filterDistrict
                           ? this.state.isCancel === true
                             ? null
-                            : districtsFilter[
-                                districtsFilter.findIndex(function(item, i) {
-                                  return item.id === filterDistrict;
-                                })
-                              ] || null
+                            : filterDistrict
                           : null
                       }
-                      renderInput={params => (
+                      renderInput={(params) => (
                         <Input
                           {...params}
                           fullWidth

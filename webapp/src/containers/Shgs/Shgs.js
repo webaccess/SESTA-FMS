@@ -13,31 +13,31 @@ import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Layout from "../../hoc/Layout/Layout";
 import style from "./Shgs.module.css";
 
-const useStyles = theme => ({
+const useStyles = (theme) => ({
   root: {},
   row: {
     height: "42px",
     display: "flex",
     alignItems: "center",
-    marginTop: theme.spacing(1)
+    marginTop: theme.spacing(1),
   },
   buttonRow: {
     height: "42px",
-    marginTop: theme.spacing(1)
+    marginTop: theme.spacing(1),
   },
   spacer: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   addButton: {
     float: "right",
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   exportButton: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   searchInput: {
-    marginRight: theme.spacing(1)
-  }
+    marginRight: theme.spacing(1),
+  },
 });
 
 export class Shgs extends React.Component {
@@ -63,54 +63,60 @@ export class Shgs extends React.Component {
       getVillage: [],
       isCancel: false,
       singleDelete: "",
-      multipleDelete: ""
+      multipleDelete: "",
     };
   }
   async componentDidMount() {
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "shgs/", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
+      .get(
+        process.env.REACT_APP_SERVER_URL +
+          JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
+          "s?sub_type=SHG",
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         }
-      })
-      .then(res => {
+      )
+      .then((res) => {
         this.setState({ data: this.getData(res.data) });
       });
     //api call for states filter
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "states/", {
+      .get(process.env.REACT_APP_SERVER_URL + "states?is_active=true", {
         headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
+          Authorization: "Bearer " + auth.getToken() + "",
+        },
       })
-      .then(res => {
+      .then((res) => {
         this.setState({ getState: res.data });
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
     //api call for village filter
     await axios
       .get(process.env.REACT_APP_SERVER_URL + "villages/", {
         headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
+          Authorization: "Bearer " + auth.getToken() + "",
+        },
       })
-      .then(res => {
+      .then((res) => {
         this.setState({ getVillage: res.data });
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   }
   getData(result) {
     for (let i in result) {
       let villages = [];
-      for (let j in result[i].villages) {
-        villages.push(result[i].villages[j].name + " ");
+      for (let j in result[i].contact.villages) {
+        console.log("v==", result[i].contact.villages[j].name);
+        villages.push(result[i].contact.villages[j].name + " ");
       }
 
-      result[i]["villages"] = villages;
+      result[i]["contact"]["villages"] = villages;
     }
     return result;
   }
@@ -118,25 +124,25 @@ export class Shgs extends React.Component {
     if (value !== null) {
       this.setState({ filterState: value.id });
       this.setState({
-        isCancel: false
+        isCancel: false,
       });
 
       let stateId = value.id;
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "districts?master_state.id=" +
+            "districts?is_active=true&&master_state.id=" +
             stateId,
           {
             headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
-            }
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
           }
         )
-        .then(res => {
+        .then((res) => {
           this.setState({ getDistrict: res.data });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     } else {
@@ -144,7 +150,7 @@ export class Shgs extends React.Component {
         filterState: "",
         filterDistrict: "",
         filterVillage: "",
-        getVillage: ""
+        getVillage: "",
       });
       this.componentDidMount();
     }
@@ -160,19 +166,19 @@ export class Shgs extends React.Component {
       axios
         .get(process.env.REACT_APP_SERVER_URL + "districts/" + distId, {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         })
-        .then(res => {
+        .then((res) => {
           this.setState({ getVillage: res.data.villages });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     } else {
       this.setState({
         filterDistrict: "",
-        filterVillage: ""
+        filterVillage: "",
       });
       this.componentDidMount();
     }
@@ -182,16 +188,16 @@ export class Shgs extends React.Component {
     if (value !== null) {
       this.setState({ filterVillage: value.id });
       this.setState({
-        isCancel: false
+        isCancel: false,
       });
     } else {
       this.setState({
-        filterVillage: ""
+        filterVillage: "",
       });
     }
   }
 
-  editData = cellid => {
+  editData = (cellid) => {
     this.props.history.push("/shgs/edit/" + cellid);
   };
 
@@ -200,36 +206,50 @@ export class Shgs extends React.Component {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
       axios
-        .delete(process.env.REACT_APP_SERVER_URL + "shgs/" + cellid, {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
+        .delete(
+          process.env.REACT_APP_SERVER_URL +
+            JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
+            "s/" +
+            cellid,
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
           }
-        })
-        .then(res => {
+        )
+        .then((res) => {
           this.setState({ singleDelete: res.data.name });
           this.componentDidMount();
         })
-        .catch(error => {
+        .catch((error) => {
           this.setState({ singleDelete: false });
           console.log(error);
         });
     }
   };
-  DeleteAll = selectedId => {
+  DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       for (let i in selectedId) {
         axios
-          .delete(process.env.REACT_APP_SERVER_URL + "shgs/" + selectedId[i], {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + ""
+          .delete(
+            process.env.REACT_APP_SERVER_URL +
+              JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
+                "Organization"
+              ][0] +
+              "s/" +
+              selectedId[i],
+            {
+              headers: {
+                Authorization: "Bearer " + auth.getToken() + "",
+              },
             }
-          })
-          .then(res => {
+          )
+          .then((res) => {
             this.setState({ multipleDelete: true });
             this.componentDidMount();
           })
-          .catch(error => {
+          .catch((error) => {
             this.setState({ multipleDelete: false });
 
             console.log("err", error);
@@ -245,7 +265,7 @@ export class Shgs extends React.Component {
       filterVo: "",
       filterShg: "",
 
-      isCancel: true
+      isCancel: true,
     });
     this.componentDidMount();
     //routing code #route to village_list page
@@ -273,13 +293,13 @@ export class Shgs extends React.Component {
     axios
       .get(process.env.REACT_APP_SERVER_URL + "shgs?" + searchData, {
         headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
+          Authorization: "Bearer " + auth.getToken() + "",
+        },
       })
-      .then(res => {
+      .then((res) => {
         this.setState({ data: this.getData(res.data) });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log("err", err);
       });
   }
@@ -291,7 +311,7 @@ export class Shgs extends React.Component {
       {
         name: "SHG",
         selector: "name",
-        sortable: true
+        sortable: true,
       },
       {
         name: "Village Organization",
@@ -313,6 +333,11 @@ export class Shgs extends React.Component {
         selector: "state.name",
         sortable: true
       }
+      // {
+      //   name: "Village Name",
+      //   selector: "contact.villages",
+      //   sortable: true,
+      // },
     ];
 
     let selectors = [];
@@ -321,6 +346,7 @@ export class Shgs extends React.Component {
     }
 
     let columnsvalue = selectors[0];
+    console.log("columnsvalue", columnsvalue);
     const { classes } = this.props;
     let statesFilter = this.state.getState;
     let filterState = this.state.filterState;
@@ -335,14 +361,14 @@ export class Shgs extends React.Component {
           <h1 className={style.title}>Manage Self Help Group</h1>
           <div className={classes.row}>
             <div className={style.addButton}>
-               <Button
+              <Button
                 color="primary"
                 variant="contained"
                 component={Link}
                 to="/Shgs/add"
               >
                 Add SHG
-              </Button> 
+              </Button>
             </div>
           </div>
           {this.props.location.addData ? (
@@ -411,7 +437,7 @@ export class Shgs extends React.Component {
                   <Autocomplete
                     id="combo-box-demo"
                     options={statesFilter}
-                    getOptionLabel={option => option.name}
+                    getOptionLabel={(option) => option.name}
                     onChange={(event, value) => {
                       this.handleStateChange(event, value);
                     }}
@@ -420,13 +446,13 @@ export class Shgs extends React.Component {
                         ? this.state.isCancel === true
                           ? null
                           : statesFilter[
-                              statesFilter.findIndex(function(item, i) {
+                              statesFilter.findIndex(function (item, i) {
                                 return item.id === filterState;
                               })
                             ] || null
                         : null
                     }
-                    renderInput={params => (
+                    renderInput={(params) => (
                       <Input
                         {...params}
                         fullWidth
@@ -446,7 +472,7 @@ export class Shgs extends React.Component {
                     id="combo-box-demo"
                     options={districtsFilter}
                     name="filterDistrict"
-                    getOptionLabel={option => option.name}
+                    getOptionLabel={(option) => option.name}
                     onChange={(event, value) => {
                       this.handleDistrictChange(event, value);
                     }}
@@ -455,13 +481,13 @@ export class Shgs extends React.Component {
                         ? this.state.isCancel === true
                           ? null
                           : districtsFilter[
-                              districtsFilter.findIndex(function(item, i) {
+                              districtsFilter.findIndex(function (item, i) {
                                 return item.id === filterDistrict;
                               })
                             ] || null
                         : null
                     }
-                    renderInput={params => (
+                    renderInput={(params) => (
                       <Input
                         {...params}
                         fullWidth
@@ -481,7 +507,7 @@ export class Shgs extends React.Component {
                     id="combo-box-demo"
                     options={villagesFilter}
                     name="filterVillage"
-                    getOptionLabel={option => option.name}
+                    getOptionLabel={(option) => option.name}
                     onChange={(event, value) => {
                       this.handleVillageChange(event, value);
                     }}
@@ -490,13 +516,13 @@ export class Shgs extends React.Component {
                         ? this.state.isCancel === true
                           ? null
                           : villagesFilter[
-                              villagesFilter.findIndex(function(item, i) {
+                              villagesFilter.findIndex(function (item, i) {
                                 return item.id === filterVillage;
                               })
                             ] || null
                         : null
                     }
-                    renderInput={params => (
+                    renderInput={(params) => (
                       <Input
                         {...params}
                         fullWidth
@@ -522,7 +548,7 @@ export class Shgs extends React.Component {
               title={"Shgs"}
               filterData={true}
               Searchplaceholder={"Seacrh by SHG Name"}
-              filterBy={["name"]}
+              // filterBy={["name"]}
               data={data}
               column={Usercolumns}
               editData={this.editData}
