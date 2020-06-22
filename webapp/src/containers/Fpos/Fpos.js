@@ -4,14 +4,13 @@ import Table from "../../components/Datatable/Datatable.js";
 import Layout from "../../hoc/Layout/Layout";
 import Button from "../../components/UI/Button/Button";
 import { withStyles, ThemeProvider } from "@material-ui/core/styles";
-import style from "./Vos.module.css";
+import style from "./Fpos.module.css";
 import { Link } from "react-router-dom";
 import auth from "../../components/Auth/Auth.js";
 import Input from "../../components/UI/Input/Input";
 import AutoSuggest from "../../components/UI/Autosuggest/Autosuggest";
 import { Grid } from "@material-ui/core";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-// import Autocomplete from "@material-ui/lab/Autocomplete";
 import Autocomplete from "../../components/Autocomplete/Autocomplete.js";
 
 import { createBrowserHistory } from "history";
@@ -24,13 +23,9 @@ const useStyles = (theme) => ({
     alignItems: "center",
     marginTop: theme.spacing(1),
   },
-  floatRow: {
-    height: "40px",
-    float: "right",
-  },
   buttonRow: {
     height: "42px",
-    float: "right",
+    marginTop: theme.spacing(1),
   },
   spacer: {
     flexGrow: 1,
@@ -56,14 +51,13 @@ const useStyles = (theme) => ({
   },
 });
 
-export class Vos extends React.Component {
+export class Fpos extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
-      // fiterShg:"",
       filterVo: "",
       Result: [],
       data: [],
@@ -74,9 +68,6 @@ export class Vos extends React.Component {
       properties: props,
       getState: [],
       getDistrict: [],
-      getVillage: [],
-      // getShgs: [],
-      // selectedShg: [],
       isCancel: false,
       singleDelete: "",
       multipleDelete: "",
@@ -89,7 +80,8 @@ export class Vos extends React.Component {
     await axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-          "village-organizations/?_sort=name:ASC",
+          JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
+          "s?sub_type=FPO&_sort=name:ASC",
         {
           headers: {
             Authorization: "Bearer " + auth.getToken() + "",
@@ -112,43 +104,7 @@ export class Vos extends React.Component {
       .catch((error) => {
         console.log(error);
       });
-
-    //api call for villages filter
-    await axios
-      .get(process.env.REACT_APP_SERVER_URL + "Villages/", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
-      .then((res) => {
-        this.setState({ getVillage: res.data });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    //api for shgs filter
-    // await axios
-    //   .get(process.env.REACT_APP_SERVER_URL + "shgs/", {
-    //     headers: {
-    //       Authorization: "Bearer " + auth.getToken() + ""
-    //     }
-    //   })
-    //   .then(res => {
-    //     this.setState({ getShgs: res.data });
-    //   })
-    //   .catch(error => {
-    //     console.log(error);
-    //   });
-  }
-  // onHandleChange = shgValue => {
-  // 	// if (shgValue){
-  // 		this.setState({
-  // 		isCancel: false,
-  // 		fiterShg:shgValue['id']
-  // 		});
-  // 		this.setState({ selectedShg: shgValue });
-  // 	// }
-  // };
+    };
 
   handleStateChange = async (event, value, method) => {
     if (value !== null) {
@@ -180,51 +136,49 @@ export class Vos extends React.Component {
       this.setState({
         filterState: "",
         filterDistrict: "",
-        // fiterShg:""
-        // selectedShg:""
       });
     }
   };
+
   handleChange = (event, value) => {
-    this.setState({ filterVo: event.target.value });
+    this.setState({ filterFpo: event.target.value });
   };
+
   handleDistrictChange(event, value) {
     if (value !== null) {
       this.setState({ filterDistrict: value.id });
       let distId = value.id;
     } else {
       this.setState({
-        filterDistrict: "",
-        // fiterShg:""
-        // selectedShg:""
+        filterDistrict: ""
       });
     }
-  }
+  };
+
   handleVillageChange(event, value) {
     if (value !== null) {
       this.setState({ filterVillage: value.id });
       this.setState({ isCancel: false });
     } else {
       this.setState({
-        filterVillage: "",
-        // fiterShg:""
-        // selectedShg:""
+        filterVillage: ""
       });
-    }
-    // this.setState({ selectedShg: "" });
-  }
+    } 
+  };
 
   editData = (cellid) => {
-    this.props.history.push("/village-organizations/edit/" + cellid);
+    this.props.history.push("/fpos/edit/" + cellid);
   };
 
   DeleteData = (cellid, selectedId) => {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-
       axios
-        .delete(
-          process.env.REACT_APP_SERVER_URL + "village-organizations/" + cellid,
+         .delete(
+          process.env.REACT_APP_SERVER_URL +
+            JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
+            "s/" +
+            cellid,
           {
             headers: {
               Authorization: "Bearer " + auth.getToken() + "",
@@ -241,6 +195,7 @@ export class Vos extends React.Component {
         });
     }
   };
+
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
@@ -248,7 +203,10 @@ export class Vos extends React.Component {
         axios
           .delete(
             process.env.REACT_APP_SERVER_URL +
-              "village-organizations/" +
+              JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
+                "Organization"
+              ][0] +
+              "s/" +
               selectedId[i],
             {
               headers: {
@@ -262,7 +220,6 @@ export class Vos extends React.Component {
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
-
             console.log("err", error);
           });
       }
@@ -273,9 +230,7 @@ export class Vos extends React.Component {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
-      filterVo: "",
-      //fiterShg:"",
-      //selectedShg: "",
+      filterFpo: "",
       isCancel: true,
     });
 
@@ -283,62 +238,32 @@ export class Vos extends React.Component {
   };
 
   handleSearch() {
-    let searchData = "";
-    if (
-      this.state.filterState ||
-      this.state.filterDistrict ||
-      this.state.filterDistrict ||
-      this.state.fiterVo
-    )
-      searchData = "?";
-    // if (this.state.fiterShg) {
-    //   searchData += "shgs.id=" + this.state.fiterShg;
-    // }
-    // let searchData = "";
-    if (this.state.filterVo) {
-      searchData = "?";
-      searchData += "name_contains=" + this.state.filterVo;
-    }
+     let searchData = "";
     if (this.state.filterState) {
-      searchData += searchData ? "&" : "";
-      searchData += "shgs.state=" + this.state.filterState;
+      searchData += "state.id=" + this.state.filterState + "&&";
     }
-
     if (this.state.filterDistrict) {
-      searchData += searchData ? "&" : "";
-      searchData += "shgs.district=" + this.state.filterDistrict;
+      searchData += "district.id=" + this.state.filterDistrict + "&&";
     }
-
-    if (this.state.filterVillage) {
-      if (
-        !this.state.filterVo &&
-        !this.state.filterState &&
-        !this.state.filterDistrict
-      ) {
-        searchData = "?";
-      } else {
-        searchData += searchData ? "&" : "";
-      }
-      searchData += "shgs.villages=" + this.state.filterVillage;
+     if (this.state.filterFpo) {
+      searchData += "name_contains=" + this.state.filterFpo;
     }
-    // } else {
-    //   searchData += "shgs.villages=" + this.state.filterVillage;
-    // }
-
-    //api call after search filter
     axios
       .get(
-        process.env.REACT_APP_SERVER_URL + "village-organizations" + searchData,
+        process.env.REACT_APP_SERVER_URL +
+          "contacts?organization.sub_type=FPO&" +
+          searchData +
+          "&_sort=name:ASC",
         {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
+            Authorization: "Bearer " + auth.getToken() + ""
+          }
         }
       )
-      .then((res) => {
+      .then(res => {
         this.setState({ data: res.data });
       })
-      .catch((err) => {
+      .catch(err => {
         console.log("err", err);
       });
   }
@@ -350,9 +275,11 @@ export class Vos extends React.Component {
 
     const Usercolumns = [
       {
-        name: "Village Organization",
+        name: "Name of the  Organization",
         selector: "name",
-      },
+        sortable: true,
+       },
+      
     ];
 
     let selectors = [];
@@ -366,40 +293,36 @@ export class Vos extends React.Component {
     let filterState = this.state.filterState;
     let districtsFilter = this.state.getDistrict;
     let filterDistrict = this.state.filterDistrict;
-    let villagesFilter = this.state.getVillage;
-    let filterVillage = this.state.filterVillage;
-
     return (
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}> Manage Village Organizations
-              <div className={classes.floatRow}>
-                <div className={classes.buttonRow}>
-                  <Button
-                    variant="contained"
-                    component={Link}
-                    to="/Village-organizations/add"
-                  >
-                    Add Village Organization
-                  </Button>
-                </div>
+           <h1 className={style.title}>Manage Farmers Producer Organization</h1>
+            <div className={classes.row}>
+              <div className={classes.buttonRow}>
+                <Button
+                  variant="contained"
+                  component={Link}
+                  to="/fpos/add"
+                >
+                  Add FPO
+                </Button>
               </div>
-            </h1>
-            {this.props.location.addVoData ? (
+            </div>
+            {this.props.location.addFPO ? (
               <Snackbar severity="success">
-                Village organization added successfully.
+                FPO added successfully.
               </Snackbar>
-            ) : this.props.location.editVoData ? (
+            ) : this.props.location.editFPO ? (
               <Snackbar severity="success">
-                Village organization edited successfully.
+                FPO edited successfully.
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
             this.state.singleDelete !== "" &&
             this.state.singleDelete ? (
               <Snackbar severity="success" Showbutton={false}>
-                Village organization {this.state.singleDelete} deleted
+                FPO {this.state.singleDelete} deleted
                 successfully!
               </Snackbar>
             ) : null}
@@ -410,7 +333,7 @@ export class Vos extends React.Component {
             ) : null}
             {this.state.multipleDelete === true ? (
               <Snackbar severity="success" Showbutton={false}>
-                Village organizations deleted successfully!
+                FPO deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.multipleDelete === false ? (
@@ -418,34 +341,23 @@ export class Vos extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
+            <br></br>
             <div className={classes.row}>
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
                     <Input
                       fullWidth
-                      label="Village Organization"
-                      name="filterVo"
+                      label="FPO Name"
+                      name="filterFpo"
                       id="combo-box-demo"
-                      value={this.state.filterVo || ""}
+                      value={this.state.filterFpo || ""}
                       onChange={this.handleChange.bind(this)}
                       variant="outlined"
                     />
                   </Grid>
                 </div>
               </div>
-              {/* <div className={classes.searchInput}>
-                <div className={style.Districts}>
-                  <Grid item md={12} xs={12}>
-                    <AutoSuggest
-                      data={this.state.getShgs}
-                      margin="dense"
-                      onSelectShg={this.onHandleChange}
-                      onClearShg={this.state.isCancel}
-                    />
-                  </Grid>
-                </div>
-              </div> */}
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -473,7 +385,6 @@ export class Vos extends React.Component {
                         <Input
                           {...params}
                           fullWidth
-                          // margin="dense"
                           label="Select State"
                           name="addState"
                           variant="outlined"
@@ -494,7 +405,6 @@ export class Vos extends React.Component {
                       onChange={(event, value) => {
                         this.handleDistrictChange(event, value);
                       }}
-                      // defaultValue={[]}
                       value={
                         filterDistrict
                           ? this.state.isCancel === true
@@ -513,42 +423,6 @@ export class Vos extends React.Component {
                           // margin="dense"
                           label="Select District"
                           name="filterDistrict"
-                          variant="outlined"
-                        />
-                      )}
-                    />
-                  </Grid>
-                </div>
-              </div>
-              <div className={classes.searchInput}>
-                <div className={style.Districts}>
-                  <Grid item md={12} xs={12}>
-                    <Autocomplete
-                      id="combo-box-demo"
-                      options={villagesFilter}
-                      // name="filterVillage"
-                      getOptionLabel={(option) => option.name}
-                      onChange={(event, value) => {
-                        this.handleVillageChange(event, value);
-                      }}
-                      value={
-                        filterVillage
-                          ? this.state.isCancel === true
-                            ? null
-                            : villagesFilter[
-                                villagesFilter.findIndex(function (item, i) {
-                                  return item.id === filterVillage;
-                                })
-                              ] || null
-                          : null
-                      }
-                      renderInput={(params) => (
-                        <Input
-                          {...params}
-                          fullWidth
-                          label="Select Village"
-                          // value={filterVillage}
-                          name="filterVillage"
                           variant="outlined"
                         />
                       )}
@@ -575,10 +449,10 @@ export class Vos extends React.Component {
             </div>
             {data ? (
               <Table
-                title={"Village Organizations"}
+                title={"FPOs"}
                 filterData={true}
                 showSearch={false}
-                Searchplaceholder={"Search by Village Organization Name"}
+                Searchplaceholder={"Search by FPO Name"}
                 filterBy={["name"]}
                 data={data}
                 column={Usercolumns}
@@ -599,4 +473,4 @@ export class Vos extends React.Component {
     );
   }
 }
-export default withStyles(useStyles)(Vos);
+export default withStyles(useStyles)(Fpos);

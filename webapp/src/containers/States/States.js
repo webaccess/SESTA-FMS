@@ -7,76 +7,59 @@ import { withStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
 import style from "./States.module.css";
 import { Grid } from "@material-ui/core";
-import Autocomplete from "@material-ui/lab/Autocomplete";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import CustomizedSwitches from "../../components/Switch/Switch";
-import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Switch from '../../components/Switch/Switch';
+import Modal from "../../components/UI/Modal/Modal.js";
+import Switch from "../../components/UI/Switch/Switch";
 
-const useStyles = theme => ({
+const useStyles = (theme) => ({
   root: {},
   row: {
     height: "42px",
     display: "flex",
     alignItems: "center",
-    marginTop: theme.spacing(1)
+    marginTop: theme.spacing(1),
+  },
+  floatRow: {
+    height: "40px",
+    float: "right",
   },
   buttonRow: {
     height: "42px",
-    marginTop: theme.spacing(1)
-  },
-  spacer: {
-    flexGrow: 1
-  },
-  addButton: {
     float: "right",
-    marginRight: theme.spacing(1)
   },
   searchInput: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   Districts: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   States: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   Search: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   Cancel: {
-    marginRight: theme.spacing(1)
-  }
+    marginRight: theme.spacing(1),
+  },
 });
 
-export class Villages extends React.Component {
+export class States extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       values: {},
       FilterState: "",
-      Result: [],
-      TestData: [],
       data: [],
-      selectedid: 0,
-      open: false,
-      isSetActive: false,
-      isSetInActive: false,
+      isActiveAllShowing: false,
       columnsvalue: [],
       DeleteData: false,
-      properties: props,
-      getState: [],
-      getDistrict: [],
-      getVillage: [],
       isCancel: false,
       dataCellId: [],
       singleDelete: "",
       multipleDelete: "",
-      active: {}
     };
   }
 
@@ -84,19 +67,20 @@ export class Villages extends React.Component {
     await axios
       .get(process.env.REACT_APP_SERVER_URL + "states/?_sort=name:ASC", {
         headers: {
-          Authorization: "Bearer " + auth.getToken() + ""
-        }
+          Authorization: "Bearer " + auth.getToken() + "",
+        },
       })
-      .then(res => {
+      .then((res) => {
         this.setState({ data: res.data });
       });
   }
 
   StateFilter(event, value, target) {
     this.setState({
-      values: { ...this.state.values, [event.target.name]: event.target.value }
+      values: { ...this.state.values, [event.target.name]: event.target.value },
     });
   }
+
   getData(result) {
     for (let i in result) {
       let states = [];
@@ -116,23 +100,24 @@ export class Villages extends React.Component {
     axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-        "states?" +
-        searchData +
-        "&&_sort=name:ASC",
+          "states?" +
+          searchData +
+          "&&_sort=name:ASC",
         {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         }
       )
-      .then(res => {
+      .then((res) => {
         this.setState({ data: this.getData(res.data) });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log("err", err);
       });
   }
-  editData = cellid => {
+
+  editData = (cellid) => {
     this.props.history.push("/states/edit/" + cellid);
   };
 
@@ -142,7 +127,7 @@ export class Villages extends React.Component {
       values: {},
       formSubmitted: "",
       stateSelected: false,
-      isCancel: true
+      isCancel: true,
     });
     this.componentDidMount();
   };
@@ -153,22 +138,22 @@ export class Villages extends React.Component {
       axios
         .delete(process.env.REACT_APP_SERVER_URL + "states/" + cellid, {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         })
-        .then(res => {
+        .then((res) => {
           this.setState({ singleDelete: res.data.name });
           this.setState({ dataCellId: "" });
           this.componentDidMount();
         })
-        .catch(error => {
+        .catch((error) => {
           this.setState({ singleDelete: false });
           console.log(error);
         });
     }
   };
 
-  DeleteAll = selectedId => {
+  DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       for (let i in selectedId) {
@@ -177,15 +162,15 @@ export class Villages extends React.Component {
             process.env.REACT_APP_SERVER_URL + "states/" + selectedId[i],
             {
               headers: {
-                Authorization: "Bearer " + auth.getToken() + ""
-              }
+                Authorization: "Bearer " + auth.getToken() + "",
+              },
             }
           )
-          .then(res => {
+          .then((res) => {
             this.setState({ multipleDelete: true });
             this.componentDidMount();
           })
-          .catch(error => {
+          .catch((error) => {
             this.setState({ multipleDelete: false });
             console.log("err", error);
           });
@@ -193,9 +178,61 @@ export class Villages extends React.Component {
     }
   };
 
+ActiveAll = (selectedId, selected, numberOfIsActive) => {
+    if (selectedId.length !== 0) {
+      for (let i in numberOfIsActive){
+      let IsActive = !(numberOfIsActive[i]);
+        axios
+          .put(
+            process.env.REACT_APP_SERVER_URL +
+            "states/" +
+            selectedId[i],
+            {
+              is_active: IsActive
+            },
+            {
+              headers: {
+                Authorization: "Bearer " + auth.getToken() + ""
+              }
+            }
+          )
+          .then(res => {
+            this.setState({ formSubmitted: true });
+            this.componentDidMount({ editData: true });
+            this.props.history.push({ pathname: "/states", editData: true });
+          })
+          .catch(error => {
+            this.setState({ formSubmitted: false });
+            if (error.response !== undefined) {
+              this.setState({ errorCode: error.response.data.statusCode + " Error- " + error.response.data.error + " Message- " + error.response.data.message + " Please try again!" })
+            } else {
+              this.setState({ errorCode: "Network Error - Please try again!" });
+            }
+            console.log(error);
+          });
+      // }
+    }
+  }
+  };
+
+  clearSelected = (selected) => {
+    selected = [];
+  }
+
+confirmActive = (event) => {
+    this.setState({ isActiveAllShowing: true })
+    this.setState({ setActiveId: event.target.id });
+    this.setState({ IsActive: event.target.checked });
+  };
+
+  handleClose = () => {
+    this.setState({ open: false })
+  };
+
   handleActive = (event) => {
-    let setActiveId = event.target.id;
-    let IsActive = event.target.checked;
+    this.setState({ isActiveAllShowing: false })
+    let setActiveId = this.state.setActiveId;
+    let IsActive = this.state.IsActive;
     axios
       .put(
         process.env.REACT_APP_SERVER_URL +
@@ -212,6 +249,7 @@ export class Villages extends React.Component {
       )
       .then(res => {
         this.setState({ formSubmitted: true });
+        this.setState({ open: true })
         this.componentDidMount({ editData: true });
         this.props.history.push({ pathname: "/states", editData: true });
       })
@@ -226,6 +264,10 @@ export class Villages extends React.Component {
       });
   };
 
+  closeActiveAllModalHandler = (event) => {
+    this.setState({ isActiveAllShowing: false });
+
+  };
   handleCheckBox = (event) => {
     this.setState({ [event.target.name]: event.target.checked });
     this.setState({ addIsActive: true })
@@ -241,7 +283,7 @@ export class Villages extends React.Component {
       },
       {
         name: "Active",
-        cell: cell => (<Switch id={cell.id} onChange={e => { this.handleActive(e) }} defaultChecked={cell.is_active} Small={true} />),
+        cell: cell => (<Switch id={cell.id} name={cell.name} onChange={event => { this.confirmActive(event) }} defaultChecked={cell.is_active} Small={true} />),
         sortable: true,
         button: true
       }
@@ -271,19 +313,19 @@ export class Villages extends React.Component {
                 </Button>
               </div>
             </div>
-            <br></br>
             {this.props.location.addData ? (
               <Snackbar severity="success">
                 State added successfully.
               </Snackbar>
             ) : null}
             {this.props.location.editData ? (
-              <Snackbar severity="success">
+              <Snackbar open={this.state.open} autoHideDuration={3000} onClose={this.handleClose} severity="success">
                 State edited successfully.
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
               this.state.singleDelete !== "" &&
+
               this.state.singleDelete ? (
                 <Snackbar severity="success" Showbutton={false}>
                   State {this.state.singleDelete} deleted successfully!
@@ -304,6 +346,7 @@ export class Villages extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
+            <br></br>
             <div className={classes.row}>
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
@@ -332,10 +375,10 @@ export class Villages extends React.Component {
             <br></br>
             {data ? (
               <Table
+                showSetAllActive={true}
                 title={"States"}
                 showSearch={false}
                 filterData={true}
-                // noDataComponent={"No Records To be shown"}
                 Searchplaceholder={"Search by State Name"}
                 filterBy={["name"]}
                 filters={filters}
@@ -343,7 +386,10 @@ export class Villages extends React.Component {
                 column={Usercolumns}
                 editData={this.editData}
                 DeleteData={this.DeleteData}
+                clearSelected={this.clearSelected}
                 DeleteAll={this.DeleteAll}
+                handleActive={this.handleActive}
+                ActiveAll={this.ActiveAll}
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 DeleteMessage={"Are you Sure you want to Delete"}
@@ -351,10 +397,28 @@ export class Villages extends React.Component {
             ) : (
                 <h1>Loading...</h1>
               )}
+            <Modal
+              className="modal"
+              show={this.state.isActiveAllShowing}
+              close={this.closeActiveAllModalHandler}
+              displayCross={{ display: "none" }}
+              handleEventChange={true}
+              event={this.handleActive}
+              footer={{
+                footerSaveName: "OKAY",
+                footerCloseName: "CLOSE",
+                displayClose: { display: "true" },
+                displaySave: { display: "true" }
+              }}
+            >
+              {this.state.IsActive ? (<p>Do you want to set selected Active ?{this.state.data.name}</p>
+               ) : (<p>Do you want to Deactivate selected State.?</p>)
+              }
+            </Modal>
           </div>
         </Grid>
       </Layout>
     );
   }
 }
-export default withStyles(useStyles)(Villages);
+export default withStyles(useStyles)(States);

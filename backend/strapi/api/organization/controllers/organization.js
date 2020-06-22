@@ -8,31 +8,38 @@ const { sanitizeEntity } = require("strapi-utils");
 module.exports = {
   async find(ctx) {
     let org;
+    console.log("query", ctx.query);
     if (ctx.query._q) {
+      console.log("case1");
       org = await strapi.services.organization.search(ctx.query);
     } else {
+      console.log("case2");
       org = await strapi.services.organization.find(ctx.query);
     }
 
-    //for contact
-    let contact = await strapi.services.contact.find({
-      id: org[0].contact.id,
-    });
-    org[0].contact = contact[0];
-
-    //for vo
-    let vo = await strapi.services.contact.find({
-      id: org[0].vo.id,
-    });
-    org[0].vo = vo[0];
-
-    //if fpo then add
-    if ("id" in org[0].fpo) {
-      let fpo = await strapi.services.contact.find({
-        id: org[0].fpo.id,
+    org.map(async (organization) => {
+      //for contact
+      let contact = await strapi.services.contact.find({
+        id: organization.contact.id,
       });
-      org[0].fpo = fpo[0];
-    }
+      organization.contact = contact[0];
+
+      //for vo
+      if (organization.vo) {
+        let vo = await strapi.services.contact.find({
+          id: organization.vo.id,
+        });
+        organization.vo = vo[0];
+      }
+
+      //if fpo then add
+      if (organization.fpo) {
+        let fpo = await strapi.services.contact.find({
+          id: organization.fpo.id,
+        });
+        organization.fpo = fpo[0];
+      }
+    });
 
     console.log("ctx.query", org);
     return org.map((entity) =>
@@ -67,7 +74,7 @@ module.exports = {
     console.log("body", ctx.request.body);
     // update contact
     let contact = await strapi.services.contact.update(
-      ctx.params,
+      { organization: ctx.params.id },
       ctx.request.body
     );
     console.log("contact", contact);
@@ -98,10 +105,19 @@ module.exports = {
     }
     //update org
     let orgDetails = Object.assign(orgOtherDetails, ctx.request.body);
-    let org = await strapi.services.organization.update(
-      { id: contact.organization.id },
-      orgDetails
-    );
+    let org = await strapi.services.organization.update(ctx.params, orgDetails);
+    return sanitizeEntity(org, { model: strapi.models.organization });
+  },
+
+  async delete(ctx) {
+    const contact = await strapi.services.contact.delete({
+      organization: ctx.params.id,
+    });
+    const bankdetail = await strapi.services.bankdetail.delete({
+      organization: ctx.params.id,
+    });
+    const org = await strapi.services.organization.delete(ctx.params);
+    console.log("org", org);
     return sanitizeEntity(org, { model: strapi.models.organization });
   },
 };

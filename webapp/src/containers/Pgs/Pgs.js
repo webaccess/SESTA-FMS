@@ -10,7 +10,8 @@ import { Grid } from "@material-ui/core";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import Switch from "../../components/Switch/Switch";
+import Switch from "../../components/UI/Switch/Switch";
+
 const useStyles = (theme) => ({
   root: {},
   row: {
@@ -19,9 +20,13 @@ const useStyles = (theme) => ({
     alignItems: "center",
     marginTop: theme.spacing(1),
   },
+  floatRow: {
+    height: "40px",
+    float: "right",
+  },
   buttonRow: {
     height: "42px",
-    marginTop: theme.spacing(1),
+    float: "right",
   },
   spacer: {
     flexGrow: 1,
@@ -249,14 +254,16 @@ export class Pgs extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>Manage Producer Group</h1>
-            <div className={classes.row}>
-              <div className={classes.buttonRow}>
-                <Button variant="contained" component={Link} to="/Pgs/add">
-                  Add PG
-                </Button>
+            <h1 className={style.title}>
+              Manage Producer Group
+              <div className={classes.floatRow}>
+                <div className={classes.buttonRow}>
+                  <Button variant="contained" component={Link} to="/Pgs/add">
+                    Add PG
+                  </Button>
+                </div>
               </div>
-            </div>
+            </h1>
             {this.props.location.addData ? (
               <Snackbar severity="success">
                 Producer Group added successfully.
@@ -297,11 +304,6 @@ export class Pgs extends React.Component {
                 {this.state.errorCode}
               </Snackbar>
             ) : null}
-            {/* {this.state.formSubmitted === true ? (
-              <Snackbar severity="success" Showbutton={false}>
-                {this.state.successCode}
-              </Snackbar>
-            ) : null} */}
             <br></br>
             <div className={classes.row}>
               <div className={classes.searchInput}>
@@ -309,7 +311,7 @@ export class Pgs extends React.Component {
                   <Grid item md={12} xs={12}>
                     <Input
                       fullWidth
-                      label="Producer Group Name"
+                      label="Producer Group"
                       name="filterPg"
                       variant="outlined"
                       onChange={(event) => {
@@ -330,7 +332,7 @@ export class Pgs extends React.Component {
             </div>
             {data ? (
               <Table
-                title={"Villages"}
+                title={"Producer Group"}
                 showSearch={false}
                 filterData={true}
                 // noDataComponent={"No Records To be shown"}
