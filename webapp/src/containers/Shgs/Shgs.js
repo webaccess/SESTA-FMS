@@ -1,11 +1,12 @@
 import { Grid } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autocomplete from "../../components/Autocomplete/Autocomplete";
 import axios from "axios";
 import React from "react";
 import { Link } from "react-router-dom";
 import auth from "../../components/Auth/Auth.js";
 import Table from "../../components/Datatable/Datatable.js";
+import { map } from "lodash";
 import Spinner from "../../components/Spinner";
 import Button from "../../components/UI/Button/Button";
 import Input from "../../components/UI/Input/Input";
@@ -117,7 +118,6 @@ export class Shgs extends React.Component {
     for (let i in result) {
       let villages = [];
       for (let j in result[i].contact.villages) {
-        console.log("v==", result[i].contact.villages[j].name);
         villages.push(result[i].contact.villages[j].name + " ");
       }
 
@@ -127,9 +127,9 @@ export class Shgs extends React.Component {
   }
   handleStateChange = async (event, value) => {
     if (value !== null) {
-      this.setState({ filterState: value.id });
+      this.setState({ filterState: value });
       this.setState({
-        isCancel: false,
+        isCancel: false,filterDistrict:"",filterVillage:''
       });
 
       let stateId = value.id;
@@ -166,7 +166,8 @@ export class Shgs extends React.Component {
 
   handleDistrictChange(event, value) {
     if (value !== null) {
-      this.setState({ filterDistrict: value.id });
+      this.setState({ filterDistrict: value });
+      this.setState({filterVillage:''})
       let distId = value.id;
       axios
         .get(process.env.REACT_APP_SERVER_URL + "districts/" + distId, {
@@ -191,7 +192,7 @@ export class Shgs extends React.Component {
 
   handleVillageChange(event, value) {
     if (value !== null) {
-      this.setState({ filterVillage: value.id });
+      this.setState({ filterVillage: value });
       this.setState({
         isCancel: false,
       });
@@ -256,7 +257,6 @@ export class Shgs extends React.Component {
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
-
             console.log("err", error);
           });
       }
@@ -285,15 +285,14 @@ export class Shgs extends React.Component {
         "village_organization.name_contains=" + this.state.filterVo + "&&";
     }
     if (this.state.filterState) {
-      searchData += "state.id=" + this.state.filterState + "&&";
+      searchData += "state.id=" + this.state.filterState.id + "&&";
     }
     if (this.state.filterDistrict) {
-      searchData += "district.id=" + this.state.filterDistrict + "&&";
+      searchData += "district.id=" + this.state.filterDistrict.id + "&&";
     }
     if (this.state.filterVillage) {
-      searchData += "villages.id=" + this.state.filterVillage;
+      searchData += "villages.id=" + this.state.filterVillage.id;
     }
-
     //api call after search filter
     axios
       .get(process.env.REACT_APP_SERVER_URL + "shgs?" + searchData, {
@@ -351,7 +350,6 @@ export class Shgs extends React.Component {
     }
 
     let columnsvalue = selectors[0];
-    console.log("columnsvalue", columnsvalue);
     const { classes } = this.props;
     let statesFilter = this.state.getState;
     let filterState = this.state.filterState;
@@ -360,6 +358,30 @@ export class Shgs extends React.Component {
     let villagesFilter = this.state.getVillage;
     let filterVillage = this.state.filterVillage;
     let isCancel = this.state.isCancel;
+    let addStates = [];
+    map(filterState, (state, key) => {
+      addStates.push(
+        statesFilter.findIndex(function (item, i) {
+          return item.id === state;
+        })
+      );
+    });
+    let addDistricts = [];
+    map(filterDistrict, (district, key) => {
+      addDistricts.push(
+        districtsFilter.findIndex(function (item, i) {
+          return item.id === district;
+        })
+      );
+      let addVillages = [];
+      map(filterVillage, (village, key) => {
+        addVillages.push(
+          villagesFilter.findIndex(function (item, i) {
+            return item.id === village;
+          })
+        );
+      });
+    });
     return (
       <Layout>
         <div className="App">
@@ -450,11 +472,7 @@ export class Shgs extends React.Component {
                       filterState
                         ? this.state.isCancel === true
                           ? null
-                          : statesFilter[
-                              statesFilter.findIndex(function (item, i) {
-                                return item.id === filterState;
-                              })
-                            ] || null
+                          : filterState
                         : null
                     }
                     renderInput={(params) => (
@@ -485,11 +503,7 @@ export class Shgs extends React.Component {
                       filterDistrict
                         ? this.state.isCancel === true
                           ? null
-                          : districtsFilter[
-                              districtsFilter.findIndex(function (item, i) {
-                                return item.id === filterDistrict;
-                              })
-                            ] || null
+                          : filterDistrict
                         : null
                     }
                     renderInput={(params) => (
@@ -519,12 +533,8 @@ export class Shgs extends React.Component {
                     value={
                       filterVillage
                         ? this.state.isCancel === true
-                          ? null
-                          : villagesFilter[
-                              villagesFilter.findIndex(function (item, i) {
-                                return item.id === filterVillage;
-                              })
-                            ] || null
+                        ? null
+                        :filterVillage
                         : null
                     }
                     renderInput={(params) => (
