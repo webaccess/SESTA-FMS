@@ -43,6 +43,18 @@ class FpoPage extends Component {
             message: "State field required",
           },
         },
+        addEmail: {
+          email: {
+            value: "true",
+            message: "Please enter valid email id",
+          },
+        },
+        addPhone: {
+          phone: {
+            value: "true",
+            message: "Please enter valid phone number",
+          },
+        },
       },
       errors: {
         addDistrict: [],
@@ -162,6 +174,7 @@ class FpoPage extends Component {
         values: {
           ...this.state.values,
           addState: "",
+          addDistrict: "",
         },
       });
       this.setState({ stateSelected: false });
@@ -175,7 +188,10 @@ class FpoPage extends Component {
       });
     } else {
       this.setState({
-        addDistrict: [],
+        values: {
+          ...this.state.values,
+          addDistrict: "",
+        },
       });
     }
   }
@@ -486,6 +502,7 @@ class FpoPage extends Component {
                   <Input
                     fullWidth
                     label="Email"
+                    type="email"
                     name="addEmail"
                     error={this.hasError("addEmail")}
                     helperText={
@@ -502,7 +519,7 @@ class FpoPage extends Component {
                   <Input
                     fullWidth
                     label="Phone"
-                    type="number"
+                    type="tel"
                     name="addPhone"
                     error={this.hasError("addPhone")}
                     helperText={

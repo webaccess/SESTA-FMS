@@ -87,6 +87,10 @@ const roles = {
         name: "tag",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
+      {
+        name: "country",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
     ],
     grantAllPermissions: false,
   },
@@ -139,6 +143,10 @@ const roles = {
 
       {
         name: "tag",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "country",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
     ],
@@ -195,6 +203,10 @@ const roles = {
         name: "tag",
         action: [],
       },
+      {
+        name: "country",
+        action: [],
+      },
     ],
     grantAllPermissions: false,
   },
@@ -247,6 +259,10 @@ const roles = {
 
       {
         name: "tag",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "country",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
     ],
@@ -431,6 +447,36 @@ const modules = {
     displayNavigation: false,
     module: "", //slug
     order: 12,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  Countries: {
+    is_active: true,
+    icon_class: "people",
+    url: "/countries",
+    slug: "list_country",
+    displayNavigation: true,
+    module: "", //slug
+    order: 13,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Add Country": {
+    is_active: true,
+    icon_class: "",
+    url: "/countries/add",
+    slug: "add_country",
+    displayNavigation: false,
+    module: "", //slug
+    order: 14,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Edit Country": {
+    is_active: true,
+    icon_class: "",
+    url: "/countries/edit/:id",
+    slug: "edit_country",
+    displayNavigation: false,
+    module: "", //slug
+    order: 14,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
 };

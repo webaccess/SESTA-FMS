@@ -9,35 +9,35 @@ async function allRoles() {
   return await bookshelf
     .model("role")
     .fetchAll()
-    .then(res => res.toJSON());
+    .then((res) => res.toJSON());
 }
 
 async function allModules() {
   return await bookshelf
     .model("module")
     .fetchAll()
-    .then(res => res.toJSON());
+    .then((res) => res.toJSON());
 }
 
 async function getRoleModules(roles, module) {
   return await bookshelf
     .model("roleModule")
-    .query(function(qb) {
+    .query(function (qb) {
       qb.where("role_id", "in", roles).andWhere("module_id", "=", module);
     })
     .fetchAll()
-    .then(res => res.toJSON());
+    .then((res) => res.toJSON());
 }
 
 function addPermissionsToGivenRole(role, id) {
   /**
    * Creating permissions WRT to controllers and mapping to created role
    */
-  Object.keys(role.permissions || {}).forEach(type => {
-    Object.keys(role.permissions[type].controllers).forEach(controller => {
+  Object.keys(role.permissions || {}).forEach((type) => {
+    Object.keys(role.permissions[type].controllers).forEach((controller) => {
       console.log(`Adding permission for ${controller} for role ${role.name}`);
       Object.keys(role.permissions[type].controllers[controller]).forEach(
-        action => {
+        (action) => {
           bookshelf
             .model("permission")
             .forge({
@@ -45,7 +45,7 @@ function addPermissionsToGivenRole(role, id) {
               type: controller === "user" ? "users-permissions" : type,
               controller: controller,
               action: action.toLowerCase(),
-              ...role.permissions[type].controllers[controller][action]
+              ...role.permissions[type].controllers[controller][action],
             })
             .save();
         }
@@ -60,18 +60,18 @@ function addRoleModule(role, moduleItem) {
     .model("roleModule")
     .forge({
       role_id: role.id,
-      module_id: moduleItem.id
+      module_id: moduleItem.id,
     })
     .save()
-    .then(rr => {
+    .then((rr) => {
       console.log("module " + moduleItem.name + " added!!!");
     })
-    .catch(error => {
+    .catch((error) => {
       console.log(error);
     });
 }
 
-module.exports = strapi => {
+module.exports = (strapi) => {
   const hook = {
     /**
      * Default options
@@ -88,7 +88,7 @@ module.exports = strapi => {
     async initialize() {
       let controllerActionWithoutUser = fs
         .readdirSync(apiFolder, { withFileTypes: true })
-        .filter(api => api.isDirectory())
+        .filter((api) => api.isDirectory())
         .reduce((acc, folder) => {
           const { name } = folder;
           const raw = fs.readFileSync(`./api/${name}/config/routes.json`);
@@ -109,15 +109,15 @@ module.exports = strapi => {
           create: { enabled: false },
           update: { enabled: false },
           destroy: { enabled: false },
-          me: { enabled: false }
-        }
+          me: { enabled: false },
+        },
       });
 
       const roles = _data.roles;
 
       var _allModules = await allModules();
 
-      const _roleRequestData = Object.keys(roles).map(r => {
+      const _roleRequestData = Object.keys(roles).map((r) => {
         const { controllers, grantAllPermissions, content } = roles[r];
         const updatedController = controllers.reduce((result, controller) => {
           const { name, action } = controller;
@@ -163,20 +163,20 @@ module.exports = strapi => {
           type: content.type ? content.type : r,
           permissions: {
             application: {
-              controllers: updatedController
-            }
-          }
+              controllers: updatedController,
+            },
+          },
         };
       });
 
-      var promise = new Promise(function(resolve, reject) {
-        _roleRequestData.forEach(role => {
+      var promise = new Promise(function (resolve, reject) {
+        _roleRequestData.forEach((role) => {
           bookshelf
             .model("role")
             .fetchAll()
-            .then(model => {
+            .then((model) => {
               const response = model.toJSON();
-              const isRolePresent = response.find(r => r.name === role.name);
+              const isRolePresent = response.find((r) => r.name === role.name);
 
               if (!isRolePresent) {
                 // Creating role
@@ -185,7 +185,7 @@ module.exports = strapi => {
                   .forge({
                     name: role.name,
                     description: role.description,
-                    type: role.type
+                    type: role.type,
                   })
                   .save()
                   .then(async function rRoles(r) {
@@ -194,7 +194,7 @@ module.exports = strapi => {
                     addPermissionsToGivenRole(role, _role.id);
                     resolve();
                   })
-                  .catch(error => {
+                  .catch((error) => {
                     reject(error);
                   });
               } else {
@@ -209,12 +209,12 @@ module.exports = strapi => {
                     addPermissionsToGivenRole(role, isRolePresent.id);
                     resolve();
                   })
-                  .catch(error => {
+                  .catch((error) => {
                     reject(error);
                   });
               }
             })
-            .catch(failed => {
+            .catch((failed) => {
               reject({ failed });
             });
         });
@@ -222,23 +222,23 @@ module.exports = strapi => {
 
       const modules = _data.modules;
 
-      promise.then(async function() {
+      promise.then(async function () {
         var _allRoles = await allRoles();
-        Object.keys(modules).forEach(module => {
+        Object.keys(modules).forEach((module) => {
           bookshelf
             .model("module")
             .fetchAll()
             .then(async function getAllModules(model) {
               const response = model.toJSON();
               const isModulePresent = response.find(
-                r => r.slug === modules[module]["slug"]
+                (r) => r.slug === modules[module]["slug"]
               );
 
               const _roles = _allRoles.filter(
-                r => modules[module]["roles"].indexOf(r.name) > -1
+                (r) => modules[module]["roles"].indexOf(r.name) > -1
               );
               const _module = _allModules.find(
-                m => modules[module]["module"] === m.name
+                (m) => modules[module]["module"] === m.name
               );
               var roleModules = [];
               if (!isModulePresent) {
@@ -253,17 +253,17 @@ module.exports = strapi => {
                     url: modules[module]["url"],
                     displayNavigation: modules[module]["displayNavigation"],
                     module: _module ? _module.id : null,
-                    order: modules[module]["order"]
+                    order: modules[module]["order"],
                   })
                   .save()
-                  .then(m => {
+                  .then((m) => {
                     const moduleItem = m.toJSON();
-                    _roles.map(role => {
+                    _roles.map((role) => {
                       //linking roles to modules
                       addRoleModule(role, moduleItem);
                     });
                   })
-                  .catch(error => {
+                  .catch((error) => {
                     console.log(error);
                   });
               } else {
@@ -271,14 +271,14 @@ module.exports = strapi => {
                   .model("roleModule")
                   .query({ where: { module_id: isModulePresent.id } })
                   .fetchAll()
-                  .then(res => res.toJSON());
+                  .then((res) => res.toJSON());
                 // updating module
                 bookshelf
                   .model("module")
                   .query({
                     where: {
-                      slug: modules[module]["slug"]
-                    }
+                      slug: modules[module]["slug"],
+                    },
                   })
                   .save(
                     {
@@ -288,19 +288,19 @@ module.exports = strapi => {
                       url: modules[module]["url"],
                       displayNavigation: modules[module]["displayNavigation"],
                       module: _module ? _module.id : null,
-                      order: modules[module]["order"]
+                      order: modules[module]["order"],
                     },
                     { patch: true }
                   )
-                  .then(m => {
+                  .then((m) => {
                     const moduleItem = m.toJSON();
                     if (roleMods.length > 0) {
-                      roleMods.map(role => {
+                      roleMods.map((role) => {
                         bookshelf
                           .model("roleModule")
                           .where({
                             role_id: role.id,
-                            module_id: isModulePresent.id
+                            module_id: isModulePresent.id,
                           })
                           .destroy()
                           .then(async function rRoleMod() {
@@ -309,28 +309,28 @@ module.exports = strapi => {
                             );
                             addRoleModule(role, moduleItem);
                           })
-                          .catch(error => {
+                          .catch((error) => {
                             console.log("error", error);
                           });
                       });
                     } else {
-                      _roles.map(role => {
+                      _roles.map((role) => {
                         //linking roles to modules
                         addRoleModule(role, moduleItem);
                       });
                     }
                   })
-                  .catch(error => {
+                  .catch((error) => {
                     console.log(error);
                   });
               }
             })
-            .catch(failed => {
+            .catch((failed) => {
               console.log("failed", failed);
             });
         });
       });
-    }
+    },
   };
 
   return hook;
