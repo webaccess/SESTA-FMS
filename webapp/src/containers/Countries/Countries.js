@@ -5,12 +5,12 @@ import Layout from "../../hoc/Layout/Layout";
 import Button from "../../components/UI/Button/Button";
 import { withStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
-import style from "./Pgs.module.css";
+import style from "./Countries.module.css";
 import { Grid } from "@material-ui/core";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
-import Modal from "../../components/UI/Modal/Modal.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
+import Modal from "../../components/UI/Modal/Modal.js";
 import Switch from "../../components/UI/Switch/Switch";
 
 const useStyles = (theme) => ({
@@ -21,13 +21,9 @@ const useStyles = (theme) => ({
     alignItems: "center",
     marginTop: theme.spacing(1),
   },
-  floatRow: {
-    height: "40px",
-    float: "right",
-  },
   buttonRow: {
     height: "42px",
-    float: "right",
+    marginTop: theme.spacing(1),
   },
   spacer: {
     flexGrow: 1,
@@ -42,7 +38,7 @@ const useStyles = (theme) => ({
   Districts: {
     marginRight: theme.spacing(1),
   },
-  States: {
+  Countries: {
     marginRight: theme.spacing(1),
   },
   Search: {
@@ -53,47 +49,105 @@ const useStyles = (theme) => ({
   },
 });
 
-export class Pgs extends React.Component {
+export class Countries extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       values: {},
+      filterCountry: "",
+      Result: [],
       data: [],
-      DeleteData: false,
+      selectedid: 0,
+      open: false,
+      isSetActive: false,
+      isSetInActive: false,
       isActiveAllShowing: false,
+      columnsvalue: [],
+      DeleteData: false,
+      properties: props,
       isCancel: false,
+      dataCellId: [],
       singleDelete: "",
       multipleDelete: "",
-      errorCode: "",
-      successCode: "",
+      active: {},
+      allIsActive: [],
     };
-    this.snackbar = React.createRef();
   }
+
   async componentDidMount() {
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "tags/?_sort=name:ASC", {
+      .get(process.env.REACT_APP_SERVER_URL + "countries/?_sort=name:ASC", {
         headers: {
           Authorization: "Bearer " + auth.getToken() + "",
         },
       })
       .then((res) => {
         this.setState({ data: res.data });
+      });
+  }
+
+  StateFilter(event, value, target) {
+    this.setState({
+      values: { ...this.state.values, [event.target.name]: event.target.value },
+    });
+  }
+
+  getData(result) {
+    for (let i in result) {
+      let countries = [];
+      for (let j in result[i].countries) {
+        countries.push(result[i].countries[j].name + " ");
+      }
+      result[i]["countries"] = countries;
+    }
+    return result;
+  }
+
+  handleSearch() {
+    let searchData = "";
+    if (this.state.values.filterCountry) {
+      searchData += "name_contains=" + this.state.values.filterCountry;
+    }
+    axios
+      .get(
+        process.env.REACT_APP_SERVER_URL +
+          "countries?" +
+          searchData +
+          "&&_sort=name:ASC",
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
+        }
+      )
+      .then((res) => {
+        this.setState({ data: this.getData(res.data) });
       })
-      .catch((error) => {
-        console.log(error);
+      .catch((err) => {
+        console.log("err", err);
       });
   }
 
   editData = (cellid) => {
-    this.props.history.push("/pgs/edit/" + cellid);
+    this.props.history.push("/countries/edit/" + cellid);
+  };
+
+  cancelForm = () => {
+    this.setState({
+      filterCountry: "",
+      values: {},
+      formSubmitted: "",
+      stateSelected: false,
+      isCancel: true,
+    });
+    this.componentDidMount();
   };
 
   DeleteData = (cellid, selectedId) => {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-
       axios
-        .delete(process.env.REACT_APP_SERVER_URL + "tags/" + cellid, {
+        .delete(process.env.REACT_APP_SERVER_URL + "countries/" + cellid, {
           headers: {
             Authorization: "Bearer " + auth.getToken() + "",
           },
@@ -109,16 +163,20 @@ export class Pgs extends React.Component {
         });
     }
   };
+
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       for (let i in selectedId) {
         axios
-          .delete(process.env.REACT_APP_SERVER_URL + "tags/" + selectedId[i], {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          })
+          .delete(
+            process.env.REACT_APP_SERVER_URL + "countries/" + selectedId[i],
+            {
+              headers: {
+                Authorization: "Bearer " + auth.getToken() + "",
+              },
+            }
+          )
           .then((res) => {
             this.setState({ multipleDelete: true });
             this.componentDidMount();
@@ -131,20 +189,56 @@ export class Pgs extends React.Component {
     }
   };
 
-  resetForm = () => {
-    this.setState({
-      values: {},
-      formSubmitted: "",
-      stateSelected: false,
-      isCancel: true,
-    });
-    this.componentDidMount();
-  };
-
-  handleChange = ({ target }) => {
-    this.setState({
-      values: { ...this.state.values, [target.name]: target.value },
-    });
+  ActiveAll = (selectedId, selected) => {
+    if (selectedId.length !== 0) {
+      let numberOfIsActive = [];
+      for (let i in selected) {
+        numberOfIsActive.push(selected[0]["is_active"]);
+      }
+      this.setState({ allIsActive: numberOfIsActive });
+      let IsActive = "";
+      if (selected[0]["is_active"] === true) {
+        IsActive = false;
+      } else {
+        IsActive = true;
+      }
+      for (let i in selectedId) {
+        axios
+          .put(
+            process.env.REACT_APP_SERVER_URL + "countries/" + selectedId[i],
+            {
+              is_active: IsActive,
+            },
+            {
+              headers: {
+                Authorization: "Bearer " + auth.getToken() + "",
+              },
+            }
+          )
+          .then((res) => {
+            this.setState({ formSubmitted: true });
+            this.componentDidMount({ editData: true });
+            this.props.history.push({ pathname: "/countries", editData: true });
+          })
+          .catch((error) => {
+            this.setState({ formSubmitted: false });
+            if (error.response !== undefined) {
+              this.setState({
+                errorCode:
+                  error.response.data.statusCode +
+                  " Error- " +
+                  error.response.data.error +
+                  " Message- " +
+                  error.response.data.message +
+                  " Please try again!",
+              });
+            } else {
+              this.setState({ errorCode: "Network Error - Please try again!" });
+            }
+            console.log(error);
+          });
+      }
+    }
   };
 
   confirmActive = (event) => {
@@ -153,14 +247,17 @@ export class Pgs extends React.Component {
     this.setState({ IsActive: event.target.checked });
   };
 
-  handleActive = async (e) => {
-     this.setState({ isActiveAllShowing: false });
-    this.setState({ successCode: "", errorCode: "" });
+  handleClose = () => {
+    this.setState({ open: false });
+  };
+
+  handleActive = (event) => {
+    this.setState({ isActiveAllShowing: false });
     let setActiveId = this.state.setActiveId;
     let IsActive = this.state.IsActive;
-    await axios
+    axios
       .put(
-        process.env.REACT_APP_SERVER_URL + "tags/" + setActiveId,
+        process.env.REACT_APP_SERVER_URL + "countries/" + setActiveId,
         {
           is_active: IsActive,
         },
@@ -171,22 +268,10 @@ export class Pgs extends React.Component {
         }
       )
       .then((res) => {
-        let isActive = "";
-        if (res.data.is_active) {
-          isActive = "Active";
-        } else {
-          isActive = "Inactive";
-        }
         this.setState({ formSubmitted: true });
-        this.setState({
-          successCode:
-            "Producer group " + res.data.name + " is " + isActive + ".",
-        });
-        this.componentDidMount();
-        this.props.history.push({ pathname: "/pgs", updateData: true });
-        if (this.props.location.updateData && this.snackbar.current !== null) {
-            this.snackbar.current.handleClick();
-        }
+        this.setState({ open: true });
+        this.componentDidMount({ editData: true });
+        this.props.history.push({ pathname: "/countries", editData: true });
       })
       .catch((error) => {
         this.setState({ formSubmitted: false });
@@ -207,40 +292,20 @@ export class Pgs extends React.Component {
       });
   };
 
-   closeActiveAllModalHandler = (event) => {
+  closeActiveAllModalHandler = (event) => {
     this.setState({ isActiveAllShowing: false });
   };
 
-  handleSearch() {
-    let searchData = "";
-    if (this.state.values.filterPg) {
-      searchData += "name_contains=" + this.state.values.filterPg;
-    }
-    axios
-      .get(
-        process.env.REACT_APP_SERVER_URL +
-          "tags?" +
-          searchData +
-          "&&_sort=name:ASC",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
-      )
-      .then((res) => {
-        this.setState({ data: res.data });
-      })
-      .catch((err) => {
-        console.log("err", err);
-      });
-  }
+  handleCheckBox = (event) => {
+    this.setState({ [event.target.name]: event.target.checked });
+    this.setState({ addIsActive: true });
+  };
 
   render() {
     let data = this.state.data;
     const Usercolumns = [
       {
-        name: "Producer Group",
+        name: "Country",
         selector: "name",
         sortable: true,
       },
@@ -273,35 +338,33 @@ export class Pgs extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>Manage Producer Group</h1>
+            <h1 className={style.title}>Manage Countries</h1>
             <div className={classes.row}>
               <div className={classes.buttonRow}>
-                <Button variant="contained" component={Link} to="/Pgs/add">
-                  Add PG
+                <Button
+                  variant="contained"
+                  component={Link}
+                  to="/countries/add"
+                >
+                  Add Country
                 </Button>
               </div>
             </div>
-           {this.props.location.addData ? (
-              <Snackbar severity="success">Producer Group added successfully.</Snackbar>
+            {this.props.location.addData ? (
+              <Snackbar severity="success">
+                Country added successfully.
+              </Snackbar>
             ) : null}
             {this.props.location.editData ? (
-              <Snackbar severity="success">Producer Group edited successfully.</Snackbar>
-            ) : null}
-            {this.props.location.updateData ? (
-              <Snackbar
-                ref={this.snackbar}
-                open={true}
-                autoHideDuration={4000}
-                severity="success"
-              >
-                State updated successfully.
+              <Snackbar severity="success">
+                Country edited successfully.
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
             this.state.singleDelete !== "" &&
             this.state.singleDelete ? (
               <Snackbar severity="success" Showbutton={false}>
-                PG {this.state.singleDelete} deleted successfully!
+                Country {this.state.singleDelete} deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.singleDelete === false ? (
@@ -311,17 +374,12 @@ export class Pgs extends React.Component {
             ) : null}
             {this.state.multipleDelete === true ? (
               <Snackbar severity="success" Showbutton={false}>
-                PGs deleted successfully!
+                Countries deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.multipleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
-              </Snackbar>
-            ) : null}
-            {this.state.formSubmitted === false ? (
-              <Snackbar severity="error" Showbutton={false}>
-                {this.state.errorCode}
               </Snackbar>
             ) : null}
             <br></br>
@@ -331,47 +389,55 @@ export class Pgs extends React.Component {
                   <Grid item md={12} xs={12}>
                     <Input
                       fullWidth
-                      label="Producer Group"
-                      name="filterPg"
+                      label="Country Name"
+                      name="filterCountry"
                       variant="outlined"
-                      onChange={(event) => {
-                        this.handleChange(event);
+                      onChange={(event, value) => {
+                        this.StateFilter(event, value);
                       }}
-                      value={this.state.values.filterPg || ""}
+                      value={this.state.values.filterCountry || ""}
                     />
                   </Grid>
                 </div>
               </div>
-              <div className={classes.searchInput}></div>
-              <br></br>
-              <Button onClick={this.handleSearch.bind(this)}>Search</Button>
-              &nbsp;&nbsp;&nbsp;
-              <Button color="secondary" clicked={this.resetForm}>
-                reset
-              </Button>
+              <div className={classes.searchInput}>
+                <Button onClick={this.handleSearch.bind(this)}>Search</Button>
+                &nbsp;&nbsp;&nbsp;
+                <Button color="secondary" clicked={this.cancelForm}>
+                  Reset
+                </Button>
+              </div>
             </div>
+            <br></br>
             {data ? (
               <Table
-                title={"Producer Group"}
+                showSetAllActive={true}
+                title={"Countries"}
                 showSearch={false}
                 filterData={true}
-                // noDataComponent={"No Records To be shown"}
-                Searchplaceholder={"Seacrh by Village Name"}
-                filterBy={["name", "state.name"]}
+                allIsActive={this.state.allIsActive}
+                Searchplaceholder={"Search by Country Name"}
+                filterBy={["name"]}
                 filters={filters}
                 data={data}
                 column={Usercolumns}
                 editData={this.editData}
                 DeleteData={this.DeleteData}
+                clearSelected={this.clearSelected}
                 DeleteAll={this.DeleteAll}
+                handleActive={this.handleActive}
+                ActiveAll={this.ActiveAll}
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 DeleteMessage={"Are you Sure you want to Delete"}
+                ActiveMessage={
+                  "Are you Sure you want to Deactivate selected Country"
+                }
               />
             ) : (
               <h1>Loading...</h1>
             )}
-             <Modal
+            <Modal
               className="modal"
               show={this.state.isActiveAllShowing}
               close={this.closeActiveAllModalHandler}
@@ -386,8 +452,8 @@ export class Pgs extends React.Component {
               }}
             >
               {this.state.IsActive
-                ? " Do you want to set selected Active ?"
-                : "Do you want to Deactivate selected State.?"}
+                ? " Do you want to activate selected country ?"
+                : "Do you want to deactivate selected country ?"}
             </Modal>
           </div>
         </Grid>
@@ -395,4 +461,4 @@ export class Pgs extends React.Component {
     );
   }
 }
-export default withStyles(useStyles)(Pgs);
+export default withStyles(useStyles)(Countries);

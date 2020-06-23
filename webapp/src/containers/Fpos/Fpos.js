@@ -8,7 +8,7 @@ import style from "./Fpos.module.css";
 import { Link } from "react-router-dom";
 import auth from "../../components/Auth/Auth.js";
 import Input from "../../components/UI/Input/Input";
-import AutoSuggest from "../../components/UI/Autosuggest/Autosuggest";
+import { map } from "lodash";
 import { Grid } from "@material-ui/core";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autocomplete from "../../components/Autocomplete/Autocomplete.js";
@@ -104,14 +104,14 @@ export class Fpos extends React.Component {
       .catch((error) => {
         console.log(error);
       });
-    };
+  }
 
   handleStateChange = async (event, value, method) => {
     if (value !== null) {
-      this.setState({ filterState: value.id });
-
+      this.setState({ filterState: value });
       this.setState({
         isCancel: false,
+        filterDistrict: "",
       });
 
       let stateId = value.id;
@@ -146,25 +146,24 @@ export class Fpos extends React.Component {
 
   handleDistrictChange(event, value) {
     if (value !== null) {
-      this.setState({ filterDistrict: value.id });
-      let distId = value.id;
+      this.setState({ filterDistrict: value });
     } else {
       this.setState({
-        filterDistrict: ""
+        filterDistrict: "",
       });
     }
-  };
+  }
 
   handleVillageChange(event, value) {
     if (value !== null) {
-      this.setState({ filterVillage: value.id });
+      this.setState({ filterVillage: value });
       this.setState({ isCancel: false });
     } else {
       this.setState({
-        filterVillage: ""
+        filterVillage: "",
       });
-    } 
-  };
+    }
+  }
 
   editData = (cellid) => {
     this.props.history.push("/fpos/edit/" + cellid);
@@ -174,7 +173,7 @@ export class Fpos extends React.Component {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       axios
-         .delete(
+        .delete(
           process.env.REACT_APP_SERVER_URL +
             JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
             "s/" +
@@ -238,14 +237,14 @@ export class Fpos extends React.Component {
   };
 
   handleSearch() {
-     let searchData = "";
+    let searchData = "";
     if (this.state.filterState) {
-      searchData += "state.id=" + this.state.filterState + "&&";
+      searchData += "state.id=" + this.state.filterState.id + "&&";
     }
     if (this.state.filterDistrict) {
-      searchData += "district.id=" + this.state.filterDistrict + "&&";
+      searchData += "district.id=" + this.state.filterDistrict.id + "&&";
     }
-     if (this.state.filterFpo) {
+    if (this.state.filterFpo) {
       searchData += "name_contains=" + this.state.filterFpo;
     }
     axios
@@ -256,14 +255,14 @@ export class Fpos extends React.Component {
           "&_sort=name:ASC",
         {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         }
       )
-      .then(res => {
+      .then((res) => {
         this.setState({ data: res.data });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log("err", err);
       });
   }
@@ -278,8 +277,7 @@ export class Fpos extends React.Component {
         name: "Name of the  Organization",
         selector: "name",
         sortable: true,
-       },
-      
+      },
     ];
 
     let selectors = [];
@@ -293,37 +291,47 @@ export class Fpos extends React.Component {
     let filterState = this.state.filterState;
     let districtsFilter = this.state.getDistrict;
     let filterDistrict = this.state.filterDistrict;
+
+    let addStates = [];
+    map(filterState, (state, key) => {
+      addStates.push(
+        statesFilter.findIndex(function (item, i) {
+          return item.id === state;
+        })
+      );
+    });
+    let addDistricts = [];
+    map(filterDistrict, (district, key) => {
+      addDistricts.push(
+        districtsFilter.findIndex(function (item, i) {
+          return item.id === district;
+        })
+      );
+    });
     return (
       <Layout>
         <Grid>
           <div className="App">
-           <h1 className={style.title}>Manage Farmers Producer Organization</h1>
+            <h1 className={style.title}>
+              Manage Farmers Producer Organization
+            </h1>
             <div className={classes.row}>
               <div className={classes.buttonRow}>
-                <Button
-                  variant="contained"
-                  component={Link}
-                  to="/fpos/add"
-                >
+                <Button variant="contained" component={Link} to="/fpos/add">
                   Add FPO
                 </Button>
               </div>
             </div>
             {this.props.location.addFPO ? (
-              <Snackbar severity="success">
-                FPO added successfully.
-              </Snackbar>
+              <Snackbar severity="success">FPO added successfully.</Snackbar>
             ) : this.props.location.editFPO ? (
-              <Snackbar severity="success">
-                FPO edited successfully.
-              </Snackbar>
+              <Snackbar severity="success">FPO edited successfully.</Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
             this.state.singleDelete !== "" &&
             this.state.singleDelete ? (
               <Snackbar severity="success" Showbutton={false}>
-                FPO {this.state.singleDelete} deleted
-                successfully!
+                FPO {this.state.singleDelete} deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.singleDelete === false ? (
@@ -374,11 +382,7 @@ export class Fpos extends React.Component {
                         filterState
                           ? this.state.isCancel === true
                             ? null
-                            : statesFilter[
-                                statesFilter.findIndex(function (item, i) {
-                                  return item.id === filterState;
-                                })
-                              ] || null
+                            : filterState
                           : null
                       }
                       renderInput={(params) => (
@@ -409,11 +413,7 @@ export class Fpos extends React.Component {
                         filterDistrict
                           ? this.state.isCancel === true
                             ? null
-                            : districtsFilter[
-                                districtsFilter.findIndex(function (item, i) {
-                                  return item.id === filterDistrict;
-                                })
-                              ] || null
+                            : filterDistrict
                           : null
                       }
                       renderInput={(params) => (

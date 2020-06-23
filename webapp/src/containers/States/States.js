@@ -7,7 +7,6 @@ import { withStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
 import style from "./States.module.css";
 import { Grid } from "@material-ui/core";
-import Autocomplete from "@material-ui/lab/Autocomplete";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
@@ -36,6 +35,14 @@ const useStyles = (theme) => ({
     float: "right",
     marginRight: theme.spacing(1),
   },
+  floatRow: {
+    height: "40px",
+    float: "right",
+  },
+  buttonRow: {
+    height: "42px",
+    float: "right",
+  },
   searchInput: {
     marginRight: theme.spacing(1),
   },
@@ -59,20 +66,10 @@ export class States extends React.Component {
     this.state = {
       values: {},
       FilterState: "",
-      Result: [],
-      TestData: [],
       data: [],
-      selectedid: 0,
-      open: false,
-      isSetActive: false,
-      isSetInActive: false,
       isActiveAllShowing: false,
       columnsvalue: [],
       DeleteData: false,
-      properties: props,
-      getState: [],
-      getDistrict: [],
-      getVillage: [],
       isCancel: false,
       dataCellId: [],
       singleDelete: "",
@@ -198,7 +195,7 @@ export class States extends React.Component {
     }
   };
 
-  ActiveAll = (selectedId, selected) => {
+ActiveAll = (selectedId, selected) => {
     if (selectedId.length !== 0) {
       let numberOfIsActive = [];
       for (let i in selected) {
@@ -356,8 +353,6 @@ export class States extends React.Component {
     let columnsvalue = selectors[0];
     const { classes } = this.props;
     let filters = this.state.values;
-    console.log("editData", this.snackbar.current);
-
 
     return (
       <Layout>

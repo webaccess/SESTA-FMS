@@ -1,18 +1,3 @@
-// /**
-//  * SnackBar
-//  * Snackbars provide brief messages about app processes.
-//  * The component is also known as a toast.
-// severity="error"
-// severity="warning"
-// severity="info"
-// severity="success"
-
-// **Sample code for using Snackbar**
-// <Snackbar severity="error">
-//   This is a success message!
-// </Snackbar>
-// **/
-
 import React from "react";
 import Button from "@material-ui/core/Button";
 import Snackbar from "@material-ui/core/Snackbar";
@@ -43,6 +28,7 @@ export class CustomizedSnackbars extends React.Component {
   handleClick = () => {
     this.setState({ open: true });
   };
+
   handleClose = (event) => {
     // if (reason === "clickaway") {
     //   return;
@@ -50,7 +36,7 @@ export class CustomizedSnackbars extends React.Component {
     this.setState({ open: false });
   };
 
-  render() {
+    render() {
     const { classes } = this.props;
     return (
       <div>
@@ -100,6 +86,6 @@ export class CustomizedSnackbars extends React.Component {
       </div>
     );
   }
-}
+ }
 
 export default CustomizedSnackbars;

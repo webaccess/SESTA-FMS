@@ -35,12 +35,24 @@ class FpoPage extends Component {
           },
         },
         addDistrict: {
-          required: { value: "true", message: "State field required" },
+          required: { value: "true", message: "District field required" },
         },
         addState: {
           required: {
             value: "true",
-            message: "District field required",
+            message: "State field required",
+          },
+        },
+        addEmail: {
+          email: {
+            value: "true",
+            message: "Please enter valid email id",
+          },
+        },
+        addPhone: {
+          phone: {
+            value: "true",
+            message: "Please enter valid phone number",
           },
         },
       },
@@ -162,6 +174,7 @@ class FpoPage extends Component {
         values: {
           ...this.state.values,
           addState: "",
+          addDistrict: "",
         },
       });
       this.setState({ stateSelected: false });
@@ -175,7 +188,10 @@ class FpoPage extends Component {
       });
     } else {
       this.setState({
-        addDistrict: [],
+        values: {
+          ...this.state.values,
+          addDistrict: "",
+        },
       });
     }
   }
@@ -323,12 +339,10 @@ class FpoPage extends Component {
   };
 
   render() {
-   
     let stateFilter = this.state.getState;
     let addState = this.state.values.addState;
     let districtFilter = this.state.getDistrict;
     let addDistrict = this.state.values.addDistrict;
-    console.log("values",addState,addDistrict,this.state.values.addState);
     return (
       <Layout
         breadcrumbs={
@@ -488,6 +502,7 @@ class FpoPage extends Component {
                   <Input
                     fullWidth
                     label="Email"
+                    type="email"
                     name="addEmail"
                     error={this.hasError("addEmail")}
                     helperText={
@@ -504,7 +519,7 @@ class FpoPage extends Component {
                   <Input
                     fullWidth
                     label="Phone"
-                    type="number"
+                    type="tel"
                     name="addPhone"
                     error={this.hasError("addPhone")}
                     helperText={
