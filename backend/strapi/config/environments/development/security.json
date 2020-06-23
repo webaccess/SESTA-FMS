@@ -21,7 +21,13 @@
     "mode": "block"
   },
   "cors": {
-    "origin": ["http://localhost:3000", "http://localhost:1337"],
+    "origin": [
+      "http://localhost:3000",
+      "http://localhost:1337",
+      "https://indian-cities-api-nocbegfhqg.now.sh/",
+      "http://www.goidirectory.gov.in/district.php",
+      "https://data.gov.in/resources/complete-villages-directory-indiastatedistrictsub-district-level-census-2011-assam/api#/Resource/get_resource_4e8f0544_6acb_4674_bdb0_da7d7e1b009b"
+    ],
     "enabled": true
   },
   "ip": {

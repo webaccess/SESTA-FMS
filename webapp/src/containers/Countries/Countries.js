@@ -5,7 +5,7 @@ import Layout from "../../hoc/Layout/Layout";
 import Button from "../../components/UI/Button/Button";
 import { withStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
-import style from "./States.module.css";
+import style from "./Countries.module.css";
 import { Grid } from "@material-ui/core";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
@@ -21,13 +21,16 @@ const useStyles = (theme) => ({
     alignItems: "center",
     marginTop: theme.spacing(1),
   },
-  floatRow: {
-    height: "40px",
-    float: "right",
-  },
   buttonRow: {
     height: "42px",
+    marginTop: theme.spacing(1),
+  },
+  spacer: {
+    flexGrow: 1,
+  },
+  addButton: {
     float: "right",
+    marginRight: theme.spacing(1),
   },
   searchInput: {
     marginRight: theme.spacing(1),
@@ -35,7 +38,7 @@ const useStyles = (theme) => ({
   Districts: {
     marginRight: theme.spacing(1),
   },
-  States: {
+  Countries: {
     marginRight: theme.spacing(1),
   },
   Search: {
@@ -46,26 +49,34 @@ const useStyles = (theme) => ({
   },
 });
 
-export class States extends React.Component {
+export class Countries extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       values: {},
-      FilterState: "",
+      filterCountry: "",
+      Result: [],
       data: [],
+      selectedid: 0,
+      open: false,
+      isSetActive: false,
+      isSetInActive: false,
       isActiveAllShowing: false,
       columnsvalue: [],
       DeleteData: false,
+      properties: props,
       isCancel: false,
       dataCellId: [],
       singleDelete: "",
       multipleDelete: "",
+      active: {},
+      allIsActive: [],
     };
   }
 
   async componentDidMount() {
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "states/?_sort=name:ASC", {
+      .get(process.env.REACT_APP_SERVER_URL + "countries/?_sort=name:ASC", {
         headers: {
           Authorization: "Bearer " + auth.getToken() + "",
         },
@@ -83,24 +94,24 @@ export class States extends React.Component {
 
   getData(result) {
     for (let i in result) {
-      let states = [];
-      for (let j in result[i].states) {
-        states.push(result[i].states[j].name + " ");
+      let countries = [];
+      for (let j in result[i].countries) {
+        countries.push(result[i].countries[j].name + " ");
       }
-      result[i]["states"] = states;
+      result[i]["countries"] = countries;
     }
     return result;
   }
 
   handleSearch() {
     let searchData = "";
-    if (this.state.values.FilterState) {
-      searchData += "name_contains=" + this.state.values.FilterState;
+    if (this.state.values.filterCountry) {
+      searchData += "name_contains=" + this.state.values.filterCountry;
     }
     axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-          "states?" +
+          "countries?" +
           searchData +
           "&&_sort=name:ASC",
         {
@@ -118,12 +129,12 @@ export class States extends React.Component {
   }
 
   editData = (cellid) => {
-    this.props.history.push("/states/edit/" + cellid);
+    this.props.history.push("/countries/edit/" + cellid);
   };
 
   cancelForm = () => {
     this.setState({
-      FilterState: "",
+      filterCountry: "",
       values: {},
       formSubmitted: "",
       stateSelected: false,
@@ -136,7 +147,7 @@ export class States extends React.Component {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       axios
-        .delete(process.env.REACT_APP_SERVER_URL + "states/" + cellid, {
+        .delete(process.env.REACT_APP_SERVER_URL + "countries/" + cellid, {
           headers: {
             Authorization: "Bearer " + auth.getToken() + "",
           },
@@ -159,7 +170,7 @@ export class States extends React.Component {
       for (let i in selectedId) {
         axios
           .delete(
-            process.env.REACT_APP_SERVER_URL + "states/" + selectedId[i],
+            process.env.REACT_APP_SERVER_URL + "countries/" + selectedId[i],
             {
               headers: {
                 Authorization: "Bearer " + auth.getToken() + "",
@@ -178,85 +189,102 @@ export class States extends React.Component {
     }
   };
 
-ActiveAll = (selectedId, selected, numberOfIsActive) => {
+  ActiveAll = (selectedId, selected) => {
     if (selectedId.length !== 0) {
-      for (let i in numberOfIsActive){
-      let IsActive = !(numberOfIsActive[i]);
+      let numberOfIsActive = [];
+      for (let i in selected) {
+        numberOfIsActive.push(selected[0]["is_active"]);
+      }
+      this.setState({ allIsActive: numberOfIsActive });
+      let IsActive = "";
+      if (selected[0]["is_active"] === true) {
+        IsActive = false;
+      } else {
+        IsActive = true;
+      }
+      for (let i in selectedId) {
         axios
           .put(
-            process.env.REACT_APP_SERVER_URL +
-            "states/" +
-            selectedId[i],
+            process.env.REACT_APP_SERVER_URL + "countries/" + selectedId[i],
             {
-              is_active: IsActive
+              is_active: IsActive,
             },
             {
               headers: {
-                Authorization: "Bearer " + auth.getToken() + ""
-              }
+                Authorization: "Bearer " + auth.getToken() + "",
+              },
             }
           )
-          .then(res => {
+          .then((res) => {
             this.setState({ formSubmitted: true });
             this.componentDidMount({ editData: true });
-            this.props.history.push({ pathname: "/states", editData: true });
+            this.props.history.push({ pathname: "/countries", editData: true });
           })
-          .catch(error => {
+          .catch((error) => {
             this.setState({ formSubmitted: false });
             if (error.response !== undefined) {
-              this.setState({ errorCode: error.response.data.statusCode + " Error- " + error.response.data.error + " Message- " + error.response.data.message + " Please try again!" })
+              this.setState({
+                errorCode:
+                  error.response.data.statusCode +
+                  " Error- " +
+                  error.response.data.error +
+                  " Message- " +
+                  error.response.data.message +
+                  " Please try again!",
+              });
             } else {
               this.setState({ errorCode: "Network Error - Please try again!" });
             }
             console.log(error);
           });
-      // }
+      }
     }
-  }
   };
 
-  clearSelected = (selected) => {
-    selected = [];
-  }
-
-confirmActive = (event) => {
-    this.setState({ isActiveAllShowing: true })
+  confirmActive = (event) => {
+    this.setState({ isActiveAllShowing: true });
     this.setState({ setActiveId: event.target.id });
     this.setState({ IsActive: event.target.checked });
   };
 
   handleClose = () => {
-    this.setState({ open: false })
+    this.setState({ open: false });
   };
 
   handleActive = (event) => {
-    this.setState({ isActiveAllShowing: false })
+    this.setState({ isActiveAllShowing: false });
     let setActiveId = this.state.setActiveId;
     let IsActive = this.state.IsActive;
     axios
       .put(
-        process.env.REACT_APP_SERVER_URL +
-        "states/" +
-        setActiveId,
+        process.env.REACT_APP_SERVER_URL + "countries/" + setActiveId,
         {
-          is_active: IsActive
+          is_active: IsActive,
         },
         {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         }
       )
-      .then(res => {
+      .then((res) => {
         this.setState({ formSubmitted: true });
-        this.setState({ open: true })
+        this.setState({ open: true });
         this.componentDidMount({ editData: true });
-        this.props.history.push({ pathname: "/states", editData: true });
+        this.props.history.push({ pathname: "/countries", editData: true });
       })
-      .catch(error => {
+      .catch((error) => {
         this.setState({ formSubmitted: false });
         if (error.response !== undefined) {
-          this.setState({ errorCode: error.response.data.statusCode + " Error- " + error.response.data.error + " Message- " + error.response.data.message + " Please try again!" })
+          this.setState({
+            errorCode:
+              error.response.data.statusCode +
+              " Error- " +
+              error.response.data.error +
+              " Message- " +
+              error.response.data.message +
+              " Please try again!",
+          });
         } else {
           this.setState({ errorCode: "Network Error - Please try again!" });
         }
@@ -266,27 +294,36 @@ confirmActive = (event) => {
 
   closeActiveAllModalHandler = (event) => {
     this.setState({ isActiveAllShowing: false });
-
   };
+
   handleCheckBox = (event) => {
     this.setState({ [event.target.name]: event.target.checked });
-    this.setState({ addIsActive: true })
+    this.setState({ addIsActive: true });
   };
 
   render() {
     let data = this.state.data;
     const Usercolumns = [
       {
-        name: "State",
+        name: "Country",
         selector: "name",
         sortable: true,
       },
       {
         name: "Active",
-        cell: cell => (<Switch id={cell.id} name={cell.name} onChange={event => { this.confirmActive(event) }} defaultChecked={cell.is_active} Small={true} />),
+        cell: (cell) => (
+          <Switch
+            id={cell.id}
+            onChange={(e) => {
+              this.confirmActive(e);
+            }}
+            defaultChecked={cell.is_active}
+            Small={true}
+          />
+        ),
         sortable: true,
-        button: true
-      }
+        button: true,
+      },
     ];
 
     let selectors = [];
@@ -301,36 +338,35 @@ confirmActive = (event) => {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>Manage States</h1>
+            <h1 className={style.title}>Manage Countries</h1>
             <div className={classes.row}>
               <div className={classes.buttonRow}>
                 <Button
                   variant="contained"
                   component={Link}
-                  to="/states/add"
+                  to="/countries/add"
                 >
-                  Add State
+                  Add Country
                 </Button>
               </div>
             </div>
             {this.props.location.addData ? (
               <Snackbar severity="success">
-                State added successfully.
+                Country added successfully.
               </Snackbar>
             ) : null}
             {this.props.location.editData ? (
-              <Snackbar open={this.state.open} autoHideDuration={3000} onClose={this.handleClose} severity="success">
-                State edited successfully.
+              <Snackbar severity="success">
+                Country edited successfully.
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
-              this.state.singleDelete !== "" &&
-
-              this.state.singleDelete ? (
-                <Snackbar severity="success" Showbutton={false}>
-                  State {this.state.singleDelete} deleted successfully!
-                </Snackbar>
-              ) : null}
+            this.state.singleDelete !== "" &&
+            this.state.singleDelete ? (
+              <Snackbar severity="success" Showbutton={false}>
+                Country {this.state.singleDelete} deleted successfully!
+              </Snackbar>
+            ) : null}
             {this.state.singleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
@@ -338,7 +374,7 @@ confirmActive = (event) => {
             ) : null}
             {this.state.multipleDelete === true ? (
               <Snackbar severity="success" Showbutton={false}>
-                States deleted successfully!
+                Countries deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.multipleDelete === false ? (
@@ -353,33 +389,34 @@ confirmActive = (event) => {
                   <Grid item md={12} xs={12}>
                     <Input
                       fullWidth
-                      label="State Name"
-                      name="FilterState"
+                      label="Country Name"
+                      name="filterCountry"
                       variant="outlined"
                       onChange={(event, value) => {
                         this.StateFilter(event, value);
                       }}
-                      value={this.state.values.FilterState || ""}
+                      value={this.state.values.filterCountry || ""}
                     />
                   </Grid>
                 </div>
               </div>
               <div className={classes.searchInput}>
                 <Button onClick={this.handleSearch.bind(this)}>Search</Button>
-               &nbsp;&nbsp;&nbsp;
-              <Button color="secondary" clicked={this.cancelForm}>
+                &nbsp;&nbsp;&nbsp;
+                <Button color="secondary" clicked={this.cancelForm}>
                   Reset
-              </Button>
+                </Button>
               </div>
             </div>
             <br></br>
             {data ? (
               <Table
                 showSetAllActive={true}
-                title={"States"}
+                title={"Countries"}
                 showSearch={false}
                 filterData={true}
-                Searchplaceholder={"Search by State Name"}
+                allIsActive={this.state.allIsActive}
+                Searchplaceholder={"Search by Country Name"}
                 filterBy={["name"]}
                 filters={filters}
                 data={data}
@@ -393,10 +430,13 @@ confirmActive = (event) => {
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 DeleteMessage={"Are you Sure you want to Delete"}
+                ActiveMessage={
+                  "Are you Sure you want to Deactivate selected Country"
+                }
               />
             ) : (
-                <h1>Loading...</h1>
-              )}
+              <h1>Loading...</h1>
+            )}
             <Modal
               className="modal"
               show={this.state.isActiveAllShowing}
@@ -408,12 +448,12 @@ confirmActive = (event) => {
                 footerSaveName: "OKAY",
                 footerCloseName: "CLOSE",
                 displayClose: { display: "true" },
-                displaySave: { display: "true" }
+                displaySave: { display: "true" },
               }}
             >
-              {this.state.IsActive ? (<p>Do you want to set selected Active ?{this.state.data.name}</p>
-               ) : (<p>Do you want to Deactivate selected State.?</p>)
-              }
+              {this.state.IsActive
+                ? " Do you want to activate selected country ?"
+                : "Do you want to deactivate selected country ?"}
             </Modal>
           </div>
         </Grid>
@@ -421,4 +461,4 @@ confirmActive = (event) => {
     );
   }
 }
-export default withStyles(useStyles)(States);
+export default withStyles(useStyles)(Countries);

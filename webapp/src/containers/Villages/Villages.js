@@ -5,10 +5,10 @@ import Layout from "../../hoc/Layout/Layout";
 import Button from "../../components/UI/Button/Button";
 import { withStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
+import { map } from "lodash";
 import style from "./Villages.module.css";
 import { Grid } from "@material-ui/core";
-import Autotext from "../../components/Autotext/Autotext";
-// import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autocomplete from "../../components/Autocomplete/Autocomplete";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
@@ -20,8 +20,13 @@ const useStyles = (theme) => ({
     alignItems: "center",
     marginTop: theme.spacing(1),
   },
+  floatRow: {
+    height: "40px",
+    float: "right",
+  },
   buttonRow: {
     height: "42px",
+    float: "right",
     marginTop: theme.spacing(1),
   },
   spacer: {
@@ -109,10 +114,10 @@ export class Villages extends React.Component {
   }
   handleStateChange = async (event, value) => {
     if (value !== null) {
-      this.setState({ filterState: value.id });
+      this.setState({ filterState: value });
 
       this.setState({
-        isCancel: false,
+        isCancel: false,filterDistrict:""
       });
       let stateId = value.id;
       await axios
@@ -142,7 +147,7 @@ export class Villages extends React.Component {
   };
   handleDistrictChange(event, value) {
     if (value !== null) {
-      this.setState({ filterDistrict: value.id });
+      this.setState({ filterDistrict: value });
 
       let distId = value.id;
       axios
@@ -243,10 +248,10 @@ export class Villages extends React.Component {
   handleSearch() {
     let searchData = "";
     if (this.state.filterState) {
-      searchData += "state.id=" + this.state.filterState + "&&";
+      searchData += "state.id=" + this.state.filterState.id + "&&";
     }
     if (this.state.filterDistrict) {
-      searchData += "district.id=" + this.state.filterDistrict + "&&";
+      searchData += "district.id=" + this.state.filterDistrict.id + "&&";
     }
     if (this.state.values.addVillage) {
       searchData += "name_contains=" + this.state.values.addVillage;
@@ -305,18 +310,43 @@ export class Villages extends React.Component {
     let villagesFilter = this.state.getVillage;
     let filterVillage = this.state.filterVillage;
     let filters = this.state.values;
+
+    let addStates = [];
+    map(filterState, (state, key) => {
+      addStates.push(
+        statesFilter.findIndex(function (item, i) {
+          return item.id === state;
+        })
+      );
+    });
+    let addDistricts = [];
+    map(filterDistrict, (district, key) => {
+      addDistricts.push(
+        districtsFilter.findIndex(function (item, i) {
+          return item.id === district;
+        })
+      );
+    });
+      
+
     return (
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>Manage Villages</h1>
-            <div className={classes.row}>
-              <div className={classes.buttonRow}>
-                <Button variant="contained" component={Link} to="/Villages/add">
-                  Add Village
-                </Button>
+            <h1 className={style.title}>
+              Manage Villages
+              <div className={classes.floatRow}>
+                <div className={classes.buttonRow}>
+                  <Button
+                    variant="contained"
+                    component={Link}
+                    to="/Villages/add"
+                  >
+                    Add Village
+                  </Button>
+                </div>
               </div>
-            </div>
+            </h1>
             {this.props.location.addData ? (
               <Snackbar severity="success">
                 Village added successfully.
@@ -369,11 +399,9 @@ export class Villages extends React.Component {
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
-                    <Autotext
+                    <Autocomplete
                       id="combo-box-demo"
                       options={statesFilter}
-                      variant="outlined"
-                      label="Select State"
                       getOptionLabel={(option) => option.name}
                       onChange={(event, value) => {
                         this.handleStateChange(event, value);
@@ -382,18 +410,14 @@ export class Villages extends React.Component {
                         filterState
                           ? this.state.isCancel === true
                             ? null
-                            : statesFilter[
-                                statesFilter.findIndex(function (item, i) {
-                                  return item.id === filterState;
-                                })
-                              ] || null
+                            :filterState
                           : null
                       }
                       renderInput={(params) => (
                         <Input
                           {...params}
                           fullWidth
-                          
+                          label="Select State"
                           name="addState"
                           variant="outlined"
                         />
@@ -405,12 +429,10 @@ export class Villages extends React.Component {
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
-                    <Autotext
+                    <Autocomplete
                       id="combo-box-demo"
-                      variant="outlined"
                       options={districtsFilter}
                       name="filterDistrict"
-                      label="Select District"
                       getOptionLabel={(option) => option.name}
                       onChange={(event, value) => {
                         this.handleDistrictChange(event, value);
@@ -419,18 +441,14 @@ export class Villages extends React.Component {
                         filterDistrict
                           ? this.state.isCancel === true
                             ? null
-                            : districtsFilter[
-                                districtsFilter.findIndex(function (item, i) {
-                                  return item.id === filterDistrict;
-                                })
-                              ] || null
+                            : filterDistrict
                           : null
                       }
                       renderInput={(params) => (
                         <Input
                           {...params}
                           fullWidth
-                          
+                          label="Select District"
                           name="filterDistrict"
                           variant="outlined"
                         />

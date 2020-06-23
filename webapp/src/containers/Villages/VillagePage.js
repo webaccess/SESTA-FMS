@@ -12,6 +12,8 @@ import {
   Divider,
   Grid,
 } from "@material-ui/core";
+import Checkbox from "@material-ui/core/Checkbox";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
 import { ADD_VILLAGE_BREADCRUMBS, EDIT_VILLAGE_BREADCRUMBS } from "./config";
@@ -23,18 +25,20 @@ class VillagePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      values: {},
+      values: {
+        addIsActive: false,
+      },
       getState: [],
       getDistrict: [],
       validations: {
         addVillage: {
-          required: { value: "true", message: "Village field required" },
+          required: { value: "true", message: "Village field is required" },
         },
         addState: {
-          required: { value: "true", message: "State field required" },
+          required: { value: "true", message: "State field is required" },
         },
         addDistrict: {
-          required: { value: "true", message: "District field required" },
+          required: { value: "true", message: "District field is required" },
         },
       },
       errors: {
@@ -70,6 +74,9 @@ class VillagePage extends Component {
           this.setState({
             values: {
               addVillage: res.data[0].name,
+              addAbbreviation: res.data[0].abbreviation,
+              addIdentifier: res.data[0].identifier,
+              addIsActive: res.data[0].is_active,
               addDistrict: res.data[0].district.id,
               addState: res.data[0].state.id,
             },
@@ -117,6 +124,14 @@ class VillagePage extends Component {
   handleChange = ({ target }) => {
     this.setState({
       values: { ...this.state.values, [target.name]: target.value },
+    });
+  };
+  handleCheckBox = (event) => {
+    this.setState({
+      values: {
+        ...this.state.values,
+        [event.target.name]: event.target.checked,
+      },
     });
   };
 
@@ -200,6 +215,9 @@ class VillagePage extends Component {
 
     if (Object.keys(this.state.errors).length > 0) return;
     let villageName = this.state.values.addVillage;
+    let abbreviation = this.state.values.addAbbreviation;
+    let identifier = this.state.values.addIdentifier;
+    let isActive = this.state.values.addIsActive;
     let districtId = this.state.values.addDistrict;
     let stateId = this.state.values.addState;
 
@@ -212,12 +230,15 @@ class VillagePage extends Component {
             this.state.editPage[1],
           {
             name: villageName,
+            abbreviation: abbreviation,
+            identifier: identifier,
+            is_active: isActive,
             district: {
               id: districtId,
             },
             state: {
               id: stateId,
-            },
+            }
           },
           {
             headers: {
@@ -251,15 +272,17 @@ class VillagePage extends Component {
       await axios
         .post(
           process.env.REACT_APP_SERVER_URL + "villages",
-
           {
             name: villageName,
+            abbreviation: abbreviation,
+            identifier: identifier,
+            is_active: isActive,
             district: {
               id: districtId,
             },
             state: {
               id: stateId,
-            },
+            }
           },
           {
             headers: {
@@ -304,6 +327,7 @@ class VillagePage extends Component {
     let addState = this.state.values.addState;
     let districtFilter = this.state.getDistrict;
     let addDistrict = this.state.values.addDistrict;
+
     return (
       <Layout
         breadcrumbs={
@@ -337,7 +361,7 @@ class VillagePage extends Component {
                     </Snackbar>
                   ) : null}
                 </Grid>
-                <Grid item md={6} xs={12}>
+                <Grid item md={12} xs={12}>
                   <Input
                     fullWidth
                     label="Village Name*"
@@ -349,6 +373,38 @@ class VillagePage extends Component {
                         : null
                     }
                     value={this.state.values.addVillage || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Abbreviation"
+                    name="addAbbreviation"
+                    error={this.hasError("addAbbreviation")}
+                    helperText={
+                      this.hasError("addAbbreviation")
+                        ? this.state.errors.addVAbbreviation[0]
+                        : null
+                    }
+                    value={this.state.values.addAbbreviation || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Identifier"
+                    name="addIdentifier"
+                    error={this.hasError("addIdentifier")}
+                    helperText={
+                      this.hasError("addIdentifier")
+                        ? this.state.errors.addIdentifier[0]
+                        : null
+                    }
+                    value={this.state.values.addIdentifier || ""}
                     onChange={this.handleChange}
                     variant="outlined"
                   />
@@ -428,6 +484,19 @@ class VillagePage extends Component {
                         variant="outlined"
                       />
                     )}
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={this.state.values.addIsActive}
+                        onChange={this.handleCheckBox}
+                        name="addIsActive"
+                        color="primary"
+                      />
+                    }
+                    label="Active"
                   />
                 </Grid>
               </Grid>

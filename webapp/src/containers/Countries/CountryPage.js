@@ -6,6 +6,7 @@ import Button from "../../components/UI/Button/Button";
 import Input from "../../components/UI/Input/Input";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
+
 import {
   Card,
   CardHeader,
@@ -16,26 +17,37 @@ import {
 } from "@material-ui/core";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
-import { ADD_STATE_BREADCRUMBS, EDIT_STATE_BREADCRUMBS } from "./config";
+import { ADD_COUNTRY_BREADCRUMBS, EDIT_COUNTRY_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 
-class StatePage extends Component {
+class CountryPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      addIsActive: false,
       values: {},
+      addIsActive: false,
       validations: {
-        addState: {
-          required: { value: "true", message: "State field required" },
+        addCountry: {
+          required: { value: "true", message: "Country name is required" },
         },
+        addAbbreviation: {
+          required: {
+            value: "true",
+            message: "Abbreviation field is required",
+          },
+        },
+        addIdentifier: {},
       },
       errors: {
-        addState: [],
+        addCountry: [],
+        addAbbreviation: [],
+        addIdentifier: [],
       },
+      serverErrors: {},
       formSubmitted: "",
       errorCode: "",
+      countrySelected: false,
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
@@ -48,7 +60,7 @@ class StatePage extends Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "states?id=" +
+            "countries?id=" +
             this.state.editPage[1],
           {
             headers: {
@@ -57,19 +69,21 @@ class StatePage extends Component {
           }
         )
         .then((res) => {
+          console.log(res.data);
           this.setState({
             values: {
-              addState: res.data[0].name,
-              active: res.data[0].is_active,
-              addAbbreviation: res.data[0].Abbreviation,
-              addIdentifier: res.data[0].Identifier
+              addCountry: res.data[0].name,
+              addAbbreviation: res.data[0].abbreviation,
+              addIdentifier: res.data[0].identifier,
             },
           });
+          this.setState({ addIsActive: res.data[0].is_active });
         })
         .catch((error) => {
           console.log(error);
         });
     }
+    this.countryIds = this.state.values.addCountry;
   }
 
   handleChange = ({ target, event }) => {
@@ -105,20 +119,22 @@ class StatePage extends Component {
     this.validate();
     this.setState({ formSubmitted: "" });
     if (Object.keys(this.state.errors).length > 0) return;
-    let stateName = this.state.values.addState;
-    let abbreviation = this.state.values.addAbbreviation;
-    let identifier = this.state.values.addIdentifier;
+    let countryName = this.state.values.addCountry;
+    let countryAbbr = this.state.values.addAbbreviation;
+    let countryIdentifier = this.state.values.addIdentifier;
     let IsActive = this.state.addIsActive;
     if (this.state.editPage[0]) {
       // Code for Edit Data Page
       await axios
         .put(
-          process.env.REACT_APP_SERVER_URL + "states/" + this.state.editPage[1],
+          process.env.REACT_APP_SERVER_URL +
+            "countries/" +
+            this.state.editPage[1],
           {
-            name: stateName,
+            name: countryName,
             is_active: IsActive,
-            Abbreviation: abbreviation,
-            Identifier: identifier
+            abbreviation: countryAbbr,
+            identifier: countryIdentifier,
           },
           {
             headers: {
@@ -128,7 +144,7 @@ class StatePage extends Component {
         )
         .then((res) => {
           this.setState({ formSubmitted: true });
-          this.props.history.push({ pathname: "/states", editData: true });
+          this.props.history.push({ pathname: "/countries", editData: true });
         })
         .catch((error) => {
           this.setState({ formSubmitted: false });
@@ -151,12 +167,12 @@ class StatePage extends Component {
       //Code for Add Data Page
       await axios
         .post(
-          process.env.REACT_APP_SERVER_URL + "states",
+          process.env.REACT_APP_SERVER_URL + "countries",
           {
-            name: stateName,
+            name: countryName,
             is_active: IsActive,
-            Abbreviation: abbreviation,
-            Identifier: identifier
+            abbreviation: countryAbbr,
+            identifier: countryIdentifier,
           },
           {
             headers: {
@@ -166,7 +182,7 @@ class StatePage extends Component {
         )
         .then((res) => {
           this.setState({ formSubmitted: true });
-          this.props.history.push({ pathname: "/states", addData: true });
+          this.props.history.push({ pathname: "/countries", addData: true });
           this.handleActive();
         })
         .catch((error) => {
@@ -196,7 +212,7 @@ class StatePage extends Component {
     this.setState({
       values: {},
       formSubmitted: "",
-      stateSelected: false,
+      countrySelected: false,
     });
     // Routing code #route to state_list page
   };
@@ -206,8 +222,8 @@ class StatePage extends Component {
       <Layout
         breadcrumbs={
           this.state.editPage[0]
-            ? EDIT_STATE_BREADCRUMBS
-            : ADD_STATE_BREADCRUMBS
+            ? EDIT_COUNTRY_BREADCRUMBS
+            : ADD_COUNTRY_BREADCRUMBS
         }
       >
         <Card>
@@ -218,11 +234,11 @@ class StatePage extends Component {
             method="post"
           >
             <CardHeader
-              title={this.state.editPage[0] ? "Edit state" : "Add state"}
+              title={this.state.editPage[0] ? "Edit country" : "Add country"}
               subheader={
                 this.state.editPage[0]
-                  ? "You can edit state data here!"
-                  : "You can add new state data here!"
+                  ? "You can edit country data here!"
+                  : "You can add new country data here!"
               }
             />
             <Divider />
@@ -235,18 +251,34 @@ class StatePage extends Component {
                     </Snackbar>
                   ) : null}
                 </Grid>
+                <Grid item xs={12}>
+                  <Input
+                    fullWidth
+                    label="Country Name*"
+                    name="addCountry"
+                    error={this.hasError("addCountry")}
+                    helperText={
+                      this.hasError("addCountry")
+                        ? this.state.errors.addCountry[0]
+                        : null
+                    }
+                    value={this.state.values.addCountry || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
-                    label="State Name*"
-                    name="addState"
-                    error={this.hasError("addState")}
+                    label="Abbreviation*"
+                    name="addAbbreviation"
+                    error={this.hasError("addAbbreviation")}
                     helperText={
-                      this.hasError("addState")
-                        ? this.state.errors.addState[0]
+                      this.hasError("addAbbreviation")
+                        ? this.state.errors.addAbbreviation[0]
                         : null
                     }
-                    value={this.state.values.addState || ""}
+                    value={this.state.values.addAbbreviation || ""}
                     onChange={this.handleChange}
                     variant="outlined"
                   />
@@ -267,23 +299,7 @@ class StatePage extends Component {
                     variant="outlined"
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Abbreviation"
-                    name="addAbbreviation"
-                    error={this.hasError("addAbbreviation")}
-                    helperText={
-                      this.hasError("addAbbreviation")
-                        ? this.state.errors.addAbbreviation[0]
-                        : null
-                    }
-                    value={this.state.values.addAbbreviation || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
+                <Grid item xs={12}>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -305,7 +321,7 @@ class StatePage extends Component {
                 color="secondary"
                 clicked={this.cancelForm}
                 component={Link}
-                to="/states"
+                to="/countries"
               >
                 Cancel
               </Button>
@@ -317,4 +333,4 @@ class StatePage extends Component {
   }
 }
 
-export default StatePage;
+export default CountryPage;
