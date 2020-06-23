@@ -20,8 +20,8 @@
       "type": "string"
     },
     "villages": {
-      "collection": "village",
-      "via": "shgs"
+      "via": "shgs",
+      "collection": "village"
     },
     "state": {
       "model": "state"
@@ -30,8 +30,8 @@
       "model": "district"
     },
     "village_organization": {
-      "model": "village-organization",
-      "via": "shgs"
+      "via": "shgs",
+      "model": "village-organization"
     }
   }
 }

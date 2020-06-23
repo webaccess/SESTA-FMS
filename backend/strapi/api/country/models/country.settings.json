@@ -26,6 +26,10 @@
     "identifier": {
       "type": "string",
       "unique": true
+    },
+    "master_states": {
+      "via": "country",
+      "collection": "state"
     }
   }
 }

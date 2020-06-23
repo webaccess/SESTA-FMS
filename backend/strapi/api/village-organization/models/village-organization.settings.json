@@ -20,8 +20,14 @@
       "type": "string"
     },
     "shgs": {
-      "via": "village_organization",
-      "collection": "shg"
+      "collection": "shg",
+      "via": "village_organization"
+    },
+    "block": {
+      "type": "string"
+    },
+    "gp": {
+      "type": "string"
     }
   }
 }

@@ -30,7 +30,7 @@ const Autotext = props => {
       renderInput={params => (
         <Input
           {...params}
-          helperText={props.error === true ? props.helperText : null}
+          helperText={ props.helperText }
           error={props.error ? props.error : false}
           variant={props.variant}
           label={props.label}

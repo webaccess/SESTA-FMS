@@ -13,7 +13,9 @@ const validateInput = (value, inputValidations = {}, type = "text") => {
   const emailRegex = new RegExp(
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
   );
-
+  const phoneRegex = new RegExp(
+    /^\s*(?:\+?(\d{1,3}))?[- (]*(\d{3})[- )]*(\d{3})[- ]*(\d{4})(?: *[x/#]{1}(\d+))?\s*$/
+  );
   const passRegx = new RegExp("^(?=.*[a-zA-Z])(?=.*[0-9])(?=.{8,})");
 
   // handle i18n
@@ -55,6 +57,16 @@ const validateInput = (value, inputValidations = {}, type = "text") => {
           errors.push(validationValue.message);
         }
         break;
+      case "email":
+        if (value.length !== 0 && !emailRegex.test(value)) {
+          errors.push(validationValue.message);
+        }
+        break;
+      case "phone":
+        if (value.length !== 0 && !phoneRegex.test(value)) {
+          errors.push(validationValue.message);
+        }
+        break;
       default:
         errors = [];
     }
@@ -65,7 +77,7 @@ const validateInput = (value, inputValidations = {}, type = "text") => {
   }
 
   if (includes(errors, requiredError)) {
-    errors = reject(errors, error => error !== requiredError);
+    errors = reject(errors, (error) => error !== requiredError);
   }
 
   return errors;
