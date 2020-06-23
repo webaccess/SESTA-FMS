@@ -64,6 +64,7 @@ export class Account extends Component {
         password: []
       }
     };
+    this.snackbar = React.createRef();
   }
 
   handleClickShowPassword = () => {
@@ -105,6 +106,9 @@ export class Account extends Component {
       )
       .then(res => {
         this.setState({ success: "Password changed successfully!!" });
+         if (this.snackbar.current !== null) {
+            this.snackbar.current.handleClick();
+          }
       })
       .catch(error => {
         this.setState({ error });
@@ -137,7 +141,9 @@ export class Account extends Component {
     }
   };
 
+
   render() {
+   
     let userInfo = auth.getUserInfo();
     console.log(userInfo);
     const { classes } = this.props;
@@ -151,7 +157,12 @@ export class Account extends Component {
               </Snackbar>
             ) : null}
             {this.state.success ? (
-              <Snackbar severity="success" Showbutton={false}>
+              <Snackbar
+                ref={this.snackbar}
+                open={true}
+                autoHideDuration={4000}
+                severity="success"
+              >
                 {this.state.success}
               </Snackbar>
             ) : null}
