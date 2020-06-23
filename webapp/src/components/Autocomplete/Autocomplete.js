@@ -6,6 +6,7 @@ export default function Tags(props) {
     <Autocomplete
       multiple={props.multiple}
       id={props.id}
+      name={props.name}
       options={props.options}
       getOptionLabel={props.getOptionLabel}
       onChange={props.onChange}
