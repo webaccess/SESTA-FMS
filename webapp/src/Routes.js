@@ -28,6 +28,8 @@ import FpoPage from "./containers/Fpos/FpoPage";
 import Fpos from "./containers/Fpos/Fpos";
 import countries from "./containers/Countries/Countries";
 import CountryPage from "./containers/Countries/CountryPage";
+import Loanpurposes from "./containers/Loanpurpose/Loanpurposes";
+import LoanpurposePage from "./containers/Loanpurpose/LoanpurposePage";
 
 function Routes() {
   return (
@@ -77,6 +79,17 @@ function Routes() {
             <PrivateRoute
               path="/countries/edit/:id"
               component={CountryPage}
+              exact
+            />
+            <PrivateRoute path="/Loanpurposes" component={Loanpurposes} exact />
+            <PrivateRoute
+              path="/Loanpurpose/add"
+              component={LoanpurposePage}
+              exact
+            />
+            <PrivateRoute
+              path="/Loanpurpose/edit/:id"
+              component={LoanpurposePage}
               exact
             />
             <Route path="/404" component={NotFoundPage} />

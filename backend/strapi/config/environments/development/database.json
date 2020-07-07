@@ -5,12 +5,12 @@
       "connector": "bookshelf",
       "settings": {
         "client": "postgres",
-        "database": "sesta",
+        "database": "sestatest",
         "host": "127.0.0.1",
         "port": 5432,
         "username": "postgres",
         "password": "root",
-        "ssl": true
+        "ssl": false
       },
       "options": {}
     }
