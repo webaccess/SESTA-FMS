@@ -1,0 +1,31 @@
+{
+  "connection": "default",
+  "collectionName": "loanmodels",
+  "info": {
+    "name": "loanmodel"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "product_name": {
+      "type": "string"
+    },
+    "specification": {
+      "type": "text"
+    },
+    "loan_amount": {
+      "type": "decimal"
+    },
+    "duration": {
+      "type": "integer"
+    },
+    "emi": {
+      "type": "decimal"
+    },
+    "fpo": {
+      "model": "contact"
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/loanmodels",
+      "handler": "loanmodel.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/loanmodels/count",
+      "handler": "loanmodel.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/loanmodels/:id",
+      "handler": "loanmodel.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/loanmodels",
+      "handler": "loanmodel.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/loanmodels/:id",
+      "handler": "loanmodel.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/loanmodels/:id",
+      "handler": "loanmodel.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}

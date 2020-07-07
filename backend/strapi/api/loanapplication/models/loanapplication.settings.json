@@ -1,0 +1,49 @@
+{
+  "connection": "default",
+  "collectionName": "loanapplications",
+  "info": {
+    "name": "loanapplication"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "contact": {
+      "model": "contact"
+    },
+    "loanmodel": {
+      "model": "loanmodel"
+    },
+    "application_no": {
+      "type": "text",
+      "required": true
+    },
+    "purpose": {
+      "type": "text",
+      "required": true
+    },
+    "application_date": {
+      "type": "date",
+      "required": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "UnderReview",
+        "Approved",
+        "Denied",
+        "Canceled"
+      ]
+    },
+    "approved_by": {
+      "model": "contact"
+    },
+    "approved_date": {
+      "type": "datetime"
+    },
+    "review_comments": {
+      "type": "text"
+    }
+  }
+}

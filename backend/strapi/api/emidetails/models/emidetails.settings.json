@@ -1,0 +1,22 @@
+{
+  "info": {
+    "name": "emidetails"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "loan_model": {
+      "model": "loanmodel"
+    },
+    "principal": {
+      "type": "decimal"
+    },
+    "interest": {
+      "type": "decimal"
+    }
+  },
+  "connection": "default",
+  "collectionName": "emidetails"
+}

@@ -1,0 +1,38 @@
+{
+  "info": {
+    "name": "loaninstallment"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "loan_application": {
+      "model": "loanapplication"
+    },
+    "month": {
+      "type": "integer",
+      "required": true
+    },
+    "payment_date": {
+      "type": "datetime"
+    },
+    "expected_principal": {
+      "type": "decimal"
+    },
+    "expected_interest": {
+      "type": "decimal"
+    },
+    "actual_principal": {
+      "type": "decimal"
+    },
+    "actual_interest": {
+      "type": "decimal"
+    },
+    "fine": {
+      "type": "decimal"
+    }
+  },
+  "connection": "default",
+  "collectionName": "loaninstallments"
+}
