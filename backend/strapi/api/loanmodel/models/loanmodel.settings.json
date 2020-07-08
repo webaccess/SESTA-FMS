@@ -10,22 +10,34 @@
   },
   "attributes": {
     "product_name": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "specification": {
-      "type": "text"
+      "type": "text",
+      "required": true
     },
     "loan_amount": {
-      "type": "decimal"
+      "type": "decimal",
+      "private": false,
+      "required": true
     },
     "duration": {
-      "type": "integer"
+      "type": "integer",
+      "required": true
     },
     "emi": {
-      "type": "decimal"
+      "type": "decimal",
+      "required": true
     },
     "fpo": {
       "model": "contact"
+    },
+    "loantasks": {
+      "collection": "loantask"
+    },
+    "emidetails": {
+      "collection": "emidetails"
     }
   }
 }

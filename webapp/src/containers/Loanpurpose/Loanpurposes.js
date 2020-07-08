@@ -169,7 +169,7 @@ export class Loanpurposes extends React.Component {
     const Usercolumns = [
       {
         name: "Name of the Purpose",
-        selector: "name",
+        selector: "product_name",
       },
       {
         name: "Duration(months)",
@@ -205,7 +205,7 @@ export class Loanpurposes extends React.Component {
                   <Button
                     variant="contained"
                     component={Link}
-                    to="/Loanpurposes/add"
+                    to="/Loanpurpose/add"
                   >
                     Add Loan Purpose
                   </Button>

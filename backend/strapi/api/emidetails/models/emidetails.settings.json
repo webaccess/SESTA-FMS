@@ -1,4 +1,6 @@
 {
+  "connection": "default",
+  "collectionName": "emidetails",
   "info": {
     "name": "emidetails"
   },
@@ -16,7 +18,5 @@
     "interest": {
       "type": "decimal"
     }
-  },
-  "connection": "default",
-  "collectionName": "emidetails"
+  }
 }

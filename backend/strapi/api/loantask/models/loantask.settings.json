@@ -1,4 +1,6 @@
 {
+  "connection": "default",
+  "collectionName": "loantasks",
   "info": {
     "name": "loantask"
   },
@@ -13,7 +15,5 @@
     "name": {
       "type": "string"
     }
-  },
-  "connection": "default",
-  "collectionName": "loantasks"
+  }
 }
