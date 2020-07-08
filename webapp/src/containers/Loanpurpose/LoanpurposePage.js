@@ -455,24 +455,6 @@ class LoanpurposePage extends Component {
       });
   };
 
-  // deleteemidetails = async (url) => {
-  //   await axios
-  //     .delete(url, {
-  //       headers: {
-  //         Authorization: "Bearer " + auth.getToken() + "",
-  //       },
-  //     })
-  //     .then((res) => {
-  //       this.setState({ formSubmitted: true });
-
-  //       this.props.history.push({ pathname: "/loanpurposes", addData: true });
-  //     })
-  //     .catch((error) => {
-  //       this.setState({ formSubmitted: false });
-  //       console.log(error);
-  //     });
-  // };
-
   cancelForm = () => {
     this.setState({
       values: {},
