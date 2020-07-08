@@ -21,7 +21,7 @@ class AuthPage extends PureComponent {
       formErrors: {},
       formSubmitted: false,
       showSuccessMsg: false,
-      buttonView: false
+      buttonView: false,
     };
   }
 
@@ -32,7 +32,7 @@ class AuthPage extends PureComponent {
       fieldErrors: {},
       formErrors: [],
       formSubmitted: false,
-      showSuccessMsg: false
+      showSuccessMsg: false,
     });
     if (nextProps.match.params.authType !== this.props.match.params.authType) {
       this.generateForm(nextProps);
@@ -43,7 +43,7 @@ class AuthPage extends PureComponent {
     this.generateForm(this.props);
   }
 
-  generateForm = props => {
+  generateForm = (props) => {
     const params = props.location.search
       ? replace(props.location.search, "?code=", "")
       : props.match.params.id;
@@ -85,7 +85,7 @@ class AuthPage extends PureComponent {
 
   handleChange = ({ target }) => {
     this.setState({
-      value: { ...this.state.value, [target.name]: target.value }
+      value: { ...this.state.value, [target.name]: target.value },
     });
   };
 
@@ -107,7 +107,7 @@ class AuthPage extends PureComponent {
     });
   };
 
-  handleSubmit = e => {
+  handleSubmit = (e) => {
     e.preventDefault();
     const body = this.state.value;
     this.setState({ buttonView: true });
@@ -130,13 +130,13 @@ class AuthPage extends PureComponent {
       method: "post",
       url: requestURL,
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       data: this.state.value,
-      withCredentials: true,
-      responseType: "json"
+      // withCredentials: true,
+      responseType: "json",
     })
-      .then(response => {
+      .then((response) => {
         if (this.props.match.params.authType === "login") {
           auth.setToken(response.data.jwt);
           auth.setUserInfo(response.data.user);
@@ -144,7 +144,7 @@ class AuthPage extends PureComponent {
         this.setState({ buttonView: false });
         this.redirectUser();
       })
-      .catch(error => {
+      .catch((error) => {
         this.setState({ buttonView: false });
         if (error.response) {
           let errors =
@@ -209,7 +209,7 @@ class AuthPage extends PureComponent {
     );
   };
 
-  renderFieldErrorBlock = inputs => {
+  renderFieldErrorBlock = (inputs) => {
     map(inputs, (input, key) => {
       let renderFormErrors = map(this.state.formErrors, (error, keyval) => {
         let nameval = get(input, "name");
@@ -245,7 +245,7 @@ class AuthPage extends PureComponent {
   render() {
     const inputs = get(form, ["views", this.props.match.params.authType], []);
     const errorArr = Object.keys(this.state.errors).map(
-      i => this.state.errors[i]
+      (i) => this.state.errors[i]
     );
 
     return (
@@ -308,7 +308,7 @@ class AuthPage extends PureComponent {
                           inputProps={{
                             validations: `${JSON.stringify(
                               get(input, "validations")
-                            )}`
+                            )}`,
                           }}
                         />
                       </div>

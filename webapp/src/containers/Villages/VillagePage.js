@@ -62,7 +62,7 @@ class VillagePage extends Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "villages?id=" +
+            "crm-plugin/villages/?id=" +
             this.state.editPage[1],
           {
             headers: {
@@ -86,10 +86,11 @@ class VillagePage extends Component {
           console.log(error);
         });
       this.stateIds = this.state.values.addState;
+
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "districts?is_active=true&&master_state.id=" +
+            "crm-plugin/districts/?is_active=true&&state.id=" +
             this.state.values.addState,
           {
             headers: {
@@ -105,11 +106,14 @@ class VillagePage extends Component {
         });
     }
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "states?is_active=true", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+      .get(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true",
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
+        }
+      )
       .then((res) => {
         this.setState({ getState: res.data });
       })
@@ -126,6 +130,7 @@ class VillagePage extends Component {
       values: { ...this.state.values, [target.name]: target.value },
     });
   };
+
   handleCheckBox = (event) => {
     this.setState({
       values: {
@@ -144,7 +149,7 @@ class VillagePage extends Component {
       axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "districts?is_active=true&&master_state.id=" +
+            "crm-plugin/districts/?is_active=true&&state.id=" +
             stateId,
           {
             headers: {
@@ -226,7 +231,7 @@ class VillagePage extends Component {
       await axios
         .put(
           process.env.REACT_APP_SERVER_URL +
-            "villages/" +
+            "crm-plugin/villages/" +
             this.state.editPage[1],
           {
             name: villageName,
@@ -238,7 +243,7 @@ class VillagePage extends Component {
             },
             state: {
               id: stateId,
-            }
+            },
           },
           {
             headers: {
@@ -271,7 +276,7 @@ class VillagePage extends Component {
       //for add data page
       await axios
         .post(
-          process.env.REACT_APP_SERVER_URL + "villages",
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/villages",
           {
             name: villageName,
             abbreviation: abbreviation,
@@ -282,7 +287,7 @@ class VillagePage extends Component {
             },
             state: {
               id: stateId,
-            }
+            },
           },
           {
             headers: {

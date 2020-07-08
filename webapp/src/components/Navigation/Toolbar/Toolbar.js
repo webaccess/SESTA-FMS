@@ -1,6 +1,4 @@
 import React from "react";
-
-import styles from "./Toolbar.module.css";
 import Logo from "../../Logo/Logo";
 import DrawerToggle from "../SideDrawer/DrawerToggle/DrawerToggle";
 import { AppBar, Hidden } from "@material-ui/core";
@@ -13,25 +11,25 @@ import auth from "../../Auth/Auth";
 import { withRouter } from "react-router-dom";
 import { makeStyles } from "@material-ui/styles";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
-    boxShadow: "none"
+    boxShadow: "none",
   },
   flexGrow: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   signOutButton: {
-    marginLeft: theme.spacing(1)
+    marginLeft: theme.spacing(1),
   },
   accntBtn: {
     backgroundColor: "#028941",
     "&:hover": {
-      backgroundColor: "#026430"
+      backgroundColor: "#026430",
     },
     "&:active": {
-      backgroundColor: "#03b053"
-    }
-  }
+      backgroundColor: "#03b053",
+    },
+  },
 }));
 
 function Toolbar(props) {
@@ -39,7 +37,7 @@ function Toolbar(props) {
   const classes = useStyles();
   const isMenuOpen = Boolean(anchorEl);
 
-  const handleProfileMenuOpen = event => {
+  const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
 

@@ -4,11 +4,9 @@ import deburr from "lodash/deburr";
 import Autosuggest from "react-autosuggest";
 import match from "autosuggest-highlight/match";
 import parse from "autosuggest-highlight/parse";
-import TextField from "@material-ui/core/TextField";
 import Input from "../Input/Input";
 import Paper from "@material-ui/core/Paper";
 import MenuItem from "@material-ui/core/MenuItem";
-import Popper from "@material-ui/core/Popper";
 import { withStyles } from "@material-ui/core/styles";
 
 function renderInputComponent(inputProps) {
@@ -19,13 +17,13 @@ function renderInputComponent(inputProps) {
       // fullWidth
       className={classes.textField}
       InputProps={{
-        inputRef: node => {
+        inputRef: (node) => {
           ref(node);
           inputRef(node);
         },
         classes: {
-          input: classes.input
-        }
+          input: classes.input,
+        },
       }}
       {...other}
       fullWidth
@@ -37,16 +35,16 @@ function renderInputComponent(inputProps) {
 }
 
 function getSuggestions(value, data) {
-  console.log("Value",value,value.length);
-  if (value.length > 1 ) {
-  // if (value) {
+  console.log("Value", value, value.length);
+  if (value.length > 1) {
+    // if (value) {
     const inputValue = deburr(value.trim()).toLowerCase();
     const inputLength = inputValue.length;
     let count = 0;
 
     return inputLength === 0
       ? []
-      : data.filter(suggestion => {
+      : data.filter((suggestion) => {
           const keep =
             count < 5 &&
             suggestion.name.slice(0, inputLength).toLowerCase() === inputValue;
@@ -65,29 +63,29 @@ function getSuggestionValue(suggestion) {
   return suggestion.name;
 }
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     // height: 250,
-    flexGrow: 1
+    flexGrow: 1,
   },
   container: {
-    position: "relative"
+    position: "relative",
   },
   suggestionsContainerOpen: {
     position: "absolute",
     zIndex: 1,
     marginTop: theme.spacing.unit,
     left: 0,
-    right: 0
+    right: 0,
   },
   suggestion: {
-    display: "block"
+    display: "block",
   },
   suggestionsList: {
     margin: 0,
     padding: 0,
-    listStyleType: "none"
-  }
+    listStyleType: "none",
+  },
   // divider: {
   //   height: theme.spacing.unit * 2
   // }
@@ -100,14 +98,14 @@ class AutoSuggest extends React.Component {
       single: "",
       popper: "",
       suggestions: [],
-      data: []
+      data: [],
     };
   }
   handleSuggestionsFetchRequested = ({ value }) => {
     if (value) {
       this.setState({ data: this.props.data });
       this.setState({
-        suggestions: getSuggestions(value, this.state.data)
+        suggestions: getSuggestions(value, this.state.data),
       });
     } else {
       return "";
@@ -116,13 +114,13 @@ class AutoSuggest extends React.Component {
 
   handleSuggestionsClearRequested = () => {
     this.setState({
-      suggestions: []
+      suggestions: [],
     });
   };
 
-  handleChange = name => (event, { newValue }) => {
+  handleChange = (name) => (event, { newValue }) => {
     this.setState({
-      [name]: newValue
+      [name]: newValue,
     });
   };
   renderSuggestion = (suggestion, { query, isHighlighted }) => {
@@ -164,13 +162,12 @@ class AutoSuggest extends React.Component {
       onSuggestionsFetchRequested: this.handleSuggestionsFetchRequested,
       onSuggestionsClearRequested: this.handleSuggestionsClearRequested,
       getSuggestionValue,
-      renderSuggestion: this.renderSuggestion
+      renderSuggestion: this.renderSuggestion,
     };
 
     if (this.props.onClearShg) {
-      this.state.single = "";
+      this.setState({ single: "" });
       this.props.onSelectShg("");
-      // this.props.onClearShg = false;
     }
     return (
       <div className={classes.root}>
@@ -180,15 +177,15 @@ class AutoSuggest extends React.Component {
             classes,
             placeholder: "SHG",
             value: this.state.single,
-            onChange: this.handleChange("single")
+            onChange: this.handleChange("single"),
           }}
           theme={{
             container: classes.container,
             suggestionsContainerOpen: classes.suggestionsContainerOpen,
             suggestionsList: classes.suggestionsList,
-            suggestion: classes.suggestion
+            suggestion: classes.suggestion,
           }}
-          renderSuggestionsContainer={options => (
+          renderSuggestionsContainer={(options) => (
             <Paper {...options.containerProps} square>
               {options.children}
             </Paper>
@@ -200,7 +197,7 @@ class AutoSuggest extends React.Component {
 }
 
 AutoSuggest.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(AutoSuggest);

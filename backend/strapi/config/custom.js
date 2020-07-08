@@ -1,0 +1,4 @@
+module.exports = {
+  myCustomConfiguration:
+    "This configuration is accessible through strapi.config.myCustomConfiguration",
+};

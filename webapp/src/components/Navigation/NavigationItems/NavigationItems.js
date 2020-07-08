@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
 
-import styles from "./NavigationItems.module.css";
 import NavigationItem from "./NavigationItem/NavigationItem";
 import auth from "../../Auth/Auth";
 import { withRouter } from "react-router-dom";
-import { List, colors } from "@material-ui/core";
+import { List, colors, ListSubheader, ListItem } from "@material-ui/core";
 import Collapse from "@material-ui/core/Collapse";
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
@@ -15,33 +14,36 @@ import { map } from "lodash";
 import clsx from "clsx";
 import { makeStyles, useTheme } from "@material-ui/styles";
 import { useMediaQuery } from "@material-ui/core";
+import QueuePlayNextIcon from "@material-ui/icons/QueuePlayNext";
+import ExpandLess from "@material-ui/icons/ExpandLess";
+import ExpandMore from "@material-ui/icons/ExpandMore";
 
 const StyledMenu = withStyles({
   paper: {
-    border: "1px solid #d3d4d5"
-  }
-})(props => (
+    border: "1px solid #d3d4d5",
+  },
+})((props) => (
   <Menu
     elevation={0}
     getContentAnchorEl={null}
     anchorOrigin={{
       vertical: "bottom",
-      horizontal: "center"
+      horizontal: "center",
     }}
     transformOrigin={{
       vertical: "top",
-      horizontal: "center"
+      horizontal: "center",
     }}
     {...props}
   />
 ));
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {},
   item: {
     display: "flex",
     paddingTop: 0,
-    paddingBottom: 0
+    paddingBottom: 0,
   },
   button: {
     color: colors.blueGrey[800],
@@ -50,7 +52,7 @@ const useStyles = makeStyles(theme => ({
     textTransform: "none",
     letterSpacing: 0,
     width: "100%",
-    fontWeight: theme.typography.fontWeightMedium
+    fontWeight: theme.typography.fontWeightMedium,
   },
   icon: {
     color: theme.palette.icon,
@@ -58,29 +60,29 @@ const useStyles = makeStyles(theme => ({
     height: 24,
     display: "flex",
     alignItems: "center",
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   active: {
     color: theme.palette.primary.main,
     fontWeight: theme.typography.fontWeightMedium,
     "& $icon": {
-      color: theme.palette.primary.main
-    }
-  }
+      color: theme.palette.primary.main,
+    },
+  },
 }));
 
-const StyledMenuItem = withStyles(theme => ({
+const StyledMenuItem = withStyles((theme) => ({
   root: {
     "&:selected": {
       backgroundColor: theme.palette.primary.main,
       "& .MuiListItemIcon-root, & .MuiListItemText-primary": {
-        color: theme.palette.common.white
-      }
+        color: theme.palette.common.white,
+      },
     },
     "& .MuiListItem-root.Mui-selected, .MuiListItem-root.Mui-selected:hover": {
-      background: "none"
-    }
-  }
+      background: "none",
+    },
+  },
 }))(MenuItem);
 
 function NavigationItems(props) {
@@ -92,33 +94,108 @@ function NavigationItems(props) {
   const isMobile = window.innerWidth < 500;
   const { className, ...rest } = props;
   const theme = useTheme();
+  const [openMenu, setOpenMenu] = React.useState(true);
   const isDesktop = useMediaQuery(theme.breakpoints.up("lg"), {
-    defaultMatches: true
+    defaultMatches: true,
   });
 
   const classes = useStyles();
 
-  const handleClick = (event, moduleId) => {
-    setAnchorEl(event.currentTarget);
-    updateMenuItemState(moduleId);
-  };
-
-  const handleClose = moduleId => {
-    setAnchorEl(null);
-    updateMenuItemState(moduleId);
-  };
-
-  const handleSubMenuOpen = () => {
-    setOpen(!open);
-  };
-
-  const updateMenuItemState = moduleId => {
+  const updateMenuItemState = (moduleId) => {
     let moduleStatesArr = { ...moduleStates };
     map(modules, (module, key) => {
       if (module.id === moduleId)
         moduleStatesArr[module.id]["open"] = !moduleStates[module.id]["open"];
     });
     setModuleStates(moduleStatesArr);
+  };
+
+  const handleClick = () => {
+    setOpenMenu(!openMenu);
+  };
+
+  const masterMenu = () => {
+    return (
+      <List
+        subheader={
+          <ListSubheader
+            component="div"
+            id="nested-list-subheader"
+            button
+            onClick={handleClick}
+          >
+            <QueuePlayNextIcon></QueuePlayNextIcon>&nbsp; Masters
+            {openMenu ? <ExpandLess /> : <ExpandMore />}
+          </ListSubheader>
+        }
+      >
+        {renderSideMenu1()}
+      </List>
+    );
+    return masterMenu;
+  };
+
+  const renderSideMenu1 = () => {
+    let nav1 = map(modules, (module, key) => {
+      if (module.modules.length <= 0) {
+        if (
+          module.name === "Fpos" ||
+          module.name === "SHGs" ||
+          module.name === "Villages" ||
+          module.name === "Village Organizations" ||
+          module.name === "States" ||
+          module.name === "Pgs" ||
+          module.name === "Countries"
+        ) {
+          return (
+            <Collapse in={openMenu} timeout="auto" unmountOnExit>
+              <ListItem>
+                <NavigationItem link={module.url} text={module.name} />
+              </ListItem>
+            </Collapse>
+          );
+        } else {
+          return (
+            <NavigationItem
+              link={module.url}
+              text={module.name}
+              icon={module.icon_class}
+            />
+          );
+        }
+      } else {
+        return (
+          <div>
+            <NavigationItem
+              text={module.name}
+              icon={module.icon_class}
+              showopen="true"
+              open={moduleStates[module["id"]].open}
+              clicked={() => updateMenuItemState(module.id)}
+            />
+            <Collapse
+              in={moduleStates[module["id"]].open}
+              timeout="auto"
+              unmountOnExit
+            >
+              <List component="div" disablePadding>
+                {map(module.modules, (submodule, subkey) => {
+                  return (
+                    <NavigationItem
+                      link={submodule.url}
+                      text={submodule.name}
+                      icon={submodule.icon_class}
+                      nested="true"
+                    />
+                  );
+                })}
+              </List>
+            </Collapse>
+          </div>
+        );
+      }
+    });
+    return nav1;
   };
 
   const renderSideMenu = () => {
@@ -177,11 +254,11 @@ function NavigationItems(props) {
             userInfo.role.id,
           {
             headers: {
-              Authorization: "Bearer " + auth.getToken()
-            }
+              Authorization: "Bearer " + auth.getToken(),
+            },
           }
         )
-        .then(res => {
+        .then((res) => {
           let moduleStatesArr = {};
           map(res.data, (module, key) => {
             if (module.id in moduleStatesArr === false)
@@ -201,7 +278,8 @@ function NavigationItems(props) {
   return (
     <Aux>
       <List component="nav" className={clsx(classes.root, className)}>
-        {renderSideMenu()}
+        {masterMenu()}
+        {/* {renderSideMenu()} */}
         {!isDesktop ? (
           <Aux>
             <NavigationItem

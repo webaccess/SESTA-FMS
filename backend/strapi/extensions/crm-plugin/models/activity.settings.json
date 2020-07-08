@@ -1,0 +1,36 @@
+{
+  "connection": "default",
+  "collectionName": "activities",
+  "info": {
+    "name": "activity"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "start_datetime": {
+      "type": "datetime"
+    },
+    "end_datetime": {
+      "type": "datetime"
+    },
+    "description": {
+      "type": "richtext"
+    },
+    "activitytype": {
+      "via": "activities",
+      "plugin": "crm-plugin",
+      "model": "activitytype"
+    },
+    "activityassignees": {
+      "plugin": "crm-plugin",
+      "via": "activity",
+      "collection": "activityassignee"
+    }
+  }
+}

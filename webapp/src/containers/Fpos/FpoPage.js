@@ -76,8 +76,7 @@ class FpoPage extends Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
-            "s?sub_type=FPO&id=" +
+            "crm-plugin/contact/" +
             this.state.editPage[1],
           {
             headers: {
@@ -86,29 +85,28 @@ class FpoPage extends Component {
           }
         )
         .then((res) => {
-          console.log("results", res.data[0]);
           this.setState({
             values: {
-              addFpo: res.data[0].name,
-              addAddress: res.data[0].contact.address_1,
-              addPointOfContact: res.data[0].person_incharge,
-              addDistrict: res.data[0].contact.district,
-              addState: res.data[0].contact.state,
-              addBlock: res.data[0].contact.block,
-              addEmail: res.data[0].contact.email,
-              addPhone: res.data[0].contact.phone,
+              addFpo: res.data.organization.name,
+              addAddress: res.data.address_1,
+              addPointOfContact: res.data.organization.person_incharge,
+              addDistrict: res.data.district.id,
+              addState: res.data.state.id,
+              addBlock: res.data.block,
+              addEmail: res.data.email,
+              addPhone: res.data.phone,
             },
           });
-          stateId = res.data[0].contact.state;
+          stateId = res.data.state.id;
         })
         .catch((error) => {
           console.log(error);
         });
-      console.log("state".stteId);
+
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "districts?is_active=true&&master_state.id=" +
+            "crm-plugin/districts/?is_active=true&&state.id=" +
             stateId,
           {
             headers: {
@@ -125,11 +123,14 @@ class FpoPage extends Component {
     }
 
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "states?is_active=true", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+      .get(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true",
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
+        }
+      )
       .then((res) => {
         this.setState({ getState: res.data });
       })
@@ -154,7 +155,7 @@ class FpoPage extends Component {
       axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "districts?is_active=true&&master_state.id=" +
+            "crm-plugin/districts/?is_active=true&&state.id=" +
             stateId,
           {
             headers: {
@@ -221,7 +222,6 @@ class FpoPage extends Component {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
-    // if (Object.keys(this.state.errors).length > 0) return;
     let fpoName = this.state.values.addFpo;
     let fpoState = this.state.values.addState;
     let fpoDistrict = this.state.values.addDistrict;
@@ -236,7 +236,7 @@ class FpoPage extends Component {
       await axios
         .put(
           process.env.REACT_APP_SERVER_URL +
-            "organizations/" +
+            "crm-plugin/contact/" +
             this.state.editPage[1],
           {
             name: fpoName,
@@ -245,7 +245,6 @@ class FpoPage extends Component {
             contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
               "Organization"
             ][0],
-            name: fpoName,
             address_1: fpoAddress,
             state: fpoState,
             district: fpoDistrict,
@@ -261,7 +260,6 @@ class FpoPage extends Component {
         )
         .then((res) => {
           this.setState({ formSubmitted: true });
-          console.log("testing", res);
           this.props.history.push({ pathname: "/fpos", editData: true });
         })
         .catch((error) => {
@@ -279,12 +277,12 @@ class FpoPage extends Component {
           } else {
             this.setState({ errorCode: "Network Error - Please try again!" });
           }
-          console.log("error", error.response);
+          console.log(error);
         });
     } else {
       await axios
         .post(
-          process.env.REACT_APP_SERVER_URL + "organizations/",
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",
           {
             name: fpoName,
             sub_type: "FPO",
@@ -292,7 +290,6 @@ class FpoPage extends Component {
             contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
               "Organization"
             ][0],
-            name: fpoName,
             address_1: fpoAddress,
             state: fpoState,
             district: fpoDistrict,
@@ -325,7 +322,7 @@ class FpoPage extends Component {
           } else {
             this.setState({ errorCode: "Network Error - Please try again!" });
           }
-          console.log("Error  ", error);
+          console.log(error);
         });
     }
   };

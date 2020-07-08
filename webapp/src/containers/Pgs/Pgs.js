@@ -71,11 +71,14 @@ export class Pgs extends React.Component {
   }
   async componentDidMount() {
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "tags/?_sort=name:ASC", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+      .get(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/tags/?_sort=name:ASC",
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
+        }
+      )
       .then((res) => {
         this.setState({ data: res.data });
       })
@@ -93,11 +96,14 @@ export class Pgs extends React.Component {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
       axios
-        .delete(process.env.REACT_APP_SERVER_URL + "tags/" + cellid, {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        })
+        .delete(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/tags/" + cellid,
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
+          }
+        )
         .then((res) => {
           this.setState({ singleDelete: res.data.name });
           this.setState({ dataCellId: "" });
@@ -109,16 +115,22 @@ export class Pgs extends React.Component {
         });
     }
   };
+
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       for (let i in selectedId) {
         axios
-          .delete(process.env.REACT_APP_SERVER_URL + "tags/" + selectedId[i], {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          })
+          .delete(
+            process.env.REACT_APP_SERVER_URL +
+              "crm-plugin/tags/" +
+              selectedId[i],
+            {
+              headers: {
+                Authorization: "Bearer " + auth.getToken() + "",
+              },
+            }
+          )
           .then((res) => {
             this.setState({ multipleDelete: true });
             this.componentDidMount();
@@ -154,13 +166,13 @@ export class Pgs extends React.Component {
   };
 
   handleActive = async (e) => {
-     this.setState({ isActiveAllShowing: false });
+    this.setState({ isActiveAllShowing: false });
     this.setState({ successCode: "", errorCode: "" });
     let setActiveId = this.state.setActiveId;
     let IsActive = this.state.IsActive;
     await axios
       .put(
-        process.env.REACT_APP_SERVER_URL + "tags/" + setActiveId,
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/tags/" + setActiveId,
         {
           is_active: IsActive,
         },
@@ -185,7 +197,7 @@ export class Pgs extends React.Component {
         this.componentDidMount();
         this.props.history.push({ pathname: "/pgs", updateData: true });
         if (this.props.location.updateData && this.snackbar.current !== null) {
-            this.snackbar.current.handleClick();
+          this.snackbar.current.handleClick();
         }
       })
       .catch((error) => {
@@ -207,7 +219,7 @@ export class Pgs extends React.Component {
       });
   };
 
-   closeActiveAllModalHandler = (event) => {
+  closeActiveAllModalHandler = (event) => {
     this.setState({ isActiveAllShowing: false });
   };
 
@@ -219,7 +231,7 @@ export class Pgs extends React.Component {
     axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-          "tags?" +
+          "crm-plugin/tags/?" +
           searchData +
           "&&_sort=name:ASC",
         {
@@ -281,11 +293,15 @@ export class Pgs extends React.Component {
                 </Button>
               </div>
             </div>
-           {this.props.location.addData ? (
-              <Snackbar severity="success">Producer Group added successfully.</Snackbar>
+            {this.props.location.addData ? (
+              <Snackbar severity="success">
+                Producer Group added successfully.
+              </Snackbar>
             ) : null}
             {this.props.location.editData ? (
-              <Snackbar severity="success">Producer Group edited successfully.</Snackbar>
+              <Snackbar severity="success">
+                Producer Group edited successfully.
+              </Snackbar>
             ) : null}
             {this.props.location.updateData ? (
               <Snackbar
@@ -371,7 +387,7 @@ export class Pgs extends React.Component {
             ) : (
               <h1>Loading...</h1>
             )}
-             <Modal
+            <Modal
               className="modal"
               show={this.state.isActiveAllShowing}
               close={this.closeActiveAllModalHandler}
