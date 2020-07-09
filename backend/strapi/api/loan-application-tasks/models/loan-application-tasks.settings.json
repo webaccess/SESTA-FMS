@@ -1,0 +1,27 @@
+{
+  "connection": "default",
+  "collectionName": "loan_application_tasks",
+  "info": {
+    "name": "Loan Application Tasks"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "loan_applications": {
+      "collection": "loan-application",
+      "via": "loan_application_task"
+    },
+    "date": {
+      "type": "date",
+      "required": true
+    },
+    "status": {
+      "type": "boolean"
+    },
+    "comments": {
+      "type": "string"
+    }
+  }
+}

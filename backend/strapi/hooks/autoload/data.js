@@ -91,6 +91,22 @@ const roles = {
         name: "country",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
+      {
+        name: "loan-model",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "loan-application",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "loan-application-tasks",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "loan-application-installments",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
     ],
     grantAllPermissions: false,
   },
@@ -147,6 +163,22 @@ const roles = {
       },
       {
         name: "country",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "loan-model",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "loan-application",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "loan-application-tasks",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "loan-application-installments",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
     ],
@@ -207,6 +239,22 @@ const roles = {
         name: "country",
         action: [],
       },
+      {
+        name: "loan-model",
+        action: [],
+      },
+      {
+        name: "loan-application",
+        action: [],
+      },
+      {
+        name: "loan-application-tasks",
+        action: [],
+      },
+      {
+        name: "loan-application-installments",
+        action: [],
+      },
     ],
     grantAllPermissions: false,
   },
@@ -263,6 +311,22 @@ const roles = {
       },
       {
         name: "country",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "loan-model",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "loan-application",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "loan-application-tasks",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "loan-application-installments",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
     ],
@@ -396,7 +460,6 @@ const modules = {
     displayNavigation: true,
     module: "", //slug
     order: 9,
-
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Add Pg": {
@@ -477,6 +540,37 @@ const modules = {
     displayNavigation: false,
     module: "", //slug
     order: 14,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+
+  Loan: {
+    is_active: true,
+    icon_class: "people",
+    url: "/loan",
+    slug: "list_loan",
+    displayNavigation: true,
+    module: "", //slug
+    order: 18,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Add Loan": {
+    is_active: true,
+    icon_class: "",
+    url: "/loan/add",
+    slug: "add_loan",
+    displayNavigation: false,
+    module: "", //slug
+    order: 19,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Edit Loan": {
+    is_active: true,
+    icon_class: "",
+    url: "/loan/edit/:id",
+    slug: "edit_loan",
+    displayNavigation: false,
+    module: "", //slug
+    order: 19,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
 };

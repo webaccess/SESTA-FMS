@@ -1,0 +1,41 @@
+{
+  "connection": "default",
+  "collectionName": "loan_models",
+  "info": {
+    "name": "Loan Model"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "product_name": {
+      "type": "string",
+      "required": true
+    },
+    "specification": {
+      "type": "string",
+      "required": true
+    },
+    "loan_amount": {
+      "type": "decimal",
+      "required": true
+    },
+    "duration": {
+      "type": "integer",
+      "required": true
+    },
+    "emi": {
+      "type": "decimal",
+      "required": true
+    },
+    "contact": {
+      "model": "contact",
+      "via": "loan_model"
+    },
+    "loan_application": {
+      "via": "loan_model",
+      "model": "loan-application"
+    }
+  }
+}

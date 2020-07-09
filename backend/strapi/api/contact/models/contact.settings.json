@@ -68,6 +68,14 @@
     "organization": {
       "via": "contact",
       "model": "organization"
+    },
+    "loan_application": {
+      "via": "approved_by",
+      "model": "loan-application"
+    },
+    "loan_model": {
+      "via": "contact",
+      "model": "loan-model"
     }
   }
 }

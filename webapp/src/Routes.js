@@ -28,6 +28,8 @@ import FpoPage from "./containers/Fpos/FpoPage";
 import Fpos from "./containers/Fpos/Fpos";
 import countries from "./containers/Countries/Countries";
 import CountryPage from "./containers/Countries/CountryPage";
+import Loan from "./containers/Loan/Loan";
+
 
 function Routes() {
   return (
@@ -53,6 +55,7 @@ function Routes() {
               exact
             />
 
+            <PrivateRoute path="/loan" component={Loan} exact />
             <PrivateRoute path="/village-organizations" component={Vos} exact />
             <PrivateRoute path="/villages" component={Villages} exact />
             <PrivateRoute path="/shgs/add" component={ShgPage} exact />
