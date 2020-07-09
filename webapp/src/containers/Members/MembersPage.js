@@ -156,6 +156,20 @@ class ActivityPage extends Component {
   }
 
   async componentDidMount() {
+    // get all roles
+    axios
+      .get(process.env.REACT_APP_SERVER_URL + "users-permissions/roles", {
+        headers: {
+          Authorization: "Bearer " + auth.getToken() + "",
+        },
+      })
+      .then((res) => {
+        this.setState({ rolesList: res.data.roles });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
     if (this.state.editPage[0]) {
       await axios
         .get(
@@ -187,6 +201,8 @@ class ActivityPage extends Component {
               addEmail: res.data.email,
             },
           });
+
+          // if isShareholder is checked
           if (res.data.shareinformation) {
             this.setState({ shareInfoId: res.data.shareinformation.id });
             let tempValues = this.state.values;
@@ -201,6 +217,7 @@ class ActivityPage extends Component {
               values: tempValues,
             });
           }
+          // if createUser is checked
           if (res.data.user) {
             this.setState({ createUserId: res.data.user.id });
             axios
@@ -220,6 +237,32 @@ class ActivityPage extends Component {
                 let tempUserValues = this.state.values;
                 tempUserValues["username"] = res.data.user.username;
                 tempUserValues["role"] = response.data[0].role;
+                // to get the role obj from role id
+                axios
+                  .get(
+                    process.env.REACT_APP_SERVER_URL +
+                      "users-permissions/roles/" +
+                      res.data.user.role,
+                    {
+                      headers: {
+                        Authorization: "Bearer " + auth.getToken() + "",
+                      },
+                    }
+                  )
+                  .then((roleRes) => {
+                    if (roleRes.data.role.name === "SHG Member") {
+                      tempUserValues["selectField"] = res.data.individual.shg;
+                    }
+                    if (
+                      roleRes.data.role.name ===
+                      "CSP (Community Service Provider)"
+                    ) {
+                      tempUserValues["selectField"] = res.data.individual.vo;
+                    }
+
+                    this.handleRoleChange("", roleRes.data.role);
+                  })
+                  .catch((error) => {});
                 this.setState({
                   createUser: true,
                   values: tempUserValues,
@@ -397,19 +440,6 @@ class ActivityPage extends Component {
     this.setState({
       createUser: !this.state.createUser,
     });
-    // get all roles
-    axios
-      .get(process.env.REACT_APP_SERVER_URL + "users-permissions/roles", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
-      .then((res) => {
-        this.setState({ rolesList: res.data.roles });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   };
 
   handleRoleChange = (event, value) => {
@@ -459,10 +489,9 @@ class ActivityPage extends Component {
   };
 
   handleFieldChange = (event, value) => {
-    console.log("-- field change --", value);
     if (value !== null) {
       this.setState({
-        values: { ...this.state.values, selectField: value },
+        values: { ...this.state.values, selectField: value.id },
       });
     } else {
       this.setState({
@@ -698,9 +727,28 @@ class ActivityPage extends Component {
       last_name: this.state.values.lastName,
     };
 
+    let postIndividualData = {};
+    if (roleId.name === "SHG Member") {
+      postIndividualData = {
+        shg: selectFieldId,
+        vo: 0,
+      };
+    } else if (roleId.name === "CSP (Community Service Provider)") {
+      postIndividualData = {
+        vo: selectFieldId,
+        shg: 0,
+      };
+    } else {
+      postIndividualData = {
+        vo: 0,
+        shg: 0,
+      };
+    }
+
     if (data.user) {
       // update user in Users table
       if (this.state.createUser) {
+        // if createUser checkbox is checked
         await axios
           .put(
             process.env.REACT_APP_SERVER_URL +
@@ -713,12 +761,28 @@ class ActivityPage extends Component {
               },
             }
           )
-          .then((res) => {})
+          .then((res) => {
+            axios
+              .put(
+                process.env.REACT_APP_SERVER_URL +
+                  "crm-plugin/individuals/" +
+                  data.individual.id,
+                postIndividualData,
+                {
+                  headers: {
+                    Authorization: "Bearer " + auth.getToken() + "",
+                  },
+                }
+              )
+              .then((res) => {})
+              .catch((error) => {});
+          })
           .catch((error) => {
             console.log(error);
           });
       } else {
         if (this.state.createUserId) {
+          // if createUSer is selected previously but unchecked later
           axios
             .delete(
               process.env.REACT_APP_SERVER_URL +
@@ -730,7 +794,24 @@ class ActivityPage extends Component {
                 },
               }
             )
-            .then((res) => {})
+            .then((res) => {
+              axios
+                .put(
+                  process.env.REACT_APP_SERVER_URL +
+                    "crm-plugin/individuals/" +
+                    data.individual.id,
+                  { shg: 0, vo: 0 },
+                  {
+                    headers: {
+                      Authorization: "Bearer " + auth.getToken() + "",
+                    },
+                  }
+                )
+                .then((res) => {})
+                .catch((error) => {
+                  console.log(error);
+                });
+            })
             .catch((error) => {
               console.log(error);
             });
@@ -744,7 +825,25 @@ class ActivityPage extends Component {
             Authorization: "Bearer " + auth.getToken() + "",
           },
         })
-        .then((res) => {})
+        .then((res) => {
+          // add shg/vo in Individuals table based on selected role
+          axios
+            .put(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/individuals/" +
+                data.individual.id,
+              postIndividualData,
+              {
+                headers: {
+                  Authorization: "Bearer " + auth.getToken() + "",
+                },
+              }
+            )
+            .then((res) => {})
+            .catch((error) => {
+              console.log(error);
+            });
+        })
         .catch((error) => {
           console.log(error);
         });
@@ -1306,7 +1405,7 @@ class ActivityPage extends Component {
                                     item,
                                     i
                                   ) {
-                                    return item === selectField;
+                                    return item.id === selectField;
                                   })
                                 ] || null
                               : null

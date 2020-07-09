@@ -65,9 +65,11 @@ export class Members extends React.Component {
       getState: [],
       getDistrict: [],
       getVillage: [],
+      getShg: [],
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
+      filterShg: "",
       isCancel: false,
       DeleteData: false,
       dataCellId: [],
@@ -93,6 +95,24 @@ export class Members extends React.Component {
       .catch((error) => {
         console.log(error);
       });
+
+    // get all SHGs
+    axios
+      .get(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG",
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
+        }
+      )
+      .then((res) => {
+        this.setState({ getShg: res.data });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   getMembers = () => {
@@ -107,18 +127,7 @@ export class Members extends React.Component {
         }
       )
       .then((res) => {
-        res.data.forEach((element, index) => {
-          if (element.user !== null) {
-            this.state.rolesList
-              .filter((role) => role.id === element.user.role)
-              .map((filteredRole) => {
-                res.data[index]["user"]["role"] = filteredRole.name; // to assign role name based on role id
-                this.setState({ data: res.data });
-              });
-          } else {
-            this.setState({ data: res.data });
-          }
-        });
+        this.updateRoleIdWithName(res.data);
       })
       .catch((error) => {
         console.log(error);
@@ -140,6 +149,21 @@ export class Members extends React.Component {
       .catch((error) => {
         console.log(error);
       });
+  };
+
+  updateRoleIdWithName = (data) => {
+    data.forEach((element, index) => {
+      if (element.user !== null) {
+        this.state.rolesList
+          .filter((role) => role.id === element.user.role)
+          .map((filteredRole) => {
+            data[index]["user"]["role"] = filteredRole.name; // to assign role name based on role id
+            this.setState({ data: data });
+          });
+      } else {
+        this.setState({ data: data });
+      }
+    });
   };
 
   handleStateChange = async (event, value) => {
@@ -210,6 +234,16 @@ export class Members extends React.Component {
     }
   }
 
+  handleShgChange(event, value) {
+    if (value !== null) {
+      this.setState({ filterShg: value, isCancel: false });
+    } else {
+      this.setState({
+        filterShg: "",
+      });
+    }
+  }
+
   handleVillageChange = async (event, value) => {
     if (value !== null) {
       this.setState({ filterVillage: value, isCancel: false });
@@ -246,6 +280,10 @@ export class Members extends React.Component {
       searchData += searchData ? "&&" : "";
       searchData += "villages=" + this.state.filterVillage.id;
     }
+    if (this.state.filterShg) {
+      searchData += searchData ? "&&" : "";
+      searchData += "individual.shg=" + this.state.filterShg.id;
+    }
 
     //api call after search filter
     axios
@@ -260,7 +298,7 @@ export class Members extends React.Component {
         }
       )
       .then((res) => {
-        this.setState({ data: res.data });
+        this.updateRoleIdWithName(res.data);
       })
       .catch((error) => {
         console.log(error);
@@ -395,8 +433,10 @@ export class Members extends React.Component {
     let filterDistrict = this.state.filterDistrict;
     let villagesFilter = this.state.getVillage;
     let filterVillage = this.state.filterVillage;
+    let shgFilter = this.state.getShg;
+    let filterShg = this.state.filterShg;
     let filters = this.state.values;
-
+    console.log("render filterShg ... ", filterShg);
     let addStates = [];
     map(filterState, (state, key) => {
       addStates.push(
@@ -585,6 +625,37 @@ export class Members extends React.Component {
                           fullWidth
                           label="Select Village"
                           name="filterVillage"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                </div>
+              </div>
+              <div className={classes.searchInput}>
+                <div className={style.Districts}>
+                  <Grid item md={12} xs={12}>
+                    <Autocomplete
+                      id="combo-box-demo"
+                      options={shgFilter}
+                      name="filterShg"
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handleShgChange(event, value);
+                      }}
+                      value={
+                        filterShg
+                          ? this.state.isCancel === true
+                            ? null
+                            : filterShg
+                          : null
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          {...params}
+                          fullWidth
+                          label="Select SHG"
+                          name="filterShg"
                           variant="outlined"
                         />
                       )}

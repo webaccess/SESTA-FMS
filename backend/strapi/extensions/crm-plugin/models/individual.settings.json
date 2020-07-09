@@ -28,6 +28,10 @@
     "shg": {
       "plugin": "crm-plugin",
       "model": "contact"
+    },
+    "vo": {
+      "plugin": "crm-plugin",
+      "model": "contact"
     }
   }
 }
