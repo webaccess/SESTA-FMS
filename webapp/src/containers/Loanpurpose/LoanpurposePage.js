@@ -30,7 +30,6 @@ class LoanpurposePage extends Component {
       emidetails: {},
       loantasks: {},
       addPurpose: "",
-      addDuration: [],
       getState: [],
       checkedB: false,
       checkedTasks: false,
@@ -56,12 +55,12 @@ class LoanpurposePage extends Component {
             message: "Total Amount field is required",
           },
         },
-        // addFPO: {
-        //   required: {
-        //     value: "true",
-        //     message: "FPO field is required",
-        //   },
-        // },
+        addFPO: {
+          // required: {
+          //   value: "true",
+          //   message: "FPO field is required",
+          // },
+        },
         addEMI: {
           required: {
             value: "true",
@@ -76,8 +75,13 @@ class LoanpurposePage extends Component {
         // },
       },
       errors: {
-        addVillage: [],
+        addPurpose: [],
+        addDuration: [],
+        addSpecification: [],
+        addAmount: [],
         addFPO: [],
+        addEMI: [],
+        addVillage: [],
         firstName: [],
       },
       bankErrors: {},
@@ -118,14 +122,14 @@ class LoanpurposePage extends Component {
               addDuration: res.data.duration,
               addSpecification: res.data.specification,
               addAmount: res.data.loan_amount,
-              addFPO: res.data.fpo.id,
+              // addFPO: res.data.fpo.id,
               addEMI: res.data.emi,
             },
           });
           if (res.data.emidetails) {
             this.setState({
               emidetails: {
-                id: res.data.emidetails.id,
+                // id: res.data.emidetails.id,
                 addPrincipal: res.data.emidetails[0].principal,
                 addInterest: res.data.emidetails[0].interest,
               },
@@ -143,14 +147,20 @@ class LoanpurposePage extends Component {
                 addTask: res.data.loantasks[0].name,
               },
             });
+            console.log(
+              "----values---",
+              this.state.values,
+              "emidetails---",
+              this.state.emidetails,
+              "---loantasks---",
+              this.state.loantasks
+            );
           } else {
             this.setState({
               checkedB: false,
               checkedTasks: false,
             });
           }
-
-          stateId = res.data[0].state.id;
         })
         .catch((error) => {
           console.log(error);
@@ -387,12 +397,15 @@ class LoanpurposePage extends Component {
           console.log("add ", res);
           let bankId = res.data.id;
           this.setState({ bankDeatilsId: bankId });
-          // if (this.state.checkedB)
-          this.saveEmiDetails(
-            process.env.REACT_APP_SERVER_URL + "emidetails",
-            res.data.id
-          );
-          this.saveTaskDetails("url", res.data.id);
+          if (this.state.checkedB) {
+            this.saveEmiDetails(
+              process.env.REACT_APP_SERVER_URL + "emidetails",
+              res.data.id
+            );
+          }
+          if (this.state.checkedTasks) {
+            this.saveTaskDetails("url", res.data.id);
+          }
           this.props.history.push({ pathname: "/loanpurposes", addData: true });
           this.setState({ formSubmitted: true });
         })
