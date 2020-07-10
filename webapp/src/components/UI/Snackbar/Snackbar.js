@@ -2,14 +2,10 @@ import React from "react";
 import Button from "@material-ui/core/Button";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
-import { makeStyles } from "@material-ui/core/styles";
-import { useTheme } from "@material-ui/styles";
-import { useMediaQuery } from "@material-ui/core";
 import style from "./Snackbar.module.css";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import Collapse from "@material-ui/core/Collapse";
-import { withStyles } from "@material-ui/core/styles";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="standard" {...props} />;
@@ -30,13 +26,10 @@ export class CustomizedSnackbars extends React.Component {
   };
 
   handleClose = (event) => {
-    // if (reason === "clickaway") {
-    //   return;
-    // }
     this.setState({ open: false });
   };
 
-    render() {
+  render() {
     const { classes } = this.props;
     return (
       <div>
@@ -86,6 +79,6 @@ export class CustomizedSnackbars extends React.Component {
       </div>
     );
   }
- }
+}
 
 export default CustomizedSnackbars;

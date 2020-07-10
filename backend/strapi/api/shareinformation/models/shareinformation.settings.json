@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "shareinformations",
+  "info": {
+    "name": "Shareinformation"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "contact": {
+      "plugin": "crm-plugin",
+      "model": "contact",
+      "via": "shareinformation"
+    },
+    "nominee_name": {
+      "type": "string",
+      "required": true
+    },
+    "no_share": {
+      "type": "integer",
+      "required": true
+    },
+    "amount": {
+      "type": "decimal",
+      "required": true
+    },
+    "certificate_no": {
+      "type": "string",
+      "required": true
+    },
+    "date": {
+      "type": "date",
+      "required": true
+    }
+  }
+}

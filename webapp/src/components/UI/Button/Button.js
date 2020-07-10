@@ -1,8 +1,7 @@
 import React from "react";
 import { Button } from "@material-ui/core";
-import styles from "./Button.module.css";
 
-const button = props => (
+const button = (props) => (
   <Button
     variant={props.variant ? props.variant : "contained"}
     color={props.color ? props.color : "primary"}

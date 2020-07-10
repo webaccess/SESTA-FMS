@@ -30,6 +30,7 @@
       "required": true
     },
     "organization": {
+      "plugin": "crm-plugin",
       "via": "bankdetail",
       "model": "organization"
     }

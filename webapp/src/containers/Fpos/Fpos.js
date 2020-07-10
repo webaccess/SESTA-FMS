@@ -3,7 +3,7 @@ import axios from "axios";
 import Table from "../../components/Datatable/Datatable.js";
 import Layout from "../../hoc/Layout/Layout";
 import Button from "../../components/UI/Button/Button";
-import { withStyles, ThemeProvider } from "@material-ui/core/styles";
+import { withStyles } from "@material-ui/core/styles";
 import style from "./Fpos.module.css";
 import { Link } from "react-router-dom";
 import auth from "../../components/Auth/Auth.js";
@@ -12,8 +12,6 @@ import { map } from "lodash";
 import { Grid } from "@material-ui/core";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autocomplete from "../../components/Autocomplete/Autocomplete.js";
-
-import { createBrowserHistory } from "history";
 
 const useStyles = (theme) => ({
   root: {},
@@ -72,16 +70,13 @@ export class Fpos extends React.Component {
       singleDelete: "",
       multipleDelete: "",
     };
-
-    let history = props;
   }
 
   async componentDidMount() {
     await axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-          JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
-          "s?sub_type=FPO&_sort=name:ASC",
+          "crm-plugin/contact/?contact_type=organization&organization.sub_type=FPO&_sort=name:ASC",
         {
           headers: {
             Authorization: "Bearer " + auth.getToken() + "",
@@ -91,13 +86,17 @@ export class Fpos extends React.Component {
       .then((res) => {
         this.setState({ data: res.data });
       });
+
     //api call for states filter
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "states?is_active=true", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+      .get(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true",
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
+        }
+      )
       .then((res) => {
         this.setState({ getState: res.data });
       })
@@ -118,7 +117,7 @@ export class Fpos extends React.Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "districts?is_active=true&&master_state.id=" +
+            "crm-plugin/districts/?is_active=true&&state.id=" +
             stateId,
           {
             headers: {
@@ -174,10 +173,7 @@ export class Fpos extends React.Component {
       this.setState({ singleDelete: "", multipleDelete: "" });
       axios
         .delete(
-          process.env.REACT_APP_SERVER_URL +
-            JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
-            "s/" +
-            cellid,
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/" + cellid,
           {
             headers: {
               Authorization: "Bearer " + auth.getToken() + "",
@@ -202,10 +198,7 @@ export class Fpos extends React.Component {
         axios
           .delete(
             process.env.REACT_APP_SERVER_URL +
-              JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
-                "Organization"
-              ][0] +
-              "s/" +
+              "crm-plugin/contact/" +
               selectedId[i],
             {
               headers: {
@@ -250,9 +243,8 @@ export class Fpos extends React.Component {
     axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-          "contacts?organization.sub_type=FPO&" +
-          searchData +
-          "&_sort=name:ASC",
+          "crm-plugin/contact/?contact_type=organization&organization.sub_type=FPO&&_sort=name:ASC&&" +
+          searchData,
         {
           headers: {
             Authorization: "Bearer " + auth.getToken() + "",
@@ -322,9 +314,9 @@ export class Fpos extends React.Component {
                 </Button>
               </div>
             </div>
-            {this.props.location.addFPO ? (
+            {this.props.location.addData ? (
               <Snackbar severity="success">FPO added successfully.</Snackbar>
-            ) : this.props.location.editFPO ? (
+            ) : this.props.location.editData ? (
               <Snackbar severity="success">FPO edited successfully.</Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&

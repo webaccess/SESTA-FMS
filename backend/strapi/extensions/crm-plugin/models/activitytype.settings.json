@@ -1,0 +1,37 @@
+{
+  "connection": "default",
+  "collectionName": "activitytypes",
+  "info": {
+    "name": "activitytype"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "is_active": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    },
+    "activities": {
+      "plugin": "crm-plugin",
+      "collection": "activity",
+      "via": "activitytype"
+    },
+    "remuneration": {
+      "type": "decimal",
+      "required": true
+    },
+    "contact": {
+      "plugin": "crm-plugin",
+      "collection": "contact",
+      "via": "activitytypes",
+      "dominant": true
+    }
+  }
+}

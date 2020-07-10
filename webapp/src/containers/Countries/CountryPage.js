@@ -60,7 +60,7 @@ class CountryPage extends Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "countries?id=" +
+            "crm-plugin/countries/?id=" +
             this.state.editPage[1],
           {
             headers: {
@@ -128,7 +128,7 @@ class CountryPage extends Component {
       await axios
         .put(
           process.env.REACT_APP_SERVER_URL +
-            "countries/" +
+            "crm-plugin/countries/" +
             this.state.editPage[1],
           {
             name: countryName,
@@ -167,7 +167,7 @@ class CountryPage extends Component {
       //Code for Add Data Page
       await axios
         .post(
-          process.env.REACT_APP_SERVER_URL + "countries",
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/countries",
           {
             name: countryName,
             is_active: IsActive,
@@ -214,7 +214,6 @@ class CountryPage extends Component {
       formSubmitted: "",
       countrySelected: false,
     });
-    // Routing code #route to state_list page
   };
 
   render() {

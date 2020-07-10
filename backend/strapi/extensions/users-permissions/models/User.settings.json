@@ -65,6 +65,7 @@
       "type": "string"
     },
     "contact": {
+      "plugin": "crm-plugin",
       "via": "user",
       "model": "contact"
     }

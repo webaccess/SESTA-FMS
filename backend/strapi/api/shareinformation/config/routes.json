@@ -1,0 +1,52 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/shareinformations",
+      "handler": "shareinformation.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/shareinformations/count",
+      "handler": "shareinformation.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/shareinformations/:id",
+      "handler": "shareinformation.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/shareinformations",
+      "handler": "shareinformation.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/shareinformations/:id",
+      "handler": "shareinformation.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/shareinformations/:id",
+      "handler": "shareinformation.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}

@@ -32,7 +32,6 @@ class ShgPage extends Component {
       bankValues: {},
       addShg: "",
       addVillage: [],
-      getState: [],
       checkedB: false,
       getDistrict: [],
       getVillage: [],
@@ -73,8 +72,7 @@ class ShgPage extends Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
-            "s?sub_type=SHG&id=" +
+            "crm-plugin/contact/" +
             this.state.editPage[1],
           {
             headers: {
@@ -83,7 +81,6 @@ class ShgPage extends Component {
           }
         )
         .then((res) => {
-          console.log("results", res.data[0].contact.name);
           this.setState({
             values: {
               addShg: res.data[0].contact.name,
@@ -118,11 +115,15 @@ class ShgPage extends Component {
     }
 
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "village-organizations/", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+      .get(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/organizations/?sub_type=VO/",
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
+        }
+      )
       .then((res) => {
         this.setState({ getVillageOrganization: res.data });
       })
@@ -132,13 +133,12 @@ class ShgPage extends Component {
 
     //api call for village filter
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "villages/", {
+      .get(process.env.REACT_APP_SERVER_URL + "crm-plugin/villages/", {
         headers: {
           Authorization: "Bearer " + auth.getToken() + "",
         },
       })
       .then((res) => {
-        console.log("villagedata", res.data);
         this.setState({ getVillage: res.data });
       })
       .catch((error) => {
@@ -156,7 +156,6 @@ class ShgPage extends Component {
   handleVillageChange(event, value) {
     let villageValue = [];
     let villageIds;
-    console.log("villageValue", villageValue);
     for (let i in value) {
       villageIds = map(villageValue, (village, key) => {
         return village.id;
@@ -219,7 +218,6 @@ class ShgPage extends Component {
 
   hasError = (field) => {
     if (this.state.errors[field] !== undefined) {
-      console.log("errors length", Object.keys(this.state.errors).length);
       return Object.keys(this.state.errors).length > 0 &&
         this.state.errors[field].length > 0
         ? true
@@ -230,10 +228,6 @@ class ShgPage extends Component {
   hasBankError = (field) => {
     if (this.state.checkedB) {
       if (this.state.bankErrors[field] !== undefined) {
-        console.log(
-          "bankerr length",
-          Object.keys(this.state.bankErrors).length
-        );
         return Object.keys(this.state.bankErrors).length > 0 &&
           this.state.bankErrors[field].length > 0
           ? true
@@ -310,12 +304,10 @@ class ShgPage extends Component {
   handleSubmit = async (e) => {
     e.preventDefault();
     this.validate();
-    console.log("errors", this.state.errors);
     if (this.state.checkedB) {
       this.bankValidate();
     }
     this.setState({ formSubmitted: "" });
-    // if (Object.keys(this.state.errors).length > 0) return;
     let shgName = this.state.values.addShg;
     let shgAddress = this.state.values.addAddress;
     let shgPersonInCharge = this.state.values.addPointOfContact;
@@ -324,11 +316,10 @@ class ShgPage extends Component {
 
     if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
-      // let bankIds = "";
       await axios
         .put(
           process.env.REACT_APP_SERVER_URL +
-            "organizations/" +
+            "crm-plugin/contact/" +
             this.state.editPage[1],
           {
             name: shgName,
@@ -357,7 +348,6 @@ class ShgPage extends Component {
           this.setState({ formSubmitted: true });
 
           // bankIds = res.data.id;
-          console.log("data added", res);
           //api call for edited values in bank
           // if (this.state.checkedB)
           //   this.handleBankDetails(
@@ -381,7 +371,7 @@ class ShgPage extends Component {
     } else {
       await axios
         .post(
-          process.env.REACT_APP_SERVER_URL + "organizations/",
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",
           {
             name: shgName,
             sub_type: "SHG",
@@ -393,7 +383,6 @@ class ShgPage extends Component {
             ][0],
             villages: shgVillage,
             vo: shgVo,
-
             account_name: this.state.values.addAccountName,
             account_no: this.state.values.addAccountNo,
             bank_name: this.state.values.addBankName,
@@ -407,7 +396,6 @@ class ShgPage extends Component {
           }
         )
         .then((res) => {
-          console.log("add shg", res);
           this.setState({ formSubmitted: true });
           let bankId = res.data.id;
           this.setState({ bankDeatilsId: bankId });
@@ -419,7 +407,7 @@ class ShgPage extends Component {
           this.props.history.push({ pathname: "/shgs", addData: true });
         })
         .catch((error) => {
-          console.log("Error  ", error);
+          console.log(error);
         });
     }
   };
@@ -428,7 +416,6 @@ class ShgPage extends Component {
     await axios
       .post(
         url,
-
         {
           account_name: this.state.values.addAccountName,
           account_no: this.state.values.addAccountNo,
@@ -481,40 +468,19 @@ class ShgPage extends Component {
   };
 
   render() {
-    let statesFilter = this.state.getState;
     let voFilters = this.state.getVillageOrganization;
     let addVo = this.state.values.addVo;
     let villagesFilter = this.state.getVillage;
-    console.log("villagesFilter==", villagesFilter);
     let addVillage = this.state.values.addVillage;
-    const addVillageConst = addVillage
-      ? this.state.isCancel === true
-        ? []
-        : addVillage
-      : [];
-    let isCancel = this.state.isCancel;
     let checked = this.state.checkedB;
-    console.log("addVillage", addVillage);
     let addVillages = [];
     map(addVillage, (village, key) => {
-      console.log("village===", village);
       addVillages.push(
         villagesFilter.findIndex(function (item, i) {
           return item.id === village;
         })
       );
     });
-
-    console.log("addVillages", addVillages);
-
-    let vtest =
-      villagesFilter[
-        villagesFilter.findIndex(function (item, i) {
-          return item.id === 12;
-        })
-      ];
-
-    console.log("vtest", vtest);
 
     return (
       <Layout
@@ -784,7 +750,7 @@ class ShgPage extends Component {
             <CardActions>
               <Button type="submit">Save</Button>
               <Button
-                color="default"
+                color="secondary"
                 clicked={this.cancelForm}
                 component={Link}
                 to="/shgs"

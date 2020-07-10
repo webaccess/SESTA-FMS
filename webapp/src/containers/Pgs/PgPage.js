@@ -48,7 +48,7 @@ class PgPage extends Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "tags?id=" +
+            "crm-plugin/tags/?id=" +
             this.state.editPage[1],
           {
             headers: {
@@ -81,7 +81,6 @@ class PgPage extends Component {
     this.setState({ [event.target.name]: event.target.checked });
   };
 
-  //
   validate = () => {
     const values = this.state.values;
     const validations = this.state.validations;
@@ -119,7 +118,9 @@ class PgPage extends Component {
       // for edit data page
       await axios
         .put(
-          process.env.REACT_APP_SERVER_URL + "tags/" + this.state.editPage[1],
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/tags/" +
+            this.state.editPage[1],
           {
             name: pgName,
             is_active: isActive,
@@ -132,7 +133,6 @@ class PgPage extends Component {
           }
         )
         .then((res) => {
-          console.log("res", res);
           this.setState({ formSubmitted: true });
           this.props.history.push({ pathname: "/Pgs", editData: true });
         })
@@ -157,7 +157,7 @@ class PgPage extends Component {
       //for add data page
       await axios
         .post(
-          process.env.REACT_APP_SERVER_URL + "tags",
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/tags",
 
           {
             name: pgName,
@@ -190,7 +190,6 @@ class PgPage extends Component {
           } else {
             this.setState({ errorCode: "Network Error - Please try again!" });
           }
-          console.log("formsubmitted", this.state.formSubmitted);
         });
     }
   };
@@ -204,8 +203,6 @@ class PgPage extends Component {
   };
 
   render() {
-    console.log("values", this.state.values);
-
     return (
       <Layout
         breadcrumbs={

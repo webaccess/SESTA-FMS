@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 import auth from "../../components/Auth/Auth.js";
 import Table from "../../components/Datatable/Datatable.js";
 import { map } from "lodash";
-import Spinner from "../../components/Spinner";
 import Button from "../../components/UI/Button/Button";
 import Input from "../../components/UI/Input/Input";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
@@ -76,8 +75,7 @@ export class Shgs extends React.Component {
     await axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-          JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
-          "s?sub_type=SHG",
+          "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC",
         {
           headers: {
             Authorization: "Bearer " + auth.getToken() + "",
@@ -87,22 +85,27 @@ export class Shgs extends React.Component {
       .then((res) => {
         this.setState({ data: this.getData(res.data) });
       });
+
     //api call for states filter
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "states?is_active=true", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+      .get(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true",
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
+        }
+      )
       .then((res) => {
         this.setState({ getState: res.data });
       })
       .catch((error) => {
         console.log(error);
       });
+
     //api call for village filter
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "villages/", {
+      .get(process.env.REACT_APP_SERVER_URL + "crm-plugin/villages/", {
         headers: {
           Authorization: "Bearer " + auth.getToken() + "",
         },
@@ -114,6 +117,7 @@ export class Shgs extends React.Component {
         console.log(error);
       });
   }
+
   getData(result) {
     for (let i in result) {
       let villages = [];
@@ -125,18 +129,21 @@ export class Shgs extends React.Component {
     }
     return result;
   }
+
   handleStateChange = async (event, value) => {
     if (value !== null) {
       this.setState({ filterState: value });
       this.setState({
-        isCancel: false,filterDistrict:"",filterVillage:''
+        isCancel: false,
+        filterDistrict: "",
+        filterVillage: "",
       });
 
       let stateId = value.id;
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "districts?is_active=true&&master_state.id=" +
+            "crm-plugin/districts/?is_active=true&&state.id=" +
             stateId,
           {
             headers: {
@@ -160,6 +167,7 @@ export class Shgs extends React.Component {
       this.componentDidMount();
     }
   };
+
   handleChange(event) {
     this.setState({ [event.target.name]: event.target.value });
   }
@@ -167,14 +175,17 @@ export class Shgs extends React.Component {
   handleDistrictChange(event, value) {
     if (value !== null) {
       this.setState({ filterDistrict: value });
-      this.setState({filterVillage:''})
+      this.setState({ filterVillage: "" });
       let distId = value.id;
       axios
-        .get(process.env.REACT_APP_SERVER_URL + "districts/" + distId, {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        })
+        .get(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/districts/" + distId,
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
+          }
+        )
         .then((res) => {
           this.setState({ getVillage: res.data.villages });
         })
@@ -213,10 +224,7 @@ export class Shgs extends React.Component {
 
       axios
         .delete(
-          process.env.REACT_APP_SERVER_URL +
-            JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
-            "s/" +
-            cellid,
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/" + cellid,
           {
             headers: {
               Authorization: "Bearer " + auth.getToken() + "",
@@ -233,6 +241,7 @@ export class Shgs extends React.Component {
         });
     }
   };
+
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
@@ -240,10 +249,7 @@ export class Shgs extends React.Component {
         axios
           .delete(
             process.env.REACT_APP_SERVER_URL +
-              JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
-                "Organization"
-              ][0] +
-              "s/" +
+              "crm-plugin/contact/" +
               selectedId[i],
             {
               headers: {
@@ -257,11 +263,12 @@ export class Shgs extends React.Component {
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
-            console.log("err", error);
+            console.log(error);
           });
       }
     }
   };
+
   cancelForm = () => {
     this.setState({
       filterState: "",
@@ -273,8 +280,8 @@ export class Shgs extends React.Component {
       isCancel: true,
     });
     this.componentDidMount();
-    //routing code #route to village_list page
   };
+
   handleSearch() {
     let searchData = "";
     if (this.state.filterShg) {
@@ -293,13 +300,19 @@ export class Shgs extends React.Component {
     if (this.state.filterVillage) {
       searchData += "villages.id=" + this.state.filterVillage.id;
     }
+
     //api call after search filter
     axios
-      .get(process.env.REACT_APP_SERVER_URL + "shgs?" + searchData, {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+      .get(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC&&" +
+          searchData,
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
+        }
+      )
       .then((res) => {
         this.setState({ data: this.getData(res.data) });
       })
@@ -320,23 +333,23 @@ export class Shgs extends React.Component {
       {
         name: "Village Organization",
         selector: "village_organization.name",
-        sortable: true
+        sortable: true,
       },
       {
         name: "Village",
         selector: "villages",
-        sortable: true
+        sortable: true,
       },
       {
         name: "District",
         selector: "district.name",
-        sortable: true
+        sortable: true,
       },
       {
         name: "State",
         selector: "state.name",
-        sortable: true
-      }
+        sortable: true,
+      },
       // {
       //   name: "Village Name",
       //   selector: "contact.villages",
@@ -357,7 +370,6 @@ export class Shgs extends React.Component {
     let filterDistrict = this.state.filterDistrict;
     let villagesFilter = this.state.getVillage;
     let filterVillage = this.state.filterVillage;
-    let isCancel = this.state.isCancel;
     let addStates = [];
     map(filterState, (state, key) => {
       addStates.push(
@@ -382,6 +394,7 @@ export class Shgs extends React.Component {
         );
       });
     });
+
     return (
       <Layout>
         <div className="App">
@@ -533,8 +546,8 @@ export class Shgs extends React.Component {
                     value={
                       filterVillage
                         ? this.state.isCancel === true
-                        ? null
-                        :filterVillage
+                          ? null
+                          : filterVillage
                         : null
                     }
                     renderInput={(params) => (
