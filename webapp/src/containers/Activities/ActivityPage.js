@@ -207,10 +207,12 @@ class ActivityPage extends Component {
     }
     let startDate = this.state.values.addStartDate;
     let endDate = this.state.values.addEndDate;
+
     if (new Date(startDate).getTime() > new Date(endDate).getTime()) {
       this.setState({ DateTimepickerError: true });
     } else {
       this.setState({ DateTimepickerError: false });
+
       if (this.state.editPage[0]) {
         // for edit data page
         await axios

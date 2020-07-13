@@ -128,7 +128,7 @@ export class Countries extends React.Component {
         this.setState({ data: this.getData(res.data) });
       })
       .catch((err) => {
-        console.log("err", err);
+        console.log(err);
       });
   }
 
@@ -192,7 +192,7 @@ export class Countries extends React.Component {
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
-            console.log("err", error);
+            console.log(error);
           });
       }
     }

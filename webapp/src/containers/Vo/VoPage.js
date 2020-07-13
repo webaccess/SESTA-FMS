@@ -118,7 +118,7 @@ class VoPage extends Component {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
-    if (Object.keys(this.state.errors).length > 0) return;
+    // if (Object.keys(this.state.errors).length > 0) return;
     let voName = this.state.values.addVo;
     let voAddress = this.state.values.addVoAddress;
     let person = this.state.values.addPerson;
@@ -168,15 +168,14 @@ class VoPage extends Component {
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",
           {
             name: voName,
-            sub_type: "VO",
-            address: voAddress,
-            person_incharge: person,
+            address_1: voAddress,
             contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
               "Organization"
             ][0],
-            address_1: voAddress,
             block: block,
             gp: gp,
+            person_incharge: person,
+            sub_type: "VO",
           },
           {
             headers: {

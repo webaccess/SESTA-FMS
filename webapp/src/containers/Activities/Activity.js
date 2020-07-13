@@ -164,11 +164,6 @@ export class Activity extends React.Component {
 
   handleSearch() {
     let searchData = "";
-
-    console.log(
-      "--this.state.filterActivitytype --",
-      this.state.filterActivitytype
-    );
     if (this.state.values.FilterActivity) {
       searchData += "title_contains=" + this.state.values.FilterActivity + "&&";
     }

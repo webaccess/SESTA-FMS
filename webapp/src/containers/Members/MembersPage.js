@@ -190,6 +190,7 @@ class ActivityPage extends Component {
             values: {
               firstName: res.data.individual.first_name,
               lastName: res.data.individual.last_name,
+              husbandName: res.data.individual.partner_name,
               address: res.data.address_1,
               addDistrict: res.data.district.id,
               addState: res.data.state.id,
@@ -550,6 +551,7 @@ class ActivityPage extends Component {
       gp: gp,
       first_name: fName,
       last_name: lName,
+      partner_name: hName,
     };
 
     if (this.state.editPage[0]) {

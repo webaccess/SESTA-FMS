@@ -151,16 +151,21 @@ export class Members extends React.Component {
       });
   };
 
-  updateRoleIdWithName = (data) => {
+  updateRoleIdWithName = (data, index) => {
     data.forEach((element, index) => {
-      if (element.user !== null) {
+      if (element.user) {
         this.state.rolesList
           .filter((role) => role.id === element.user.role)
           .map((filteredRole) => {
-            data[index]["user"]["role"] = filteredRole.name; // to assign role name based on role id
+            Object.assign(data[index], {
+              userRole: filteredRole.name ? filteredRole.name : "",
+            });
             this.setState({ data: data });
           });
       } else {
+        Object.assign(data[index], {
+          userRole: "",
+        });
         this.setState({ data: data });
       }
     });
@@ -310,7 +315,6 @@ export class Members extends React.Component {
   };
 
   DeleteData = async (cellid, selectedId) => {
-    console.log("delelesingle called ....", cellid);
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
@@ -348,44 +352,36 @@ export class Members extends React.Component {
   };
 
   deleteShareInfo = async (id) => {
-    console.log("delete share id----", id);
     axios
       .delete(process.env.REACT_APP_SERVER_URL + "shareinformations/" + id, {
         headers: {
           Authorization: "Bearer " + auth.getToken() + "",
         },
       })
-      .then((res) => {
-        console.log("delete share ----", res);
-      })
+      .then((res) => {})
       .catch((error) => {
         console.log(error);
       });
   };
 
   deleteUserInfo = async (id) => {
-    console.log("delete user id ----", id);
     axios
       .delete(process.env.REACT_APP_SERVER_URL + "users/" + id, {
         headers: {
           Authorization: "Bearer " + auth.getToken() + "",
         },
       })
-      .then((res) => {
-        console.log("delete user ----", res);
-      })
+      .then((res) => {})
       .catch((error) => {
         console.log(error);
       });
   };
 
   DeleteAll = (selectedId) => {
-    console.log("delete all called....", selectedId);
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
       for (let i in selectedId) {
-        console.log("--- i --- ", selectedId[i]);
         axios
           .delete(
             process.env.REACT_APP_SERVER_URL +
@@ -398,16 +394,6 @@ export class Members extends React.Component {
             }
           )
           .then((res) => {
-            console.log(
-              "--- res.data.shareinformatio --",
-              res.data.shareinformation,
-              res.data.shareinformation.id
-            );
-            console.log(
-              "--- res.data.user --",
-              res.data.user,
-              res.data.user.id
-            );
             if (res.data.shareinformation) {
               this.deleteShareInfo(res.data.shareinformation.id);
             }
@@ -436,7 +422,7 @@ export class Members extends React.Component {
     let shgFilter = this.state.getShg;
     let filterShg = this.state.filterShg;
     let filters = this.state.values;
-    console.log("render filterShg ... ", filterShg);
+
     let addStates = [];
     map(filterState, (state, key) => {
       addStates.push(
@@ -471,7 +457,7 @@ export class Members extends React.Component {
       },
       {
         name: "Role",
-        selector: "user.role",
+        selector: "userRole",
         sortable: true,
       },
       {
@@ -686,7 +672,7 @@ export class Members extends React.Component {
                 filterData={true}
                 filterBy={[
                   "name",
-                  "user.role",
+                  "userRole",
                   "villages[0].name",
                   "district.name",
                   "phone",

@@ -242,7 +242,7 @@ export class Villages extends React.Component {
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
-            console.log("err", error);
+            console.log(error);
           });
       }
     }
@@ -294,7 +294,7 @@ export class Villages extends React.Component {
         this.setState({ data: this.getData(res.data) });
       })
       .catch((err) => {
-        console.log("err", err);
+        console.log(err);
       });
   }
 

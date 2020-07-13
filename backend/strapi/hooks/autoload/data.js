@@ -376,7 +376,7 @@ const modules = {
   },
   Activities: {
     is_active: true,
-    icon_class: "people",
+    icon_class: "assignmentTurnedIn",
     url: "/activities",
     slug: "list_activity",
     displayNavigation: true,

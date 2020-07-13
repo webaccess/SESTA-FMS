@@ -1,4 +1,5 @@
 {
+  "kind": "collectionType",
   "connection": "default",
   "collectionName": "organizations",
   "info": {
@@ -14,9 +15,9 @@
       "required": true
     },
     "contact": {
+      "via": "organization",
       "plugin": "crm-plugin",
-      "model": "contact",
-      "via": "organization"
+      "model": "contact"
     },
     "person_incharge": {
       "type": "string"
