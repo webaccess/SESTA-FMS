@@ -99,6 +99,14 @@
       "plugin": "users-permissions",
       "model": "user",
       "via": "contact"
+    },
+    "loan_model": {
+      "via": "fpo",
+      "model": "loan-model"
+    },
+    "loan_application": {
+      "via": "approved_by",
+      "model": "loan-application"
     }
   }
 }
