@@ -411,6 +411,16 @@ export class Members extends React.Component {
     }
   };
 
+  viewData = (cellid) => {
+    let memberData;
+    this.state.data.map(memData=>{
+      if(cellid == memData.id){
+        memberData = memData;
+      }
+    })
+    this.props.history.push("/loans/view/" + cellid, memberData);
+  };
+
   render() {
     const { classes } = this.props;
     let statesFilter = this.state.getState;
@@ -680,6 +690,7 @@ export class Members extends React.Component {
                 filters={filters}
                 data={data}
                 column={Usercolumns}
+                viewData={this.viewData}
                 editData={this.editData}
                 DeleteData={this.DeleteData}
                 DeleteAll={this.DeleteAll}

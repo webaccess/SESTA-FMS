@@ -1,0 +1,52 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/loan-application-tasks",
+      "handler": "loan-application-tasks.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/loan-application-tasks/count",
+      "handler": "loan-application-tasks.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/loan-application-tasks/:id",
+      "handler": "loan-application-tasks.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/loan-application-tasks",
+      "handler": "loan-application-tasks.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/loan-application-tasks/:id",
+      "handler": "loan-application-tasks.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/loan-application-tasks/:id",
+      "handler": "loan-application-tasks.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}

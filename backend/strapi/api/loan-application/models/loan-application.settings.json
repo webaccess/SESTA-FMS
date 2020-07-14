@@ -1,0 +1,64 @@
+{
+  "kind": "collectionType",
+  "collectionName": "loan_applications",
+  "info": {
+    "name": "Loan Application"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "contact": {
+      "plugin": "crm-plugin",
+      "model": "contact",
+      "via": "loan_application"
+    },
+    "loan_model": {
+      "model": "loan-model",
+      "via": "loan_application"
+    },
+    "application_no": {
+      "type": "string",
+      "required": true
+    },
+    "application_date": {
+      "type": "date",
+      "required": true
+    },
+    "purpose": {
+      "type": "string",
+      "required": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "UnderReview",
+        "Approved",
+        "Denied",
+        "Cancelled"
+      ],
+      "required": true
+    },
+    "approved_by": {
+      "plugin": "crm-plugin",
+      "model": "contact",
+      "via": "loan_application"
+    },
+    "approved_date": {
+      "type": "date",
+      "required": true
+    },
+    "review_comments": {
+      "type": "string"
+    },
+    "loan_application_installment": {
+      "via": "loan_applications",
+      "model": "loan-application-installments"
+    },
+    "loan_application_task": {
+      "via": "loan_applications",
+      "model": "loan-application-tasks"
+    }
+  }
+}
