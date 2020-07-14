@@ -147,7 +147,6 @@ class LoansPage extends Component {
         }
       )
       .then((res) => {
-        console.log('vo det. ', res.data);
         this.setState({ shgUnderVo: res.data });
       })
       .catch((error) => {
@@ -159,7 +158,6 @@ class LoansPage extends Component {
     } else {
       url = "?vo.id=" + VOid;
     }
-    console.log('shg/vo ',url);
 
     // get shg/vo from Individual model
     await axios
@@ -173,7 +171,6 @@ class LoansPage extends Component {
         }
       )
       .then((res) => {
-        console.log('individual res.. ', res.data);
         this.setState({ getShgVo: res.data });
       });
       
@@ -186,7 +183,6 @@ class LoansPage extends Component {
         },
       })
       .then((res) => {
-        console.log('loan_applcation ',res.data);
         this.setState({ loan_app: res.data });
       })
       
@@ -198,7 +194,6 @@ class LoansPage extends Component {
         },
       })
       .then((res) => {
-        // console.log('loan_applcation-install ',res.data);
         this.setState({ loan_installments: res.data });
       })
       .catch((error) => {
@@ -226,7 +221,6 @@ class LoansPage extends Component {
     this.state.shgUnderVo.map(vo=> { 
       shgUnderVo = vo.name;
     });
-    // console.log('loanpage props.. ',data);
     let filters = this.state.values;
     const Usercolumns = [
       {
