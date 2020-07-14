@@ -10,9 +10,9 @@
   },
   "attributes": {
     "contact": {
+      "via": "shareinformation",
       "plugin": "crm-plugin",
-      "model": "contact",
-      "via": "shareinformation"
+      "model": "contact"
     },
     "nominee_name": {
       "type": "string",

@@ -69,7 +69,6 @@ class CountryPage extends Component {
           }
         )
         .then((res) => {
-          console.log(res.data);
           this.setState({
             values: {
               addCountry: res.data[0].name,

@@ -18,9 +18,9 @@
       "type": "string"
     },
     "contact": {
+      "via": "individual",
       "plugin": "crm-plugin",
-      "model": "contact",
-      "via": "individual"
+      "model": "contact"
     },
     "partner_name": {
       "type": "string"

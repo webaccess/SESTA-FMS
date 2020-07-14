@@ -60,7 +60,6 @@ export class Vos extends React.Component {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
-      // fiterShg:"",
       filterVo: "",
       Result: [],
       data: [],
@@ -72,8 +71,6 @@ export class Vos extends React.Component {
       getState: [],
       getDistrict: [],
       getVillage: [],
-      // getShgs: [],
-      // selectedShg: [],
       isCancel: false,
       singleDelete: "",
       multipleDelete: "",
@@ -125,29 +122,7 @@ export class Vos extends React.Component {
       .catch((error) => {
         console.log(error);
       });
-    //api for shgs filter
-    // await axios
-    //   .get(process.env.REACT_APP_SERVER_URL + "shgs/", {
-    //     headers: {
-    //       Authorization: "Bearer " + auth.getToken() + ""
-    //     }
-    //   })
-    //   .then(res => {
-    //     this.setState({ getShgs: res.data });
-    //   })
-    //   .catch(error => {
-    //     console.log(error);
-    //   });
   }
-  // onHandleChange = shgValue => {
-  // 	// if (shgValue){
-  // 		this.setState({
-  // 		isCancel: false,
-  // 		fiterShg:shgValue['id']
-  // 		});
-  // 		this.setState({ selectedShg: shgValue });
-  // 	// }
-  // };
 
   handleStateChange = async (event, value, method) => {
     if (value !== null) {
@@ -179,8 +154,6 @@ export class Vos extends React.Component {
       this.setState({
         filterState: "",
         filterDistrict: "",
-        // fiterShg:""
-        // selectedShg:""
       });
       this.componentDidMount();
     }
@@ -196,8 +169,6 @@ export class Vos extends React.Component {
     } else {
       this.setState({
         filterDistrict: "",
-        // fiterShg:""
-        // selectedShg:""
       });
       this.componentDidMount();
     }
@@ -210,11 +181,8 @@ export class Vos extends React.Component {
     } else {
       this.setState({
         filterVillage: "",
-        // fiterShg:""
-        // selectedShg:""
       });
     }
-    // this.setState({ selectedShg: "" });
   }
 
   editData = (cellid) => {
@@ -278,8 +246,6 @@ export class Vos extends React.Component {
       filterDistrict: "",
       filterVillage: "",
       filterVo: "",
-      //fiterShg:"",
-      //selectedShg: "",
       isCancel: true,
     });
 
@@ -288,16 +254,7 @@ export class Vos extends React.Component {
 
   handleSearch() {
     let searchData = "";
-    // if (
-    //   this.state.filterState ||
-    //   this.state.filterDistrict ||
-    //   this.state.filterVillage ||
-    //   this.state.fiterVo
-    // )
-    //   searchData = "?";
-
     if (this.state.filterVo) {
-      // searchData = "?";
       searchData += "name_contains=" + this.state.filterVo;
     }
     if (this.state.filterState) {
@@ -315,7 +272,6 @@ export class Vos extends React.Component {
         !this.state.filterState &&
         !this.state.filterDistrict
       ) {
-        // searchData = "?";
       } else {
         searchData += searchData ? "&&" : "";
       }
@@ -459,18 +415,6 @@ export class Vos extends React.Component {
                   </Grid>
                 </div>
               </div>
-              {/* <div className={classes.searchInput}>
-                <div className={style.Districts}>
-                  <Grid item md={12} xs={12}>
-                    <AutoSuggest
-                      data={this.state.getShgs}
-                      margin="dense"
-                      onSelectShg={this.onHandleChange}
-                      onClearShg={this.state.isCancel}
-                    />
-                  </Grid>
-                </div>
-              </div> */}
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>

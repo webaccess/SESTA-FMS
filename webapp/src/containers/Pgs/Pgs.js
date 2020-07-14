@@ -137,7 +137,7 @@ export class Pgs extends React.Component {
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
-            console.log("err", error);
+            console.log(error);
           });
       }
     }
@@ -244,7 +244,7 @@ export class Pgs extends React.Component {
         this.setState({ data: res.data });
       })
       .catch((err) => {
-        console.log("err", err);
+        console.log(err);
       });
   }
 
@@ -371,7 +371,6 @@ export class Pgs extends React.Component {
                 title={"Producer Group"}
                 showSearch={false}
                 filterData={true}
-                // noDataComponent={"No Records To be shown"}
                 Searchplaceholder={"Seacrh by Village Name"}
                 filterBy={["name", "state.name"]}
                 filters={filters}

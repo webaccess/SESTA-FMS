@@ -127,7 +127,7 @@ export class States extends React.Component {
         this.setState({ data: this.getData(res.data) });
       })
       .catch((err) => {
-        console.log("err", err);
+        console.log(err);
       });
   }
 
@@ -191,7 +191,7 @@ export class States extends React.Component {
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
-            console.log("err", error);
+            console.log(error);
           });
       }
     }
@@ -205,7 +205,6 @@ export class States extends React.Component {
       }
       this.setState({ allIsActive: numberOfIsActive });
       let IsActive = "";
-      console.log('--selected[0]["is_active"] --', selected[0]["is_active"]);
       numberOfIsActive.forEach((element, index) => {
         if (numberOfIsActive[index] === true) {
           IsActive = false;

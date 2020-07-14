@@ -212,7 +212,7 @@ export class Fpos extends React.Component {
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
-            console.log("err", error);
+            console.log(error);
           });
       }
     }
@@ -255,7 +255,7 @@ export class Fpos extends React.Component {
         this.setState({ data: res.data });
       })
       .catch((err) => {
-        console.log("err", err);
+        console.log(err);
       });
   }
 

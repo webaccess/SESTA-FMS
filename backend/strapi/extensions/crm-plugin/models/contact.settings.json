@@ -43,9 +43,9 @@
       "required": true
     },
     "organization": {
-      "via": "vo",
       "plugin": "crm-plugin",
-      "model": "organization"
+      "model": "organization",
+      "via": "contact"
     },
     "country": {
       "plugin": "crm-plugin",
@@ -66,28 +66,24 @@
       "model": "district"
     },
     "individual": {
-      "via": "contact",
       "plugin": "crm-plugin",
-      "model": "individual"
-    },
-    "user": {
-      "plugin": "users-permissions",
-      "model": "user"
+      "model": "individual",
+      "via": "contact"
     },
     "activityassignees": {
       "plugin": "crm-plugin",
-      "via": "contact",
-      "collection": "activityassignee"
+      "collection": "activityassignee",
+      "via": "contact"
     },
     "contacttags": {
-      "via": "contact",
       "plugin": "crm-plugin",
-      "collection": "contacttag"
+      "collection": "contacttag",
+      "via": "contact"
     },
     "activitytypes": {
-      "via": "contact",
       "plugin": "crm-plugin",
-      "collection": "activitytype"
+      "collection": "activitytype",
+      "via": "contact"
     },
     "block": {
       "type": "string"
@@ -96,8 +92,13 @@
       "type": "string"
     },
     "shareinformation": {
-      "via": "contact",
-      "model": "shareinformation"
+      "model": "shareinformation",
+      "via": "contact"
+    },
+    "user": {
+      "plugin": "users-permissions",
+      "model": "user",
+      "via": "contact"
     }
   }
 }

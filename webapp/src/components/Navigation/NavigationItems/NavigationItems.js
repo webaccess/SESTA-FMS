@@ -101,6 +101,33 @@ function NavigationItems(props) {
 
   const classes = useStyles();
 
+  useEffect(() => {
+    if (
+      props.location.pathname !== "/members" ||
+      props.location.pathname !== "/activities" ||
+      props.location.pathname !== "/loans" ||
+      props.location.pathname !== "/"
+    ) {
+      if (openMenu !== true) {
+        setOpenMenu(true);
+      }
+    } else {
+      setOpenMenu(false);
+    }
+    if (
+      props.location.pathname == "/members" ||
+      props.location.pathname == "/activities" ||
+      props.location.pathname == "/loans" ||
+      props.location.pathname == "/"
+    ) {
+      if (openMenu == true) {
+        setOpenMenu(false);
+      }
+    } else {
+      setOpenMenu(true);
+    }
+  }, []);
+
   const updateMenuItemState = (moduleId) => {
     let moduleStatesArr = { ...moduleStates };
     map(modules, (module, key) => {
@@ -115,39 +142,26 @@ function NavigationItems(props) {
   };
 
   const masterMenu = () => {
-    return (
-      <List
-        subheader={
-          <ListSubheader
-            component="div"
-            id="nested-list-subheader"
-            button
-            onClick={handleClick}
-          >
-            <QueuePlayNextIcon></QueuePlayNextIcon>&nbsp; Masters
-            {openMenu ? <ExpandLess /> : <ExpandMore />}
-          </ListSubheader>
-        }
-      >
-        {renderSideMenu1()}
-      </List>
-    );
+    return renderSideMenu1();
     return masterMenu;
   };
 
   const renderSideMenu1 = () => {
+    let masterMenu = [];
+    let otherMenu = [];
+    let moduleArray = [
+      "Fpos",
+      "SHGs",
+      "Villages",
+      "Village Organizations",
+      "States",
+      "Pgs",
+      "Countries",
+    ];
     let nav1 = map(modules, (module, key) => {
       if (module.modules.length <= 0) {
-        if (
-          module.name === "Fpos" ||
-          module.name === "SHGs" ||
-          module.name === "Villages" ||
-          module.name === "Village Organizations" ||
-          module.name === "States" ||
-          module.name === "Pgs" ||
-          module.name === "Countries"
-        ) {
-          return (
+        if (moduleArray.includes(module.name)) {
+          masterMenu.push(
             <Collapse in={openMenu} timeout="auto" unmountOnExit>
               <ListItem>
                 <NavigationItem link={module.url} text={module.name} />
@@ -155,7 +169,7 @@ function NavigationItems(props) {
             </Collapse>
           );
         } else {
-          return (
+          otherMenu.push(
             <NavigationItem
               link={module.url}
               text={module.name}
@@ -195,7 +209,27 @@ function NavigationItems(props) {
         );
       }
     });
-    return nav1;
+    return (
+      <React.Fragment>
+        {otherMenu}
+        <List
+          subheader={
+            <ListSubheader
+              component="div"
+              id="nested-list-subheader"
+              button
+              onClick={handleClick}
+            >
+              <QueuePlayNextIcon></QueuePlayNextIcon>&nbsp; Masters
+              {openMenu ? <ExpandLess /> : <ExpandMore />}
+            </ListSubheader>
+          }
+        >
+          {masterMenu}
+        </List>
+      </React.Fragment>
+    );
+    // return nav1;
   };
 
   const renderSideMenu = () => {

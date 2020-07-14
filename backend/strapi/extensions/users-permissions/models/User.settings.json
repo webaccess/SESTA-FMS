@@ -1,4 +1,5 @@
 {
+  "kind": "collectionType",
   "connection": "default",
   "collectionName": "users-permissions_user",
   "info": {
@@ -65,8 +66,8 @@
       "type": "string"
     },
     "contact": {
-      "plugin": "crm-plugin",
       "via": "user",
+      "plugin": "crm-plugin",
       "model": "contact"
     }
   }
