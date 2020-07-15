@@ -59,8 +59,7 @@ class VoPage extends Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
-            "s?sub_type=VO&id=" +
+            "crm-plugin/contact/" +
             this.state.editPage[1],
           {
             headers: {
@@ -71,11 +70,11 @@ class VoPage extends Component {
         .then((res) => {
           this.setState({
             values: {
-              addVo: res.data[0].contact.name,
-              addVoAddress: res.data[0].contact.address,
-              addPerson: res.data[0].person_incharge,
-              addBlock: res.data[0].contact.block,
-              addGp: res.data[0].contact.gp,
+              addVo: res.data.organization.name,
+              addVoAddress: res.data.address_1,
+              addPerson: res.data.organization.person_incharge,
+              addBlock: res.data.block,
+              addGp: res.data.gp,
             },
           });
         })
@@ -119,7 +118,7 @@ class VoPage extends Component {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
-    if (Object.keys(this.state.errors).length > 0) return;
+    // if (Object.keys(this.state.errors).length > 0) return;
     let voName = this.state.values.addVo;
     let voAddress = this.state.values.addVoAddress;
     let person = this.state.values.addPerson;
@@ -131,7 +130,7 @@ class VoPage extends Component {
       await axios
         .put(
           process.env.REACT_APP_SERVER_URL +
-            "organizations/" +
+            "crm-plugin/contact/" +
             this.state.editPage[1],
           {
             name: voName,
@@ -141,7 +140,6 @@ class VoPage extends Component {
             contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
               "Organization"
             ][0],
-            name: voName,
             address_1: voAddress,
             block: block,
             gp: gp,
@@ -167,20 +165,17 @@ class VoPage extends Component {
       //for add VO page
       await axios
         .post(
-          process.env.REACT_APP_SERVER_URL + "organizations/",
-
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",
           {
             name: voName,
-            sub_type: "VO",
-            address: voAddress,
-            person_incharge: person,
+            address_1: voAddress,
             contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
               "Organization"
             ][0],
-            name: voName,
-            address_1: voAddress,
             block: block,
             gp: gp,
+            person_incharge: person,
+            sub_type: "VO",
           },
           {
             headers: {
@@ -324,20 +319,6 @@ class VoPage extends Component {
                     variant="outlined"
                   />
                 </Grid>
-                {/* <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Select FPO"
-                    margin="dense"
-                    name="addFpo"n
-                    onChange={this.handleStateChange}
-                    select
-                    value={this.state.values.addFpo || ""}
-                    variant="outlined"
-                  >
-                    ))}
-                  </Input>
-                </Grid> */}
               </Grid>
             </CardContent>
             <Divider />

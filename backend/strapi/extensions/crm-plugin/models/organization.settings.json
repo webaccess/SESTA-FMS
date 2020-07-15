@@ -1,0 +1,49 @@
+{
+  "kind": "collectionType",
+  "connection": "default",
+  "collectionName": "organizations",
+  "info": {
+    "name": "organization"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "contact": {
+      "via": "organization",
+      "plugin": "crm-plugin",
+      "model": "contact"
+    },
+    "person_incharge": {
+      "type": "string"
+    },
+    "sub_type": {
+      "type": "enumeration",
+      "enum": [
+        "FPO",
+        "VO",
+        "SHG"
+      ],
+      "required": true
+    },
+    "fpo": {
+      "plugin": "crm-plugin",
+      "model": "contact",
+      "via": "organization"
+    },
+    "vo": {
+      "plugin": "crm-plugin",
+      "model": "contact",
+      "via": "organization"
+    },
+    "bankdetail": {
+      "model": "bankdetail",
+      "via": "organization"
+    }
+  }
+}

@@ -7,6 +7,7 @@ export default function Tags(props) {
       multiple={props.multiple}
       id={props.id}
       name={props.name}
+      disabled={props.disabled}
       options={props.options}
       getOptionLabel={props.getOptionLabel}
       onChange={props.onChange}

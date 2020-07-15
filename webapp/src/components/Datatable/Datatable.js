@@ -10,6 +10,8 @@ import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import { makeStyles } from "@material-ui/styles";
+import MoneyIcon from "@material-ui/icons/Money";
+import Tooltip from "@material-ui/core/Tooltip";
 
 const useStyles = makeStyles((theme) => ({
   editIcon: {
@@ -28,6 +30,15 @@ const useStyles = makeStyles((theme) => ({
     },
     "&:active": {
       color: "#ff1a1a",
+    },
+  },
+  MoneyIcon: {
+    color: "#131514",
+    "&:hover": {
+      color: "#282F2B",
+    },
+    "&:active": {
+      color: "#282F2B",
     },
   },
 }));
@@ -55,6 +66,9 @@ const Table = (props) => {
   const editData = (id) => {
     props.editData(id);
   };
+  const viewData = (id) => {
+    props.viewData(id);
+  };
 
   const handleDeleteAllEvent = () => {
     props.DeleteAll(row, DataID, setisDeleteShowing(!isDeleteShowing));
@@ -80,6 +94,10 @@ const Table = (props) => {
     setisDeleteShowing(!isDeleteShowing);
     props.editData(DataID, selectedId);
   };
+  const handleViewEvent = () => {
+    setisDeleteShowing(!isDeleteShowing);
+    props.viewData(DataID, selectedId);
+  };
 
   const closeDeleteAllModalHandler = () => {
     setisDeleteAllShowing(!isDeleteAllShowing);
@@ -90,6 +108,8 @@ const Table = (props) => {
   };
 
   let valueformodal = props.columnsvalue;
+  let valueForMemberPage = props.title;
+  let str = "notview";
 
   const [isDeleteShowing, setisDeleteShowing] = React.useState(false);
   const [isDeleteAllShowing, setisDeleteAllShowing] = React.useState(false);
@@ -99,9 +119,11 @@ const Table = (props) => {
     {
       cell: (cell) => (
         <div onClick={(event) => editData(cell.id)} id={cell.id}>
-          <IconButton aria-label="edit" value={cell[valueformodal]}>
-            <EditIcon className={classes.editIcon} />
-          </IconButton>
+          <Tooltip title="Edit">
+            <IconButton aria-label="edit" value={cell[valueformodal]}>
+              <EditIcon className={classes.editIcon} />
+            </IconButton>
+          </Tooltip>
         </div>
       ),
       button: true,
@@ -112,9 +134,27 @@ const Table = (props) => {
           onClick={(event) => deleteDataModal(cell.id, cell[valueformodal])}
           id={cell.id}
         >
-          <IconButton aria-label="delete">
-            <DeleteIcon className={classes.deleteIcon} />
-          </IconButton>
+          <Tooltip title="Delete">
+            <IconButton aria-label="delete">
+              <DeleteIcon className={classes.deleteIcon} />
+            </IconButton>
+          </Tooltip>
+        </div>
+      ),
+      button: true,
+    },
+    {
+      cell: (cell) => (
+        <div onClick={(event) => viewData(cell.id, cell[valueformodal])}>
+          {valueForMemberPage == "Members" ? (
+            <Tooltip title="View">
+              <IconButton aria-label="view">
+                <MoneyIcon className={classes.MoneyIcon} />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            ""
+          )}
         </div>
       ),
       button: true,
@@ -132,7 +172,6 @@ const Table = (props) => {
   let filteredData = [];
   const [data, setData] = React.useState(props.filterBy);
   if (props.filterData) {
-    console.log("props.data------", props.data);
     for (let values in data) {
       filteredItems.push(props.data.filter((item) => item[data[values]]));
     }
@@ -155,7 +194,6 @@ const Table = (props) => {
     selectedId.push(selected[values]["id"]);
   }
   let SelectedId = selectedId.join("");
-  let SelectedIds = SelectedId.substring(0, SelectedId.length - 1);
 
   const onFilter = (event) => {
     setFilterText(event.target.value);

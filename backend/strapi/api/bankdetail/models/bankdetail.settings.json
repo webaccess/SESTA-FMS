@@ -1,4 +1,5 @@
 {
+  "kind": "collectionType",
   "connection": "default",
   "collectionName": "bankdetails",
   "info": {
@@ -30,6 +31,7 @@
       "required": true
     },
     "organization": {
+      "plugin": "crm-plugin",
       "via": "bankdetail",
       "model": "organization"
     }

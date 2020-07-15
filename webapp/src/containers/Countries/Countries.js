@@ -76,11 +76,15 @@ export class Countries extends React.Component {
 
   async componentDidMount() {
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "countries/?_sort=name:ASC", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+      .get(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/countries/?_sort=name:ASC",
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
+        }
+      )
       .then((res) => {
         this.setState({ data: res.data });
       });
@@ -111,7 +115,7 @@ export class Countries extends React.Component {
     axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-          "countries?" +
+          "crm-plugin/countries/?" +
           searchData +
           "&&_sort=name:ASC",
         {
@@ -124,7 +128,7 @@ export class Countries extends React.Component {
         this.setState({ data: this.getData(res.data) });
       })
       .catch((err) => {
-        console.log("err", err);
+        console.log(err);
       });
   }
 
@@ -147,11 +151,14 @@ export class Countries extends React.Component {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       axios
-        .delete(process.env.REACT_APP_SERVER_URL + "countries/" + cellid, {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        })
+        .delete(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/countries/" + cellid,
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
+          }
+        )
         .then((res) => {
           this.setState({ singleDelete: res.data.name });
           this.setState({ dataCellId: "" });
@@ -170,7 +177,9 @@ export class Countries extends React.Component {
       for (let i in selectedId) {
         axios
           .delete(
-            process.env.REACT_APP_SERVER_URL + "countries/" + selectedId[i],
+            process.env.REACT_APP_SERVER_URL +
+              "crm-plugin/countries/" +
+              selectedId[i],
             {
               headers: {
                 Authorization: "Bearer " + auth.getToken() + "",
@@ -183,7 +192,7 @@ export class Countries extends React.Component {
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
-            console.log("err", error);
+            console.log(error);
           });
       }
     }
@@ -193,19 +202,23 @@ export class Countries extends React.Component {
     if (selectedId.length !== 0) {
       let numberOfIsActive = [];
       for (let i in selected) {
-        numberOfIsActive.push(selected[0]["is_active"]);
+        numberOfIsActive.push(selected[i]["is_active"]);
       }
       this.setState({ allIsActive: numberOfIsActive });
       let IsActive = "";
-      if (selected[0]["is_active"] === true) {
-        IsActive = false;
-      } else {
-        IsActive = true;
-      }
-      for (let i in selectedId) {
+      numberOfIsActive.forEach((element, index) => {
+        if (numberOfIsActive[index] === true) {
+          IsActive = false;
+        } else {
+          IsActive = true;
+        }
+
+        let setActiveId = selectedId[index];
         axios
           .put(
-            process.env.REACT_APP_SERVER_URL + "countries/" + selectedId[i],
+            process.env.REACT_APP_SERVER_URL +
+              "crm-plugin/countries/" +
+              setActiveId,
             {
               is_active: IsActive,
             },
@@ -237,7 +250,7 @@ export class Countries extends React.Component {
             }
             console.log(error);
           });
-      }
+      });
     }
   };
 
@@ -257,7 +270,9 @@ export class Countries extends React.Component {
     let IsActive = this.state.IsActive;
     axios
       .put(
-        process.env.REACT_APP_SERVER_URL + "countries/" + setActiveId,
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/countries/" +
+          setActiveId,
         {
           is_active: IsActive,
         },

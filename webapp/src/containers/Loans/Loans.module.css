@@ -1,0 +1,35 @@
+.title {
+  color: #263238;
+}
+.addButton {
+  float: right;
+  /* padding-bottom: px; */
+}
+.Progess {
+  font-size: 50px;
+}
+
+.Districts {
+  width: 230px;
+}
+
+.Buttons {
+  margin: 0px 10px 0px 0px;
+}
+table {
+  border-collapse: collapse;
+}
+
+table, th, td {
+  /* font-size:"11px"; */
+  border: 1px solid lightgray;
+  border-radius: 3px;
+  padding: 24px;
+}
+.loan {
+  position: relative;
+  top: 20px;
+}
+td {
+  font-size:11px;
+}

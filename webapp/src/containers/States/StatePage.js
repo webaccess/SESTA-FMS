@@ -48,7 +48,7 @@ class StatePage extends Component {
       await axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "states?id=" +
+            "crm-plugin/states/?id=" +
             this.state.editPage[1],
           {
             headers: {
@@ -62,7 +62,7 @@ class StatePage extends Component {
               addState: res.data[0].name,
               active: res.data[0].is_active,
               addAbbreviation: res.data[0].Abbreviation,
-              addIdentifier: res.data[0].Identifier
+              addIdentifier: res.data[0].Identifier,
             },
           });
         })
@@ -113,12 +113,14 @@ class StatePage extends Component {
       // Code for Edit Data Page
       await axios
         .put(
-          process.env.REACT_APP_SERVER_URL + "states/" + this.state.editPage[1],
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/states/" +
+            this.state.editPage[1],
           {
             name: stateName,
             is_active: IsActive,
             Abbreviation: abbreviation,
-            Identifier: identifier
+            Identifier: identifier,
           },
           {
             headers: {
@@ -151,12 +153,12 @@ class StatePage extends Component {
       //Code for Add Data Page
       await axios
         .post(
-          process.env.REACT_APP_SERVER_URL + "states",
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/states",
           {
             name: stateName,
             is_active: IsActive,
             Abbreviation: abbreviation,
-            Identifier: identifier
+            Identifier: identifier,
           },
           {
             headers: {
@@ -198,7 +200,6 @@ class StatePage extends Component {
       formSubmitted: "",
       stateSelected: false,
     });
-    // Routing code #route to state_list page
   };
 
   render() {

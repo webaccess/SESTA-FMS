@@ -1,12 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import {
-  BrowserRouter as Router,
-  Switch,
-  useLocation,
-  Route,
-} from "react-router-dom";
-import { useHistory } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Aux from "./hoc/Auxiliary/Auxiliary.js";
 import PrivateRoute from "./hoc/PrivateRoute/PrivateRoute";
 import AuthRoute from "./hoc/AuthRoute/AuthRoute";
@@ -30,6 +23,12 @@ import countries from "./containers/Countries/Countries";
 import CountryPage from "./containers/Countries/CountryPage";
 import Loanpurposes from "./containers/Loanpurpose/Loanpurposes";
 import LoanpurposePage from "./containers/Loanpurpose/LoanpurposePage";
+import Activity from "./containers/Activities/Activity";
+import ActivityPage from "./containers/Activities/ActivityPage";
+import Members from "./containers/Members/Members";
+import MembersPage from "./containers/Members/MembersPage";
+import Loans from "./containers/Loans/Loans";
+import LoansPage from "./containers/Loans/LoansPage";
 
 function Routes() {
   return (
@@ -54,7 +53,17 @@ function Routes() {
               component={VoPage}
               exact
             />
-
+            <PrivateRoute path="/activities" component={Activity} exact />
+            <PrivateRoute
+              path="/activities/add"
+              component={ActivityPage}
+              exact
+            />
+            <PrivateRoute
+              path="/activities/edit/:id"
+              component={ActivityPage}
+              exact
+            />
             <PrivateRoute path="/village-organizations" component={Vos} exact />
             <PrivateRoute path="/villages" component={Villages} exact />
             <PrivateRoute path="/shgs/add" component={ShgPage} exact />
@@ -92,6 +101,15 @@ function Routes() {
               component={LoanpurposePage}
               exact
             />
+            <PrivateRoute path="/members" component={Members} exact />
+            <PrivateRoute path="/members/add" component={MembersPage} exact />
+            <PrivateRoute
+              path="/members/edit/:id"
+              component={MembersPage}
+              exact
+            />
+            <PrivateRoute path="/loans" component={Loans} exact />
+            <PrivateRoute path="/loans/view/:id" component={LoansPage} exact />
             <Route path="/404" component={NotFoundPage} />
             <AuthRoute path="/:authType/:id?" component={AuthPage} />
           </Switch>

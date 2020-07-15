@@ -36,6 +36,32 @@ const roles = {
     ],
     grantAllPermissions: false
   },*/
+
+  "SHG Member": {
+    content: {
+      description: "SHG Member user",
+      type: "",
+    },
+    controllers: [
+      // {
+      //   name: "user",
+      //   action: ["update"],
+      // },
+      {
+        name: "module",
+        action: ["find", "count", "findone"],
+      },
+      // {
+      //   name: "bankdetail",
+      //   action: ["find", "count", "findone", "create", "update", "delete"],
+      // },
+      // {
+      //   name: "shareinformation",
+      //   action: ["find", "count", "findone", "create", "update", "delete"],
+      // },
+    ],
+    grantAllPermissions: false,
+  },
   "FPO Admin": {
     content: {
       description: "FPO admin user",
@@ -51,44 +77,27 @@ const roles = {
         action: ["find", "count", "findone"],
       },
       {
-        name: "state",
-        action: ["find", "count", "findone", "create", "update", "delete"],
-      },
-      {
-        name: "district",
-        action: ["find", "count", "findone", "create", "update", "delete"],
-      },
-      {
-        name: "village",
-        action: ["find", "count", "findone", "create", "update", "delete"],
-      },
-      {
-        name: "shg",
-        action: ["find", "count", "findone", "create", "update", "delete"],
-      },
-      {
         name: "bankdetail",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
-        name: "contact",
+        name: "shareinformation",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
-        name: "organization",
+        name: "loan-model",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
-        name: "village-organization",
-        action: ["find", "count", "findone", "create", "update", "delete"],
-      },
-
-      {
-        name: "tag",
+        name: "loan-application",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
-        name: "country",
+        name: "loan-application-tasks",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "loan-application-installments",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
     ],
@@ -102,51 +111,34 @@ const roles = {
     controllers: [
       {
         name: "user",
-        action: ["update"],
+        action: ["update", "create"],
       },
       {
         name: "module",
         action: ["find", "count", "findone"],
       },
       {
-        name: "state",
-        action: ["find", "count", "findone", "create", "update", "delete"],
-      },
-      {
-        name: "district",
-        action: ["find", "count", "findone", "create", "update", "delete"],
-      },
-      {
-        name: "village",
-        action: ["find", "count", "findone", "create", "update", "delete"],
-      },
-      {
-        name: "shg",
-        action: ["find", "count", "findone", "create", "update", "delete"],
-      },
-      {
         name: "bankdetail",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
-        name: "contact",
+        name: "shareinformation",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
-        name: "organization",
+        name: "loan-model",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
-        name: "village-organization",
-        action: ["find", "count", "findone", "create", "update", "delete"],
-      },
-
-      {
-        name: "tag",
+        name: "loan-application",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
-        name: "country",
+        name: "loan-application-tasks",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "loan-application-installments",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
     ],
@@ -167,44 +159,28 @@ const roles = {
         action: ["find", "count", "findone"],
       },
       {
-        name: "state",
-        action: [],
-      },
-      {
-        name: "district",
-        action: [],
-      },
-      {
-        name: "village",
-        action: [],
-      },
-      {
-        name: "shg",
-        action: [],
-      },
-      {
         name: "bankdetail",
         action: [],
       },
+      ,
       {
-        name: "contact",
+        name: "shareinformation",
         action: [],
       },
       {
-        name: "organization",
+        name: "loan-model",
         action: [],
       },
       {
-        name: "village-organization",
-        action: [],
-      },
-
-      {
-        name: "tag",
+        name: "loan-application",
         action: [],
       },
       {
-        name: "country",
+        name: "loan-application-tasks",
+        action: [],
+      },
+      {
+        name: "loan-application-installments",
         action: [],
       },
     ],
@@ -225,44 +201,27 @@ const roles = {
         action: ["find", "count", "findone"],
       },
       {
-        name: "state",
-        action: ["find", "count", "findone", "create", "update", "delete"],
-      },
-      {
-        name: "district",
-        action: ["find", "count", "findone", "create", "update", "delete"],
-      },
-      {
-        name: "village",
-        action: ["find", "count", "findone", "create", "update", "delete"],
-      },
-      {
-        name: "shg",
-        action: ["find", "count", "findone", "create", "update", "delete"],
-      },
-      {
         name: "bankdetail",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
-        name: "contact",
+        name: "shareinformation",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
-        name: "organization",
+        name: "loan-model",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
-        name: "village-organization",
-        action: ["find", "count", "findone", "create", "update", "delete"],
-      },
-
-      {
-        name: "tag",
+        name: "loan-application",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
       {
-        name: "country",
+        name: "loan-application-tasks",
+        action: ["find", "count", "findone", "create", "update", "delete"],
+      },
+      {
+        name: "loan-application-installments",
         action: ["find", "count", "findone", "create", "update", "delete"],
       },
     ],
@@ -479,6 +438,106 @@ const modules = {
     order: 14,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
+  Activities: {
+    is_active: true,
+    icon_class: "assignmentTurnedIn",
+    url: "/activities",
+    slug: "list_activity",
+    displayNavigation: true,
+    module: "", //slug
+    order: 15,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Add Activity": {
+    is_active: true,
+    icon_class: "",
+    url: "/activities/add",
+    slug: "add_activity",
+    displayNavigation: false,
+    module: "", //slug
+    order: 16,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Edit Activity": {
+    is_active: true,
+    icon_class: "",
+    url: "/activities/edit/:id",
+    slug: "edit_activity",
+    displayNavigation: false,
+    module: "", //slug
+    order: 16,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  Members: {
+    is_active: true,
+    icon_class: "people",
+    url: "/members",
+    slug: "list_members",
+    displayNavigation: true,
+    module: "", //slug
+    order: 17,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Add Member": {
+    is_active: true,
+    icon_class: "",
+    url: "/members/add",
+    slug: "add_member",
+    displayNavigation: false,
+    module: "", //slug
+    order: 18,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Edit Member": {
+    is_active: true,
+    icon_class: "",
+    url: "/members/edit/:id",
+    slug: "edit_member",
+    displayNavigation: false,
+    module: "", //slug
+    order: 18,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  Loans: {
+    is_active: true,
+    icon_class: "money",
+    url: "/loans",
+    slug: "list_loan",
+    displayNavigation: true,
+    module: "", //slug
+    order: 19,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Add Loan": {
+    is_active: true,
+    icon_class: "",
+    url: "/loans/add",
+    slug: "add_loan",
+    displayNavigation: false,
+    module: "", //slug
+    order: 20,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Edit Loan": {
+    is_active: true,
+    icon_class: "",
+    url: "/loans/edit/:id",
+    slug: "edit_loan",
+    displayNavigation: false,
+    module: "", //slug
+    order: 20,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Apply Loan": {
+    is_active: true,
+    icon_class: "",
+    url: "/loans/view/:id",
+    slug: "view_loan",
+    displayNavigation: false,
+    module: "", //slug
+    order: 20,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
   Loanpurposes: {
     is_active: true,
     icon_class: "people",
@@ -486,7 +545,7 @@ const modules = {
     slug: "list_loanpurpose",
     displayNavigation: true,
     module: "", //slug
-    order: 15,
+    order: 21,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Add Loanpurpose": {
@@ -496,7 +555,7 @@ const modules = {
     slug: "add_loanpurpose",
     displayNavigation: false,
     module: "", //slug
-    order: 16,
+    order: 22,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Edit Loanpurpose": {
@@ -506,7 +565,7 @@ const modules = {
     slug: "edit_loanpurpose",
     displayNavigation: false,
     module: "", //slug
-    order: 17,
+    order: 22,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
 };

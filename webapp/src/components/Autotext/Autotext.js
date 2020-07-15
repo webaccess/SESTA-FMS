@@ -1,20 +1,18 @@
-import React from 'react';
-import Chip from '@material-ui/core/Chip';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import { makeStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
+import React from "react";
+import Autocomplete from "@material-ui/lab/Autocomplete";
+import { makeStyles } from "@material-ui/core/styles";
 import Input from "../UI/Input/Input.js";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     width: 500,
-    '& > * + *': {
+    "& > * + *": {
       marginTop: theme.spacing(3),
     },
   },
 }));
 
-const Autotext = props => {
+const Autotext = (props) => {
   const { autoFocus, variant, error, ...rest } = props;
   const classes = useStyles();
   return (
@@ -27,10 +25,10 @@ const Autotext = props => {
       filterSelectedOptions
       value={props.value}
       {...rest}
-      renderInput={params => (
+      renderInput={(params) => (
         <Input
           {...params}
-          helperText={ props.helperText }
+          helperText={props.helperText}
           error={props.error ? props.error : false}
           variant={props.variant}
           label={props.label}
@@ -40,5 +38,5 @@ const Autotext = props => {
       )}
     />
   );
-}
+};
 export default Autotext;

@@ -4,54 +4,43 @@
 // Usage: <Switch id=id onChange={e=>{function(e)}}/>
 // */
 
-import React, { Component ,useState} from "react";
-import { withStyles } from '@material-ui/core/styles';
-import Switch from '@material-ui/core/Switch';
+import React, { useState } from "react";
 import PropTypes from "prop-types";
-import styles from "./Switch.module.css"
+import styles from "./Switch.module.css";
 
-function ToggleSwitch(props){
-const [state, setState] = useState({
-checked: props.defaultChecked
-});
+function ToggleSwitch(props) {
+  const [state, setState] = useState({
+    checked: props.defaultChecked,
+  });
 
-  const onChange = e => {
+  const onChange = (e) => {
     setState({
-      checked: e.target.checked
+      checked: e.target.checked,
     });
     if (typeof props.onChange === "function") props.onChange();
   };
 
-    return (
-      <div
-        className={styles.toggleSwitch + (props.Small ? " small-switch" : "")}
-      >
-        <input
-          type="checkbox"
-          name={props.Name}
-          className={styles.toggleSwitchCheckbox}
-          id={props.id}
-          checked={props.currentValue}
-          defaultChecked={props.defaultChecked}
-          onChange={props.onChange}
-          disabled={props.disabled}
-        />
-        {props.id ? (
-          <label className={styles.toggleSwitchLabel} htmlFor={props.id}>
-            <span
-              className={
-                styles.toggleSwitchInner
-              }
-            />
-            <span
-              className=
-              {styles.toggleSwitchSwitch}
-            />
-          </label>
-        ) : null}
-      </div>
-    );
-  }
+  return (
+    <div className={styles.toggleSwitch + (props.Small ? " small-switch" : "")}>
+      <input
+        type="checkbox"
+        name={props.Name}
+        className={styles.toggleSwitchCheckbox}
+        id={props.id}
+        checked={props.currentValue}
+        defaultChecked={props.defaultChecked}
+        onChange={props.onChange}
+        disabled={props.disabled}
+      />
+      {props.id ? (
+        <label className={styles.toggleSwitchLabel} htmlFor={props.id}>
+          <span className={styles.toggleSwitchInner} />
+          <span className={styles.toggleSwitchSwitch} />
+        </label>
+      ) : null}
+    </div>
+  );
+}
 
 ToggleSwitch.propTypes = {
   id: PropTypes.any.isRequired,
@@ -61,7 +50,7 @@ ToggleSwitch.propTypes = {
   defaultChecked: PropTypes.bool,
   Small: PropTypes.bool,
   currentValue: PropTypes.bool,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
 };
 
 export default ToggleSwitch;

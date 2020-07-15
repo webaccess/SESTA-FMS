@@ -1,0 +1,34 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/individuals",
+      "handler": "individual.find"
+    },
+    {
+      "method": "GET",
+      "path": "/individuals/count",
+      "handler": "individual.count"
+    },
+    {
+      "method": "GET",
+      "path": "/individuals/:id",
+      "handler": "individual.findOne"
+    },
+    {
+      "method": "POST",
+      "path": "/individuals",
+      "handler": "individual.create"
+    },
+    {
+      "method": "PUT",
+      "path": "/individuals/:id",
+      "handler": "individual.update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/individuals/:id",
+      "handler": "individual.delete"
+    }
+  ]
+}

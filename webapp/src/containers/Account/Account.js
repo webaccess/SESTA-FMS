@@ -9,7 +9,7 @@ import {
   CardHeader,
   Avatar,
   Typography,
-  Divider
+  Divider,
 } from "@material-ui/core";
 import auth from "../../components/Auth/Auth";
 import Input from "../../components/UI/Input/Input";
@@ -20,29 +20,27 @@ import IconButton from "@material-ui/core/IconButton";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import axios from "axios";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import InputLabel from "@material-ui/core/InputLabel";
-import FormControl from "@material-ui/core/FormControl";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
 
-const useStyles = theme => ({
+const useStyles = (theme) => ({
   root: {},
   details: {
-    display: "flex"
+    display: "flex",
   },
   avatar: {
     marginLeft: "auto",
     height: 110,
     width: 100,
     flexShrink: 0,
-    flexGrow: 0
+    flexGrow: 0,
   },
   progress: {
-    marginTop: theme.spacing(2)
+    marginTop: theme.spacing(2),
   },
   uploadButton: {
-    marginRight: theme.spacing(2)
-  }
+    marginRight: theme.spacing(2),
+  },
 });
 
 export class Account extends Component {
@@ -51,18 +49,18 @@ export class Account extends Component {
     this.state = {
       values: {
         password: "",
-        showPassword: false
+        showPassword: false,
       },
       error: "",
       success: "",
       validations: {
         password: {
-          required: { value: true, message: "Password required" }
-        }
+          required: { value: true, message: "Password required" },
+        },
       },
       errors: {
-        password: []
-      }
+        password: [],
+      },
     };
     this.snackbar = React.createRef();
   }
@@ -71,22 +69,22 @@ export class Account extends Component {
     this.setState({
       values: {
         ...this.state.values,
-        showPassword: !this.state.values.showPassword
-      }
+        showPassword: !this.state.values.showPassword,
+      },
     });
   };
 
-  handleMouseDownPassword = event => {
+  handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
 
   handleChange = ({ target }) => {
     this.setState({
-      values: { ...this.state.values, [target.name]: target.value }
+      values: { ...this.state.values, [target.name]: target.value },
     });
   };
 
-  handleSubmit = e => {
+  handleSubmit = (e) => {
     e.preventDefault();
     this.validate();
 
@@ -96,21 +94,21 @@ export class Account extends Component {
       .put(
         process.env.REACT_APP_SERVER_URL + "users/" + userInfo.id,
         {
-          password: this.state.values.password
+          password: this.state.values.password,
         },
         {
           headers: {
-            Authorization: "Bearer " + auth.getToken()
-          }
+            Authorization: "Bearer " + auth.getToken(),
+          },
         }
       )
-      .then(res => {
+      .then((res) => {
         this.setState({ success: "Password changed successfully!!" });
-         if (this.snackbar.current !== null) {
-            this.snackbar.current.handleClick();
-          }
+        if (this.snackbar.current !== null) {
+          this.snackbar.current.handleClick();
+        }
       })
-      .catch(error => {
+      .catch((error) => {
         this.setState({ error });
         console.log(error);
       });
@@ -132,7 +130,7 @@ export class Account extends Component {
     console.log(this.state.errors.password);
   };
 
-  hasError = field => {
+  hasError = (field) => {
     if (this.state.errors[field] !== undefined) {
       return Object.keys(this.state.errors).length > 0 &&
         this.state.errors[field].length > 0
@@ -141,9 +139,7 @@ export class Account extends Component {
     }
   };
 
-
   render() {
-   
     let userInfo = auth.getUserInfo();
     console.log(userInfo);
     const { classes } = this.props;
@@ -245,7 +241,7 @@ export class Account extends Component {
                                 )}
                               </IconButton>
                             </InputAdornment>
-                          )
+                          ),
                         }}
                       />
                       {/* </FormControl> */}

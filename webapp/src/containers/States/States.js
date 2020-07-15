@@ -10,9 +10,6 @@ import { Grid } from "@material-ui/core";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import FormGroup from "@material-ui/core/FormGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Checkbox from "@material-ui/core/Checkbox";
 import Modal from "../../components/UI/Modal/Modal.js";
 import Switch from "../../components/UI/Switch/Switch";
 
@@ -27,6 +24,7 @@ const useStyles = (theme) => ({
   buttonRow: {
     height: "42px",
     marginTop: theme.spacing(1),
+    float: "right",
   },
   spacer: {
     flexGrow: 1,
@@ -37,10 +35,6 @@ const useStyles = (theme) => ({
   },
   floatRow: {
     height: "40px",
-    float: "right",
-  },
-  buttonRow: {
-    height: "42px",
     float: "right",
   },
   searchInput: {
@@ -82,11 +76,14 @@ export class States extends React.Component {
 
   async componentDidMount() {
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "states/?_sort=name:ASC", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+      .get(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?_sort=name:ASC",
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
+        }
+      )
       .then((res) => {
         this.setState({ data: res.data });
       });
@@ -117,7 +114,7 @@ export class States extends React.Component {
     axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-          "states?" +
+          "crm-plugin/states/?" +
           searchData +
           "&&_sort=name:ASC",
         {
@@ -130,7 +127,7 @@ export class States extends React.Component {
         this.setState({ data: this.getData(res.data) });
       })
       .catch((err) => {
-        console.log("err", err);
+        console.log(err);
       });
   }
 
@@ -153,11 +150,14 @@ export class States extends React.Component {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       axios
-        .delete(process.env.REACT_APP_SERVER_URL + "states/" + cellid, {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        })
+        .delete(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/states/" + cellid,
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
+          }
+        )
         .then((res) => {
           this.setState({ singleDelete: res.data.name });
           this.setState({ dataCellId: "" });
@@ -176,7 +176,9 @@ export class States extends React.Component {
       for (let i in selectedId) {
         axios
           .delete(
-            process.env.REACT_APP_SERVER_URL + "states/" + selectedId[i],
+            process.env.REACT_APP_SERVER_URL +
+              "crm-plugin/states/" +
+              selectedId[i],
             {
               headers: {
                 Authorization: "Bearer " + auth.getToken() + "",
@@ -189,30 +191,33 @@ export class States extends React.Component {
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
-            console.log("err", error);
+            console.log(error);
           });
       }
     }
   };
 
-ActiveAll = (selectedId, selected) => {
+  ActiveAll = (selectedId, selected) => {
     if (selectedId.length !== 0) {
       let numberOfIsActive = [];
       for (let i in selected) {
-        numberOfIsActive.push(selected[0]["is_active"]);
+        numberOfIsActive.push(selected[i]["is_active"]);
       }
       this.setState({ allIsActive: numberOfIsActive });
       let IsActive = "";
-      if (selected[0]["is_active"] === true) {
-        IsActive = false;
-      } else {
-        IsActive = true;
-      }
-      let setActiveId = selectedId;
-      for (let i in selectedId) {
+      numberOfIsActive.forEach((element, index) => {
+        if (numberOfIsActive[index] === true) {
+          IsActive = false;
+        } else {
+          IsActive = true;
+        }
+
+        let setActiveId = selectedId[index];
         axios
           .put(
-            process.env.REACT_APP_SERVER_URL + "states/" + selectedId[i],
+            process.env.REACT_APP_SERVER_URL +
+              "crm-plugin/states/" +
+              setActiveId,
             {
               is_active: IsActive,
             },
@@ -225,7 +230,10 @@ ActiveAll = (selectedId, selected) => {
           .then((res) => {
             this.setState({ formSubmitted: true });
             this.componentDidMount({ updateData: true });
-            this.props.history.push({ pathname: "/states", updateData: true });
+            this.props.history.push({
+              pathname: "/states",
+              updateData: true,
+            });
             this.clearSelected(selected);
           })
           .catch((error) => {
@@ -241,11 +249,13 @@ ActiveAll = (selectedId, selected) => {
                   " Please try again!",
               });
             } else {
-              this.setState({ errorCode: "Network Error - Please try again!" });
+              this.setState({
+                errorCode: "Network Error - Please try again!",
+              });
             }
             console.log(error);
           });
-      }
+      });
     }
   };
 
@@ -264,7 +274,7 @@ ActiveAll = (selectedId, selected) => {
   };
 
   handleClose = () => {
-   this.setState({ open: false })
+    this.setState({ open: false });
   };
 
   handleActive = (event) => {
@@ -273,7 +283,7 @@ ActiveAll = (selectedId, selected) => {
     let IsActive = this.state.IsActive;
     axios
       .put(
-        process.env.REACT_APP_SERVER_URL + "states/" + setActiveId,
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/" + setActiveId,
         {
           is_active: IsActive,
         },
@@ -288,9 +298,9 @@ ActiveAll = (selectedId, selected) => {
         this.setState({ open: true });
         this.componentDidMount({ updateData: true });
         this.props.history.push({ pathname: "/states", updateData: true });
-          if (this.props.location.updateData && this.snackbar.current !== null) {
-            this.snackbar.current.handleClick();
-          }
+        if (this.props.location.updateData && this.snackbar.current !== null) {
+          this.snackbar.current.handleClick();
+        }
       })
       .catch((error) => {
         this.setState({ formSubmitted: false });
@@ -314,7 +324,7 @@ ActiveAll = (selectedId, selected) => {
   closeActiveAllModalHandler = (event) => {
     this.setState({ isActiveAllShowing: false });
   };
-  
+
   handleCheckBox = (event) => {
     this.setState({ [event.target.name]: event.target.checked });
     this.setState({ addIsActive: true });
