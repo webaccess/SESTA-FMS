@@ -83,7 +83,8 @@ export class Shgs extends React.Component {
         }
       )
       .then((res) => {
-        this.setState({ data: this.getData(res.data) });
+        this.setState({ data: res.data });
+        // this.setState({ data: this.getData(res.data) });
       });
 
     //api call for states filter
@@ -121,11 +122,11 @@ export class Shgs extends React.Component {
   getData(result) {
     for (let i in result) {
       let villages = [];
-      for (let j in result[i].contact.villages) {
-        villages.push(result[i].contact.villages[j].name + " ");
-      }
+      //   for (let j in result[i].contact.villages) {
+      //     villages.push(result[i].contact.villages[j].name + " ");
+      //   }
 
-      result[i]["contact"]["villages"] = villages;
+      //   result[i]["contact"]["villages"] = villages;
     }
     return result;
   }
@@ -317,39 +318,38 @@ export class Shgs extends React.Component {
         this.setState({ data: this.getData(res.data) });
       })
       .catch((err) => {
-        console.log("err", err);
+        console.log(err);
       });
   }
 
   render() {
     let data = this.state.data;
-
     const Usercolumns = [
       {
         name: "SHG",
         selector: "name",
         sortable: true,
       },
-      {
-        name: "Village Organization",
-        selector: "village_organization.name",
-        sortable: true,
-      },
+      // {
+      //   name: "Village Organization",
+      //   selector: "organization.vo",
+      //   sortable: true,
+      // },
       {
         name: "Village",
-        selector: "villages",
+        selector: "villages[0].name",
         sortable: true,
       },
-      {
-        name: "District",
-        selector: "district.name",
-        sortable: true,
-      },
-      {
-        name: "State",
-        selector: "state.name",
-        sortable: true,
-      },
+      // {
+      //   name: "District",
+      //   selector: "district.name",
+      //   sortable: true,
+      // },
+      // {
+      //   name: "State",
+      //   selector: "state.name",
+      //   sortable: true,
+      // },
       // {
       //   name: "Village Name",
       //   selector: "contact.villages",
@@ -361,8 +361,8 @@ export class Shgs extends React.Component {
     for (let i in Usercolumns) {
       selectors.push(Usercolumns[i]["selector"]);
     }
-
     let columnsvalue = selectors[0];
+
     const { classes } = this.props;
     let statesFilter = this.state.getState;
     let filterState = this.state.filterState;
@@ -576,7 +576,13 @@ export class Shgs extends React.Component {
               title={"Shgs"}
               filterData={true}
               Searchplaceholder={"Seacrh by SHG Name"}
-              // filterBy={["name"]}
+              filterBy={[
+                "name",
+                // "organization.vo",
+                "villages[0].name",
+                // "district.name",
+                // "state.name",
+              ]}
               data={data}
               column={Usercolumns}
               editData={this.editData}

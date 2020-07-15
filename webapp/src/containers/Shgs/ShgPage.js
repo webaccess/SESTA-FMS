@@ -31,7 +31,6 @@ class ShgPage extends Component {
       values: {},
       bankValues: {},
       addShg: "",
-      addVillage: [],
       checkedB: false,
       getDistrict: [],
       getVillage: [],
@@ -81,24 +80,26 @@ class ShgPage extends Component {
           }
         )
         .then((res) => {
+          this.handleVillageChange("", res.data.villages[0]);
+          this.handleVoChange("", res.data.organization.vo);
           this.setState({
             values: {
-              addShg: res.data[0].contact.name,
-              addAddress: res.data[0].contact.address_1,
-              addPointOfContact: res.data[0].person_incharge,
-              addVillage: res.data[0].contact.villages,
-              addVo: res.data[0].vo.id,
+              addShg: res.data.name,
+              addAddress: res.data.address_1,
+              addPointOfContact: res.data.organization.person_incharge,
+              addVillage: res.data.villages[0].id,
+              addVo: res.data.organization.vo,
             },
           });
-          if (res.data[0].bankdetail !== null) {
+          if (res.data.organization.bankdetail !== null) {
             this.setState({
               bankValues: {
-                id: res.data[0].bankdetail.id,
-                addAccountName: res.data[0].bankdetail.account_name,
-                addBankName: res.data[0].bankdetail.bank_name,
-                addAccountNo: res.data[0].bankdetail.account_no,
-                addIfsc: res.data[0].bankdetail.ifsc_code,
-                addBranch: res.data[0].bankdetail.branch,
+                id: res.data.organization.bankdetail.id,
+                addAccountName: res.data.organization.bankdetail.account_name,
+                addBankName: res.data.organization.bankdetail.bank_name,
+                addAccountNo: res.data.organization.bankdetail.account_no,
+                addIfsc: res.data.organization.bankdetail.ifsc_code,
+                addBranch: res.data.organization.bankdetail.branch,
               },
             });
           } else {
@@ -106,8 +107,6 @@ class ShgPage extends Component {
               checkedB: false,
             });
           }
-
-          stateId = res.data[0].state.id;
         })
         .catch((error) => {
           console.log(error);
@@ -117,7 +116,7 @@ class ShgPage extends Component {
     await axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/organizations/?sub_type=VO/",
+          "crm-plugin/contact/?contact_type=organization&organization.sub_type=VO&&_sort=name:ASC",
         {
           headers: {
             Authorization: "Bearer " + auth.getToken() + "",
@@ -154,21 +153,16 @@ class ShgPage extends Component {
   };
 
   handleVillageChange(event, value) {
-    let villageValue = [];
-    let villageIds;
-    for (let i in value) {
-      villageIds = map(villageValue, (village, key) => {
-        return village.id;
-      });
-      if (villageIds.indexOf(value[i].id) <= -1) villageValue.push(value[i]);
-    }
     if (value !== null) {
       this.setState({
-        values: { ...this.state.values, addVillage: villageValue },
+        values: { ...this.state.values, addVillage: value.id },
       });
     } else {
       this.setState({
-        addVillage: [],
+        values: {
+          ...this.state.values,
+          addVillage: "",
+        },
       });
     }
   }
@@ -313,7 +307,14 @@ class ShgPage extends Component {
     let shgPersonInCharge = this.state.values.addPointOfContact;
     let shgVillage = this.state.values.addVillage;
     let shgVo = this.state.values.addVo;
-
+    console.log(
+      "shgvo-- ",
+      this.state.values.addAccountName,
+      this.state.values.addAccountNo,
+      this.state.values.addBankName,
+      this.state.values.addBranch,
+      this.state.values.addIfsc
+    );
     if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
       await axios
@@ -329,7 +330,9 @@ class ShgPage extends Component {
             contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
               "Organization"
             ][0],
-            villages: shgVillage,
+            villages: {
+              id: shgVillage,
+            },
             vo: shgVo,
             account_name: this.state.values.addAccountName,
             account_no: this.state.values.addAccountNo,
@@ -377,11 +380,12 @@ class ShgPage extends Component {
             sub_type: "SHG",
             address_1: shgAddress,
             person_incharge: shgPersonInCharge,
-
             contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
               "Organization"
             ][0],
-            villages: shgVillage,
+            villages: {
+              id: shgVillage,
+            },
             vo: shgVo,
             account_name: this.state.values.addAccountName,
             account_no: this.state.values.addAccountNo,
@@ -470,17 +474,9 @@ class ShgPage extends Component {
   render() {
     let voFilters = this.state.getVillageOrganization;
     let addVo = this.state.values.addVo;
-    let villagesFilter = this.state.getVillage;
+    let villageFilter = this.state.getVillage;
     let addVillage = this.state.values.addVillage;
     let checked = this.state.checkedB;
-    let addVillages = [];
-    map(addVillage, (village, key) => {
-      addVillages.push(
-        villagesFilter.findIndex(function (item, i) {
-          return item.id === village;
-        })
-      );
-    });
 
     return (
       <Layout
@@ -521,7 +517,7 @@ class ShgPage extends Component {
                 <Grid item md={12} xs={12}>
                   <Input
                     fullWidth
-                    label="Shg Name"
+                    label="Shg Name*"
                     name="addShg"
                     error={this.hasError("addShg")}
                     helperText={
@@ -535,26 +531,32 @@ class ShgPage extends Component {
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <Autocomplete
+                  <Autotext
                     id="combo-box-demo"
-                    options={villagesFilter}
-                    multiple={true}
+                    options={villageFilter}
                     variant="outlined"
-                    label="Select Village"
-                    // name="addVillage"
-                    getOptionLabel={(option) => (option ? option.name : "")}
+                    label="Select Village*"
+                    name="addVillage"
+                    getOptionLabel={(option) => option.name}
                     onChange={(event, value) => {
                       this.handleVillageChange(event, value);
                     }}
                     defaultValue={[]}
                     value={
                       addVillage
-                        ? this.state.isCancel === true
-                          ? []
-                          : addVillage
-                        : []
+                        ? villageFilter[
+                            villageFilter.findIndex(function (item, i) {
+                              return item.id === addVillage;
+                            })
+                          ] || null
+                        : null
                     }
                     error={this.hasError("addVillage")}
+                    helperText={
+                      this.hasError("addVillage")
+                        ? this.state.errors.addVillage[0]
+                        : null
+                    }
                     renderInput={(params) => (
                       <Input
                         {...params}
@@ -562,11 +564,6 @@ class ShgPage extends Component {
                         label="Select Village"
                         name="addVillage"
                         variant="outlined"
-                        helperText={
-                          this.hasError("addVillage")
-                            ? this.state.errors.addVillage[0]
-                            : null
-                        }
                       />
                     )}
                   />
@@ -608,7 +605,7 @@ class ShgPage extends Component {
                     id="combo-box-demo"
                     options={voFilters}
                     variant="outlined"
-                    label="Select VO"
+                    label="Select VO*"
                     getOptionLabel={(option) => option.name}
                     onChange={(event, value) => {
                       this.handleVoChange(event, value);

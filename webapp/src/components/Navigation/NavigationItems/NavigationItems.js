@@ -69,6 +69,32 @@ const useStyles = makeStyles((theme) => ({
       color: theme.palette.primary.main,
     },
   },
+  masterMenuSubHeader: {
+    color: "#37474f",
+    width: "100%",
+    padding: "0px 8px",
+    fontWeight: "500",
+    letterSpacing: "0",
+    textTransform: "none",
+    justifyContent: "flex-start",
+    marginBottom: "0px !important",
+  },
+  masterMenuSpan: {
+    display: "inline-block",
+    verticalAlign: "middle",
+    padding: "0px 8px",
+    marginBottom: "0px !important",
+  },
+  masterMenuIcon: {
+    display: "inline-block",
+    verticalAlign: "middle",
+    marginBottom: "0px !important",
+  },
+  masterMenuExtendIcon: {
+    display: "inline-block",
+    verticalAlign: "middle",
+    marginBottom: "0px !important",
+  },
 }));
 
 const StyledMenuItem = withStyles((theme) => ({
@@ -103,9 +129,10 @@ function NavigationItems(props) {
 
   useEffect(() => {
     if (
-      props.location.pathname !== "/members" ||
-      props.location.pathname !== "/activities" ||
-      props.location.pathname !== "/loans" ||
+      !props.location.pathname.includes("/members") ||
+      !props.location.pathname.includes("/activities") ||
+      !props.location.pathname.includes("/loans") ||
+      !props.location.pathname.includes("/loanpurpose") ||
       props.location.pathname !== "/"
     ) {
       if (openMenu !== true) {
@@ -115,10 +142,11 @@ function NavigationItems(props) {
       setOpenMenu(false);
     }
     if (
-      props.location.pathname == "/members" ||
-      props.location.pathname == "/activities" ||
-      props.location.pathname == "/loans" ||
-      props.location.pathname == "/"
+      props.location.pathname.includes("/members") ||
+      props.location.pathname.includes("/activities") ||
+      props.location.pathname.includes("/loans") ||
+      props.location.pathname.includes("/loanpurpose") ||
+      props.location.pathname === "/"
     ) {
       if (openMenu == true) {
         setOpenMenu(false);
@@ -219,9 +247,26 @@ function NavigationItems(props) {
               id="nested-list-subheader"
               button
               onClick={handleClick}
+              className={clsx(classes.masterMenuSubHeader, className)}
             >
-              <QueuePlayNextIcon></QueuePlayNextIcon>&nbsp; Masters
-              {openMenu ? <ExpandLess /> : <ExpandMore />}
+              <QueuePlayNextIcon
+                className={clsx(classes.masterMenuIcon, className)}
+              ></QueuePlayNextIcon>
+              <span
+                id="master-menu-label"
+                className={clsx(classes.masterMenuSpan, className)}
+              >
+                Masters{" "}
+              </span>
+              {openMenu ? (
+                <ExpandLess
+                  className={clsx(classes.masterMenuExtendIcon, className)}
+                />
+              ) : (
+                <ExpandMore
+                  className={clsx(classes.masterMenuExtendIcon, className)}
+                />
+              )}
             </ListSubheader>
           }
         >
@@ -229,7 +274,6 @@ function NavigationItems(props) {
         </List>
       </React.Fragment>
     );
-    // return nav1;
   };
 
   const renderSideMenu = () => {
@@ -313,7 +357,6 @@ function NavigationItems(props) {
     <Aux>
       <List component="nav" className={clsx(classes.root, className)}>
         {masterMenu()}
-        {/* {renderSideMenu()} */}
         {!isDesktop ? (
           <Aux>
             <NavigationItem
