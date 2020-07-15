@@ -152,9 +152,10 @@ export class Vos extends React.Component {
 
   handleStateChange = async (event, value, method) => {
     if (value !== null) {
-      this.setState({ filterState: value});
+      this.setState({ filterState: value });
       this.setState({
-        isCancel: false,filterDistrict:'',
+        isCancel: false,
+        filterDistrict: "",
       });
 
       let stateId = value.id;
@@ -190,7 +191,7 @@ export class Vos extends React.Component {
   };
   handleDistrictChange(event, value) {
     if (value !== null) {
-      this.setState({ filterDistrict: value});
+      this.setState({ filterDistrict: value });
       let distId = value.id;
     } else {
       this.setState({
@@ -289,7 +290,7 @@ export class Vos extends React.Component {
     this.componentDidMount();
   };
 
-   handleSearch() {
+  handleSearch() {
     let searchData = "";
     if (
       this.state.filterState ||
@@ -338,14 +339,14 @@ export class Vos extends React.Component {
         process.env.REACT_APP_SERVER_URL + "village-organizations" + searchData,
         {
           headers: {
-            Authorization: "Bearer " + auth.getToken() + ""
-          }
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
         }
       )
-      .then(res => {
+      .then((res) => {
         this.setState({ data: res.data });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log("err", err);
       });
   }
@@ -404,7 +405,9 @@ export class Vos extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}> Manage Village Organizations
+            <h1 className={style.title}>
+              {" "}
+              Manage Village Organizations
               <div className={classes.floatRow}>
                 <div className={classes.buttonRow}>
                   <Button
@@ -557,8 +560,8 @@ export class Vos extends React.Component {
                       value={
                         filterVillage
                           ? this.state.isCancel === true
-                          ? null
-                          :filterVillage
+                            ? null
+                            : filterVillage
                           : null
                       }
                       renderInput={(params) => (

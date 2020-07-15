@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import Layout from "../../hoc/Layout/Layout";
 import axios from "axios";
 import auth from "../../components/Auth/Auth";
+import IconButton from "@material-ui/core/IconButton";
+import { AddCircleOutlined, RemoveCircleOutlined } from "@material-ui/icons";
 import Button from "../../components/UI/Button/Button";
 import Autotext from "../../components/Autotext/Autotext.js";
 import Input from "../../components/UI/Input/Input";
@@ -27,7 +29,13 @@ class LoanpurposePage extends Component {
     super(props);
     this.state = {
       values: {},
-      emidetails: {},
+      // emId: "",
+      // taskId: ""
+      details: [],
+      addTask: [],
+      addPrincipal: [],
+      addInterest: [],
+      emidetails: [],
       loantasks: {},
       addPurpose: "",
       getState: [],
@@ -83,6 +91,8 @@ class LoanpurposePage extends Component {
         addEMI: [],
         addVillage: [],
         firstName: [],
+        addPrincipal: [],
+        addInterest: [],
       },
       bankErrors: {},
       taskErrors: {},
@@ -122,18 +132,21 @@ class LoanpurposePage extends Component {
               addDuration: res.data.duration,
               addSpecification: res.data.specification,
               addAmount: res.data.loan_amount,
-              // addFPO: res.data.fpo.id,
+              addFPO: res.data.fpo.id,
               addEMI: res.data.emi,
             },
           });
           if (res.data.emidetails) {
-            this.setState({
-              emidetails: {
-                // id: res.data.emidetails.id,
-                addPrincipal: res.data.emidetails[0].principal,
-                addInterest: res.data.emidetails[0].interest,
-              },
-            });
+            let getEmi = res.data.emidetails;
+            for (let i in getEmi) {
+              this.setState({
+                emidetails: {
+                  emId: res.data.emidetails[i].id,
+                  addPrincipal: res.data.emidetails[i].principal,
+                  addInterest: res.data.emidetails[i].interest,
+                },
+              });
+            }
           } else {
             this.setState({
               checkedB: false,
@@ -142,19 +155,23 @@ class LoanpurposePage extends Component {
           }
           console.log("----loan tasks---", res.data.loantasks[0].name);
           if (res.data.loantasks) {
-            this.setState({
-              loantasks: {
-                addTask: res.data.loantasks[0].name,
-              },
-            });
-            console.log(
-              "----values---",
-              this.state.values,
-              "emidetails---",
-              this.state.emidetails,
-              "---loantasks---",
-              this.state.loantasks
-            );
+            let getTasks = res.data.loantasks;
+            for (let i in getTasks) {
+              this.setState({
+                loantasks: {
+                  taskId: res.data.loantasks[i].id,
+                  addTask: res.data.loantasks[i].name,
+                },
+              });
+              console.log(
+                "----values---",
+                this.state.values,
+                "emidetails---",
+                this.state.emidetails,
+                "---loantasks---",
+                this.state.loantasks
+              );
+            }
           } else {
             this.setState({
               checkedB: false,
@@ -203,6 +220,52 @@ class LoanpurposePage extends Component {
       loantasks: { ...this.state.loantasks, [target.name]: target.value },
     });
   };
+  handleEMIChange(i, event) {
+    let addPrincipal = [...this.state.addPrincipal];
+    addPrincipal[i] = event.target.value;
+    console.log("---value--", event.target.value);
+    this.setState({ addPrincipal });
+    console.log("----addPrincipal--", addPrincipal);
+  }
+  handleInterestChange(i, event) {
+    let addInterest = [...this.state.addInterest];
+    addInterest[i] = event.target.value;
+    console.log("---value--", event.target.value);
+    this.setState({ addInterest });
+  }
+  handleDetailChange(i, event) {
+    // if (this.state.addPrincipal) {
+    let details = [...this.state.details];
+    details[i] = event.target.value;
+    this.setState({ details });
+    console.log("addTask---", details);
+    // }
+  }
+  addClick(event) {
+    this.setState((prevState) => ({ details: [...prevState.details, ""] }));
+    // this.setState({
+    // details: { ...this.state.details, [target.name]: target.value },
+    // });
+  }
+  addEmiClick() {
+    this.setState((prevState) => ({
+      addPrincipal: [...prevState.addPrincipal, ""],
+      addInterest: [...prevState.addInterest, ""],
+    }));
+  }
+  removeClick(i) {
+    let details = [...this.state.details];
+    details.splice(i, 1);
+    this.setState({ details });
+  }
+  removeEmiClick(i) {
+    let addPrincipal = [...this.state.addPrincipal];
+    addPrincipal.splice(i, 1);
+    this.setState({ addPrincipal });
+    let addInterest = [...this.state.addInterest];
+    addInterest.splice(i, 1);
+    this.setState({ addInterest });
+  }
 
   handleFpoChange(event, value) {
     if (value !== null) {
@@ -277,8 +340,8 @@ class LoanpurposePage extends Component {
     this.setState({
       emidetails: {
         id: this.state.emidetails.id,
-        addPrincipal: "",
-        addInterest: "",
+        // addPrincipal: "",
+        // addInterest: "",
       },
     });
     this.setState({ hasBankError: "" });
@@ -287,20 +350,17 @@ class LoanpurposePage extends Component {
     if (event.target.checked) {
       let validations = {
         addPrincipal: {
-          required: {
-            value: "true",
-            message: "Bank Account Name field required",
-          },
+          // required: {
+          //   value: "true",
+          //   message: "Bank Account Name field required",
+          // },
         },
-        addInterest: {
-          required: { value: "true", message: "Account Number field required" },
-        },
+        // addInterest: {
+        //   required: { value: "true", message: "Account Number field required" },
+        // },
       };
 
-      let errors = {
-        addPrincipal: [],
-        addInterest: [],
-      };
+      let errors = {};
 
       allValidations = { ...this.state.values.addVillage, ...validations };
       allErrors = { ...this.state.values.errors, ...errors };
@@ -321,9 +381,9 @@ class LoanpurposePage extends Component {
     this.validate();
     this.setState({ formSubmitted: "" });
     console.log("errors", this.state.errors);
-    // if (this.state.checkedB) {
-    //   this.bankValidate();
-    // }
+    if (this.state.checkedB) {
+      // this.bankValidate();
+    }
     // if (Object.keys(this.state.errors).length > 0) return;
     let productName = this.state.values.addPurpose;
     let addDuration = this.state.values.addDuration;
@@ -356,11 +416,10 @@ class LoanpurposePage extends Component {
           }
         )
         .then((res) => {
-          this.saveEmiDetails(
-            process.env.REACT_APP_SERVER_URL + "emidetails",
-            res.data.id
-          );
-          this.saveTaskDetails("url", res.data.id);
+          this.saveEmiDetails(res.data, res.data.id);
+          if (this.state.checkedTasks) {
+            this.saveTaskDetails(res.data, res.data.id);
+          }
           this.setState({ formSubmitted: true });
 
           // bankIds = res.data.id;
@@ -398,13 +457,10 @@ class LoanpurposePage extends Component {
           let bankId = res.data.id;
           this.setState({ bankDeatilsId: bankId });
           if (this.state.checkedB) {
-            this.saveEmiDetails(
-              process.env.REACT_APP_SERVER_URL + "emidetails",
-              res.data.id
-            );
+            this.saveEmiDetails(res.data, res.data.id);
           }
           if (this.state.checkedTasks) {
-            this.saveTaskDetails("url", res.data.id);
+            this.saveTaskDetails(res.data, res.data.id);
           }
           this.props.history.push({ pathname: "/loanpurposes", addData: true });
           this.setState({ formSubmitted: true });
@@ -417,57 +473,252 @@ class LoanpurposePage extends Component {
   };
 
   saveEmiDetails = async (data, Id) => {
-    let saveData = {
-      principal: this.state.values.addPrincipal,
-      interest: this.state.values.addInterest,
-      loan_model: Id,
-    };
-    if (data.emidetails) {
-      await axios
-        .put(process.env.REACT_APP_SERVER_URL + "emidetails/", saveData, {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        })
-        .then((res) => {})
-        .catch((error) => {
-          console.log(error);
-        });
+    let emiDet = this.state.emidetails;
+    console.log("emiDet---", emiDet, data);
+    for (let i in emiDet) {
+      console.log("i in this.state.emiDet----", i, emiDet);
+    }
+    let addPrincipal = this.state.addPrincipal;
+    for (let i in addPrincipal) {
+      console.log("i in this.state.addPrincipal----", i, addPrincipal);
+    }
+    if (data.emidetails.addPrincipal) {
+      if (this.state.checkedB) {
+        for (let i in addPrincipal) {
+          console.log(
+            "i in this.state.addPrincipal inside----",
+            addPrincipal[i],
+            this.state.addInterest[i]
+          );
+          await axios
+            .put(
+              process.env.REACT_APP_SERVER_URL + "emidetails/",
+              {
+                principal: this.state.addPrincipal[i],
+                interest: this.state.addInterest[i],
+                loan_model: Id,
+              },
+              {
+                headers: {
+                  Authorization: "Bearer " + auth.getToken() + "",
+                },
+              }
+            )
+            .then((res) => {})
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+      } else {
+        if (this.state.emidetails.emId) {
+          axios
+            .delete(
+              process.env.REACT_APP_SERVER_URL +
+                "emidetails/" +
+                this.state.emidetails.emId,
+              {
+                headers: {
+                  Authorization: "Bearer " + auth.getToken() + "",
+                },
+              }
+            )
+            .then((res) => {})
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+      }
     } else {
-      await axios
-        .post(process.env.REACT_APP_SERVER_URL + "emidetails/", saveData, {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        })
-        .then((res) => {})
-        .catch((error) => {
-          console.log(error);
-        });
+      for (let i in addPrincipal) {
+        console.log(
+          "i in this.state.addPrincipal inside----",
+          this.state.addPrincipal[i],
+          this.state.addInterest[i]
+        );
+        await axios
+          .post(
+            process.env.REACT_APP_SERVER_URL + "emidetails/",
+            {
+              principal: this.state.addPrincipal[i],
+              interest: this.state.addInterest[i],
+              loan_model: Id,
+            },
+            {
+              headers: {
+                Authorization: "Bearer " + auth.getToken() + "",
+              },
+            }
+          )
+          .then((res) => {})
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     }
   };
 
-  saveTaskDetails = async (url, Id) => {
-    let TaskName = this.state.values.addTask;
-    await axios
-      .post(
-        process.env.REACT_APP_SERVER_URL + "loantasks/",
-        {
-          name: TaskName,
-          loan_model: Id,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
+  saveTaskDetails = async (data, Id) => {
+    let TaskName = this.state.addTask;
+
+    if (data.loantasks) {
+      if (this.state.checkedTasks) {
+        for (let i in TaskName) {
+          await axios
+            .put(
+              process.env.REACT_APP_SERVER_URL + "loantasks/",
+              {
+                name: TaskName[i],
+                loan_model: Id,
+              },
+              {
+                headers: {
+                  Authorization: "Bearer " + auth.getToken() + "",
+                },
+              }
+            )
+            .then((res) => {})
+            .catch((error) => {
+              console.log(error);
+            });
         }
-      )
-      .then((res) => {})
-      .catch((error) => {
-        console.log(error);
-      });
+      } else {
+        if (this.state.loantasks.taskId) {
+          axios
+            .delete(
+              process.env.REACT_APP_SERVER_URL +
+                "loantasks/" +
+                this.state.loantasks.taskId,
+              {
+                headers: {
+                  Authorization: "Bearer " + auth.getToken() + "",
+                },
+              }
+            )
+            .then((res) => {})
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+      }
+    } else {
+      for (let i in TaskName) {
+        await axios
+          .post(
+            process.env.REACT_APP_SERVER_URL + "loantasks/",
+            {
+              name: TaskName[i],
+              loan_model: Id,
+            },
+            {
+              headers: {
+                Authorization: "Bearer " + auth.getToken() + "",
+              },
+            }
+          )
+          .then((res) => {})
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    }
   };
 
+  createUI() {
+    let checkedTasks = this.state.checkedTasks;
+    return this.state.details.map((el, i) => (
+      <div key={i}>
+        <Input
+          fullWidth
+          label="Task"
+          name="details"
+          disabled={checkedTasks ? false : true}
+          error={this.hasBankError("addTask")}
+          helperText={
+            this.hasBankError("addTask")
+              ? this.state.taskErrors.addTask[0]
+              : null
+          }
+          value={el || ""}
+          onChange={this.handleDetailChange.bind(this, i)}
+          variant="outlined"
+        />
+
+        <IconButton aria-label="remove" onClick={this.removeClick.bind(this)}>
+          <RemoveCircleOutlined />
+          Remove Task
+        </IconButton>
+      </div>
+    ));
+  }
+
+  createEmiUI() {
+    console.log(
+      "----- this.state.emidetails.addPrincipal",
+      this.state.emidetails.addPrincipal
+    );
+    return this.state.addPrincipal.map((el, i) => (
+      <div key={i}>
+        <Grid item md={6} xs={12}>
+          <Input
+            fullWidth
+            label="Principal"
+            type="number"
+            name="addPrincipal"
+            // disabled={checkedB ? false : true}
+            error={this.hasBankError("addPrincipal")}
+            helperText={
+              this.hasBankError("addPrincipal")
+                ? this.state.bankErrors.addPrincipal[0]
+                : null
+            }
+            value={
+              this.state.emidetails.addPrincipal
+                ? this.state.emidetails.addPrincipal
+                : el
+            }
+            onChange={this.handleEMIChange.bind(this, i)}
+            variant="outlined"
+          />
+        </Grid>
+        <IconButton
+          aria-label="remove"
+          onClick={this.removeEmiClick.bind(this)}
+        >
+          <RemoveCircleOutlined />
+          Remove Task
+        </IconButton>
+      </div>
+    ));
+  }
+
+  createInterestUI() {
+    return this.state.addInterest.map((el, i) => (
+      <div key={i}>
+        <Grid item md={6} xs={12}>
+          <Input
+            fullWidth
+            label="Interest"
+            type="number"
+            name="addInterest"
+            // disabled={checkedB ? false : true}
+            error={this.hasBankError("addInterest")}
+            helperText={
+              this.hasBankError("addInterest")
+                ? this.state.bankErrors.addInterest[0]
+                : null
+            }
+            value={
+              this.state.emidetails.addInterest
+                ? this.state.emidetails.addInterest
+                : el
+            }
+            onChange={this.handleInterestChange.bind(this, i)}
+            variant="outlined"
+          />
+        </Grid>
+      </div>
+    ));
+  }
   cancelForm = () => {
     this.setState({
       values: {},
@@ -479,7 +730,7 @@ class LoanpurposePage extends Component {
     let fpoFilters = this.state.getFPO;
     let addFPO = this.state.values.addFPO;
     let isCancel = this.state.isCancel;
-    let checked = this.state.checkedB;
+    let checkedB = this.state.checkedB;
     let checkedTasks = this.state.checkedTasks;
 
     return (
@@ -661,42 +912,16 @@ class LoanpurposePage extends Component {
 
                 {this.state.checkedB ? (
                   <Aux>
-                    <Grid item md={6} xs={12}>
-                      <Input
-                        fullWidth
-                        label="Principal"
-                        type="number"
-                        name="addPrincipal"
-                        // disabled={checked ? false : true}
-                        error={this.hasBankError("addPrincipal")}
-                        helperText={
-                          this.hasBankError("addPrincipal")
-                            ? this.state.bankErrors.addPrincipal[0]
-                            : null
-                        }
-                        value={this.state.emidetails.addPrincipal || ""}
-                        onChange={this.handleChange}
-                        variant="outlined"
-                      />
-                    </Grid>
-                    <Grid item md={6} xs={12}>
-                      <Input
-                        fullWidth
-                        label="Interest"
-                        type="number"
-                        name="addInterest"
-                        // disabled={checked ? false : true}
-                        error={this.hasBankError("addInterest")}
-                        helperText={
-                          this.hasBankError("addInterest")
-                            ? this.state.bankErrors.addInterest[0]
-                            : null
-                        }
-                        value={this.state.emidetails.addInterest || ""}
-                        onChange={this.handleChange}
-                        variant="outlined"
-                      />
-                    </Grid>
+                    {this.createEmiUI()}
+                    {this.createInterestUI()}
+                    {/* if(this.state.emidetails.addPrincipal){this.addEmiClick()} */}
+                    <IconButton
+                      aria-label="add"
+                      onClick={this.addEmiClick.bind(this)}
+                    >
+                      <AddCircleOutlined />
+                      Add EMI Details
+                    </IconButton>
                   </Aux>
                 ) : (
                   ""
@@ -722,21 +947,15 @@ class LoanpurposePage extends Component {
               {this.state.checkedTasks ? (
                 <Aux>
                   <Grid item md={12} xs={12}>
-                    <Input
-                      fullWidth
-                      label="Task"
-                      name="addTask"
-                      disabled={checkedTasks ? false : true}
-                      error={this.hasBankError("addTask")}
-                      helperText={
-                        this.hasBankError("addTask")
-                          ? this.state.taskErrors.addTask[0]
-                          : null
-                      }
-                      value={this.state.loantasks.addTask || ""}
-                      onChange={this.handleChange}
-                      variant="outlined"
-                    />
+                    {this.createUI()}
+
+                    <IconButton
+                      aria-label="add"
+                      onClick={this.addClick.bind(this)}
+                    >
+                      <AddCircleOutlined />
+                      Add Task
+                    </IconButton>
                   </Grid>
                 </Aux>
               ) : (

@@ -10,7 +10,8 @@
   },
   "attributes": {
     "loan_model": {
-      "model": "loanmodel"
+      "model": "loanmodel",
+      "via": "emidetails"
     },
     "principal": {
       "type": "decimal"

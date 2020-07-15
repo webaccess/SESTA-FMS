@@ -11,34 +11,34 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import { makeStyles } from "@material-ui/styles";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   editIcon: {
     color: "#028941",
     "&:hover": {
-      color: "#026430"
+      color: "#026430",
     },
     "&:active": {
-      color: "#03b053"
-    }
+      color: "#03b053",
+    },
   },
   deleteIcon: {
     color: "#e60000",
     "&:hover": {
-      color: "#b30000"
+      color: "#b30000",
     },
     "&:active": {
-      color: "#ff1a1a"
-    }
-  }
+      color: "#ff1a1a",
+    },
+  },
 }));
 
-const Table = props => {
+const Table = (props) => {
   const classes = useStyles();
   const [selectedRows, setSelectedRows] = React.useState([]);
-  const row = selectedRows.map(r => r.id);
+  const row = selectedRows.map((r) => r.id);
   const [cellId, setcellId] = React.useState([]);
   const [cellName, setcellName] = React.useState([]);
-  const handleChange = React.useCallback(state => {
+  const handleChange = React.useCallback((state) => {
     setSelectedRows(state.selectedRows);
   }, []);
   const deleteDataModal = (id, value) => {
@@ -52,7 +52,7 @@ const Table = props => {
   let dataName = cellName;
   let DataID = cellId;
 
-  const editData = id => {
+  const editData = (id) => {
     props.editData(id);
   };
 
@@ -65,9 +65,14 @@ const Table = props => {
   const handleActiveAllEvent = (event) => {
     let numberOfIsActive = [];
     for (let id in selected) {
-      numberOfIsActive.push(selected[id]['is_active'])
+      numberOfIsActive.push(selected[id]["is_active"]);
     }
-    props.ActiveAll(row, selected, numberOfIsActive, setisDeleteShowing(!isDeleteShowing))
+    props.ActiveAll(
+      row,
+      selected,
+      numberOfIsActive,
+      setisDeleteShowing(!isDeleteShowing)
+    );
     setSelectedRows([]);
   };
 
@@ -92,19 +97,19 @@ const Table = props => {
 
   const column = [
     {
-      cell: cell => (
-        <div onClick={event => editData(cell.id)} id={cell.id}>
+      cell: (cell) => (
+        <div onClick={(event) => editData(cell.id)} id={cell.id}>
           <IconButton aria-label="edit" value={cell[valueformodal]}>
             <EditIcon className={classes.editIcon} />
           </IconButton>
         </div>
       ),
-      button: true
+      button: true,
     },
     {
-      cell: cell => (
+      cell: (cell) => (
         <div
-          onClick={event => deleteDataModal(cell.id, cell[valueformodal])}
+          onClick={(event) => deleteDataModal(cell.id, cell[valueformodal])}
           id={cell.id}
         >
           <IconButton aria-label="delete">
@@ -112,11 +117,11 @@ const Table = props => {
           </IconButton>
         </div>
       ),
-      button: true
-    }
+      button: true,
+    },
   ];
 
-  const makeColumns = columns => {
+  const makeColumns = (columns) => {
     for (let Usercolumns in column) {
       columns.push(column[Usercolumns]);
     }
@@ -127,14 +132,9 @@ const Table = props => {
   let filteredData = [];
   const [data, setData] = React.useState(props.filterBy);
   if (props.filterData) {
+    console.log("props.data------", props.data);
     for (let values in data) {
-      filteredItems.push(
-        props.data.filter(
-          item =>
-            item[data[values]] &&
-            item[data[values]].toLowerCase().includes(filterText.toLowerCase())
-        )
-      );
+      filteredItems.push(props.data.filter((item) => item[data[values]]));
     }
     for (let i in filteredItems) {
       filteredData = filteredData.concat(filteredItems[i]);
@@ -157,7 +157,7 @@ const Table = props => {
   let SelectedId = selectedId.join("");
   let SelectedIds = SelectedId.substring(0, SelectedId.length - 1);
 
-  const onFilter = event => {
+  const onFilter = (event) => {
     setFilterText(event.target.value);
   };
 
@@ -180,18 +180,17 @@ const Table = props => {
           style={{ backgroundColor: "#d63447", color: "white" }}
         >
           Delete
-      </Button>
-       &nbsp;&nbsp;&nbsp;
-        {props.showSetAllActive ?
-          (<Button
+        </Button>
+        &nbsp;&nbsp;&nbsp;
+        {props.showSetAllActive ? (
+          <Button
             key="active"
             onClick={handleActive}
             style={{ backgroundColor: "primary", color: "white" }}
           >
             Active
-          </Button>)
-          : null}
-
+          </Button>
+        ) : null}
       </div>
     );
   }, [data, selectedRows, toggleCleared]);
@@ -219,8 +218,8 @@ const Table = props => {
             />
           </div>
         ) : (
-            <p></p>
-          )}
+          <p></p>
+        )}
         <Card>
           <DataTable
             data={filteredData}
@@ -241,10 +240,10 @@ const Table = props => {
               props.noDataComponent ? (
                 props.noDataComponent
               ) : (
-                  <p>
-                    There are no records to display in <b>{props.title}</b>
-                  </p>
-                )
+                <p>
+                  There are no records to display in <b>{props.title}</b>
+                </p>
+              )
             }
             noHeader={selected.length === 0 || selected.length < 2}
           />
@@ -261,7 +260,7 @@ const Table = props => {
             footerSaveName: "OKAY",
             footerCloseName: "CLOSE",
             displayClose: { display: "true" },
-            displaySave: { display: "true" }
+            displaySave: { display: "true" },
           }}
         >
           {selectedRows.length > 1 ? (
@@ -270,11 +269,11 @@ const Table = props => {
               Do you want to delete selected <b>{props.title}</b>
             </p>
           ) : (
-              <p>
-                {" "}
-                {props.DeleteMessage} <b>{dataName}</b> ?
-              </p>
-            )}
+            <p>
+              {" "}
+              {props.DeleteMessage} <b>{dataName}</b> ?
+            </p>
+          )}
         </Modal>
         <Modal
           className="modal"
@@ -288,13 +287,10 @@ const Table = props => {
             footerSaveName: "OKAY",
             footerCloseName: "CLOSE",
             displayClose: { display: "true" },
-            displaySave: { display: "true" }
+            displaySave: { display: "true" },
           }}
         >
-          <p>
-            {" "}
-            Are you sure you want to toggle the status ?
-          </p>
+          <p> Are you sure you want to toggle the status ?</p>
         </Modal>
       </div>
     </>

@@ -33,11 +33,13 @@
     "fpo": {
       "model": "contact"
     },
-    "loantasks": {
-      "collection": "loantask"
-    },
     "emidetails": {
+      "via": "loan_model",
       "collection": "emidetails"
+    },
+    "loantasks": {
+      "via": "loan_model",
+      "collection": "loantask"
     }
   }
 }

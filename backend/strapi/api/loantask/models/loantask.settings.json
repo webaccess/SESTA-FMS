@@ -10,7 +10,8 @@
   },
   "attributes": {
     "loan_model": {
-      "model": "loanmodel"
+      "model": "loanmodel",
+      "via": "loantasks"
     },
     "name": {
       "type": "string"

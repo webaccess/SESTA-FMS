@@ -164,6 +164,7 @@ class ShgPage extends Component {
       if (villageIds.indexOf(value[i].id) <= -1) villageValue.push(value[i]);
     }
     if (value !== null) {
+      console.log("villageValue--", villageValue);
       this.setState({
         values: { ...this.state.values, addVillage: villageValue },
       });

@@ -479,6 +479,36 @@ const modules = {
     order: 14,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
+  Loanpurposes: {
+    is_active: true,
+    icon_class: "people",
+    url: "/loanpurposes",
+    slug: "list_loanpurpose",
+    displayNavigation: true,
+    module: "", //slug
+    order: 15,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Add Loanpurpose": {
+    is_active: true,
+    icon_class: "",
+    url: "/loanpurpose/add",
+    slug: "add_loanpurpose",
+    displayNavigation: false,
+    module: "", //slug
+    order: 16,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Edit Loanpurpose": {
+    is_active: true,
+    icon_class: "",
+    url: "/loanpurpose/edit/:id",
+    slug: "edit_loanpurpose",
+    displayNavigation: false,
+    module: "", //slug
+    order: 17,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
 };
 
 module.exports = Object.freeze({

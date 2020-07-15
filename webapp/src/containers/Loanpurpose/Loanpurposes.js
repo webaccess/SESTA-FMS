@@ -63,13 +63,13 @@ export class Loanpurposes extends React.Component {
       DeleteData: false,
       properties: props,
       isCancel: false,
+      filterProduct: "",
       singleDelete: "",
       multipleDelete: "",
     };
 
     let history = props;
   }
-
   async componentDidMount() {
     //api call for loanpurpose filter
     await axios
@@ -80,14 +80,17 @@ export class Loanpurposes extends React.Component {
       })
       .then((res) => {
         this.setState({ data: res.data });
-        console.log("---data----", this.state.data);
+        console.log("---data in componentdidMount----", this.state.data);
       })
       .catch((error) => {
-        console.log("---data----", this.state.data);
         console.log(error);
       });
     console.log("---data----", this.state.data);
   }
+
+  handleChange = (event, value) => {
+    this.setState({ filterProduct: event.target.value });
+  };
 
   editData = (cellid) => {
     this.props.history.push("/loanpurpose/edit/" + cellid);
@@ -99,18 +102,25 @@ export class Loanpurposes extends React.Component {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
       axios
-        .delete(
-          process.env.REACT_APP_SERVER_URL +
-            JSON.parse(process.env.REACT_APP_CONTACT_TYPE)["Organization"][0] +
-            "s/" +
-            cellid,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
-        )
+        .delete(process.env.REACT_APP_SERVER_URL + "loanmodels/" + cellid, {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
+        })
         .then((res) => {
+          console.log("--Inside delete data---");
+          console.log(
+            "res.data.emidetails.id---",
+            res.data.emidetails.id,
+            "res.data.emidetails.id",
+            res.data.emidetails[0].id
+          );
+          if (res.data.emidetails) {
+            this.deleteEmiDet(res.data.emidetails);
+          }
+          if (res.data.loantasks) {
+            this.deleteTaskDet(res.data.loantasks[0].id);
+          }
           this.setState({ singleDelete: res.data.name });
           this.componentDidMount();
         })
@@ -120,18 +130,45 @@ export class Loanpurposes extends React.Component {
         });
     }
   };
+
+  deleteEmiDet = (emiDet) => {
+    console.log("emiDet---", emiDet);
+    for (let i in emiDet) {
+      axios
+        .delete(
+          process.env.REACT_APP_SERVER_URL + "emidetails/" + emiDet[i].id,
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
+          }
+        )
+        .then((res) => {})
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  };
+
+  deleteTaskDet = (id) => {
+    axios
+      .delete(process.env.REACT_APP_SERVER_URL + "loantasks/" + id, {
+        headers: {
+          Authorization: "Bearer " + auth.getToken() + "",
+        },
+      })
+      .then((res) => {})
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       for (let i in selectedId) {
         axios
           .delete(
-            process.env.REACT_APP_SERVER_URL +
-              JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
-                "Organization"
-              ][0] +
-              "s/" +
-              selectedId[i],
+            process.env.REACT_APP_SERVER_URL + "loanmodels/" + selectedId[i],
             {
               headers: {
                 Authorization: "Bearer " + auth.getToken() + "",
@@ -139,6 +176,19 @@ export class Loanpurposes extends React.Component {
             }
           )
           .then((res) => {
+            console.log("--Inside delete all---");
+            console.log(
+              "res.data.emidetails.id---",
+              res.data.emidetails.id,
+              "res.data.emidetails.id",
+              res.data.emidetails[0].id
+            );
+            if (res.data.emidetails) {
+              this.deleteEmiDet(res.data.emidetails);
+            }
+            if (res.data.loantasks[0].id) {
+              this.deleteTaskDet(res.data.loantasks[0].id);
+            }
             this.setState({ multipleDelete: true });
             this.componentDidMount();
           })
@@ -152,36 +202,62 @@ export class Loanpurposes extends React.Component {
   };
   cancelForm = () => {
     this.setState({
+      filterProduct: "",
       isCancel: true,
     });
 
     this.componentDidMount();
   };
 
-  handleSearch() {}
+  handleSearch() {
+    if (this.state.filterProduct) {
+      //call api for searching product name
+      axios
+        .get(
+          process.env.REACT_APP_SERVER_URL +
+            "loanmodels?product_name_contains=" +
+            this.state.filterProduct,
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken() + "",
+            },
+          }
+        )
+        .then((res) => {
+          console.log("--data after search ----", res.data);
+          this.setState({ data: res.data });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }
 
   render() {
     let data = this.state.data;
-    console.log("---data in render--", data, this.state.data);
-    if (data.length !== 0) {
+    if (this.state.data.length > 0) {
     }
-
+    console.log("---data in render--", data, this.state.data);
     const Usercolumns = [
       {
-        name: "Name of the Purpose",
+        name: "Name of the Product",
         selector: "product_name",
+        sortable: true,
       },
       {
         name: "Duration(months)",
         selector: "duration",
+        sortable: true,
       },
       {
         name: "EMI",
         selector: "emi",
+        sortable: true,
       },
       {
         name: "FPO",
-        selector: "fpo",
+        selector: "fpo.name",
+        sortable: true,
       },
     ];
 
@@ -190,7 +266,7 @@ export class Loanpurposes extends React.Component {
       selectors.push(Usercolumns[i]["selector"]);
     }
 
-    let columnsvalue = [0];
+    let columnsvalue = selectors[0];
     const { classes } = this.props;
 
     return (
@@ -249,11 +325,11 @@ export class Loanpurposes extends React.Component {
                   <Grid item md={12} xs={12}>
                     <Input
                       fullWidth
-                      label="Purpose"
-                      name=""
+                      label="Product Name"
+                      name="filterProduct"
                       id="combo-box-demo"
-                      value={""}
-                      // onChange={this.handleChange.bind(this)}
+                      value={this.state.filterProduct || ""}
+                      onChange={this.handleChange.bind(this)}
                       variant="outlined"
                     />
                   </Grid>
@@ -282,7 +358,7 @@ export class Loanpurposes extends React.Component {
                 filterData={true}
                 showSearch={false}
                 Searchplaceholder={"Search by loan purpose"}
-                filterBy={["name"]}
+                filterBy={["product_name", "duration", "emi", "FPO"]}
                 data={data}
                 column={Usercolumns}
                 editData={this.editData}
