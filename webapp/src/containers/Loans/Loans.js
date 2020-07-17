@@ -9,7 +9,7 @@ import Autocomplete from "../../components/Autocomplete/Autocomplete";
 import Button from "../../components/UI/Button/Button";
 import Table from "../../components/Datatable/Datatable.js";
 import auth from "../../components/Auth/Auth.js";
-
+import Moment from 'moment';
 
 const useStyles = (theme) => ({
   root: {},
@@ -57,19 +57,20 @@ export class Loans extends React.Component {
     super(props);
     this.state = {
       data: [],
-      getSHG: [],
+      getShg: [],
       getStatus: [
-        {'id':1, 'name': 'UnderReview'},
-        {'id':2, 'name': 'Approved'},
-        {'id':3, 'name': 'Denied'},
-        {'id':4, 'name': 'Cancelled'}
+        { 'id': 1, 'name': 'UnderReview' },
+        { 'id': 2, 'name': 'Approved' },
+        { 'id': 3, 'name': 'Denied' },
+        { 'id': 4, 'name': 'Cancelled' }
       ],
       loanStatus: [],
       isCancel: false,
       values: {},
-      filterStatus : "",
+      filterStatus: "",
+      filterShg: "",
       properties: props,
-     };
+    };
   }
 
   async componentDidMount() {
@@ -80,33 +81,54 @@ export class Loans extends React.Component {
         },
       })
       .then((res) => {
+        let amount_due;
+        res.data.map(installment => {
+          let payment_date = installment.loan_application_installment.payment_date;
+          amount_due = installment.loan_application_installment.expected_interest + installment.loan_application_installment.expected_principal;
+          installment.loan_application_installment.amount_due = amount_due;
+          installment.loan_application_installment.payment_date = Moment(payment_date).format('DD MMM YYYY');;
+        });
         this.setState({ data: res.data });
       });
 
-    await axios
-      .get(process.env.REACT_APP_SERVER_URL + "loan-application-tasks", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+    // get all SHGs
+    axios
+      .get(
+        process.env.REACT_APP_SERVER_URL +
+        "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG",
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
+        }
+      )
       .then((res) => {
-        this.setState({ loanStatus: res.data });
+        this.setState({ getShg: res.data });
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }
 
   handleSearch() {
     let searchData = "";
     if (this.state.values.addMember) {
-      searchData += "loan_model.product_name_contains=" + this.state.values.addMember + "&&";
+      searchData += searchData ? "&&" : "";
+      searchData += "contact.name_contains=" + this.state.values.addMember;
     }
     if (this.state.filterStatus) {
+      searchData += searchData ? "&&" : "";
       searchData += "status=" + this.state.filterStatus.name;
     }
+    // if (this.state.filterShg) {
+    //   searchData += searchData ? "&&" : "";
+    //   searchData += "individual.shg=" + this.state.filterShg.id;
+    // }
     axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-          "loan-applications?" +
-          searchData ,
+        "loan-applications?" +
+        searchData,
         {
           headers: {
             Authorization: "Bearer " + auth.getToken() + "",
@@ -136,7 +158,7 @@ export class Loans extends React.Component {
       values: { ...this.state.values, [event.target.name]: event.target.value },
     });
   }
-  handleStatusChange= async (event, value) => {
+  handleStatusChange = async (event, value) => {
     if (value !== null) {
       this.setState({ filterStatus: value, isCancel: false });
     } else {
@@ -152,18 +174,28 @@ export class Loans extends React.Component {
     this.props.history.push("/loans/view/:id");
   };
 
+  handleShgChange(event, value) {
+    if (value !== null) {
+      this.setState({ filterShg: value, isCancel: false });
+    } else {
+      this.setState({
+        filterShg: "",
+      });
+    }
+  }
+
   render() {
     const { classes } = this.props;
     let data = this.state.data;
-    let loanStatus = this.state.loanStatus;
-    let shgFilter = this.state.getSHG;
+    let shgFilter = this.state.getShg;
+    let filterShg = this.state.filterShg;
     let statusFilter = this.state.getStatus;
     let filterStatus = this.state.filterStatus;
     let filters = this.state.values;
     const Usercolumns = [
       {
         name: "Member Name",
-        selector: "loan_model.product_name",
+        selector: "contact.name",
         sortable: true,
       },
       {
@@ -186,11 +218,11 @@ export class Loans extends React.Component {
         selector: "status",
         sortable: true,
       },
-      // {
-      //   name: "Amount Due",
-      //   selector: "loan.amount_due",
-      //   sortable: true,
-      // },
+      {
+        name: "Amount Due",
+        selector: "loan_application_installment.amount_due",
+        sortable: true,
+      },
       {
         name: "Installment Date",
         selector: "loan_application_installment.payment_date",
@@ -231,7 +263,7 @@ export class Loans extends React.Component {
                 </Grid>
               </div>
             </div>
-            
+
             <div className={classes.searchInput}>
               <div className={style.Districts}>
                 <Grid item md={12} xs={12}>
@@ -239,13 +271,22 @@ export class Loans extends React.Component {
                     id="combo-box-demo"
                     options={shgFilter}
                     getOptionLabel={(option) => option.name}
-                    value={""}
+                    onChange={(event, value) => {
+                      this.handleShgChange(event, value);
+                    }}
+                    value={
+                      filterShg
+                        ? this.state.isCancel === true
+                          ? null
+                          : filterShg
+                        : null
+                    }
                     renderInput={(params) => (
                       <Input
                         {...params}
                         fullWidth
                         label="SHG Name"
-                        name="shgName"
+                        name="filterShg"
                         variant="outlined"
                       />
                     )}
@@ -268,7 +309,7 @@ export class Loans extends React.Component {
                       filterStatus
                         ? this.state.isCancel === true
                           ? null
-                          :filterStatus
+                          : filterStatus
                         : null
                     }
                     renderInput={(params) => (
@@ -299,8 +340,8 @@ export class Loans extends React.Component {
               showSearch={false}
               filterData={true}
               // noDataComponent={"No Records To be shown"}
-              Searchplaceholder={"Seacrh by Product name"}
-              filterBy={["loan_model.product_name", "purpose", "application_date", "loan_model.loan_amount", "status", "loan_application_installment.payment_date"]}
+              Searchplaceholder={"Seacrh by Member name"}
+              filterBy={["contact.name", "purpose", "application_date", "loan_model.loan_amount", "status", "loan_application_installment.amount_due", "loan_application_installment.payment_date"]}
               filters={filters}
               data={data}
               column={Usercolumns}
@@ -314,9 +355,9 @@ export class Loans extends React.Component {
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (
-            <h1>Loading...</h1>
-          )}
-        
+              <h1>Loading...</h1>
+            )}
+
         </Grid>
       </Layout>
     );

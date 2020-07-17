@@ -20,9 +20,7 @@ table {
   border-collapse: collapse;
 }
 
-table,
-th,
-td {
+table, th, td {
   /* font-size:"11px"; */
   border: 1px solid lightgray;
   border-radius: 3px;
@@ -35,5 +33,16 @@ td {
   top: 20px;
 }
 td {
-  font-size: 11px;
+  font-size:11px;
+}
+
+th, td {
+  border: 0px solid black;
+  border-collapse: collapse;
+}
+
+tr {
+  border: 1px solid lightgray;
+  border-collapse: collapse;
+  background-color:"#dddddd";
 }

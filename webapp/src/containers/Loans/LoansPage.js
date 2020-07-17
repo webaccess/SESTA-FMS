@@ -16,12 +16,13 @@ import {
   Grid,
 } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
-import PersonIcon from "@material-ui/icons/Person";
-import PeopleIcon from "@material-ui/icons/People";
-import HomeIcon from "@material-ui/icons/Home";
-import MoneyIcon from "@material-ui/icons/Money";
-import HomeWorkIcon from "@material-ui/icons/HomeWork";
-import TextField from "@material-ui/core/TextField";
+import PersonIcon from '@material-ui/icons/Person';
+import PeopleIcon from '@material-ui/icons/People';
+import HomeIcon from '@material-ui/icons/Home';
+import MoneyIcon from '@material-ui/icons/Money';
+import HomeWorkIcon from '@material-ui/icons/HomeWork';
+import TextField from '@material-ui/core/TextField';
+import Button from "../../components/UI/Button/Button";
 
 const useStyles = (theme) => ({
   root: {},
@@ -66,38 +67,37 @@ const useStyles = (theme) => ({
     fontSize: "40px",
     color: "#008000",
     "&:hover": {
-      color: "#008000",
+      color: "#008000"
     },
     "&:active": {
-      color: "#008000",
-    },
+      color: "#008000"
+    }
   },
   loan: {
     position: "relative",
-    top: "20px",
+    top: "20px"
   },
   member: {
-    fontSize: "11px",
-    color: "#000000",
+    fontSize: "11px"
   },
   memberData: {
-    fontSize: "20px",
+    fontSize: "20px"
   },
   tableData: {
     // padding: "1px",
     width: "100%",
     border: "0px solid black",
-    borderCollapse: "collapse",
+    borderCollapse: "collapse"
   },
   thData: {
     padding: "5px",
-    textAlign: "left",
+    textAlign: "left"
   },
   mainContent: {
-    padding: "25px",
+    padding: "25px"
   },
   purposeCard: {
-    padding: "20px",
+    padding: "20px"
   },
 });
 
@@ -111,7 +111,10 @@ class LoansPage extends Component {
       loan_app: [],
       loan_installments: [],
       shgUnderVo: [],
-    };
+      handlePurposeChange: "",
+      isCancel: false,
+      formSubmitted: "",
+    }
   }
 
   async componentDidMount() {
@@ -122,8 +125,7 @@ class LoansPage extends Component {
     await axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&id=" +
-          shgid,
+        "crm-plugin/contact/?contact_type=organization&id=" + shgid,
         {
           headers: {
             Authorization: "Bearer " + auth.getToken() + "",
@@ -141,8 +143,7 @@ class LoansPage extends Component {
     await axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?id=" +
-          VoContactId,
+        "crm-plugin/contact/?id=" + VoContactId,
         {
           headers: {
             Authorization: "Bearer " + auth.getToken() + "",
@@ -164,22 +165,9 @@ class LoansPage extends Component {
 
     // get shg/vo from Individual model
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals/" + url, {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
-      .then((res) => {
-        this.setState({ getShgVo: res.data });
-      });
-
-    // get purpose from loan application model
-    let memberId = this.props.location.state.id;
-    await axios
       .get(
         process.env.REACT_APP_SERVER_URL +
-          "loan-applications/?contact.id=" +
-          memberId,
+        "crm-plugin/individuals/" + url,
         {
           headers: {
             Authorization: "Bearer " + auth.getToken() + "",
@@ -187,42 +175,124 @@ class LoansPage extends Component {
         }
       )
       .then((res) => {
-        this.setState({ loan_app: res.data });
+        this.setState({ getShgVo: res.data });
       });
 
-    // get details of emi installments
+    // get purpose from loan application model
+    let memberId = this.props.location.state.id;
     await axios
-      .get(process.env.REACT_APP_SERVER_URL + "loan-application-installments", {
+      // .get(process.env.REACT_APP_SERVER_URL + "loan-applications/?contact.id=" + memberId, {
+      .get(process.env.REACT_APP_SERVER_URL + "loan-applications/?_sort=id:ASC", {
         headers: {
           Authorization: "Bearer " + auth.getToken() + "",
         },
       })
       .then((res) => {
-        this.setState({ loan_installments: res.data });
+        this.setState({ loan_app: res.data });
+        this.setState({ loan_installments: res.data[0].loan_app_installments });
       })
-      .catch((error) => {
-        console.log(error);
+
+
+  }
+
+  handleFieldChange = (event, value) => {
+    if (value != null) {
+      this.setState({ handlePurposeChange: value, isCancel: false });
+    } else {
+      this.setState({ handlePurposeChange: "" });
+    }
+  }
+
+  SaveData() {
+    // save loan application to contact
+    let loan_application_data = [];
+    let assignLoanAppValues;
+    let postData = this.props.location.state;
+    delete postData.individual;
+    delete postData.user;
+    if (this.state.handlePurposeChange) {
+      assignLoanAppValues = this.state.handlePurposeChange;
+    } else {
+      assignLoanAppValues = this.state.loan_app[0];
+    }
+
+    loan_application_data = {
+      id: assignLoanAppValues.id,
+      loan_model: assignLoanAppValues.assignLoanAppValues,
+      application_no: assignLoanAppValues.application_no,
+      application_date: assignLoanAppValues.application_date,
+      approved_by: assignLoanAppValues.approved_by,
+      approved_date: assignLoanAppValues.approved_date,
+      loan_application_task: assignLoanAppValues.loan_application_task,
+      purpose: assignLoanAppValues.purpose,
+      review_comments: assignLoanAppValues.review_comments,
+      status: assignLoanAppValues.status,
+    };
+
+    if (postData.loan_applications && postData.loan_applications.length) {
+      postData.loan_applications.map(loanapp => {
+        if (assignLoanAppValues.id === loanapp.id) {
+        } else {
+          postData.loan_applications.push(loan_application_data);
+        }
+      })
+    } else {
+      postData.loan_applications.push(loan_application_data);
+    }
+
+    axios
+      .put(
+        process.env.REACT_APP_SERVER_URL +
+        "crm-plugin/contact/" + postData.id,
+        postData,
+        {
+          headers: {
+            Authorization: "Bearer " + auth.getToken() + "",
+          },
+        }
+      )
+      .then((res) => {
+        this.setState({ formSubmitted: true });
       });
   }
 
+  cancelForm = () => {
+    this.setState({
+      values: {},
+      formSubmitted: "",
+      isCancel: true,
+    });
+    this.componentDidMount();
+    //routing code #route to loan_application_list page
+  };
+
   render() {
     const { classes } = this.props;
+    // store memberData(props.history.push) from member page
     let data = this.props.location.state;
     let shgName, voName, loan_app_purpose, loan_amnt, duration, specification;
     let loan_app = this.state.loan_app;
-    let loan_installments = this.state.loan_installments;
-    this.state.loan_app.map((lap) => {
-      loan_app_purpose = lap.purpose;
-      loan_amnt = lap.loan_model.loan_amount;
-      duration = lap.loan_model.duration;
-      specification = lap.loan_model.specification;
+    let handlePurposeChange = this.state.handlePurposeChange;
+    this.state.loan_app.map(lap => {
+      if (handlePurposeChange) {
+        if (lap.id == this.state.handlePurposeChange.id) {
+          loan_amnt = lap.loan_model.loan_amount;
+          duration = lap.loan_model.duration;
+          specification = lap.loan_model.specification;
+          this.state.loan_installments = lap.loan_app_installments;
+        }
+      } else {
+        loan_amnt = loan_app[0].loan_model.loan_amount;
+        duration = loan_app[0].loan_model.duration;
+        specification = loan_app[0].loan_model.specification;
+      }
     });
-    this.state.getShgVo.map((shgvo) => {
+    this.state.getShgVo.map(shgvo => {
       shgName = shgvo.shg.name;
       voName = shgvo.vo.name;
     });
     let shgUnderVo;
-    this.state.shgUnderVo.map((vo) => {
+    this.state.shgUnderVo.map(vo => {
       shgUnderVo = vo.name;
     });
     let filters = this.state.values;
@@ -231,7 +301,7 @@ class LoansPage extends Component {
         name: "Name",
         selector: "name",
         sortable: true,
-      },
+      }
     ];
     let selectors = [];
     for (let i in Usercolumns) {
@@ -243,65 +313,48 @@ class LoansPage extends Component {
         <Grid>
           <div className="App">
             <h5 className={style.loan}>LOAN</h5>
-            <h2 className={style.title}>Apply for Loan</h2>
+            <h2 className={style.title}>
+              Apply for Loan
+            </h2>
             <h4 align="right">Birangana Women Producers Company Pvt. Ltd</h4>
 
             <Card className={classes.mainContent}>
               <Grid>
                 <IconButton aria-label="view">
                   <PersonIcon className={classes.Icon} />
-                  <b>
-                    <div className={classes.member}>
-                      LOANEE
-                      <br />
-                      {data.name}
-                    </div>
-                  </b>
+                  <b><div className={classes.member}>LOANEE<br />{data.name}</div></b>
                 </IconButton>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <IconButton aria-label="view">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <IconButton aria-label="view">
                   <PeopleIcon className={classes.Icon} />
-                  <b>
-                    <div className={classes.member}>
-                      SHG GROUP <br />
-                      {shgName}
-                    </div>
-                  </b>
+                  <b><div className={classes.member}>SHG GROUP <br />{shgName}</div></b>
                 </IconButton>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <IconButton aria-label="view">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <IconButton aria-label="view">
                   <HomeIcon className={classes.Icon} />
-                  <b>
-                    <div className={classes.member}>
-                      VILLAGE <br />
-                      {data.villages[0].name}
-                    </div>
-                  </b>
+                  <b><div className={classes.member}>VILLAGE <br />{data.villages[0].name}</div></b>
                 </IconButton>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <IconButton aria-label="view">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <IconButton aria-label="view">
                   <HomeWorkIcon className={classes.Icon} />
-                  <b>
-                    <div className={classes.member}>
-                      VILLAGE ORGANIZATION <br />
-                      {shgUnderVo}
-                    </div>
-                  </b>
+                  <b><div className={classes.member}>VILLAGE ORGANIZATION <br />{shgUnderVo}</div></b>
                 </IconButton>
               </Grid>
 
               <Divider />
               <Grid className={classes.purposeCard}>
-                <Grid item xs={12} style={{ width: "66%" }}>
+                <Grid item xs={12} style={{ width: "74%" }}>
                   <Autocomplete
                     id="combo-box-demo"
-                    disabled={true}
+                    disabled={false}
                     options={loan_app}
-                    getOptionDisabled={(option) => option}
-                    getOptionLabel={(option) =>
-                      option ? loan_app_purpose : ""
-                    }
-                    disabled={{ autoComplete: "nope" }}
+                    getOptionLabel={(option) => option.purpose}
+                    onChange={(event, value) => {
+                      this.handleFieldChange(event, value);
+                    }}
+                    value={handlePurposeChange ? loan_app[loan_app.findIndex(function (item, i) {
+                      return item.id == handlePurposeChange.id;
+                    })] : loan_app[0]}
                     renderInput={(params) => (
                       <Input
                         {...params}
@@ -320,7 +373,7 @@ class LoansPage extends Component {
               <Grid className={classes.purposeCard}>
                 <table style={{ padding: "20px" }}>
                   <tr>
-                    <td style={{ paddingBottom: "130px" }}>
+                    <td style={{ paddingBottom: "179px" }}>
                       <table>
                         <tr>
                           <td>
@@ -328,134 +381,56 @@ class LoansPage extends Component {
                           </td>
                         </tr>
                         <tr>
-                          <td>
-                            <b>
-                              Loan Amount <br /> Rs. {loan_amnt}{" "}
-                            </b>
-                            <br />
-                            <br />
-                            <b>
-                              Duration <br /> {duration} Months{" "}
-                            </b>
-                            <br />
-                            <br />
-                            <b>
-                              Area/Size/Specifications <br /> {specification}{" "}
-                            </b>
-                            <br />
-                            <br />
+                          <td >
+                            <b>Loan Amount <br /> Rs. {loan_amnt} </b><br /><br />
+                            <b>Duration <br /> {duration} Months </b><br /><br />
+                            <b>Area/Size/Specifications <br /> {specification} </b><br /><br />
                           </td>
                         </tr>
                       </table>
                     </td>
 
-                    <td style={{ paddingBottom: "60px" }}>
-                      <b>
-                        <table style={{ width: "100%", height: "100%" }}>
-                          <tr
-                            style={{
-                              border: "1px solid lightgray",
-                              borderCollapse: "collapse",
-                            }}
-                          >
-                            <td
-                              style={{
-                                border: "0px solid black",
-                                borderCollapse: "collapse",
-                              }}
-                            >
-                              EMI Installment
-                            </td>
-                            <td
-                              style={{
-                                border: "0px solid black",
-                                borderCollapse: "collapse",
-                              }}
-                            ></td>
-                            <td
-                              style={{
-                                border: "0px solid black",
-                                borderCollapse: "collapse",
-                              }}
-                            >
-                              Amount in rupees
-                            </td>
+                    <td style={{ paddingBottom: "50px" }}>
+                      <b><table style={{ width: "100%", height: "100%" }}>
+                        <tr>
+                          <td>EMI Installment</td>
+                          <td></td>
+                          <td>Amount in rupees</td>
+                        </tr>
+                        <tr style={{ backgroundColor: "#dddddd" }}>
+                          <th>Due Date</th>
+                          <th>Principle</th>
+                          <th>Interest</th>
+                        </tr>
+                        {this.state.loan_installments ? this.state.loan_installments.map(row => (
+                          <tr>
+                            <td>{row.payment_date}</td>
+                            <td>{row.actual_principal}</td>
+                            <td>{row.actual_interest}</td>
                           </tr>
-                          <tr
-                            style={{
-                              border: "0px solid black",
-                              borderCollapse: "collapse",
-                              backgroundColor: "#dddddd",
-                            }}
-                          >
-                            <th
-                              style={{
-                                border: "0px solid black",
-                                borderCollapse: "collapse",
-                              }}
-                            >
-                              Due Date
-                            </th>
-                            <th
-                              style={{
-                                border: "0px solid black",
-                                borderCollapse: "collapse",
-                              }}
-                            >
-                              Principle
-                            </th>
-                            <th
-                              style={{
-                                border: "0px solid black",
-                                borderCollapse: "collapse",
-                              }}
-                            >
-                              Interest
-                            </th>
-                          </tr>
-                          {loan_installments.map((row) => (
-                            <tr
-                              style={{
-                                border: "1px solid lightgray",
-                                borderCollapse: "collapse",
-                              }}
-                            >
-                              <td
-                                style={{
-                                  border: "0px solid black",
-                                  borderCollapse: "collapse",
-                                }}
-                              >
-                                {row.payment_date}
-                              </td>
-                              <td
-                                style={{
-                                  border: "0px solid black",
-                                  borderCollapse: "collapse",
-                                }}
-                              >
-                                {row.expected_principal}
-                              </td>
-                              <td
-                                style={{
-                                  border: "0px solid black",
-                                  borderCollapse: "collapse",
-                                }}
-                              >
-                                {row.expected_interest}
-                              </td>
-                            </tr>
-                          ))}
-                        </table>
-                      </b>
+                        )) : null}
+                      </table></b>
                     </td>
                   </tr>
                 </table>
               </Grid>
+              <Divider />
+
+              <br />
+              <Grid>
+                <Button onClick={this.SaveData.bind(this)}>Save</Button>
+                &nbsp;&nbsp;&nbsp;
+                <Button color="secondary" clicked={this.cancelForm}>
+                  Cancel
+                </Button>
+              </Grid>
             </Card>
+
           </div>
         </Grid>
       </Layout>
+
+
     );
   }
 }
