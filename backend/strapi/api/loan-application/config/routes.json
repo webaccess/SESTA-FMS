@@ -10,6 +10,14 @@
     },
     {
       "method": "GET",
+      "path": "/loan-applications-print",
+      "handler": "loan-application.printPDF",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
       "path": "/loan-applications/count",
       "handler": "loan-application.count",
       "config": {
