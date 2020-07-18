@@ -23,6 +23,8 @@ import MoneyIcon from '@material-ui/icons/Money';
 import HomeWorkIcon from '@material-ui/icons/HomeWork';
 import TextField from '@material-ui/core/TextField';
 import Button from "../../components/UI/Button/Button";
+import Moment from 'moment';
+import Snackbar from "../../components/UI/Snackbar/Snackbar";
 
 const useStyles = (theme) => ({
   root: {},
@@ -78,6 +80,7 @@ const useStyles = (theme) => ({
     top: "20px"
   },
   member: {
+    color: "black",
     fontSize: "11px"
   },
   memberData: {
@@ -113,15 +116,18 @@ class LoansPage extends Component {
       shgUnderVo: [],
       handlePurposeChange: "",
       isCancel: false,
-      formSubmitted: "",
+      loanApplied: "",
+      loanNotApplied: "",
+      loanAlreadyApplied: "",
     }
   }
 
   async componentDidMount() {
-    let url, VoOrg;
-    let shgid = this.props.location.state.individual.shg;
-    let VOid = this.props.location.state.individual.vo;
-
+    let url, VoOrg, shgid, VOid;
+    if (this.props.location.state.hasOwnProperty('individual')) {
+      shgid = this.props.location.state.individual.shg;
+      VOid = this.props.location.state.individual.vo;
+    }
     await axios
       .get(
         process.env.REACT_APP_SERVER_URL +
@@ -139,7 +145,10 @@ class LoansPage extends Component {
         console.log(error);
       });
 
-    let VoContactId = VoOrg[0].organization.vo;
+    let VoContactId;
+    if (VoOrg) {
+      VoContactId = VoOrg[0].organization.vo;
+    }
     await axios
       .get(
         process.env.REACT_APP_SERVER_URL +
@@ -210,6 +219,7 @@ class LoansPage extends Component {
     let postData = this.props.location.state;
     delete postData.individual;
     delete postData.user;
+    this.state.loanApplied = false;
     if (this.state.handlePurposeChange) {
       assignLoanAppValues = this.state.handlePurposeChange;
     } else {
@@ -232,14 +242,22 @@ class LoansPage extends Component {
     if (postData.loan_applications && postData.loan_applications.length) {
       postData.loan_applications.map(loanapp => {
         if (assignLoanAppValues.id === loanapp.id) {
-        } else {
+          this.setState({ loanAlreadyApplied: true });
+        }
+        else {
           postData.loan_applications.push(loan_application_data);
+          this.saveApplyLoan(postData);
+          this.setState({ loanApplied: true });
         }
       })
     } else {
       postData.loan_applications.push(loan_application_data);
+      this.saveApplyLoan(postData);
+      this.setState({ loanApplied: true });
     }
+  }
 
+  saveApplyLoan(postData) {
     axios
       .put(
         process.env.REACT_APP_SERVER_URL +
@@ -252,8 +270,12 @@ class LoansPage extends Component {
         }
       )
       .then((res) => {
-        this.setState({ formSubmitted: true });
-      });
+        this.setState({ loanApplied: true });
+        this.setState({ loanAlreadyApplied: false });
+      })
+      .catch((error) => {
+        this.setState({ loanNotApplied: true });
+      })
   }
 
   cancelForm = () => {
@@ -268,9 +290,12 @@ class LoansPage extends Component {
 
   render() {
     const { classes } = this.props;
+    let shgName, voName, loan_amnt, duration, specification;
+    let payment_date, expected_principal, expected_interest, loan_purpose;
+    let loan_installments = this.state.loan_installments;
+
     // store memberData(props.history.push) from member page
     let data = this.props.location.state;
-    let shgName, voName, loan_app_purpose, loan_amnt, duration, specification;
     let loan_app = this.state.loan_app;
     let handlePurposeChange = this.state.handlePurposeChange;
     this.state.loan_app.map(lap => {
@@ -279,13 +304,19 @@ class LoansPage extends Component {
           loan_amnt = lap.loan_model.loan_amount;
           duration = lap.loan_model.duration;
           specification = lap.loan_model.specification;
+          loan_purpose = lap.purpose;
           this.state.loan_installments = lap.loan_app_installments;
         }
       } else {
         loan_amnt = loan_app[0].loan_model.loan_amount;
         duration = loan_app[0].loan_model.duration;
         specification = loan_app[0].loan_model.specification;
+        loan_purpose = loan_app[0].purpose;
       }
+    });
+    loan_installments.map(row => {
+      payment_date = row.payment_date;
+      row.payment_date = Moment(payment_date).format('DD MMM YYYY')
     });
     this.state.getShgVo.map(shgvo => {
       shgName = shgvo.shg.name;
@@ -316,7 +347,18 @@ class LoansPage extends Component {
             <h2 className={style.title}>
               Apply for Loan
             </h2>
+
             <h4 align="right">Birangana Women Producers Company Pvt. Ltd</h4>
+
+            {this.state.loanApplied ? (
+              <Snackbar severity="success">Loan is applied.</Snackbar>) :
+              null}
+            {this.state.loanAlreadyApplied ? (
+              <Snackbar severity="info">you have already applied loan for the Purpose {loan_purpose}.</Snackbar>) :
+              null}
+            {this.state.loanNotApplied ? (
+              <Snackbar severity="error">An error occured - Please try again later!</Snackbar>) :
+              null}
 
             <Card className={classes.mainContent}>
               <Grid>
@@ -405,8 +447,8 @@ class LoansPage extends Component {
                         {this.state.loan_installments ? this.state.loan_installments.map(row => (
                           <tr>
                             <td>{row.payment_date}</td>
-                            <td>{row.actual_principal}</td>
-                            <td>{row.actual_interest}</td>
+                            <td>{row.expected_principal}</td>
+                            <td>{row.expected_interest}</td>
                           </tr>
                         )) : null}
                       </table></b>

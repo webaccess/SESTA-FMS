@@ -83,10 +83,19 @@ export class Loans extends React.Component {
       .then((res) => {
         let amount_due;
         res.data.map(installment => {
-          let payment_date = installment.loan_application_installment.payment_date;
-          amount_due = installment.loan_application_installment.expected_interest + installment.loan_application_installment.expected_principal;
-          installment.loan_application_installment.amount_due = amount_due;
-          installment.loan_application_installment.payment_date = Moment(payment_date).format('DD MMM YYYY');;
+          installment.loan_app_installments.map(li=>{
+            let payment_date = li.payment_date;
+            console.log('payment_date... ',payment_date);
+            amount_due = li.expected_interest + li.expected_principal;
+            li.amount_due = amount_due;
+            li.payment_date = Moment(payment_date).format('DD MMM YYYY');
+          })
+
+          // let payment_date = installment.loan_app_installments.payment_date;
+          // console.log('payment_date... ',payment_date);
+          // amount_due = installment.loan_app_installments.expected_interest + installment.loan_app_installments.expected_principal;
+          // installment.loan_app_installments.amount_due = amount_due;
+          // installment.loan_app_installments.payment_date = Moment(payment_date).format('DD MMM YYYY');;
         });
         this.setState({ data: res.data });
       });
@@ -187,6 +196,11 @@ export class Loans extends React.Component {
   render() {
     const { classes } = this.props;
     let data = this.state.data;
+    data.map(cdata=>{
+      if(cdata.contacts && cdata.contacts.length) {
+        data = cdata;
+      }
+    })
     let shgFilter = this.state.getShg;
     let filterShg = this.state.filterShg;
     let statusFilter = this.state.getStatus;
@@ -220,12 +234,12 @@ export class Loans extends React.Component {
       },
       {
         name: "Amount Due",
-        selector: "loan_application_installment.amount_due",
+        selector: "loan_app_installments.amount_due",
         sortable: true,
       },
       {
         name: "Installment Date",
-        selector: "loan_application_installment.payment_date",
+        selector: "loan_app_installments.payment_date",
         sortable: true,
       },
     ];
@@ -341,7 +355,7 @@ export class Loans extends React.Component {
               filterData={true}
               // noDataComponent={"No Records To be shown"}
               Searchplaceholder={"Seacrh by Member name"}
-              filterBy={["contact.name", "purpose", "application_date", "loan_model.loan_amount", "status", "loan_application_installment.amount_due", "loan_application_installment.payment_date"]}
+              filterBy={["contact.name", "purpose", "application_date", "loan_model.loan_amount", "status", "loan_app_installments.amount_due", "loan_app_installments.payment_date"]}
               filters={filters}
               data={data}
               column={Usercolumns}

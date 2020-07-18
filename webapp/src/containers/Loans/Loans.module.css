@@ -18,6 +18,7 @@
 }
 table {
   border-collapse: collapse;
+  text-align: center;
 }
 
 table, th, td {
