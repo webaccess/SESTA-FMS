@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import style from "./Loans.module.css";
 import Layout from "../../hoc/Layout/Layout";
 import { withStyles } from "@material-ui/core/styles";
-import axios from "axios";
+import * as serviceProvider from "../../api/Axios";
 import auth from "../../components/Auth/Auth";
 import Table from "../../components/Datatable/Datatable.js";
 import Autocomplete from "../../components/Autocomplete/Autocomplete";
@@ -16,15 +16,16 @@ import {
   Grid,
 } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
-import PersonIcon from '@material-ui/icons/Person';
-import PeopleIcon from '@material-ui/icons/People';
-import HomeIcon from '@material-ui/icons/Home';
-import MoneyIcon from '@material-ui/icons/Money';
-import HomeWorkIcon from '@material-ui/icons/HomeWork';
-import TextField from '@material-ui/core/TextField';
+import PersonIcon from "@material-ui/icons/Person";
+import PeopleIcon from "@material-ui/icons/People";
+import HomeIcon from "@material-ui/icons/Home";
+import MoneyIcon from "@material-ui/icons/Money";
+import HomeWorkIcon from "@material-ui/icons/HomeWork";
+import TextField from "@material-ui/core/TextField";
 import Button from "../../components/UI/Button/Button";
-import Moment from 'moment';
+import Moment from "moment";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
+import { Link } from "react-router-dom";
 
 const useStyles = (theme) => ({
   root: {},
@@ -69,38 +70,38 @@ const useStyles = (theme) => ({
     fontSize: "40px",
     color: "#008000",
     "&:hover": {
-      color: "#008000"
+      color: "#008000",
     },
     "&:active": {
-      color: "#008000"
-    }
+      color: "#008000",
+    },
   },
   loan: {
     position: "relative",
-    top: "20px"
+    top: "20px",
   },
   member: {
     color: "black",
-    fontSize: "11px"
+    fontSize: "11px",
   },
   memberData: {
-    fontSize: "20px"
+    fontSize: "20px",
   },
   tableData: {
     // padding: "1px",
     width: "100%",
     border: "0px solid black",
-    borderCollapse: "collapse"
+    borderCollapse: "collapse",
   },
   thData: {
     padding: "5px",
-    textAlign: "left"
+    textAlign: "left",
   },
   mainContent: {
-    padding: "25px"
+    padding: "25px",
   },
   purposeCard: {
-    padding: "20px"
+    padding: "20px",
   },
 });
 
@@ -119,69 +120,54 @@ class LoansPage extends Component {
       loanApplied: "",
       loanNotApplied: "",
       loanAlreadyApplied: "",
-    }
+    };
   }
 
   async componentDidMount() {
-    let url, VoOrg, shgid, VOid;
-    if (this.props.location.state.hasOwnProperty('individual')) {
+    let url, shgid, VOid;
+    if (this.props.location.state.hasOwnProperty("individual")) {
       shgid = this.props.location.state.individual.shg;
       VOid = this.props.location.state.individual.vo;
     }
-    await axios
-      .get(
+    serviceProvider
+      .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/contact/?contact_type=organization&id=" + shgid,
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+          "crm-plugin/contact/?contact_type=organization&id=" +
+          shgid
       )
       .then((res) => {
-        VoOrg = res.data;
+        // get VO assigned to selected SHG member
+        let VoContactId;
+        if (res.data) {
+          VoContactId = res.data[0].organization.vos[0].id;
+        }
+        serviceProvider
+          .serviceProviderForGetRequest(
+            process.env.REACT_APP_SERVER_URL +
+              "crm-plugin/contact/" +
+              VoContactId
+          )
+          .then((res) => {
+            this.setState({ shgUnderVo: res.data });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       })
       .catch((error) => {
         console.log(error);
       });
 
-    let VoContactId;
-    if (VoOrg) {
-      VoContactId = VoOrg[0].organization.vo;
-    }
-    await axios
-      .get(
-        process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/contact/?id=" + VoContactId,
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
-      )
-      .then((res) => {
-        this.setState({ shgUnderVo: res.data });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
-    if (shgid != 0) {
+    if (shgid !== 0) {
       url = "?shg.id=" + shgid;
     } else {
       url = "?vo.id=" + VOid;
     }
 
     // get shg/vo from Individual model
-    await axios
-      .get(
-        process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/individuals/" + url,
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals/" + url
       )
       .then((res) => {
         this.setState({ getShgVo: res.data });
@@ -189,19 +175,14 @@ class LoansPage extends Component {
 
     // get purpose from loan application model
     let memberId = this.props.location.state.id;
-    await axios
-      // .get(process.env.REACT_APP_SERVER_URL + "loan-applications/?contact.id=" + memberId, {
-      .get(process.env.REACT_APP_SERVER_URL + "loan-applications/?_sort=id:ASC", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "loan-applications/?_sort=id:ASC"
+      )
       .then((res) => {
         this.setState({ loan_app: res.data });
         this.setState({ loan_installments: res.data[0].loan_app_installments });
-      })
-
-
+      });
   }
 
   handleFieldChange = (event, value) => {
@@ -210,7 +191,7 @@ class LoansPage extends Component {
     } else {
       this.setState({ handlePurposeChange: "" });
     }
-  }
+  };
 
   SaveData() {
     // save loan application to contact
@@ -240,16 +221,15 @@ class LoansPage extends Component {
     };
 
     if (postData.loan_applications && postData.loan_applications.length) {
-      postData.loan_applications.map(loanapp => {
+      postData.loan_applications.map((loanapp) => {
         if (assignLoanAppValues.id === loanapp.id) {
           this.setState({ loanAlreadyApplied: true });
-        }
-        else {
+        } else {
           postData.loan_applications.push(loan_application_data);
           this.saveApplyLoan(postData);
           this.setState({ loanApplied: true });
         }
-      })
+      });
     } else {
       postData.loan_applications.push(loan_application_data);
       this.saveApplyLoan(postData);
@@ -258,16 +238,11 @@ class LoansPage extends Component {
   }
 
   saveApplyLoan(postData) {
-    axios
-      .put(
-        process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/contact/" + postData.id,
-        postData,
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+    serviceProvider
+      .serviceProviderForPutRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+        postData.id,
+        postData
       )
       .then((res) => {
         this.setState({ loanApplied: true });
@@ -275,7 +250,7 @@ class LoansPage extends Component {
       })
       .catch((error) => {
         this.setState({ loanNotApplied: true });
-      })
+      });
   }
 
   cancelForm = () => {
@@ -298,7 +273,7 @@ class LoansPage extends Component {
     let data = this.props.location.state;
     let loan_app = this.state.loan_app;
     let handlePurposeChange = this.state.handlePurposeChange;
-    this.state.loan_app.map(lap => {
+    this.state.loan_app.map((lap) => {
       if (handlePurposeChange) {
         if (lap.id == this.state.handlePurposeChange.id) {
           loan_amnt = lap.loan_model.loan_amount;
@@ -314,25 +289,22 @@ class LoansPage extends Component {
         loan_purpose = loan_app[0].purpose;
       }
     });
-    loan_installments.map(row => {
+    loan_installments.map((row) => {
       payment_date = row.payment_date;
-      row.payment_date = Moment(payment_date).format('DD MMM YYYY')
+      row.payment_date = Moment(payment_date).format("DD MMM YYYY");
     });
-    this.state.getShgVo.map(shgvo => {
+    this.state.getShgVo.map((shgvo) => {
       shgName = shgvo.shg.name;
       voName = shgvo.vo.name;
     });
-    let shgUnderVo;
-    this.state.shgUnderVo.map(vo => {
-      shgUnderVo = vo.name;
-    });
+    let shgUnderVo = this.state.shgUnderVo.name;
     let filters = this.state.values;
     const Usercolumns = [
       {
         name: "Name",
         selector: "name",
         sortable: true,
-      }
+      },
     ];
     let selectors = [];
     for (let i in Usercolumns) {
@@ -344,42 +316,67 @@ class LoansPage extends Component {
         <Grid>
           <div className="App">
             <h5 className={style.loan}>LOAN</h5>
-            <h2 className={style.title}>
-              Apply for Loan
-            </h2>
+            <h2 className={style.title}>Apply for Loan</h2>
 
             <h4 align="right">Birangana Women Producers Company Pvt. Ltd</h4>
 
             {this.state.loanApplied ? (
-              <Snackbar severity="success">You have successfully applied for the loan.</Snackbar>) :
-              null}
+              <Snackbar severity="success">
+                You have successfully applied for the loan.
+              </Snackbar>
+            ) : null}
             {this.state.loanAlreadyApplied ? (
-              <Snackbar severity="info">You have already applied loan for the Purpose {loan_purpose}.</Snackbar>) :
-              null}
+              <Snackbar severity="info">
+                You have already applied loan for the Purpose {loan_purpose}.
+              </Snackbar>
+            ) : null}
             {this.state.loanNotApplied ? (
-              <Snackbar severity="error">An error occured - Please try again later!</Snackbar>) :
-              null}
+              <Snackbar severity="error">
+                An error occured - Please try again later!
+              </Snackbar>
+            ) : null}
 
             <Card className={classes.mainContent}>
               <Grid>
                 <IconButton aria-label="view">
                   <PersonIcon className={classes.Icon} />
-                  <b><div className={classes.member}>LOANEE<br />{data.name}</div></b>
+                  <b>
+                    <div className={classes.member}>
+                      LOANEE
+                      <br />
+                      {data.name}
+                    </div>
+                  </b>
                 </IconButton>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <IconButton aria-label="view">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <IconButton aria-label="view">
                   <PeopleIcon className={classes.Icon} />
-                  <b><div className={classes.member}>SHG GROUP <br />{shgName}</div></b>
+                  <b>
+                    <div className={classes.member}>
+                      SHG GROUP <br />
+                      {shgName}
+                    </div>
+                  </b>
                 </IconButton>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <IconButton aria-label="view">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <IconButton aria-label="view">
                   <HomeIcon className={classes.Icon} />
-                  <b><div className={classes.member}>VILLAGE <br />{data.villages[0].name}</div></b>
+                  <b>
+                    <div className={classes.member}>
+                      VILLAGE <br />
+                      {data.villages[0].name}
+                    </div>
+                  </b>
                 </IconButton>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <IconButton aria-label="view">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <IconButton aria-label="view">
                   <HomeWorkIcon className={classes.Icon} />
-                  <b><div className={classes.member}>VILLAGE ORGANIZATION <br />{shgUnderVo}</div></b>
+                  <b>
+                    <div className={classes.member}>
+                      VILLAGE ORGANIZATION <br />
+                      {shgUnderVo}
+                    </div>
+                  </b>
                 </IconButton>
               </Grid>
 
@@ -394,9 +391,15 @@ class LoansPage extends Component {
                     onChange={(event, value) => {
                       this.handleFieldChange(event, value);
                     }}
-                    value={handlePurposeChange ? loan_app[loan_app.findIndex(function (item, i) {
-                      return item.id == handlePurposeChange.id;
-                    })] : loan_app[0]}
+                    value={
+                      handlePurposeChange
+                        ? loan_app[
+                            loan_app.findIndex(function (item, i) {
+                              return item.id == handlePurposeChange.id;
+                            })
+                          ]
+                        : loan_app[0]
+                    }
                     renderInput={(params) => (
                       <Input
                         {...params}
@@ -423,35 +426,51 @@ class LoansPage extends Component {
                           </td>
                         </tr>
                         <tr>
-                          <td >
-                            <b>Loan Amount <br /> Rs. {loan_amnt} </b><br /><br />
-                            <b>Duration <br /> {duration} Months </b><br /><br />
-                            <b>Area/Size/Specifications <br /> {specification} </b><br /><br />
+                          <td>
+                            <b>
+                              Loan Amount <br /> Rs. {loan_amnt}{" "}
+                            </b>
+                            <br />
+                            <br />
+                            <b>
+                              Duration <br /> {duration} Months{" "}
+                            </b>
+                            <br />
+                            <br />
+                            <b>
+                              Area/Size/Specifications <br /> {specification}{" "}
+                            </b>
+                            <br />
+                            <br />
                           </td>
                         </tr>
                       </table>
                     </td>
 
                     <td style={{ paddingBottom: "50px" }}>
-                      <b><table style={{ width: "100%", height: "100%" }}>
-                        <tr>
-                          <td>EMI Installment</td>
-                          <td></td>
-                          <td>Amount in rupees</td>
-                        </tr>
-                        <tr style={{ backgroundColor: "#dddddd" }}>
-                          <th>Due Date</th>
-                          <th>Principle</th>
-                          <th>Interest</th>
-                        </tr>
-                        {this.state.loan_installments ? this.state.loan_installments.map(row => (
+                      <b>
+                        <table style={{ width: "100%", height: "100%" }}>
                           <tr>
-                            <td>{row.payment_date}</td>
-                            <td>{row.expected_principal}</td>
-                            <td>{row.expected_interest}</td>
+                            <td>EMI Installment</td>
+                            <td></td>
+                            <td>Amount in rupees</td>
                           </tr>
-                        )) : null}
-                      </table></b>
+                          <tr style={{ backgroundColor: "#dddddd" }}>
+                            <th>Due Date</th>
+                            <th>Principle</th>
+                            <th>Interest</th>
+                          </tr>
+                          {this.state.loan_installments
+                            ? this.state.loan_installments.map((row) => (
+                                <tr>
+                                  <td>{row.payment_date}</td>
+                                  <td>{row.expected_principal}</td>
+                                  <td>{row.expected_interest}</td>
+                                </tr>
+                              ))
+                            : null}
+                        </table>
+                      </b>
                     </td>
                   </tr>
                 </table>
@@ -462,17 +481,19 @@ class LoansPage extends Component {
               <Grid>
                 <Button onClick={this.SaveData.bind(this)}>Save</Button>
                 &nbsp;&nbsp;&nbsp;
-                <Button color="secondary" clicked={this.cancelForm}>
+                <Button
+                  color="secondary"
+                  clicked={this.cancelForm}
+                  component={Link}
+                  to="/members"
+                >
                   Cancel
                 </Button>
               </Grid>
             </Card>
-
           </div>
         </Grid>
       </Layout>
-
-
     );
   }
 }

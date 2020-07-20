@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Layout from "../../hoc/Layout/Layout";
-import axios from "axios";
+import * as serviceProvider from "../../api/Axios";
 import auth from "../../components/Auth/Auth";
 import Button from "../../components/UI/Button/Button";
 import Input from "../../components/UI/Input/Input";
@@ -45,16 +45,11 @@ class PgPage extends Component {
 
   async componentDidMount() {
     if (this.state.editPage[0]) {
-      await axios
-        .get(
+      serviceProvider
+        .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/tags/?id=" +
-            this.state.editPage[1],
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+            this.state.editPage[1]
         )
         .then((res) => {
           this.setState({
@@ -113,24 +108,18 @@ class PgPage extends Component {
     let pgName = this.state.values.addPg;
     let isActive = this.state.addIsActive;
     let pgDescription = this.state.values.addDescription;
-
+    let postData = {
+      name: pgName,
+      is_active: isActive,
+      description: pgDescription,
+    };
     if (this.state.editPage[0]) {
       // for edit data page
-      await axios
-        .put(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/tags/" +
-            this.state.editPage[1],
-          {
-            name: pgName,
-            is_active: isActive,
-            description: pgDescription,
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+      serviceProvider
+        .serviceProviderForPutRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/tags",
+          this.state.editPage[1],
+          postData
         )
         .then((res) => {
           this.setState({ formSubmitted: true });
@@ -155,20 +144,10 @@ class PgPage extends Component {
         });
     } else {
       //for add data page
-      await axios
-        .post(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/tags",
-
-          {
-            name: pgName,
-            is_active: isActive,
-            description: pgDescription,
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+      serviceProvider
+        .serviceProviderForPostRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/tags/",
+          postData
         )
         .then((res) => {
           this.setState({ formSubmitted: true });

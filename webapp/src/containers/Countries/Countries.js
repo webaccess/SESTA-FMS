@@ -1,5 +1,5 @@
 import React from "react";
-import axios from "axios";
+import * as serviceProvider from "../../api/Axios";
 import Table from "../../components/Datatable/Datatable.js";
 import Layout from "../../hoc/Layout/Layout";
 import Button from "../../components/UI/Button/Button";
@@ -8,7 +8,6 @@ import { Link } from "react-router-dom";
 import style from "./Countries.module.css";
 import { Grid } from "@material-ui/core";
 import Input from "../../components/UI/Input/Input";
-import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Modal from "../../components/UI/Modal/Modal.js";
 import Switch from "../../components/UI/Switch/Switch";
@@ -75,15 +74,10 @@ export class Countries extends React.Component {
   }
 
   async componentDidMount() {
-    await axios
-      .get(
+    serviceProvider
+      .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/countries/?_sort=name:ASC",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+          "crm-plugin/countries/?_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ data: res.data });
@@ -112,17 +106,12 @@ export class Countries extends React.Component {
     if (this.state.values.filterCountry) {
       searchData += "name_contains=" + this.state.values.filterCountry;
     }
-    axios
-      .get(
+    serviceProvider
+      .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
           "crm-plugin/countries/?" +
           searchData +
-          "&&_sort=name:ASC",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+          "&&_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ data: this.getData(res.data) });
@@ -150,14 +139,10 @@ export class Countries extends React.Component {
   DeleteData = (cellid, selectedId) => {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-      axios
-        .delete(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/countries/" + cellid,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+      serviceProvider
+        .serviceProviderForDeleteRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/countries",
+          cellid
         )
         .then((res) => {
           this.setState({ singleDelete: res.data.name });
@@ -175,16 +160,10 @@ export class Countries extends React.Component {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       for (let i in selectedId) {
-        axios
-          .delete(
-            process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/countries/" +
-              selectedId[i],
-            {
-              headers: {
-                Authorization: "Bearer " + auth.getToken() + "",
-              },
-            }
+        serviceProvider
+          .serviceProviderForDeleteRequest(
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/countries",
+            selectedId[i]
           )
           .then((res) => {
             this.setState({ multipleDelete: true });
@@ -214,18 +193,12 @@ export class Countries extends React.Component {
         }
 
         let setActiveId = selectedId[index];
-        axios
-          .put(
-            process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/countries/" +
-              setActiveId,
+        serviceProvider
+          .serviceProviderForPutRequest(
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/countries",
+            setActiveId,
             {
               is_active: IsActive,
-            },
-            {
-              headers: {
-                Authorization: "Bearer " + auth.getToken() + "",
-              },
             }
           )
           .then((res) => {
@@ -268,18 +241,12 @@ export class Countries extends React.Component {
     this.setState({ isActiveAllShowing: false });
     let setActiveId = this.state.setActiveId;
     let IsActive = this.state.IsActive;
-    axios
-      .put(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/countries/" +
-          setActiveId,
+    serviceProvider
+      .serviceProviderForPutRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/countries",
+        setActiveId,
         {
           is_active: IsActive,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
         }
       )
       .then((res) => {

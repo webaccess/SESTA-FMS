@@ -1,7 +1,7 @@
 import { Grid } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import Autocomplete from "../../components/Autocomplete/Autocomplete";
-import axios from "axios";
+import * as serviceProvider from "../../api/Axios";
 import React from "react";
 import { Link } from "react-router-dom";
 import auth from "../../components/Auth/Auth.js";
@@ -71,31 +71,21 @@ export class Shgs extends React.Component {
       multipleDelete: "",
     };
   }
+
   async componentDidMount() {
-    await axios
-      .get(
+    serviceProvider
+      .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+          "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ data: res.data });
-        // this.setState({ data: this.getData(res.data) });
       });
 
     //api call for states filter
-    await axios
-      .get(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true"
       )
       .then((res) => {
         this.setState({ getState: res.data });
@@ -105,30 +95,16 @@ export class Shgs extends React.Component {
       });
 
     //api call for village filter
-    await axios
-      .get(process.env.REACT_APP_SERVER_URL + "crm-plugin/villages/", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/villages/"
+      )
       .then((res) => {
         this.setState({ getVillage: res.data });
       })
       .catch((error) => {
         console.log(error);
       });
-  }
-
-  getData(result) {
-    for (let i in result) {
-      let villages = [];
-      //   for (let j in result[i].contact.villages) {
-      //     villages.push(result[i].contact.villages[j].name + " ");
-      //   }
-
-      //   result[i]["contact"]["villages"] = villages;
-    }
-    return result;
   }
 
   handleStateChange = async (event, value) => {
@@ -141,16 +117,11 @@ export class Shgs extends React.Component {
       });
 
       let stateId = value.id;
-      await axios
-        .get(
+      serviceProvider
+        .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+            stateId
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
@@ -178,14 +149,9 @@ export class Shgs extends React.Component {
       this.setState({ filterDistrict: value });
       this.setState({ filterVillage: "" });
       let distId = value.id;
-      axios
-        .get(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/districts/" + distId,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/districts/" + distId
         )
         .then((res) => {
           this.setState({ getVillage: res.data.villages });
@@ -223,16 +189,15 @@ export class Shgs extends React.Component {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
-      axios
-        .delete(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/" + cellid,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+      serviceProvider
+        .serviceProviderForDeleteRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+          cellid
         )
         .then((res) => {
+          if (res.data.organization.bankdetail) {
+            this.deleteBankDetails(res.data.organization.bankdetail);
+          }
           this.setState({ singleDelete: res.data.name });
           this.componentDidMount();
         })
@@ -243,22 +208,31 @@ export class Shgs extends React.Component {
     }
   };
 
+  deleteBankDetails = async (id) => {
+    serviceProvider
+      .serviceProviderForDeleteRequest(
+        process.env.REACT_APP_SERVER_URL + "bankdetails",
+        id
+      )
+      .then((res) => {})
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       for (let i in selectedId) {
-        axios
-          .delete(
-            process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/contact/" +
-              selectedId[i],
-            {
-              headers: {
-                Authorization: "Bearer " + auth.getToken() + "",
-              },
-            }
+        serviceProvider
+          .serviceProviderForDeleteRequest(
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+            selectedId[i]
           )
           .then((res) => {
+            if (res.data.organization.bankdetail) {
+              this.deleteBankDetails(res.data.organization.bankdetail);
+            }
             this.setState({ multipleDelete: true });
             this.componentDidMount();
           })
@@ -290,7 +264,7 @@ export class Shgs extends React.Component {
     }
     if (this.state.filterVo) {
       searchData +=
-        "village_organization.name_contains=" + this.state.filterVo + "&&";
+        "organization.vos[0].name_contains=" + this.state.filterVo + "&&";
     }
     if (this.state.filterState) {
       searchData += "state.id=" + this.state.filterState.id + "&&";
@@ -303,19 +277,14 @@ export class Shgs extends React.Component {
     }
 
     //api call after search filter
-    axios
-      .get(
+    serviceProvider
+      .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
           "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC&&" +
-          searchData,
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+          searchData
       )
       .then((res) => {
-        this.setState({ data: this.getData(res.data) });
+        this.setState({ data: res.data });
       })
       .catch((err) => {
         console.log(err);
@@ -326,35 +295,30 @@ export class Shgs extends React.Component {
     let data = this.state.data;
     const Usercolumns = [
       {
-        name: "SHG",
+        name: "Name of the Group",
         selector: "name",
         sortable: true,
       },
-      // {
-      //   name: "Village Organization",
-      //   selector: "organization.vo",
-      //   sortable: true,
-      // },
+      {
+        name: "Village Organization",
+        selector: "organization.vos[0].name",
+        sortable: true,
+      },
       {
         name: "Village",
         selector: "villages[0].name",
         sortable: true,
       },
-      // {
-      //   name: "District",
-      //   selector: "district.name",
-      //   sortable: true,
-      // },
-      // {
-      //   name: "State",
-      //   selector: "state.name",
-      //   sortable: true,
-      // },
-      // {
-      //   name: "Village Name",
-      //   selector: "contact.villages",
-      //   sortable: true,
-      // },
+      {
+        name: "District",
+        selector: "district.name",
+        sortable: true,
+      },
+      {
+        name: "State",
+        selector: "state.name",
+        sortable: true,
+      },
     ];
 
     let selectors = [];
@@ -432,7 +396,7 @@ export class Shgs extends React.Component {
           ) : null}
           {this.state.multipleDelete === true ? (
             <Snackbar severity="success" Showbutton={false}>
-              SHG's deleted successfully!
+              SHGs deleted successfully!
             </Snackbar>
           ) : null}
           {this.state.multipleDelete === false ? (
@@ -456,7 +420,8 @@ export class Shgs extends React.Component {
                 </Grid>
               </div>
             </div>
-            <div className={classes.searchInput}>
+            {/* this filter is temporary commented  */}
+            {/* <div className={classes.searchInput}>
               <div className={style.Districts}>
                 <Grid item md={12} xs={12}>
                   <Input
@@ -470,7 +435,7 @@ export class Shgs extends React.Component {
                   />
                 </Grid>
               </div>
-            </div>
+            </div> */}
             <div className={classes.searchInput}>
               <div className={style.Districts}>
                 <Grid item md={12} xs={12}>
@@ -578,10 +543,10 @@ export class Shgs extends React.Component {
               Searchplaceholder={"Seacrh by SHG Name"}
               filterBy={[
                 "name",
-                // "organization.vo",
+                "organization.vos[0].name",
                 "villages[0].name",
-                // "district.name",
-                // "state.name",
+                "district.name",
+                "state.name",
               ]}
               data={data}
               column={Usercolumns}
@@ -592,7 +557,6 @@ export class Shgs extends React.Component {
               modalHandle={this.modalHandle}
               columnsvalue={columnsvalue}
               DeleteMessage={"Are you Sure you want to Delete"}
-              noDataComponent={false}
             />
           ) : (
             <h1>Loading...</h1>

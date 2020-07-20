@@ -99,7 +99,7 @@ const roles = {
       {
         name: "loan-application-installments",
         action: ["find", "count", "findone", "create", "update", "delete"],
-      }
+      },
     ],
     grantAllPermissions: false,
   },

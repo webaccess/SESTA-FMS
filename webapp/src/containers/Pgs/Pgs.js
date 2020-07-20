@@ -1,5 +1,5 @@
 import React from "react";
-import axios from "axios";
+import * as serviceProvider from "../../api/Axios";
 import Table from "../../components/Datatable/Datatable.js";
 import Layout from "../../hoc/Layout/Layout";
 import Button from "../../components/UI/Button/Button";
@@ -70,14 +70,9 @@ export class Pgs extends React.Component {
     this.snackbar = React.createRef();
   }
   async componentDidMount() {
-    await axios
-      .get(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/tags/?_sort=name:ASC",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/tags/?_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ data: res.data });
@@ -94,15 +89,10 @@ export class Pgs extends React.Component {
   DeleteData = (cellid, selectedId) => {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-
-      axios
-        .delete(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/tags/" + cellid,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+      serviceProvider
+        .serviceProviderForDeleteRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/tags",
+          cellid
         )
         .then((res) => {
           this.setState({ singleDelete: res.data.name });
@@ -120,16 +110,10 @@ export class Pgs extends React.Component {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       for (let i in selectedId) {
-        axios
-          .delete(
-            process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/tags/" +
-              selectedId[i],
-            {
-              headers: {
-                Authorization: "Bearer " + auth.getToken() + "",
-              },
-            }
+        serviceProvider
+          .serviceProviderForDeleteRequest(
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/tags",
+            selectedId[i]
           )
           .then((res) => {
             this.setState({ multipleDelete: true });
@@ -170,16 +154,12 @@ export class Pgs extends React.Component {
     this.setState({ successCode: "", errorCode: "" });
     let setActiveId = this.state.setActiveId;
     let IsActive = this.state.IsActive;
-    await axios
-      .put(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/tags/" + setActiveId,
+    serviceProvider
+      .serviceProviderForPutRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/tags",
+        setActiveId,
         {
           is_active: IsActive,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
         }
       )
       .then((res) => {
@@ -228,17 +208,12 @@ export class Pgs extends React.Component {
     if (this.state.values.filterPg) {
       searchData += "name_contains=" + this.state.values.filterPg;
     }
-    axios
-      .get(
+    serviceProvider
+      .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
           "crm-plugin/tags/?" +
           searchData +
-          "&&_sort=name:ASC",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+          "&&_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ data: res.data });

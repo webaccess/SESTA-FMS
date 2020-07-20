@@ -1,11 +1,10 @@
 import React from "react";
 import { Grid } from "@material-ui/core";
 import Layout from "../../hoc/Layout/Layout";
-import axios from "axios";
+import * as serviceProvider from "../../api/Axios";
 import Table from "../../components/Datatable/Datatable.js";
 import { withStyles } from "@material-ui/core/styles";
 import Autocomplete from "../../components/Autocomplete/Autocomplete.js";
-import auth from "../../components/Auth/Auth.js";
 import style from "./Activity.module.css";
 import { Link } from "react-router-dom";
 import Input from "../../components/UI/Input/Input";
@@ -59,12 +58,10 @@ export class Activity extends React.Component {
   }
 
   async componentDidMount() {
-    await axios
-      .get(process.env.REACT_APP_SERVER_URL + "crm-plugin/activities/", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activities/"
+      )
       .then((res) => {
         this.setState({ data: res.data });
       })
@@ -72,15 +69,10 @@ export class Activity extends React.Component {
         console.log(error);
       });
 
-    await axios
-      .get(
+    serviceProvider
+      .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activitytypes/?is_active=true",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+          "crm-plugin/activitytypes/?is_active=true"
       )
       .then((res) => {
         this.setState({ getActivitytype: res.data });
@@ -113,15 +105,10 @@ export class Activity extends React.Component {
   DeleteData = (cellid, selectedId) => {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-
-      axios
-        .delete(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/activities/" + cellid,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+      serviceProvider
+        .serviceProviderForDeleteRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
+          cellid
         )
         .then((res) => {
           this.setState({ singleDelete: res.data.name });
@@ -139,16 +126,10 @@ export class Activity extends React.Component {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       for (let id in selectedId) {
-        axios
-          .delete(
-            process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/activities/" +
-              selectedId[id],
-            {
-              headers: {
-                Authorization: "Bearer " + auth.getToken() + "",
-              },
-            }
+        serviceProvider
+          .serviceProviderForDeleteRequest(
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
+            selectedId[id]
           )
           .then((res) => {
             this.setState({ multipleDelete: true });
@@ -170,22 +151,17 @@ export class Activity extends React.Component {
     if (this.state.filterActivitytype) {
       searchData += "activitytype.id=" + this.state.filterActivitytype;
     }
-    axios
-      .get(
+    serviceProvider
+      .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
           "crm-plugin/activities/?" +
-          searchData,
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+          searchData
       )
       .then((res) => {
         this.setState({ data: res.data });
       })
       .catch((err) => {
-        console.log("err", err);
+        console.log(err);
       });
   }
 
