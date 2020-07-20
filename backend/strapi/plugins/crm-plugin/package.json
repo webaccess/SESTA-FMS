@@ -1,0 +1,36 @@
+{
+  "name": "CRM-Plugin",
+  "version": "1.0.0",
+  "description": "This is a base CRM plugin",
+  "strapi": {
+    "name": "CRM-Plugin",
+    "icon": "plug",
+    "description": "CRM plugin for the basic contact management."
+  },
+  "scripts": {
+    "test": "node tests/integration/generateJWT.js && mocha tests/**/*.test.js",
+    "coverage": "nyc --all --reporter=lcov yarn test"
+  },
+  "author": {
+    "name": "Web Access",
+    "url": "https://github.com/webaccess/crmplatform"
+  },
+  "maintainers": [
+    {
+      "name": "Web Access",
+      "url": "https://github.com/webaccess/crmplatform"
+    }
+  ],
+  "engines": {
+    "node": ">=10.0.0",
+    "npm": ">=6.0.0"
+  },
+  "license": "AGPL-3.0",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "co-supertest": "^0.0.10",
+    "mocha": "^7.1.2",
+    "nyc": "^15.0.1",
+    "supertest": "^4.0.2"
+  }
+}

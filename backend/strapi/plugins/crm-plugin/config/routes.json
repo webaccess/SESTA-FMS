@@ -1,0 +1,297 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/activities",
+      "handler": "activity.find"
+    },
+    {
+      "method": "GET",
+      "path": "/activities/:id",
+      "handler": "activity.findOne"
+    },
+    {
+      "method": "POST",
+      "path": "/activities",
+      "handler": "activity.create"
+    },
+    {
+      "method": "PUT",
+      "path": "/activities/:id",
+      "handler": "activity.update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/activities/:id",
+      "handler": "activity.delete"
+    },
+    {
+      "method": "GET",
+      "path": "/activityassignees",
+      "handler": "activityassignee.find"
+    },
+    {
+      "method": "GET",
+      "path": "/activityassignees/count",
+      "handler": "activityassignee.count"
+    },
+    {
+      "method": "GET",
+      "path": "/activityassignees/:id",
+      "handler": "activityassignee.findOne"
+    },
+    {
+      "method": "POST",
+      "path": "/activityassignees",
+      "handler": "activityassignee.create"
+    },
+    {
+      "method": "PUT",
+      "path": "/activityassignees/:id",
+      "handler": "activityassignee.update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/activityassignees/:id",
+      "handler": "activityassignee.delete"
+    },
+    {
+      "method": "GET",
+      "path": "/activitytypes",
+      "handler": "activitytype.find"
+    },
+    {
+      "method": "GET",
+      "path": "/activitytypes/count",
+      "handler": "activitytype.count"
+    },
+    {
+      "method": "GET",
+      "path": "/activitytypes/:id",
+      "handler": "activitytype.findOne"
+    },
+    {
+      "method": "POST",
+      "path": "/activitytypes",
+      "handler": "activitytype.create"
+    },
+    {
+      "method": "PUT",
+      "path": "/activitytypes/:id",
+      "handler": "activitytype.update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/activitytypes/:id",
+      "handler": "activitytype.delete"
+    },
+    {
+      "method": "GET",
+      "path": "/contact",
+      "handler": "contact.find"
+    },
+    {
+      "method": "GET",
+      "path": "/contact/:id",
+      "handler": "contact.findOne"
+    },
+    {
+      "method": "POST",
+      "path": "/contact",
+      "handler": "contact.create"
+    },
+    {
+      "method": "PUT",
+      "path": "/contact/:id",
+      "handler": "contact.update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/contact/:id",
+      "handler": "contact.delete"
+    },
+    {
+      "method": "GET",
+      "path": "/contacttags",
+      "handler": "contacttag.find"
+    },
+    {
+      "method": "GET",
+      "path": "/contacttags/count",
+      "handler": "contacttag.count"
+    },
+    {
+      "method": "GET",
+      "path": "/contacttags/:id",
+      "handler": "contacttag.findOne"
+    },
+    {
+      "method": "POST",
+      "path": "/contacttags",
+      "handler": "contacttag.create"
+    },
+    {
+      "method": "PUT",
+      "path": "/contacttags/:id",
+      "handler": "contacttag.update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/contacttags/:id",
+      "handler": "contacttag.delete"
+    },
+    {
+      "method": "GET",
+      "path": "/countries",
+      "handler": "country.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/countries/count",
+      "handler": "country.count"
+    },
+    {
+      "method": "GET",
+      "path": "/countries/:id",
+      "handler": "country.findOne"
+    },
+    {
+      "method": "POST",
+      "path": "/countries",
+      "handler": "country.create"
+    },
+    {
+      "method": "PUT",
+      "path": "/countries/:id",
+      "handler": "country.update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/countries/:id",
+      "handler": "country.delete"
+    },
+    {
+      "method": "GET",
+      "path": "/generateRoutes",
+      "handler": "crmplugin.generateRoutes"
+    },
+    {
+      "method": "GET",
+      "path": "/districts",
+      "handler": "district.find"
+    },
+    {
+      "method": "GET",
+      "path": "/districts/count",
+      "handler": "district.count"
+    },
+    {
+      "method": "GET",
+      "path": "/districts/:id",
+      "handler": "district.findOne"
+    },
+    {
+      "method": "POST",
+      "path": "/districts",
+      "handler": "district.create"
+    },
+    {
+      "method": "PUT",
+      "path": "/districts/:id",
+      "handler": "district.update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/districts/:id",
+      "handler": "district.delete"
+    },
+    {
+      "method": "GET",
+      "path": "/states",
+      "handler": "state.find"
+    },
+    {
+      "method": "GET",
+      "path": "/states/count",
+      "handler": "state.count"
+    },
+    {
+      "method": "GET",
+      "path": "/states/:id",
+      "handler": "state.findOne"
+    },
+    {
+      "method": "POST",
+      "path": "/states",
+      "handler": "state.create"
+    },
+    {
+      "method": "PUT",
+      "path": "/states/:id",
+      "handler": "state.update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/states/:id",
+      "handler": "state.delete"
+    },
+    {
+      "method": "GET",
+      "path": "/tags",
+      "handler": "tag.find"
+    },
+    {
+      "method": "GET",
+      "path": "/tags/:id",
+      "handler": "tag.findOne"
+    },
+    {
+      "method": "POST",
+      "path": "/tags",
+      "handler": "tag.create"
+    },
+    {
+      "method": "PUT",
+      "path": "/tags/:id",
+      "handler": "tag.update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/tags/:id",
+      "handler": "tag.delete"
+    },
+    {
+      "method": "GET",
+      "path": "/villages",
+      "handler": "village.find"
+    },
+    {
+      "method": "GET",
+      "path": "/villages/count",
+      "handler": "village.count"
+    },
+    {
+      "method": "GET",
+      "path": "/villages/:id",
+      "handler": "village.findOne"
+    },
+    {
+      "method": "POST",
+      "path": "/villages",
+      "handler": "village.create"
+    },
+    {
+      "method": "PUT",
+      "path": "/villages/:id",
+      "handler": "village.update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/villages/:id",
+      "handler": "village.delete"
+    }
+  ]
+}

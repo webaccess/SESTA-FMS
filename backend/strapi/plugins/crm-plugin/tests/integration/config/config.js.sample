@@ -1,0 +1,9 @@
+const SERVER_URL = "http://localhost:1337";
+const USER_IDENTIFIER = "demo";
+const USER_PASSWORD = "demo123";
+
+module.exports = {
+  SERVER_URL,
+  USER_IDENTIFIER,
+  USER_PASSWORD,
+};

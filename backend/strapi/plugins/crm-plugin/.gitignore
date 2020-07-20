@@ -1,0 +1,14 @@
+# Don't check auto-generated stuff into git
+coverage
+.nyc_output
+node_modules
+stats.json
+package-lock.json
+yarn.lock
+tests/integration/config/config.js
+tests/integration/config/JWT.js
+
+# Cruft
+.DS_Store
+npm-debug.log
+.idea

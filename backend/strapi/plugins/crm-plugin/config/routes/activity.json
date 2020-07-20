@@ -1,0 +1,29 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/activities",
+      "handler": "activity.find"
+    },
+    {
+      "method": "GET",
+      "path": "/activities/:id",
+      "handler": "activity.findOne"
+    },
+    {
+      "method": "POST",
+      "path": "/activities",
+      "handler": "activity.create"
+    },
+    {
+      "method": "PUT",
+      "path": "/activities/:id",
+      "handler": "activity.update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/activities/:id",
+      "handler": "activity.delete"
+    }
+  ]
+}
