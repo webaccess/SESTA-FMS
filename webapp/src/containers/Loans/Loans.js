@@ -85,17 +85,10 @@ export class Loans extends React.Component {
         res.data.map(installment => {
           installment.loan_app_installments.map(li=>{
             let payment_date = li.payment_date;
-            console.log('payment_date... ',payment_date);
             amount_due = li.expected_interest + li.expected_principal;
             li.amount_due = amount_due;
             li.payment_date = Moment(payment_date).format('DD MMM YYYY');
           })
-
-          // let payment_date = installment.loan_app_installments.payment_date;
-          // console.log('payment_date... ',payment_date);
-          // amount_due = installment.loan_app_installments.expected_interest + installment.loan_app_installments.expected_principal;
-          // installment.loan_app_installments.amount_due = amount_due;
-          // installment.loan_app_installments.payment_date = Moment(payment_date).format('DD MMM YYYY');;
         });
         this.setState({ data: res.data });
       });

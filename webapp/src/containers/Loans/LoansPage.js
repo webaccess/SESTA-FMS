@@ -351,10 +351,10 @@ class LoansPage extends Component {
             <h4 align="right">Birangana Women Producers Company Pvt. Ltd</h4>
 
             {this.state.loanApplied ? (
-              <Snackbar severity="success">Loan is applied.</Snackbar>) :
+              <Snackbar severity="success">Successfully applied for the loan.</Snackbar>) :
               null}
             {this.state.loanAlreadyApplied ? (
-              <Snackbar severity="info">you have already applied loan for the Purpose {loan_purpose}.</Snackbar>) :
+              <Snackbar severity="info">You have already applied loan for the Purpose {loan_purpose}.</Snackbar>) :
               null}
             {this.state.loanNotApplied ? (
               <Snackbar severity="error">An error occured - Please try again later!</Snackbar>) :
