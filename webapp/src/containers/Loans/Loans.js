@@ -79,16 +79,9 @@ export class Loans extends React.Component {
         process.env.REACT_APP_SERVER_URL + "loan-applications"
       )
       .then((res) => {
-        let amount_due;
-        res.data.map((installment) => {
-          installment.loan_app_installments.map((li) => {
-            let payment_date = li.payment_date;
-            amount_due = li.expected_interest + li.expected_principal;
-            li.amount_due = amount_due;
-            li.payment_date = Moment(payment_date).format("DD MMM YYYY");
-          });
-        });
-        this.setState({ data: res.data });
+        this.getFormattedData(res.data);
+
+        // this.setState({ data: res.data });
       });
 
     // get all SHGs
@@ -105,11 +98,32 @@ export class Loans extends React.Component {
       });
   }
 
+  getFormattedData = (data) => {
+    let amount_due;
+    data.map((installment) => {
+      installment.loan_app_installments.map((li) => {
+        let amount_due;
+        data.map((installment) => {
+          installment.application_date = Moment(
+            installment.application_date
+          ).format("DD MMM YYYY");
+          installment.loan_app_installments.map((li) => {
+            let payment_date = li.payment_date;
+            amount_due = li.expected_interest + li.expected_principal;
+            li.amount_due = amount_due;
+            li.payment_date = Moment(payment_date).format("DD MMM YYYY");
+          });
+        });
+      });
+    });
+    this.setState({ data: data });
+  };
+
   handleSearch() {
     let searchData = "";
     if (this.state.values.addMember) {
       searchData += searchData ? "&&" : "";
-      searchData += "contact.name_contains=" + this.state.values.addMember;
+      searchData += "contacts.name_contains=" + this.state.values.addMember;
     }
     if (this.state.filterStatus) {
       searchData += searchData ? "&&" : "";
@@ -124,7 +138,7 @@ export class Loans extends React.Component {
         process.env.REACT_APP_SERVER_URL + "loan-applications?" + searchData
       )
       .then((res) => {
-        this.setState({ data: res.data });
+        this.getFormattedData(res.data);
       })
       .catch((error) => {
         console.log(error);
@@ -176,12 +190,15 @@ export class Loans extends React.Component {
 
   render() {
     const { classes } = this.props;
-    let data = this.state.data;
-    data.map((cdata) => {
+
+    let data = [];
+    this.state.data.map((cdata) => {
+      // show the loan application only members applied to
       if (cdata.contacts && cdata.contacts.length) {
-        data = cdata;
+        data.push(cdata);
       }
     });
+
     let shgFilter = this.state.getShg;
     let filterShg = this.state.filterShg;
     let statusFilter = this.state.getStatus;
@@ -190,7 +207,7 @@ export class Loans extends React.Component {
     const Usercolumns = [
       {
         name: "Member Name",
-        selector: "contact.name",
+        selector: "contacts[0].name",
         sortable: true,
       },
       {
@@ -256,7 +273,7 @@ export class Loans extends React.Component {
                 </Grid>
               </div>
             </div>
-            <div className={classes.searchInput}>
+            {/* <div className={classes.searchInput}>
               <div className={style.Districts}>
                 <Grid item md={12} xs={12}>
                   <Autocomplete
@@ -285,7 +302,7 @@ export class Loans extends React.Component {
                   />
                 </Grid>
               </div>
-            </div>
+            </div> */}
             <div className={classes.searchInput}>
               <div className={style.Districts}>
                 <Grid item md={12} xs={12}>
@@ -331,7 +348,7 @@ export class Loans extends React.Component {
               filterData={true}
               Searchplaceholder={"Seacrh by Member name"}
               filterBy={[
-                "contact.name",
+                "contacts[0].name",
                 "purpose",
                 "application_date",
                 "loan_model.loan_amount",

@@ -318,7 +318,7 @@ class LoansPage extends Component {
             <h5 className={style.loan}>LOAN</h5>
             <h2 className={style.title}>Apply for Loan</h2>
 
-            <h4 align="right">Birangana Women Producers Company Pvt. Ltd</h4>
+            {/* <h4 align="right">Birangana Women Producers Company Pvt. Ltd</h4> */}
 
             {this.state.loanApplied ? (
               <Snackbar severity="success">
