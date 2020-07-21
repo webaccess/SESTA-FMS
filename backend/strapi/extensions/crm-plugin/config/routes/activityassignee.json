@@ -1,0 +1,34 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/activityassignees",
+      "handler": "activityassignee.find"
+    },
+    {
+      "method": "GET",
+      "path": "/activityassignees/count",
+      "handler": "activityassignee.count"
+    },
+    {
+      "method": "GET",
+      "path": "/activityassignees/:id",
+      "handler": "activityassignee.findOne"
+    },
+    {
+      "method": "POST",
+      "path": "/activityassignees",
+      "handler": "activityassignee.create"
+    },
+    {
+      "method": "PUT",
+      "path": "/activityassignees/:id",
+      "handler": "activityassignee.update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/activityassignees/:id",
+      "handler": "activityassignee.delete"
+    }
+  ]
+}

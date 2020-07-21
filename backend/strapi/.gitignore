@@ -110,3 +110,4 @@ coverage
 exports
 .cache
 build
+plugins/crm-plugin/

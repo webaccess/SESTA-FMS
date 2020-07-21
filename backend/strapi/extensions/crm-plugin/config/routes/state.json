@@ -1,0 +1,34 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/states",
+      "handler": "state.find"
+    },
+    {
+      "method": "GET",
+      "path": "/states/count",
+      "handler": "state.count"
+    },
+    {
+      "method": "GET",
+      "path": "/states/:id",
+      "handler": "state.findOne"
+    },
+    {
+      "method": "POST",
+      "path": "/states",
+      "handler": "state.create"
+    },
+    {
+      "method": "PUT",
+      "path": "/states/:id",
+      "handler": "state.update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/states/:id",
+      "handler": "state.delete"
+    }
+  ]
+}

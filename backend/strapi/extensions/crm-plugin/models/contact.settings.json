@@ -42,11 +42,6 @@
       "type": "string",
       "required": true
     },
-    "organization": {
-      "plugin": "crm-plugin",
-      "model": "organization",
-      "via": "contact"
-    },
     "country": {
       "plugin": "crm-plugin",
       "model": "country"
@@ -111,6 +106,21 @@
     "loan_app_approvedby": {
       "via": "approved_by",
       "model": "loan-application"
+    },
+    "organization": {
+      "via": "contact",
+      "plugin": "crm-plugin",
+      "model": "organization"
+    },
+    "org_vos": {
+      "via": "vos",
+      "plugin": "crm-plugin",
+      "collection": "organization"
+    },
+    "org_fpo": {
+      "via": "fpo",
+      "plugin": "crm-plugin",
+      "model": "organization"
     }
   }
 }

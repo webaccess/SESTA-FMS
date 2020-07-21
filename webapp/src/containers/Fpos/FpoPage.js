@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Layout from "../../hoc/Layout/Layout";
-import axios from "axios";
+import * as serviceProvider from "../../api/Axios";
 import auth from "../../components/Auth/Auth";
 import Button from "../../components/UI/Button/Button";
 import Autotext from "../../components/Autotext/Autotext.js";
@@ -13,7 +13,7 @@ import {
   Divider,
   Grid,
 } from "@material-ui/core";
-import { map } from "lodash";
+import { map, padStart } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
 import { ADD_FPO_BREADCRUMBS, EDIT_FPO_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
@@ -26,7 +26,6 @@ class FpoPage extends Component {
       values: {},
       getState: [],
       getDistrict: [],
-
       validations: {
         addFpo: {
           required: {
@@ -73,18 +72,14 @@ class FpoPage extends Component {
   async componentDidMount() {
     if (this.state.editPage[0]) {
       let stateId = "";
-      await axios
-        .get(
+      serviceProvider
+        .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/contact/" +
-            this.state.editPage[1],
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+            this.state.editPage[1]
         )
         .then((res) => {
+          this.handleStateChange("", res.data.state);
           this.setState({
             values: {
               addFpo: res.data.organization.name,
@@ -97,39 +92,15 @@ class FpoPage extends Component {
               addPhone: res.data.phone,
             },
           });
-          stateId = res.data.state.id;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-
-      await axios
-        .get(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
-        )
-        .then((res) => {
-          this.setState({ getDistrict: res.data });
         })
         .catch((error) => {
           console.log(error);
         });
     }
 
-    await axios
-      .get(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true"
       )
       .then((res) => {
         this.setState({ getState: res.data });
@@ -152,16 +123,11 @@ class FpoPage extends Component {
         values: { ...this.state.values, addState: value.id },
       });
       let stateId = value.id;
-      axios
-        .get(
+      serviceProvider
+        .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+            stateId
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
@@ -196,6 +162,7 @@ class FpoPage extends Component {
       });
     }
   }
+
   validate = () => {
     const values = this.state.values;
     const validations = this.state.validations;
@@ -230,33 +197,27 @@ class FpoPage extends Component {
     let fpoPersonInCharge = this.state.values.addPointOfContact;
     let fpoEmail = this.state.values.addEmail;
     let fpoPhone = this.state.values.addPhone;
+    let postData = {
+      name: fpoName,
+      sub_type: "FPO",
+      person_incharge: fpoPersonInCharge,
+      contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
+        "Organization"
+      ][0],
+      address_1: fpoAddress,
+      state: fpoState,
+      district: fpoDistrict,
+      block: fpoBlock,
+      email: fpoEmail,
+      phone: fpoPhone,
+    };
 
-    if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
-      await axios
-        .put(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/" +
-            this.state.editPage[1],
-          {
-            name: fpoName,
-            sub_type: "FPO",
-            person_incharge: fpoPersonInCharge,
-            contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
-              "Organization"
-            ][0],
-            address_1: fpoAddress,
-            state: fpoState,
-            district: fpoDistrict,
-            block: fpoBlock,
-            email: fpoEmail,
-            phone: fpoPhone,
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+      serviceProvider
+        .serviceProviderForPutRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+          this.state.editPage[1],
+          postData
         )
         .then((res) => {
           this.setState({ formSubmitted: true });
@@ -280,28 +241,10 @@ class FpoPage extends Component {
           console.log(error);
         });
     } else {
-      await axios
-        .post(
+      serviceProvider
+        .serviceProviderForPostRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",
-          {
-            name: fpoName,
-            sub_type: "FPO",
-            person_incharge: fpoPersonInCharge,
-            contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
-              "Organization"
-            ][0],
-            address_1: fpoAddress,
-            state: fpoState,
-            district: fpoDistrict,
-            block: fpoBlock,
-            email: fpoEmail,
-            phone: fpoPhone,
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+          postData
         )
         .then((res) => {
           this.setState({ formSubmitted: true });

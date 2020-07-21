@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import Layout from "../../hoc/Layout/Layout";
-import axios from "axios";
-import auth from "../../components/Auth/Auth";
+import * as serviceProvider from "../../api/Axios";
 import Button from "../../components/UI/Button/Button";
 import Input from "../../components/UI/Input/Input";
 import Checkbox from "@material-ui/core/Checkbox";
@@ -57,16 +56,11 @@ class CountryPage extends Component {
 
   async componentDidMount() {
     if (this.state.editPage[0]) {
-      await axios
-        .get(
+      serviceProvider
+        .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/countries/?id=" +
-            this.state.editPage[1],
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+            this.state.editPage[1]
         )
         .then((res) => {
           this.setState({
@@ -122,24 +116,19 @@ class CountryPage extends Component {
     let countryAbbr = this.state.values.addAbbreviation;
     let countryIdentifier = this.state.values.addIdentifier;
     let IsActive = this.state.addIsActive;
+    let postData = {
+      name: countryName,
+      is_active: IsActive,
+      abbreviation: countryAbbr,
+      identifier: countryIdentifier,
+    };
     if (this.state.editPage[0]) {
       // Code for Edit Data Page
-      await axios
-        .put(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/countries/" +
-            this.state.editPage[1],
-          {
-            name: countryName,
-            is_active: IsActive,
-            abbreviation: countryAbbr,
-            identifier: countryIdentifier,
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+      serviceProvider
+        .serviceProviderForPutRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/countries",
+          this.state.editPage[1],
+          postData
         )
         .then((res) => {
           this.setState({ formSubmitted: true });
@@ -164,20 +153,10 @@ class CountryPage extends Component {
         });
     } else {
       //Code for Add Data Page
-      await axios
-        .post(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/countries",
-          {
-            name: countryName,
-            is_active: IsActive,
-            abbreviation: countryAbbr,
-            identifier: countryIdentifier,
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+      serviceProvider
+        .serviceProviderForPostRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/countries/",
+          postData
         )
         .then((res) => {
           this.setState({ formSubmitted: true });

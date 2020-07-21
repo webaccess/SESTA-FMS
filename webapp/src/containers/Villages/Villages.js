@@ -1,5 +1,5 @@
 import React from "react";
-import axios from "axios";
+import * as serviceProvider from "../../api/Axios";
 import Table from "../../components/Datatable/Datatable.js";
 import Layout from "../../hoc/Layout/Layout";
 import Button from "../../components/UI/Button/Button";
@@ -10,7 +10,6 @@ import style from "./Villages.module.css";
 import { Grid } from "@material-ui/core";
 import Autocomplete from "../../components/Autocomplete/Autocomplete";
 import Input from "../../components/UI/Input/Input";
-import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 
 const useStyles = (theme) => ({
@@ -80,29 +79,18 @@ export class Villages extends React.Component {
     };
   }
   async componentDidMount() {
-    await axios
-      .get(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/villages/?_sort=name:ASC",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/villages/?_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ data: this.getData(res.data) });
       });
 
     //api call for states filter
-    await axios
-      .get(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true"
       )
       .then((res) => {
         this.setState({ getState: res.data });
@@ -132,16 +120,11 @@ export class Villages extends React.Component {
         filterDistrict: "",
       });
       let stateId = value.id;
-      await axios
-        .get(
+      serviceProvider
+        .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+            stateId
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
@@ -162,14 +145,9 @@ export class Villages extends React.Component {
     if (value !== null) {
       this.setState({ filterDistrict: value });
       let distId = value.id;
-      axios
-        .get(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/districts/" + distId,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/districts/" + distId
         )
         .then((res) => {
           this.setState({ getVillage: res.data.villages });
@@ -199,14 +177,10 @@ export class Villages extends React.Component {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
-      axios
-        .delete(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/villages/" + cellid,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+      serviceProvider
+        .serviceProviderForDeleteRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/villages",
+          cellid
         )
         .then((res) => {
           this.setState({ singleDelete: res.data.name });
@@ -225,16 +199,10 @@ export class Villages extends React.Component {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
       for (let i in selectedId) {
-        axios
-          .delete(
-            process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/villages/" +
-              selectedId[i],
-            {
-              headers: {
-                Authorization: "Bearer " + auth.getToken() + "",
-              },
-            }
+        serviceProvider
+          .serviceProviderForDeleteRequest(
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/villages",
+            selectedId[i]
           )
           .then((res) => {
             this.setState({ multipleDelete: true });
@@ -278,17 +246,12 @@ export class Villages extends React.Component {
     if (this.state.values.addVillage) {
       searchData += "name_contains=" + this.state.values.addVillage;
     }
-    axios
-      .get(
+    serviceProvider
+      .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
           "crm-plugin/villages/?" +
           searchData +
-          "&&_sort=name:ASC",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+          "&&_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ data: this.getData(res.data) });

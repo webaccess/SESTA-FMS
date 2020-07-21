@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Layout from "../../hoc/Layout/Layout";
-import axios from "axios";
+import * as serviceProvider from "../../api/Axios";
 import auth from "../../components/Auth/Auth";
 import Button from "../../components/UI/Button/Button";
 import Input from "../../components/UI/Input/Input";
@@ -69,16 +69,11 @@ class ActivityPage extends Component {
 
   async componentDidMount() {
     if (this.state.editPage[0]) {
-      await axios
-        .get(
+      serviceProvider
+        .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/activities/?id=" +
-            this.state.editPage[1],
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+            this.state.editPage[1]
         )
         .then((res) => {
           this.setState({
@@ -97,15 +92,10 @@ class ActivityPage extends Component {
     }
 
     // get activity types having is_active=true
-    await axios
-      .get(
+    serviceProvider
+      .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activitytypes/?is_active=true",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+          "crm-plugin/activitytypes/?is_active=true"
       )
       .then((res) => {
         this.setState({ getActivitytype: res.data });
@@ -116,12 +106,10 @@ class ActivityPage extends Component {
       });
 
     // get contacts
-    await axios
-      .get(process.env.REACT_APP_SERVER_URL + "crm-plugin/contacts/", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/"
+      )
       .then((res) => {
         this.setState({ getcontact: res.data });
       })
@@ -207,7 +195,14 @@ class ActivityPage extends Component {
     }
     let startDate = this.state.values.addStartDate;
     let endDate = this.state.values.addEndDate;
-
+    let postData = {
+      title: activityTitle,
+      start_datetime: activityStartDate,
+      end_datetime: activityEndDate,
+      description: activityDescription,
+      activitytype: activityType,
+      contacts: [activityContact],
+    };
     if (new Date(startDate).getTime() > new Date(endDate).getTime()) {
       this.setState({ DateTimepickerError: true });
     } else {
@@ -215,24 +210,11 @@ class ActivityPage extends Component {
 
       if (this.state.editPage[0]) {
         // for edit data page
-        await axios
-          .put(
-            process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/activities/" +
-              this.state.editPage[1],
-            {
-              title: activityTitle,
-              start_datetime: activityStartDate,
-              end_datetime: activityEndDate,
-              description: activityDescription,
-              activitytype: activityType,
-              contacts: [activityContact],
-            },
-            {
-              headers: {
-                Authorization: "Bearer " + auth.getToken() + "",
-              },
-            }
+        serviceProvider
+          .serviceProviderForPutRequest(
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
+            this.state.editPage[1],
+            postData
           )
           .then((res) => {
             this.setState({ formSubmitted: true });
@@ -260,23 +242,10 @@ class ActivityPage extends Component {
           });
       } else {
         //for add data page
-        await axios
-          .post(
+        serviceProvider
+          .serviceProviderForPostRequest(
             process.env.REACT_APP_SERVER_URL + "crm-plugin/activities/",
-
-            {
-              title: activityTitle,
-              start_datetime: activityStartDate,
-              end_datetime: activityEndDate,
-              description: activityDescription,
-              activitytype: activityType,
-              contacts: [activityContact],
-            },
-            {
-              headers: {
-                Authorization: "Bearer " + auth.getToken() + "",
-              },
-            }
+            postData
           )
           .then((res) => {
             this.setState({ formSubmitted: true });
