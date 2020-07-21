@@ -107,3 +107,7 @@ ClearButton {
 :global(.dNoAIX) {
   display: none;
 }
+
+:global(.cLiCmx) {
+  min-width: unset !important;
+}
