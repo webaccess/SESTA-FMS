@@ -1,0 +1,34 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/activitytypes",
+      "handler": "activitytype.find"
+    },
+    {
+      "method": "GET",
+      "path": "/activitytypes/count",
+      "handler": "activitytype.count"
+    },
+    {
+      "method": "GET",
+      "path": "/activitytypes/:id",
+      "handler": "activitytype.findOne"
+    },
+    {
+      "method": "POST",
+      "path": "/activitytypes",
+      "handler": "activitytype.create"
+    },
+    {
+      "method": "PUT",
+      "path": "/activitytypes/:id",
+      "handler": "activitytype.update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/activitytypes/:id",
+      "handler": "activitytype.delete"
+    }
+  ]
+}
