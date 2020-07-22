@@ -67,9 +67,7 @@ const Table = (props) => {
     props.editData(id);
   };
   const viewData = (id) => {
-    if (props.title === "Members") {
-      props.viewData(id);
-    }
+    props.viewData(id);
   };
 
   const handleDeleteAllEvent = () => {
@@ -121,15 +119,11 @@ const Table = (props) => {
     {
       cell: (cell) => (
         <div onClick={(event) => editData(cell.id)} id={cell.id}>
-          {valueForMemberPage !== "Loans" ? (
-            <Tooltip title="Edit">
-              <IconButton aria-label="edit" value={cell[valueformodal]}>
-                <EditIcon className={classes.editIcon} />
-              </IconButton>
-            </Tooltip>
-          ) : (
-            ""
-          )}
+          <Tooltip title="Edit">
+            <IconButton aria-label="edit" value={cell[valueformodal]}>
+              <EditIcon className={classes.editIcon} />
+            </IconButton>
+          </Tooltip>
         </div>
       ),
       button: true,
@@ -140,15 +134,11 @@ const Table = (props) => {
           onClick={(event) => deleteDataModal(cell.id, cell[valueformodal])}
           id={cell.id}
         >
-          {valueForMemberPage !== "Loans" ? (
-            <Tooltip title="Delete">
-              <IconButton aria-label="delete">
-                <DeleteIcon className={classes.deleteIcon} />
-              </IconButton>
-            </Tooltip>
-          ) : (
-            ""
-          )}
+          <Tooltip title="Delete">
+            <IconButton aria-label="delete">
+              <DeleteIcon className={classes.deleteIcon} />
+            </IconButton>
+          </Tooltip>
         </div>
       ),
       button: true,
@@ -156,8 +146,8 @@ const Table = (props) => {
     {
       cell: (cell) => (
         <div onClick={(event) => viewData(cell.id, cell[valueformodal])}>
-          {valueForMemberPage == "Members" || valueForMemberPage == "Loans" ? (
-            <Tooltip title="Apply Loan">
+          {valueForMemberPage == "Members" ? (
+            <Tooltip title="View">
               <IconButton aria-label="view">
                 <MoneyIcon className={classes.MoneyIcon} />
               </IconButton>
@@ -183,13 +173,7 @@ const Table = (props) => {
   const [data, setData] = React.useState(props.filterBy);
   if (props.filterData) {
     for (let values in data) {
-      filteredItems.push(
-        props.data.filter(
-          (item) =>
-            item[data[values]] &&
-            item[data[values]].toLowerCase().includes(filterText.toLowerCase())
-        )
-      );
+      filteredItems.push(props.data.filter((item) => item[data[values]]));
     }
     for (let i in filteredItems) {
       filteredData = filteredData.concat(filteredItems[i]);

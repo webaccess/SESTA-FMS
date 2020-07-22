@@ -23,12 +23,7 @@
     },
     "status": {
       "type": "enumeration",
-      "enum": [
-        "UnderReview",
-        "Approved",
-        "Denied",
-        "Cancelled"
-      ],
+      "enum": ["UnderReview", "Approved", "Denied", "Cancelled"],
       "required": true
     },
     "approved_date": {
