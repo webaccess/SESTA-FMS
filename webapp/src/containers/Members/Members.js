@@ -1,5 +1,5 @@
 import React from "react";
-import axios from "axios";
+import * as serviceProvider from "../../api/Axios";
 import Table from "../../components/Datatable/Datatable.js";
 import Layout from "../../hoc/Layout/Layout";
 import Button from "../../components/UI/Button/Button";
@@ -81,12 +81,10 @@ export class Members extends React.Component {
 
   async componentDidMount() {
     // get all roles
-    axios
-      .get(process.env.REACT_APP_SERVER_URL + "users-permissions/roles", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "users-permissions/roles"
+      )
       .then((res) => {
         this.setState({ rolesList: res.data.roles }, function () {
           this.getMembers();
@@ -97,15 +95,10 @@ export class Members extends React.Component {
       });
 
     // get all SHGs
-    axios
-      .get(
+    serviceProvider
+      .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+          "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG"
       )
       .then((res) => {
         this.setState({ getShg: res.data });
@@ -116,15 +109,10 @@ export class Members extends React.Component {
   }
 
   getMembers = () => {
-    axios
-      .get(
+    serviceProvider
+      .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+          "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC"
       )
       .then((res) => {
         this.updateRoleIdWithName(res.data);
@@ -134,14 +122,9 @@ export class Members extends React.Component {
       });
 
     //api call for states filter
-    axios
-      .get(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true"
       )
       .then((res) => {
         this.setState({ getState: res.data });
@@ -180,16 +163,11 @@ export class Members extends React.Component {
         filterDistrict: "",
       });
       let stateId = value.id;
-      await axios
-        .get(
+      serviceProvider
+        .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+            stateId
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
@@ -214,16 +192,11 @@ export class Members extends React.Component {
         filterVillage: "",
       });
       let distId = value.id;
-      axios
-        .get(
+      serviceProvider
+        .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/villages/?is_active=true&&district.id=" +
-            distId,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+            distId
         )
         .then((res) => {
           this.setState({ getVillage: res.data });
@@ -291,19 +264,18 @@ export class Members extends React.Component {
     }
 
     //api call after search filter
-    axios
-      .get(
+    serviceProvider
+      .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
           "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&" +
-          searchData,
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+          searchData
       )
       .then((res) => {
-        this.updateRoleIdWithName(res.data);
+        if (res.data.length > 0) {
+          this.updateRoleIdWithName(res.data);
+        } else {
+          this.setState({ data: res.data });
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -318,22 +290,12 @@ export class Members extends React.Component {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
-      axios
-        .delete(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/" + cellid,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+      serviceProvider
+        .serviceProviderForDeleteRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+          cellid
         )
         .then((res) => {
-          console.log(
-            "--- delete single res --",
-            res,
-            res.data.shareinformation,
-            res.data.user
-          );
           if (res.data.shareinformation) {
             this.deleteShareInfo(res.data.shareinformation.id);
           }
@@ -352,12 +314,11 @@ export class Members extends React.Component {
   };
 
   deleteShareInfo = async (id) => {
-    axios
-      .delete(process.env.REACT_APP_SERVER_URL + "shareinformations/" + id, {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+    serviceProvider
+      .serviceProviderForDeleteRequest(
+        process.env.REACT_APP_SERVER_URL + "shareinformations",
+        id
+      )
       .then((res) => {})
       .catch((error) => {
         console.log(error);
@@ -365,12 +326,11 @@ export class Members extends React.Component {
   };
 
   deleteUserInfo = async (id) => {
-    axios
-      .delete(process.env.REACT_APP_SERVER_URL + "users/" + id, {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+    serviceProvider
+      .serviceProviderForDeleteRequest(
+        process.env.REACT_APP_SERVER_URL + "users",
+        id
+      )
       .then((res) => {})
       .catch((error) => {
         console.log(error);
@@ -382,16 +342,10 @@ export class Members extends React.Component {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
       for (let i in selectedId) {
-        axios
-          .delete(
-            process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/contact/" +
-              selectedId[i],
-            {
-              headers: {
-                Authorization: "Bearer " + auth.getToken() + "",
-              },
-            }
+        serviceProvider
+          .serviceProviderForDeleteRequest(
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+            selectedId[i]
           )
           .then((res) => {
             if (res.data.shareinformation) {
@@ -413,11 +367,11 @@ export class Members extends React.Component {
 
   viewData = (cellid) => {
     let memberData;
-    this.state.data.map(memData=>{
-      if(cellid == memData.id){
+    this.state.data.map((memData) => {
+      if (cellid == memData.id) {
         memberData = memData;
       }
-    })
+    });
     this.props.history.push("/loans/view/" + cellid, memberData);
   };
 
@@ -694,7 +648,6 @@ export class Members extends React.Component {
                 editData={this.editData}
                 DeleteData={this.DeleteData}
                 DeleteAll={this.DeleteAll}
-                // rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 DeleteMessage={"Are you Sure you want to Delete"}
               />

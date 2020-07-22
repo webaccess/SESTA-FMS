@@ -1,0 +1,52 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/emidetails",
+      "handler": "emidetails.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/emidetails/count",
+      "handler": "emidetails.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/emidetails/:id",
+      "handler": "emidetails.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/emidetails",
+      "handler": "emidetails.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/emidetails/:id",
+      "handler": "emidetails.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/emidetails/:id",
+      "handler": "emidetails.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/districts",
+      "handler": "district.find"
+    },
+    {
+      "method": "GET",
+      "path": "/districts/count",
+      "handler": "district.count"
+    },
+    {
+      "method": "GET",
+      "path": "/districts/:id",
+      "handler": "district.findOne"
+    },
+    {
+      "method": "POST",
+      "path": "/districts",
+      "handler": "district.create"
+    },
+    {
+      "method": "PUT",
+      "path": "/districts/:id",
+      "handler": "district.update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/districts/:id",
+      "handler": "district.delete"
+    }
+  ]
+}

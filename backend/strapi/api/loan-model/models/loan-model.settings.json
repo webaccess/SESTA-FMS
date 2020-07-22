@@ -19,7 +19,8 @@
     },
     "loan_amount": {
       "type": "decimal",
-      "unique": true
+      "unique": false,
+      "required": true
     },
     "duration": {
       "type": "integer",
@@ -37,6 +38,14 @@
     "loan_application": {
       "via": "loan_model",
       "model": "loan-application"
+    },
+    "emidetails": {
+      "via": "loan_model",
+      "collection": "emidetails"
+    },
+    "loantasks": {
+      "via": "loan_model",
+      "collection": "loantask"
     }
   }
 }

@@ -1,0 +1,34 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/countries",
+      "handler": "country.find"
+    },
+    {
+      "method": "GET",
+      "path": "/countries/count",
+      "handler": "country.count"
+    },
+    {
+      "method": "GET",
+      "path": "/countries/:id",
+      "handler": "country.findOne"
+    },
+    {
+      "method": "POST",
+      "path": "/countries",
+      "handler": "country.create"
+    },
+    {
+      "method": "PUT",
+      "path": "/countries/:id",
+      "handler": "country.update"
+    },
+    {
+      "method": "DELETE",
+      "path": "/countries/:id",
+      "handler": "country.delete"
+    }
+  ]
+}

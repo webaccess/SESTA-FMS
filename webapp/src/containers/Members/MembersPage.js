@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Layout from "../../hoc/Layout/Layout";
-import axios from "axios";
+import * as serviceProvider from "../../api/Axios";
 import auth from "../../components/Auth/Auth";
 import Button from "../../components/UI/Button/Button";
 import Input from "../../components/UI/Input/Input";
@@ -155,12 +155,10 @@ class ActivityPage extends Component {
 
   async componentDidMount() {
     // get all roles
-    axios
-      .get(process.env.REACT_APP_SERVER_URL + "users-permissions/roles", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "users-permissions/roles"
+      )
       .then((res) => {
         this.setState({ rolesList: res.data.roles });
       })
@@ -169,16 +167,11 @@ class ActivityPage extends Component {
       });
 
     if (this.state.editPage[0]) {
-      await axios
-        .get(
+      serviceProvider
+        .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/contact/" +
-            this.state.editPage[1],
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+            this.state.editPage[1]
         )
         .then((res) => {
           this.handleStateChange(res.data.state);
@@ -219,34 +212,24 @@ class ActivityPage extends Component {
           // if createUser is checked
           if (res.data.user) {
             this.setState({ createUserId: res.data.user.id });
-            axios
-              .get(
+            serviceProvider
+              .serviceProviderForGetRequest(
                 process.env.REACT_APP_SERVER_URL +
                   "users/?role.id=" +
                   res.data.user.role +
                   "&&contact.id=" +
-                  res.data.id,
-                {
-                  headers: {
-                    Authorization: "Bearer " + auth.getToken() + "",
-                  },
-                }
+                  res.data.id
               )
               .then((response) => {
                 let tempUserValues = this.state.values;
                 tempUserValues["username"] = res.data.user.username;
                 tempUserValues["role"] = response.data[0].role;
                 // to get the role obj from role id
-                axios
-                  .get(
+                serviceProvider
+                  .serviceProviderForGetRequest(
                     process.env.REACT_APP_SERVER_URL +
                       "users-permissions/roles/" +
-                      res.data.user.role,
-                    {
-                      headers: {
-                        Authorization: "Bearer " + auth.getToken() + "",
-                      },
-                    }
+                      res.data.user.role
                   )
                   .then((roleRes) => {
                     if (roleRes.data.role.name === "SHG Member") {
@@ -278,14 +261,9 @@ class ActivityPage extends Component {
     }
 
     // get all states
-    await axios
-      .get(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true"
       )
       .then((res) => {
         this.setState({ getState: res.data });
@@ -348,16 +326,11 @@ class ActivityPage extends Component {
         values: { ...this.state.values, addState: value.id },
       });
       let stateId = value.id;
-      axios
-        .get(
+      serviceProvider
+        .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+            stateId
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
@@ -384,16 +357,11 @@ class ActivityPage extends Component {
         values: { ...this.state.values, addDistrict: value.id },
       });
       let districtId = value.id;
-      axios
-        .get(
+      serviceProvider
+        .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/villages/?is_active=true&&district.id=" +
-            districtId,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+            districtId
         )
         .then((res) => {
           this.setState({ getVillage: res.data });
@@ -464,12 +432,8 @@ class ActivityPage extends Component {
       }
 
       // get all VO for role CSP
-      axios
-        .get(process.env.REACT_APP_SERVER_URL + apiUrl, {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        })
+      serviceProvider
+        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + apiUrl)
         .then((res) => {
           this.setState({ roleWiseData: res.data });
         })
@@ -554,17 +518,11 @@ class ActivityPage extends Component {
 
     if (this.state.editPage[0]) {
       // edit present member (update API)
-      await axios
-        .put(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/" +
-            this.state.editPage[1],
-          postData,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+      serviceProvider
+        .serviceProviderForPutRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+          this.state.editPage[1],
+          postData
         )
         .then((res) => {
           // if (this.state.isShareholder) {
@@ -594,15 +552,10 @@ class ActivityPage extends Component {
         });
     } else {
       // add new member API (entry gets saved in contact & individual table)
-      await axios
-        .post(
+      serviceProvider
+        .serviceProviderForPostRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",
-          postData,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+          postData
         )
         .then((res) => {
           if (this.state.isShareholder) {
@@ -657,17 +610,11 @@ class ActivityPage extends Component {
     if (data.shareinformation) {
       // update share info in shareinformation table
       if (this.state.isShareholder) {
-        await axios
-          .put(
-            process.env.REACT_APP_SERVER_URL +
-              "shareinformations/" +
-              this.state.shareInfoId,
-            postShareData,
-            {
-              headers: {
-                Authorization: "Bearer " + auth.getToken() + "",
-              },
-            }
+        serviceProvider
+          .serviceProviderForPutRequest(
+            process.env.REACT_APP_SERVER_URL + "shareinformations",
+            this.state.shareInfoId,
+            postShareData
           )
           .then((res) => {})
           .catch((error) => {
@@ -675,16 +622,10 @@ class ActivityPage extends Component {
           });
       } else {
         if (this.state.shareInfoId) {
-          axios
-            .delete(
-              process.env.REACT_APP_SERVER_URL +
-                "shareinformations/" +
-                this.state.shareInfoId,
-              {
-                headers: {
-                  Authorization: "Bearer " + auth.getToken() + "",
-                },
-              }
+          serviceProvider
+            .serviceProviderForDeleteRequest(
+              process.env.REACT_APP_SERVER_URL + "shareinformations",
+              this.state.shareInfoId
             )
             .then((res) => {})
             .catch((error) => {
@@ -694,15 +635,10 @@ class ActivityPage extends Component {
       }
     } else {
       // add share info in shareinformation table
-      await axios
-        .post(
+      serviceProvider
+        .serviceProviderForPostRequest(
           process.env.REACT_APP_SERVER_URL + "shareinformations/",
-          postShareData,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+          postShareData
         )
         .then((res) => {})
         .catch((error) => {
@@ -749,30 +685,18 @@ class ActivityPage extends Component {
       // update user in Users table
       if (this.state.createUser) {
         // if createUser checkbox is checked
-        await axios
-          .put(
-            process.env.REACT_APP_SERVER_URL +
-              "users/" +
-              this.state.createUserId,
-            postUserData,
-            {
-              headers: {
-                Authorization: "Bearer " + auth.getToken() + "",
-              },
-            }
+        serviceProvider
+          .serviceProviderForPutRequest(
+            process.env.REACT_APP_SERVER_URL + "users",
+            this.state.createUserId,
+            postUserData
           )
           .then((res) => {
-            axios
-              .put(
-                process.env.REACT_APP_SERVER_URL +
-                  "crm-plugin/individuals/" +
-                  data.individual.id,
-                postIndividualData,
-                {
-                  headers: {
-                    Authorization: "Bearer " + auth.getToken() + "",
-                  },
-                }
+            serviceProvider
+              .serviceProviderForPutRequest(
+                process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
+                data.individual.id,
+                postIndividualData
               )
               .then((res) => {})
               .catch((error) => {});
@@ -783,29 +707,17 @@ class ActivityPage extends Component {
       } else {
         if (this.state.createUserId) {
           // if createUSer is selected previously but unchecked later
-          axios
-            .delete(
-              process.env.REACT_APP_SERVER_URL +
-                "users/" +
-                this.state.createUserId,
-              {
-                headers: {
-                  Authorization: "Bearer " + auth.getToken() + "",
-                },
-              }
+          serviceProvider
+            .serviceProviderForDeleteRequest(
+              process.env.REACT_APP_SERVER_URL + "users",
+              this.state.createUserId
             )
             .then((res) => {
-              axios
-                .put(
-                  process.env.REACT_APP_SERVER_URL +
-                    "crm-plugin/individuals/" +
-                    data.individual.id,
-                  { shg: 0, vo: 0 },
-                  {
-                    headers: {
-                      Authorization: "Bearer " + auth.getToken() + "",
-                    },
-                  }
+              serviceProvider
+                .serviceProviderForPutRequest(
+                  process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
+                  data.individual.id,
+                  { shg: 0, vo: 0 }
                 )
                 .then((res) => {})
                 .catch((error) => {
@@ -819,25 +731,18 @@ class ActivityPage extends Component {
       }
     } else {
       // add user in Users table
-      await axios
-        .post(process.env.REACT_APP_SERVER_URL + "users/", postUserData, {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        })
+      serviceProvider
+        .serviceProviderForPostRequest(
+          process.env.REACT_APP_SERVER_URL + "users/",
+          postUserData
+        )
         .then((res) => {
           // add shg/vo in Individuals table based on selected role
-          axios
-            .put(
-              process.env.REACT_APP_SERVER_URL +
-                "crm-plugin/individuals/" +
-                data.individual.id,
-              postIndividualData,
-              {
-                headers: {
-                  Authorization: "Bearer " + auth.getToken() + "",
-                },
-              }
+          serviceProvider
+            .serviceProviderForPutRequest(
+              process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
+              data.individual.id,
+              postIndividualData
             )
             .then((res) => {})
             .catch((error) => {

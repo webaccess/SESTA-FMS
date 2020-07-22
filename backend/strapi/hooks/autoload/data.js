@@ -99,7 +99,7 @@ const roles = {
       {
         name: "loan-application-installments",
         action: ["find", "count", "findone", "create", "update", "delete"],
-      }
+      },
     ],
     grantAllPermissions: false,
   },
@@ -536,6 +536,36 @@ const modules = {
     displayNavigation: false,
     module: "", //slug
     order: 20,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Loan Purpose": {
+    is_active: true,
+    icon_class: "people",
+    url: "/loanpurposes",
+    slug: "list_loanpurpose",
+    displayNavigation: true,
+    module: "", //slug
+    order: 21,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Add Loan Purpose": {
+    is_active: true,
+    icon_class: "",
+    url: "/loanpurpose/add",
+    slug: "add_loanpurpose",
+    displayNavigation: false,
+    module: "", //slug
+    order: 22,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Edit Loan Purpose": {
+    is_active: true,
+    icon_class: "",
+    url: "/loanpurpose/edit/:id",
+    slug: "edit_loanpurpose",
+    displayNavigation: false,
+    module: "", //slug
+    order: 22,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
 };

@@ -132,7 +132,6 @@ function NavigationItems(props) {
       !props.location.pathname.includes("/members") ||
       !props.location.pathname.includes("/activities") ||
       !props.location.pathname.includes("/loans") ||
-      !props.location.pathname.includes("/loanpurpose") ||
       props.location.pathname !== "/"
     ) {
       if (openMenu !== true) {
@@ -145,7 +144,6 @@ function NavigationItems(props) {
       props.location.pathname.includes("/members") ||
       props.location.pathname.includes("/activities") ||
       props.location.pathname.includes("/loans") ||
-      props.location.pathname.includes("/loanpurpose") ||
       props.location.pathname === "/"
     ) {
       if (openMenu == true) {
@@ -185,6 +183,7 @@ function NavigationItems(props) {
       "States",
       "Pgs",
       "Countries",
+      "Loan Purpose",
     ];
     let nav1 = map(modules, (module, key) => {
       if (module.modules.length <= 0) {

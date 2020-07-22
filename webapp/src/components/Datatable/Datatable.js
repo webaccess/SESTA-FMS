@@ -10,8 +10,8 @@ import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import { makeStyles } from "@material-ui/styles";
-import MoneyIcon from '@material-ui/icons/Money';
-import Tooltip from '@material-ui/core/Tooltip';
+import MoneyIcon from "@material-ui/icons/Money";
+import Tooltip from "@material-ui/core/Tooltip";
 
 const useStyles = makeStyles((theme) => ({
   editIcon: {
@@ -35,12 +35,12 @@ const useStyles = makeStyles((theme) => ({
   MoneyIcon: {
     color: "#131514",
     "&:hover": {
-      color: "#282F2B"
+      color: "#282F2B",
     },
     "&:active": {
-      color: "#282F2B"
-    }
-  }
+      color: "#282F2B",
+    },
+  },
 }));
 
 const Table = (props) => {
@@ -58,7 +58,6 @@ const Table = (props) => {
     setcellName(value);
   };
 
-
   let searchFilter = props.filters;
   let selected = selectedRows;
   let dataName = cellName;
@@ -68,7 +67,9 @@ const Table = (props) => {
     props.editData(id);
   };
   const viewData = (id) => {
-    props.viewData(id);
+    if (props.title === "Members") {
+      props.viewData(id);
+    }
   };
 
   const handleDeleteAllEvent = () => {
@@ -109,8 +110,8 @@ const Table = (props) => {
   };
 
   let valueformodal = props.columnsvalue;
-  let valueForMemberPage = props.title
-  let str = 'notview';
+  let valueForMemberPage = props.title;
+  let str = "notview";
 
   const [isDeleteShowing, setisDeleteShowing] = React.useState(false);
   const [isDeleteAllShowing, setisDeleteAllShowing] = React.useState(false);
@@ -120,11 +121,15 @@ const Table = (props) => {
     {
       cell: (cell) => (
         <div onClick={(event) => editData(cell.id)} id={cell.id}>
-          <Tooltip title="Edit">
-            <IconButton aria-label="edit" value={cell[valueformodal]}>
-              <EditIcon className={classes.editIcon} />
-            </IconButton>
-          </Tooltip>
+          {valueForMemberPage !== "Loans" ? (
+            <Tooltip title="Edit">
+              <IconButton aria-label="edit" value={cell[valueformodal]}>
+                <EditIcon className={classes.editIcon} />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            ""
+          )}
         </div>
       ),
       button: true,
@@ -135,26 +140,31 @@ const Table = (props) => {
           onClick={(event) => deleteDataModal(cell.id, cell[valueformodal])}
           id={cell.id}
         >
-          <Tooltip title="Delete">
-            <IconButton aria-label="delete">
-              <DeleteIcon className={classes.deleteIcon} />
-            </IconButton>
-          </Tooltip>
+          {valueForMemberPage !== "Loans" ? (
+            <Tooltip title="Delete">
+              <IconButton aria-label="delete">
+                <DeleteIcon className={classes.deleteIcon} />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            ""
+          )}
         </div>
       ),
       button: true,
     },
     {
       cell: (cell) => (
-        <div
-          onClick={(event) => viewData(cell.id, cell[valueformodal])}
-        >
-          {valueForMemberPage=='Members' ? (
-            <Tooltip title="View">
+        <div onClick={(event) => viewData(cell.id, cell[valueformodal])}>
+          {valueForMemberPage === "Members" ? (
+            <Tooltip title="Apply Loan">
               <IconButton aria-label="view">
                 <MoneyIcon className={classes.MoneyIcon} />
               </IconButton>
-            </Tooltip>) : ''}
+            </Tooltip>
+          ) : (
+            ""
+          )}
         </div>
       ),
       button: true,
@@ -173,13 +183,7 @@ const Table = (props) => {
   const [data, setData] = React.useState(props.filterBy);
   if (props.filterData) {
     for (let values in data) {
-      filteredItems.push(
-        props.data.filter(
-          (item) =>
-            item[data[values]] &&
-            item[data[values]].toLowerCase().includes(filterText.toLowerCase())
-        )
-      );
+      filteredItems.push(props.data.filter((item) => item[data[values]]));
     }
     for (let i in filteredItems) {
       filteredData = filteredData.concat(filteredItems[i]);

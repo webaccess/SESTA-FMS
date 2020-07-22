@@ -15,9 +15,9 @@
       "required": true
     },
     "contact": {
-      "via": "organization",
       "plugin": "crm-plugin",
-      "model": "contact"
+      "model": "contact",
+      "via": "organization"
     },
     "person_incharge": {
       "type": "string"
@@ -31,19 +31,20 @@
       ],
       "required": true
     },
-    "fpo": {
-      "plugin": "crm-plugin",
-      "model": "contact",
-      "via": "organization"
-    },
-    "vo": {
-      "plugin": "crm-plugin",
-      "model": "contact",
-      "via": "organization"
-    },
     "bankdetail": {
       "model": "bankdetail",
       "via": "organization"
+    },
+    "vos": {
+      "plugin": "crm-plugin",
+      "collection": "contact",
+      "via": "org_vos",
+      "dominant": true
+    },
+    "fpo": {
+      "plugin": "crm-plugin",
+      "model": "contact",
+      "via": "org_fpo"
     }
   }
 }

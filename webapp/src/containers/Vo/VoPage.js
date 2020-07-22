@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Layout from "../../hoc/Layout/Layout";
-import axios from "axios";
+import * as serviceProvider from "../../api/Axios";
 import auth from "../../components/Auth/Auth";
 import Button from "../../components/UI/Button/Button";
 import Input from "../../components/UI/Input/Input";
@@ -56,16 +56,11 @@ class VoPage extends Component {
 
   async componentDidMount() {
     if (this.state.editPage[0]) {
-      await axios
-        .get(
+      serviceProvider
+        .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/contact/" +
-            this.state.editPage[1],
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+            this.state.editPage[1]
         )
         .then((res) => {
           this.setState({
@@ -124,31 +119,26 @@ class VoPage extends Component {
     let person = this.state.values.addPerson;
     let block = this.state.values.addBlock;
     let gp = this.state.values.addGp;
+    let postData = {
+      name: voName,
+      sub_type: "VO",
+      address: voAddress,
+      person_incharge: person,
+      contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
+        "Organization"
+      ][0],
+      address_1: voAddress,
+      block: block,
+      gp: gp,
+    };
 
     if (this.state.editPage[0]) {
       // for edit Vo page
-      await axios
-        .put(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/" +
-            this.state.editPage[1],
-          {
-            name: voName,
-            sub_type: "VO",
-            address: voAddress,
-            person_incharge: person,
-            contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
-              "Organization"
-            ][0],
-            address_1: voAddress,
-            block: block,
-            gp: gp,
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+      serviceProvider
+        .serviceProviderForPutRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+          this.state.editPage[1],
+          postData
         )
         .then((res) => {
           this.setState({ formSubmitted: true });
@@ -163,25 +153,10 @@ class VoPage extends Component {
         });
     } else {
       //for add VO page
-      await axios
-        .post(
+      serviceProvider
+        .serviceProviderForPostRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",
-          {
-            name: voName,
-            address_1: voAddress,
-            contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
-              "Organization"
-            ][0],
-            block: block,
-            gp: gp,
-            person_incharge: person,
-            sub_type: "VO",
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+          postData
         )
         .then((res) => {
           this.setState({ formSubmitted: true });
