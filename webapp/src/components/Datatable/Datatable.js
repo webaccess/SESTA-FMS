@@ -67,7 +67,9 @@ const Table = (props) => {
     props.editData(id);
   };
   const viewData = (id) => {
-    props.viewData(id);
+    if (props.title === "Members") {
+      props.viewData(id);
+    }
   };
 
   const handleDeleteAllEvent = () => {
@@ -119,11 +121,15 @@ const Table = (props) => {
     {
       cell: (cell) => (
         <div onClick={(event) => editData(cell.id)} id={cell.id}>
-          <Tooltip title="Edit">
-            <IconButton aria-label="edit" value={cell[valueformodal]}>
-              <EditIcon className={classes.editIcon} />
-            </IconButton>
-          </Tooltip>
+          {valueForMemberPage !== "Loans" ? (
+            <Tooltip title="Edit">
+              <IconButton aria-label="edit" value={cell[valueformodal]}>
+                <EditIcon className={classes.editIcon} />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            ""
+          )}
         </div>
       ),
       button: true,
@@ -134,11 +140,15 @@ const Table = (props) => {
           onClick={(event) => deleteDataModal(cell.id, cell[valueformodal])}
           id={cell.id}
         >
-          <Tooltip title="Delete">
-            <IconButton aria-label="delete">
-              <DeleteIcon className={classes.deleteIcon} />
-            </IconButton>
-          </Tooltip>
+          {valueForMemberPage !== "Loans" ? (
+            <Tooltip title="Delete">
+              <IconButton aria-label="delete">
+                <DeleteIcon className={classes.deleteIcon} />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            ""
+          )}
         </div>
       ),
       button: true,
@@ -146,8 +156,8 @@ const Table = (props) => {
     {
       cell: (cell) => (
         <div onClick={(event) => viewData(cell.id, cell[valueformodal])}>
-          {valueForMemberPage == "Members" ? (
-            <Tooltip title="View">
+          {valueForMemberPage === "Members" ? (
+            <Tooltip title="Apply Loan">
               <IconButton aria-label="view">
                 <MoneyIcon className={classes.MoneyIcon} />
               </IconButton>
