@@ -197,7 +197,7 @@ export class Loanpurposes extends React.Component {
       axios
         .get(
           process.env.REACT_APP_SERVER_URL +
-            "loanmodels?product_name_contains=" +
+            "loan-models?product_name_contains=" +
             this.state.filterProduct,
           {
             headers: {
@@ -329,7 +329,7 @@ export class Loanpurposes extends React.Component {
                 // clicked={this.cancelForm}
                 onClick={this.cancelForm.bind(this)}
               >
-                Cancel
+                Reset
               </Button>
             </div>
             {data ? (

@@ -538,7 +538,7 @@ const modules = {
     order: 20,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
-  Loanpurposes: {
+  "Loan Purpose": {
     is_active: true,
     icon_class: "people",
     url: "/loanpurposes",
@@ -548,7 +548,7 @@ const modules = {
     order: 21,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
-  "Add Loanpurpose": {
+  "Add Loan Purpose": {
     is_active: true,
     icon_class: "",
     url: "/loanpurpose/add",
@@ -558,7 +558,7 @@ const modules = {
     order: 22,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
-  "Edit Loanpurpose": {
+  "Edit Loan Purpose": {
     is_active: true,
     icon_class: "",
     url: "/loanpurpose/edit/:id",

@@ -36,6 +36,9 @@ const useStyles = (theme) => ({
       color: "#008000",
     },
   },
+  labelHeader: {
+    fontSize: "17px",
+  },
 });
 
 class LoanpurposePage extends Component {
@@ -611,7 +614,7 @@ class LoanpurposePage extends Component {
         />
         <IconButton aria-label="remove" onClick={this.removeClick.bind(this)}>
           <RemoveCircleOutlined className={classes.Icon} />
-          Remove Task
+          <span className={classes.labelHeader}>Remove</span>
         </IconButton>
       </div>
     ));
@@ -648,7 +651,7 @@ class LoanpurposePage extends Component {
           onClick={this.removeEmiClick.bind(this)}
         >
           <RemoveCircleOutlined className={classes.Icon} />
-          Remove EMI Details
+          <span className={classes.labelHeader}>Remove</span>
         </IconButton>
       </div>
     ));
@@ -883,7 +886,7 @@ class LoanpurposePage extends Component {
                       onClick={this.addEmiClick.bind(this)}
                     >
                       <AddCircleOutlined className={classes.Icon} />
-                      Add EMI Details
+                      <span className={classes.labelHeader}>Add EMI</span>
                     </IconButton>
                   </Aux>
                 ) : (
@@ -917,7 +920,7 @@ class LoanpurposePage extends Component {
                       onClick={this.addClick.bind(this)}
                     >
                       <AddCircleOutlined className={classes.Icon} />
-                      Add Task
+                      <span className={classes.labelHeader}>Add Task</span>
                     </IconButton>
                   </Grid>
                 </Aux>
