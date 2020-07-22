@@ -1,0 +1,20 @@
+{
+  "connection": "default",
+  "collectionName": "loantasks",
+  "info": {
+    "name": "loantask"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "loan_model": {
+      "model": "loan-model",
+      "via": "loantasks"
+    },
+    "name": {
+      "type": "string"
+    }
+  }
+}

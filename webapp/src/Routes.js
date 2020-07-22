@@ -27,6 +27,8 @@ import Members from "./containers/Members/Members";
 import MembersPage from "./containers/Members/MembersPage";
 import Loans from "./containers/Loans/Loans";
 import LoansPage from "./containers/Loans/LoansPage";
+import Loanpurposes from "./containers/Loanpurpose/Loanpurposes";
+import LoanpurposePage from "./containers/Loanpurpose/LoanpurposePage";
 
 function Routes() {
   return (
@@ -97,6 +99,17 @@ function Routes() {
             />
             <PrivateRoute path="/loans" component={Loans} exact />
             <PrivateRoute path="/loans/view/:id" component={LoansPage} exact />
+            <PrivateRoute path="/Loanpurposes" component={Loanpurposes} exact />
+            <PrivateRoute
+              path="/Loanpurpose/add"
+              component={LoanpurposePage}
+              exact
+            />
+            <PrivateRoute
+              path="/Loanpurpose/edit/:id"
+              component={LoanpurposePage}
+              exact
+            />
             <Route path="/404" component={NotFoundPage} />
             <AuthRoute path="/:authType/:id?" component={AuthPage} />
           </Switch>

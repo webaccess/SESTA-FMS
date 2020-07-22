@@ -1,0 +1,52 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/loantasks",
+      "handler": "loantask.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/loantasks/count",
+      "handler": "loantask.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/loantasks/:id",
+      "handler": "loantask.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/loantasks",
+      "handler": "loantask.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/loantasks/:id",
+      "handler": "loantask.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/loantasks/:id",
+      "handler": "loantask.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}
