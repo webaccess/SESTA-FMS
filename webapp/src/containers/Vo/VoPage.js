@@ -38,12 +38,7 @@ class VoPage extends Component {
         addBlock: {},
         addGp: {},
       },
-      errors: {
-        addVo: [],
-        addVoAddress: [],
-        addPerson: [],
-        addGp: [],
-      },
+      errors: {},
       serverErrors: {},
       formSubmitted: "",
       stateSelected: false,
@@ -131,7 +126,7 @@ class VoPage extends Component {
       block: block,
       gp: gp,
     };
-
+    if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
       // for edit Vo page
       serviceProvider

@@ -1,4 +1,5 @@
 {
+  "kind": "collectionType",
   "connection": "default",
   "collectionName": "emidetails",
   "info": {
@@ -10,8 +11,8 @@
   },
   "attributes": {
     "loan_model": {
-      "model": "loan-model",
-      "via": "emidetails"
+      "via": "emidetails",
+      "model": "loan-model"
     },
     "principal": {
       "type": "decimal"
