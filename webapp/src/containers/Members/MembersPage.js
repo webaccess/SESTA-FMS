@@ -127,25 +127,7 @@ class ActivityPage extends Component {
           required: { value: "true", message: "Field is required" },
         },
       },
-      errors: {
-        firstName: [],
-        lastName: [],
-        address: [],
-        addState: [],
-        addDistrict: [],
-        addBlock: [],
-        addGp: [],
-        addVillage: [],
-        addPincode: [],
-        noOfShares: [],
-        shareAmt: [],
-        certificateNo: [],
-        nominee: [],
-        username: [],
-        password: [],
-        role: [],
-        selectField: [],
-      },
+      errors: {},
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
@@ -292,18 +274,27 @@ class ActivityPage extends Component {
     const validationsShareholder = this.state.validationsShareholder;
     const validationsCreateuser = this.state.validationsCreateuser;
     const allValiations = validations;
-
+    console.log("--allvalidations--", allValiations);
     if (this.state.isShareholder) {
+      console.log("--if --");
       Object.assign(allValiations, validationsShareholder);
     } else {
-      delete allValiations[validationsShareholder];
+      console.log("--else--");
+      delete allValiations["certificateNo"];
+      delete allValiations["nominee"];
+      delete allValiations["shareAmt"];
+      delete allValiations["noOfShares"];
+      delete allValiations["certificateNo"];
     }
     if (this.state.createUser) {
       Object.assign(allValiations, validationsCreateuser);
     } else {
-      delete allValiations[validationsCreateuser];
+      delete allValiations["username"];
+      delete allValiations["password"];
+      delete allValiations["role"];
+      delete allValiations["selectField"];
     }
-
+    console.log("--after allvalidations--", allValiations);
     map(allValiations, (validation, key) => {
       let value = values[key] ? values[key] : "";
       const errors = validateInput(value, validation);
@@ -515,7 +506,7 @@ class ActivityPage extends Component {
       last_name: lName,
       partner_name: hName,
     };
-
+    if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
       // edit present member (update API)
       serviceProvider
@@ -664,16 +655,18 @@ class ActivityPage extends Component {
     };
 
     let postIndividualData = {};
-    if (roleId.name === "SHG Member") {
-      postIndividualData = {
-        shg: selectFieldId,
-        vo: 0,
-      };
-    } else if (roleId.name === "CSP (Community Service Provider)") {
-      postIndividualData = {
-        vo: selectFieldId,
-        shg: 0,
-      };
+    if (roleId) {
+      if (roleId.name === "SHG Member") {
+        postIndividualData = {
+          shg: selectFieldId,
+          vo: 0,
+        };
+      } else if (roleId.name === "CSP (Community Service Provider)") {
+        postIndividualData = {
+          vo: selectFieldId,
+          shg: 0,
+        };
+      }
     } else {
       postIndividualData = {
         vo: 0,

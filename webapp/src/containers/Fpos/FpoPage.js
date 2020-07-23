@@ -55,10 +55,7 @@ class FpoPage extends Component {
           },
         },
       },
-      errors: {
-        addDistrict: [],
-        addState: [],
-      },
+      errors: {},
       formSubmitted: "",
       errorCode: "",
       stateSelected: false,
@@ -211,7 +208,7 @@ class FpoPage extends Component {
       email: fpoEmail,
       phone: fpoPhone,
     };
-
+    if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
       serviceProvider
         .serviceProviderForPutRequest(
