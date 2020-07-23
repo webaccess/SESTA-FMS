@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Layout from "../../hoc/Layout/Layout";
+import * as serviceProvider from "../../api/Axios";
 import axios from "axios";
 import auth from "../../components/Auth/Auth";
 import { withStyles } from "@material-ui/core/styles";
@@ -128,10 +129,10 @@ class LoanpurposePage extends Component {
       let stateId = "";
       this.setState({
         checkedTasks: true,
-        checkedTasks: true,
+        checkedb: true,
       });
-      await axios
-        .get(
+      serviceProvider
+        .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "loan-models/" +
             this.state.editPage[1],
@@ -154,6 +155,7 @@ class LoanpurposePage extends Component {
           });
           if (res.data.emidetails) {
             let getEmi = res.data.emidetails;
+            console.log("getEmi---", getEmi);
             for (let i in getEmi) {
               this.setState({
                 emidetails: {
@@ -163,6 +165,7 @@ class LoanpurposePage extends Component {
                 },
               });
             }
+            console.log("--safter setting----", this.state.emidetails);
           } else {
             this.setState({
               checkedB: false,
@@ -171,6 +174,7 @@ class LoanpurposePage extends Component {
           }
           if (res.data.loantasks) {
             let getTasks = res.data.loantasks;
+            console.log("getTasks----", getTasks);
             for (let i in getTasks) {
               this.setState({
                 loantasks: {
@@ -182,6 +186,7 @@ class LoanpurposePage extends Component {
           } else {
             this.setState({
               checkedB: false,
+
               checkedTasks: false,
             });
           }
@@ -191,23 +196,10 @@ class LoanpurposePage extends Component {
         });
     }
 
-    await axios
-      .get(process.env.REACT_APP_SERVER_URL + "loan-models/", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
-      .then((res) => {});
-
-    await axios
-      .get(
+    serviceProvider
+      .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&organization.sub_type=FPO&&_sort=name:ASC",
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        }
+          "crm-plugin/contact/?contact_type=organization&organization.sub_type=FPO&&_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ getFPO: res.data });
@@ -218,8 +210,8 @@ class LoanpurposePage extends Component {
   handleChange = ({ target }) => {
     this.setState({
       values: { ...this.state.values, [target.name]: target.value },
-      emidetails: { ...this.state.emidetails, [target.name]: target.value },
-      loantasks: { ...this.state.loantasks, [target.name]: target.value },
+      //emidetails: { ...this.state.emidetails, [target.name]: target.value },
+      //loantasks: { ...this.state.loantasks, [target.name]: target.value },
     });
   };
   handleEMIChange(i, event) {
@@ -386,8 +378,8 @@ class LoanpurposePage extends Component {
     if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
       // let bankIds = "";
-      await axios
-        .put(
+      serviceProvider
+        .serviceProviderForPutRequest(
           process.env.REACT_APP_SERVER_URL +
             "loan-models/" +
             this.state.editPage[1],
@@ -423,8 +415,8 @@ class LoanpurposePage extends Component {
           console.log(error);
         });
     } else {
-      await axios
-        .post(
+      serviceProvider
+        .serviceProviderForPostRequest(
           process.env.REACT_APP_SERVER_URL + "loan-models/",
           {
             product_name: productName,
@@ -433,11 +425,6 @@ class LoanpurposePage extends Component {
             loan_amount: addAmount,
             fpo: addFPO,
             emi: loanEmi,
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
           }
         )
         .then((res) => {
@@ -466,18 +453,13 @@ class LoanpurposePage extends Component {
     if (data.emidetails.addPrincipal) {
       if (this.state.checkedB) {
         for (let i in addPrincipal) {
-          await axios
-            .put(
+          serviceProvider
+            .serviceProviderForPutRequest(
               process.env.REACT_APP_SERVER_URL + "emidetails/",
               {
                 principal: this.state.addPrincipal[i],
                 interest: this.state.addInterest[i],
                 loan_model: Id,
-              },
-              {
-                headers: {
-                  Authorization: "Bearer " + auth.getToken() + "",
-                },
               }
             )
             .then((res) => {})
@@ -487,16 +469,11 @@ class LoanpurposePage extends Component {
         }
       } else {
         if (this.state.emidetails.emId) {
-          axios
-            .delete(
+          serviceProvider
+            .serviceProviderForDeleteRequest(
               process.env.REACT_APP_SERVER_URL +
-                "emidetails/" +
-                this.state.emidetails.emId,
-              {
-                headers: {
-                  Authorization: "Bearer " + auth.getToken() + "",
-                },
-              }
+                "emidetails" +
+                this.state.emidetails.emId
             )
             .then((res) => {})
             .catch((error) => {
@@ -506,18 +483,13 @@ class LoanpurposePage extends Component {
       }
     } else {
       for (let i in addPrincipal) {
-        await axios
-          .post(
+        serviceProvider
+          .serviceProviderForPostRequest(
             process.env.REACT_APP_SERVER_URL + "emidetails/",
             {
               principal: this.state.addPrincipal[i],
               interest: this.state.addInterest[i],
               loan_model: Id,
-            },
-            {
-              headers: {
-                Authorization: "Bearer " + auth.getToken() + "",
-              },
             }
           )
           .then((res) => {})
@@ -533,17 +505,12 @@ class LoanpurposePage extends Component {
     if (data.loantasks.length > 0) {
       if (this.state.checkedTasks) {
         for (let i in TaskName) {
-          await axios
-            .put(
+          serviceProvider
+            .serviceProviderForPutRequest(
               process.env.REACT_APP_SERVER_URL + "loantasks/",
               {
                 name: TaskName[i],
                 loan_model: Id,
-              },
-              {
-                headers: {
-                  Authorization: "Bearer " + auth.getToken() + "",
-                },
               }
             )
             .then((res) => {})
@@ -553,16 +520,11 @@ class LoanpurposePage extends Component {
         }
       } else {
         if (this.state.loantasks.taskId) {
-          axios
-            .delete(
+          serviceProvider
+            .serviceProviderForDeleteRequest(
               process.env.REACT_APP_SERVER_URL +
-                "loantasks/" +
-                this.state.loantasks.taskId,
-              {
-                headers: {
-                  Authorization: "Bearer " + auth.getToken() + "",
-                },
-              }
+                "loantasks" +
+                this.state.loantasks.taskId
             )
             .then((res) => {})
             .catch((error) => {
@@ -572,17 +534,12 @@ class LoanpurposePage extends Component {
       }
     } else {
       for (let i in TaskName) {
-        await axios
-          .post(
+        serviceProvider
+          .serviceProviderForPostRequest(
             process.env.REACT_APP_SERVER_URL + "loantasks/",
             {
               name: TaskName[i],
               loan_model: Id,
-            },
-            {
-              headers: {
-                Authorization: "Bearer " + auth.getToken() + "",
-              },
             }
           )
           .then((res) => {})
@@ -621,7 +578,11 @@ class LoanpurposePage extends Component {
   }
   createEmiUI() {
     const { classes } = this.props;
-
+    console.log(
+      "---this.state.emidetails in createemiui---",
+      this.state.emidetails,
+      this.state.emidetails.addPrincipal
+    );
     return this.state.addPrincipal.map((el, i) => (
       <div key={i}>
         <Grid item md={6} xs={12}>
@@ -698,7 +659,8 @@ class LoanpurposePage extends Component {
     let isCancel = this.state.isCancel;
     let checkedB = this.state.checkedB;
     let checkedTasks = this.state.checkedTasks;
-
+    let emidetails = this.state.emidetails;
+    console.log("---rin render", this.state.emidetails);
     return (
       <Layout
       // breadcrumbs={
