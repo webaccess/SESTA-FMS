@@ -36,9 +36,12 @@
       "type": "decimal"
     },
     "loan_applications": {
-      "collection": "loan-application",
       "via": "loan_app_installments",
+      "collection": "loan-application",
       "dominant": true
+    },
+    "actual_payment_date": {
+      "type": "date"
     }
   }
 }

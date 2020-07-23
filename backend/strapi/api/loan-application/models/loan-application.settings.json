@@ -23,21 +23,25 @@
     },
     "status": {
       "type": "enumeration",
-      "enum": ["UnderReview", "Approved", "Denied", "Cancelled"],
+      "enum": [
+        "UnderReview",
+        "Approved",
+        "Denied",
+        "Cancelled"
+      ],
       "required": true
     },
     "approved_date": {
       "type": "date",
-      "required": true
+      "required": false
     },
     "review_comments": {
       "type": "string"
     },
-    "contacts": {
+    "contact": {
       "plugin": "crm-plugin",
-      "collection": "contact",
-      "via": "loan_applications",
-      "dominant": true
+      "model": "contact",
+      "via": "loan_applications"
     },
     "approved_by": {
       "plugin": "crm-plugin",
@@ -48,13 +52,13 @@
       "model": "loan-application-tasks",
       "via": "loan_application"
     },
-    "loan_model": {
-      "model": "loan-model",
-      "via": "loan_application"
-    },
     "loan_app_installments": {
+      "collection": "loan-application-installments",
+      "via": "loan_applications"
+    },
+    "loan_model": {
       "via": "loan_applications",
-      "collection": "loan-application-installments"
+      "model": "loan-model"
     }
   }
 }

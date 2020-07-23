@@ -35,17 +35,17 @@
       "model": "contact",
       "via": "loan_model"
     },
-    "loan_application": {
-      "via": "loan_model",
-      "model": "loan-application"
+    "loan_applications": {
+      "collection": "loan-application",
+      "via": "loan_model"
     },
     "emidetails": {
-      "via": "loan_model",
-      "collection": "emidetails"
+      "collection": "emidetails",
+      "via": "loan_model"
     },
     "loantasks": {
-      "via": "loan_model",
-      "collection": "loantask"
+      "collection": "loantask",
+      "via": "loan_model"
     }
   }
 }
