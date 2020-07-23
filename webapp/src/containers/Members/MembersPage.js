@@ -274,12 +274,9 @@ class ActivityPage extends Component {
     const validationsShareholder = this.state.validationsShareholder;
     const validationsCreateuser = this.state.validationsCreateuser;
     const allValiations = validations;
-    console.log("--allvalidations--", allValiations);
     if (this.state.isShareholder) {
-      console.log("--if --");
       Object.assign(allValiations, validationsShareholder);
     } else {
-      console.log("--else--");
       delete allValiations["certificateNo"];
       delete allValiations["nominee"];
       delete allValiations["shareAmt"];
@@ -294,7 +291,6 @@ class ActivityPage extends Component {
       delete allValiations["role"];
       delete allValiations["selectField"];
     }
-    console.log("--after allvalidations--", allValiations);
     map(allValiations, (validation, key) => {
       let value = values[key] ? values[key] : "";
       const errors = validateInput(value, validation);
