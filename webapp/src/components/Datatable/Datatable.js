@@ -12,6 +12,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import { makeStyles } from "@material-ui/styles";
 import MoneyIcon from "@material-ui/icons/Money";
 import Tooltip from "@material-ui/core/Tooltip";
+import PrintIcon from "@material-ui/icons/Print";
 
 const useStyles = makeStyles((theme) => ({
   editIcon: {
@@ -33,6 +34,15 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   MoneyIcon: {
+    color: "#131514",
+    "&:hover": {
+      color: "#282F2B",
+    },
+    "&:active": {
+      color: "#282F2B",
+    },
+  },
+  PrintIcon: {
     color: "#131514",
     "&:hover": {
       color: "#282F2B",
@@ -70,6 +80,10 @@ const Table = (props) => {
     if (props.title === "Members") {
       props.viewData(id);
     }
+  };
+
+  const customAction = (id) => {
+    props.customAction(id);
   };
 
   const handleDeleteAllEvent = () => {
@@ -118,6 +132,22 @@ const Table = (props) => {
   const [isActiveAllShowing, setisActiveAllShowing] = React.useState(false);
 
   const column = [
+    {
+      cell: (cell) => (
+        <div onClick={(event) => customAction(cell.id, cell[valueformodal])}>
+          {valueForMemberPage === "Loans" ? (
+            <Tooltip title="Print Loan Applications">
+              <IconButton aria-label="view">
+                <PrintIcon className={classes.PrintIcon} />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            ""
+          )}
+        </div>
+      ),
+      button: true,
+    },
     {
       cell: (cell) => (
         <div onClick={(event) => editData(cell.id)} id={cell.id}>

@@ -9,6 +9,7 @@ var path = require("path");
 const puppeteer = require("puppeteer");
 module.exports = {
   printPDF: async (ctx) => {
+    console.log("id", ctx.params.id);
     try {
       var content = fs.readFileSync(
         path.resolve(__dirname, "../../../assets/files/Loan-Application.html"),
@@ -22,6 +23,8 @@ module.exports = {
       // SHG_BANK;
       // SHG_BANK_BRANCH;
       // SHG_BANK_IFSC;
+      //{MEMBER_NAME}
+      //MEMBER_HUSBAND_NAME
       // await fs.writeFileSync(
       //   path.resolve(__dirname, "../../../assets/files/Loan-Application1.html"),
       //   contentVal
@@ -63,9 +66,14 @@ module.exports = {
         },
       });
       await browser.close();
+      console.log("enters this");
+      // ctx.type = "application/pdf; charset=utf-8";
+      // ctx.set("Content-Disposition: attachment; filename=Loan_application.pdf");
+      // ctx.body = buffer;
       return ctx.send(buffer);
     } catch (error) {
       console.error(error);
+
       return ctx.badRequest(null, error.message);
     }
   },

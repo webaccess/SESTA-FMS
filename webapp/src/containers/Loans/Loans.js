@@ -188,6 +188,30 @@ export class Loans extends React.Component {
     }
   }
 
+  customAction = (cellid) => {
+    let memberData;
+    // this.state.data.map((memData) => {
+    //   if (cellid == memData.id) {
+    //     memberData = memData;
+    //   }
+    // });
+    // serviceProvider
+    //   .serviceProviderForGetRequest(
+    //     process.env.REACT_APP_SERVER_URL + "loan-applications-print/" + cellid
+    //   )
+    //   .then((res) => {
+    //     console.log("done here");
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+    window.location.href =
+      process.env.REACT_APP_SERVER_URL + "loan-applications-print/" + cellid;
+    // this.props.history.push(
+    //   process.env.REACT_APP_SERVER_URL + "loan-applications-print/" + cellid
+    // );
+  };
+
   render() {
     const { classes } = this.props;
 
@@ -361,6 +385,7 @@ export class Loans extends React.Component {
               column={Usercolumns}
               // viewMemberData={this.viewMemberData}
               viewData={this.viewData}
+              customAction={this.customAction}
               // editData={this.editData}
               DeleteData={this.DeleteData}
               DeleteAll={this.DeleteAll}

@@ -10,7 +10,7 @@
     },
     {
       "method": "GET",
-      "path": "/loan-applications-print",
+      "path": "/loan-applications-print/:id",
       "handler": "loan-application.printPDF",
       "config": {
         "policies": []
