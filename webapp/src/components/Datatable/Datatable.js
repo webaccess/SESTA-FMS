@@ -294,6 +294,7 @@ const Table = (props) => {
               )
             }
             noHeader={selected.length === 0 || selected.length < 2}
+            conditionalRowStyles={props.conditionalRowStyles}
           />
         </Card>
         <Modal

@@ -232,23 +232,21 @@ class LoansPage extends Component {
 
         else if (loanapp.status == "Denied" || loanapp.status == "Cancelled") {
           if (!loanApplied && !activeLoanPresent && !loanAlreadyApplied) {
-            this.saveApplyLoan(loan_application_data, postData.id);
+            this.saveApplyLoan(loan_application_data, postData.id, assignLoanAppValues);
             loanApplied = true;
             loanAlreadyApplied = false;
             activeLoanPresent = false;
-            this.props.history.push({ pathname: "/loans", state: { loanApplied: true, purpose: assignLoanAppValues.product_name } });
           }
         }
       })
     } else {
-      this.saveApplyLoan(loan_application_data, postData.id);
+      this.saveApplyLoan(loan_application_data, postData.id, assignLoanAppValues);
       loanApplied = true;
       this.setState({ loanApplied: true });
-      this.props.history.push({ pathname: "/loans", state: { loanApplied: true, purpose: assignLoanAppValues.product_name } });
     }
   }
 
-  saveApplyLoan(postData, memberId) {
+  saveApplyLoan(postData, memberId, assignLoanAppValues) {
     serviceProvider
       .serviceProviderForPostRequest(
         // process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
@@ -257,6 +255,7 @@ class LoansPage extends Component {
       )
       .then((res) => {
         this.getMemberData(memberId);
+        this.props.history.push({ pathname: "/loans", state: { loanApplied: true, purpose: assignLoanAppValues.product_name, memberData: res.data } });
       })
       .catch((error) => {
         console.log('error applying loan ', error);
