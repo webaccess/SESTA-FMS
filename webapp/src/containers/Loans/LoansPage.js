@@ -249,12 +249,25 @@ class LoansPage extends Component {
   saveApplyLoan(postData, memberId, assignLoanAppValues) {
     serviceProvider
       .serviceProviderForPostRequest(
-        // process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
         process.env.REACT_APP_SERVER_URL + "loan-applications",
         postData
       )
       .then((res) => {
         this.getMemberData(memberId);
+
+        // put method to update application_no
+        let updateAppNo = res.data;
+        updateAppNo.application_no = res.data.id;
+
+        serviceProvider
+          .serviceProviderForPutRequest(
+            process.env.REACT_APP_SERVER_URL + "loan-applications",
+            res.data.id,
+            updateAppNo
+          )
+          .then((loanapp_res) => {
+          })
+
         this.props.history.push({ pathname: "/loans", state: { loanApplied: true, purpose: assignLoanAppValues.product_name, memberData: res.data } });
       })
       .catch((error) => {

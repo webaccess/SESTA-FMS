@@ -56,7 +56,7 @@ const useStyles = (theme) => ({
 
 const conditionalRowStyles = [
   {
-    when: row => row.status == "UnderReview" || row.status == "Approved",
+    when: row => row.status == "Approved",
     style: {
       backgroundColor: '#c9e7b1',
       color: 'black',
@@ -69,16 +69,16 @@ const conditionalRowStyles = [
   {
     when: row => row.status == "Denied",
     style: {
-      backgroundColor: '#c2d6d6',
+      backgroundColor: '#d7dbdb',
       color: 'black',
       '&:hover': {
-        backgroundColor: "#b3cccc",
+        backgroundColor: "#c9cfcf",
         cursor: 'pointer',
       },
     },
   },
   {
-    when: row => row.status == "Cancelled",
+    when: row => row.status == "UnderReview" || row.status == "Cancelled",
     style: {
       backgroundColor: '#ffd6cc',
       color: 'black',

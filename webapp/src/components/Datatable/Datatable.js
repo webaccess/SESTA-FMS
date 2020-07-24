@@ -12,6 +12,9 @@ import EditIcon from "@material-ui/icons/Edit";
 import { makeStyles } from "@material-ui/styles";
 import MoneyIcon from "@material-ui/icons/Money";
 import Tooltip from "@material-ui/core/Tooltip";
+import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
+import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
+import PrintIcon from '@material-ui/icons/Print';
 
 const useStyles = makeStyles((theme) => ({
   editIcon: {
@@ -158,8 +161,56 @@ const Table = (props) => {
         <div onClick={(event) => viewData(cell.id, cell[valueformodal])}>
           {valueForMemberPage === "Members" ? (
             <Tooltip title="Apply Loan">
-              <IconButton aria-label="view">
+              <IconButton aria-label="applyloan">
                 <MoneyIcon className={classes.MoneyIcon} />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            ""
+          )}
+        </div>
+      ),
+      button: true,
+    },
+    {
+      cell: (cell) => (
+        <div onClick={(event) => viewData(cell.id, cell[valueformodal])}>
+          {valueForMemberPage === "Loans" ? (
+            <Tooltip title="Activity">
+              <IconButton aria-label="activity">
+                <AssignmentIndIcon className={classes.AssignmentTurnedInIcon} />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            ""
+          )}
+        </div>
+      ),
+      button: true,
+    },
+    {
+      cell: (cell) => (
+        <div onClick={(event) => viewData(cell.id, cell[valueformodal])}>
+          {valueForMemberPage === "Loans" ? (
+            <Tooltip title="Task">
+              <IconButton aria-label="task">
+                <AssignmentTurnedInIcon className={classes.AssignmentTurnedInIcon} />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            ""
+          )}
+        </div>
+      ),
+      button: true,
+    },
+    {
+      cell: (cell) => (
+        <div onClick={(event) => viewData(cell.id, cell[valueformodal])}>
+          {valueForMemberPage === "Loans" ? (
+            <Tooltip title="Print">
+              <IconButton aria-label="print">
+                <PrintIcon className={classes.PrintIcon} />
               </IconButton>
             </Tooltip>
           ) : (
