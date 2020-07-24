@@ -13,18 +13,23 @@
       "type": "date",
       "required": true
     },
-    "status": {
-      "type": "boolean"
-    },
     "comments": {
       "type": "string"
     },
     "loan_application": {
       "model": "loan-application",
-      "via": "loan_application_task"
+      "via": "loan_application_tasks"
     },
-    "Name": {
+    "name": {
       "type": "string"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "Completed",
+        "Scheduled",
+        "Cancelled"
+      ]
     }
   }
 }

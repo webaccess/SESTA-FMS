@@ -217,6 +217,16 @@ export class Loans extends React.Component {
     this.props.history.push("/loans/view/:id");
   };
 
+  loanApproveData = (cellid) => {
+    let loanAppData;
+    this.state.data.map((item) => {
+      if (cellid == item.id) {
+        loanAppData = item;
+      }
+    });
+    this.props.history.push("/loans/approve/" + cellid, loanAppData);
+  };
+
   handleShgChange(event, value) {
     if (value !== null) {
       this.setState({ filterShg: value, isCancel: false });
@@ -416,9 +426,8 @@ export class Loans extends React.Component {
               filters={filters}
               data={data}
               column={Usercolumns}
-              // viewMemberData={this.viewMemberData}
+              loanApproveData={this.loanApproveData}
               viewData={this.viewData}
-              // editData={this.editData}
               DeleteData={this.DeleteData}
               DeleteAll={this.DeleteAll}
               rowsSelected={this.rowsSelect}
