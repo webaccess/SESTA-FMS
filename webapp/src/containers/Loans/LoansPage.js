@@ -232,31 +232,43 @@ class LoansPage extends Component {
 
         else if (loanapp.status == "Denied" || loanapp.status == "Cancelled") {
           if (!loanApplied && !activeLoanPresent && !loanAlreadyApplied) {
-            this.saveApplyLoan(loan_application_data, postData.id);
+            this.saveApplyLoan(loan_application_data, postData.id, assignLoanAppValues);
             loanApplied = true;
             loanAlreadyApplied = false;
             activeLoanPresent = false;
-            this.props.history.push({ pathname: "/loans", state: { loanApplied: true, purpose: assignLoanAppValues.product_name } });
           }
         }
       })
     } else {
-      this.saveApplyLoan(loan_application_data, postData.id);
+      this.saveApplyLoan(loan_application_data, postData.id, assignLoanAppValues);
       loanApplied = true;
       this.setState({ loanApplied: true });
-      this.props.history.push({ pathname: "/loans", state: { loanApplied: true, purpose: assignLoanAppValues.product_name } });
     }
   }
 
-  saveApplyLoan(postData, memberId) {
+  saveApplyLoan(postData, memberId, assignLoanAppValues) {
     serviceProvider
       .serviceProviderForPostRequest(
-        // process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
         process.env.REACT_APP_SERVER_URL + "loan-applications",
         postData
       )
       .then((res) => {
         this.getMemberData(memberId);
+
+        // put method to update application_no
+        let updateAppNo = res.data;
+        updateAppNo.application_no = res.data.id;
+
+        serviceProvider
+          .serviceProviderForPutRequest(
+            process.env.REACT_APP_SERVER_URL + "loan-applications",
+            res.data.id,
+            updateAppNo
+          )
+          .then((loanapp_res) => {
+          })
+
+        this.props.history.push({ pathname: "/loans", state: { loanApplied: true, purpose: assignLoanAppValues.product_name, memberData: res.data } });
       })
       .catch((error) => {
         console.log('error applying loan ', error);

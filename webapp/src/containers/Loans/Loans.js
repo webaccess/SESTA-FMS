@@ -54,6 +54,41 @@ const useStyles = (theme) => ({
   },
 });
 
+const conditionalRowStyles = [
+  {
+    when: row => row.status == "Approved",
+    style: {
+      backgroundColor: '#c9e7b1',
+      color: 'black',
+      '&:hover': {
+        backgroundColor: "#bce09e",
+        cursor: 'pointer',
+      },
+    },
+  },
+  {
+    when: row => row.status == "Denied",
+    style: {
+      backgroundColor: '#d7dbdb',
+      color: 'black',
+      '&:hover': {
+        backgroundColor: "#c9cfcf",
+        cursor: 'pointer',
+      },
+    },
+  },
+  {
+    when: row => row.status == "UnderReview" || row.status == "Cancelled",
+    style: {
+      backgroundColor: '#ffd6cc',
+      color: 'black',
+      '&:hover': {
+        backgroundColor: "#ffc2b3",
+        cursor: 'pointer',
+      },
+    },
+  }
+];
 export class Loans extends React.Component {
   constructor(props) {
     super(props);
@@ -95,23 +130,13 @@ export class Loans extends React.Component {
       .catch((error) => {
         console.log(error);
       });
-
   }
 
   getFormattedData = (data) => {
     let amount_due;
     data.map((loandata) => {
       loandata.application_date = Moment(loandata.application_date).format("DD MMM YYYY");
-
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-          "loan-models/?id=" + loandata.loan_model.id
-        )
-        .then((res) => {
-          // this.setState({ getShg: res.data });
-        })
-    });
+    })
     this.setState({ data: data });
   };
 
@@ -125,10 +150,33 @@ export class Loans extends React.Component {
       searchData += searchData ? "&&" : "";
       searchData += "status=" + this.state.filterStatus.name;
     }
-    // if (this.state.filterShg) {
-    //   searchData += searchData ? "&&" : "";
-    //   searchData += "individual.shg=" + this.state.filterShg.id;
-    // }
+    this.searchData(searchData);
+
+    if (this.state.filterShg) {
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals"
+      )
+      .then((res) => {
+        res.data.map(shgcontact=>{
+          if(this.state.filterShg.id == shgcontact.shg.id) {
+            searchData += searchData ? "&&" : "";
+            searchData += "contact.id=" + shgcontact.contact.id;
+            this.searchData(searchData);
+          } else {
+            searchData += searchData ? "&&" : "";
+            searchData += "contact.id=" + 0;
+            this.searchData(searchData);
+          }
+        })
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    }
+  }
+
+  searchData(searchData) {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL + "loan-applications?" + searchData
@@ -166,7 +214,6 @@ export class Loans extends React.Component {
   };
 
   viewData = (cellid) => {
-    // this.props.history.push("/loans/view" + cellid);
     this.props.history.push("/loans/view/:id");
   };
 
@@ -183,8 +230,6 @@ export class Loans extends React.Component {
   render() {
     const { classes } = this.props;
     let data = this.state.data;
-    console.log('data ==>', data);
-
     let shgFilter = this.state.getShg;
     let filterShg = this.state.filterShg;
     let statusFilter = this.state.getStatus;
@@ -220,11 +265,13 @@ export class Loans extends React.Component {
         name: "Amount Due",
         selector: "loan_app_installments.amount_due",
         sortable: true,
+        cell: row => row.loan_app_installments.amount_due? row.loan_app_installments.amount_due : '-'
       },
       {
         name: "Installment Date",
         selector: "loan_app_installments.payment_date",
         sortable: true,
+        cell: row => row.loan_app_installments.payment_date? row.loan_app_installments.payment_date : '-'
       },
     ];
     let selectors = [];
@@ -283,7 +330,7 @@ export class Loans extends React.Component {
                 </Grid>
               </div>
             </div>
-            {/* <div className={classes.searchInput}>
+            <div className={classes.searchInput}>
               <div className={style.Districts}>
                 <Grid item md={12} xs={12}>
                   <Autocomplete
@@ -312,7 +359,7 @@ export class Loans extends React.Component {
                   />
                 </Grid>
               </div>
-            </div> */}
+            </div>
             <div className={classes.searchInput}>
               <div className={style.Districts}>
                 <Grid item md={12} xs={12}>
@@ -376,6 +423,7 @@ export class Loans extends React.Component {
               DeleteAll={this.DeleteAll}
               rowsSelected={this.rowsSelect}
               columnsvalue={columnsvalue}
+              conditionalRowStyles={conditionalRowStyles}
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (

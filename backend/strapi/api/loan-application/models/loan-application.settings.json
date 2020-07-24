@@ -10,7 +10,7 @@
   },
   "attributes": {
     "application_no": {
-      "type": "string",
+      "type": "integer",
       "required": true
     },
     "application_date": {
@@ -49,8 +49,8 @@
       "via": "loan_app_approvedby"
     },
     "loan_application_task": {
-      "model": "loan-application-tasks",
-      "via": "loan_application"
+      "via": "loan_application",
+      "model": "loan-application-tasks"
     },
     "loan_app_installments": {
       "collection": "loan-application-installments",

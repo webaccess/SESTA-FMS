@@ -20,8 +20,11 @@
       "type": "string"
     },
     "loan_application": {
-      "via": "loan_application_task",
-      "model": "loan-application"
+      "model": "loan-application",
+      "via": "loan_application_task"
+    },
+    "Name": {
+      "type": "string"
     }
   }
 }
