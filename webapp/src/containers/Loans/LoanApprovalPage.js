@@ -14,6 +14,8 @@ import Moment from "moment";
 import { Link } from "react-router-dom";
 import * as constants from "../../constants/Constants";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
+import { map } from "lodash";
+import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
 
 const useStyles = (theme) => ({
   root: {
@@ -63,6 +65,15 @@ class LoanApprovalPage extends Component {
       selectedFile: null,
       fileDataArray: [],
       fileName: "",
+      validations: {
+        comment: {
+          required: {
+            value: "true",
+            message: "Comment is required",
+          },
+        },
+      },
+      errors: {},
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
@@ -140,6 +151,29 @@ class LoanApprovalPage extends Component {
       });
   };
 
+  validate = () => {
+    const values = this.state.values;
+    const validations = this.state.validations;
+    map(validations, (validation, key) => {
+      let value = values[key] ? values[key] : "";
+      const errors = validateInput(value, validation);
+
+      let errorset = this.state.errors;
+      if (errors.length > 0) errorset[key] = errors;
+      else delete errorset[key];
+      this.setState({ errors: errorset });
+    });
+  };
+
+  hasError = (field) => {
+    if (this.state.errors[field] !== undefined) {
+      return Object.keys(this.state.errors).length > 0 &&
+        this.state.errors[field].length > 0
+        ? true
+        : false;
+    }
+  };
+
   handleStatusChange = (event, value) => {
     if (value !== null) {
       this.setState({
@@ -169,6 +203,8 @@ class LoanApprovalPage extends Component {
   };
 
   onSave = () => {
+    this.validate();
+    if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.selectedFile !== null) {
       const formData = new FormData(); // Create an object of formData
       formData.append("files", this.state.selectedFile); // Update the formData object
@@ -460,7 +496,6 @@ class LoanApprovalPage extends Component {
                         label="Select Status"
                         name="loanStatus"
                         variant="outlined"
-                        // error={this.hasError("loanStatus")}
                       />
                     )}
                   />
@@ -470,12 +505,12 @@ class LoanApprovalPage extends Component {
                     fullWidth
                     label="Comment"
                     name="comment"
-                    // error={this.hasError("comment")}
-                    // helperText={
-                    //   this.hasError("comment")
-                    //     ? this.state.errors.comment[0]
-                    //     : null
-                    // }
+                    error={this.hasError("comment")}
+                    helperText={
+                      this.hasError("comment")
+                        ? this.state.errors.comment[0]
+                        : null
+                    }
                     value={this.state.values.comment || ""}
                     onChange={this.handleChange}
                     variant="outlined"
