@@ -26,19 +26,18 @@
     },
     "actual_principal": {
       "type": "decimal",
-      "required": true
+      "required": false
     },
     "actual_interest": {
       "type": "decimal",
-      "required": true
+      "required": false
     },
     "fine": {
       "type": "decimal"
     },
-    "loan_applications": {
-      "via": "loan_app_installments",
-      "collection": "loan-application",
-      "dominant": true
+    "loan_application": {
+      "model": "loan-application",
+      "via": "loan_app_installments"
     },
     "actual_payment_date": {
       "type": "date"

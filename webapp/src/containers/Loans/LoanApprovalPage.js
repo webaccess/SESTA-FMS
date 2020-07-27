@@ -4,20 +4,16 @@ import Layout from "../../hoc/Layout/Layout";
 import { withStyles } from "@material-ui/core/styles";
 import * as serviceProvider from "../../api/Axios";
 import auth from "../../components/Auth/Auth";
-import Table from "../../components/Datatable/Datatable.js";
 import Autocomplete from "../../components/Autocomplete/Autocomplete";
 import Input from "../../components/UI/Input/Input";
-import { Card, Divider, Grid } from "@material-ui/core";
+import { Card, Divider, Grid, Fab } from "@material-ui/core";
 import PersonIcon from "@material-ui/icons/Person";
 import MoneyIcon from "@material-ui/icons/Money";
-import TextField from "@material-ui/core/TextField";
 import Button from "../../components/UI/Button/Button";
 import Moment from "moment";
-import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import { Link } from "react-router-dom";
 import * as constants from "../../constants/Constants";
-import { sign } from "crypto";
-import { size } from "lodash";
+import FileCopyIcon from "@material-ui/icons/FileCopy";
 
 const useStyles = (theme) => ({
   root: {
@@ -25,39 +21,8 @@ const useStyles = (theme) => ({
       margin: theme.spacing(2),
     },
   },
-  row: {
-    height: "42px",
-    display: "flex",
-    alignItems: "center",
-    marginTop: theme.spacing(1),
-  },
-  floatRow: {
-    height: "40px",
-    float: "right",
-  },
-  buttonRow: {
-    height: "42px",
-    float: "right",
-    marginTop: theme.spacing(1),
-  },
   spacer: {
     flexGrow: 1,
-  },
-  addButton: {
-    float: "right",
-    marginRight: theme.spacing(1),
-  },
-  searchInput: {
-    marginRight: theme.spacing(1),
-  },
-  Districts: {
-    marginRight: theme.spacing(1),
-  },
-  States: {
-    marginRight: theme.spacing(1),
-  },
-  Search: {
-    marginRight: theme.spacing(1),
   },
   Cancel: {
     marginRight: theme.spacing(1),
@@ -104,8 +69,8 @@ class LoanApprovalPage extends Component {
       ],
     };
   }
+
   async componentDidMount() {
-    console.log("--user--", auth.getUserInfo());
     // get loan application details
     serviceProvider
       .serviceProviderForGetRequest(
@@ -122,11 +87,10 @@ class LoanApprovalPage extends Component {
   }
 
   getAllDetails = (data) => {
-    console.log("--loanapp loas res-- ", data);
     let document;
     let purpose = data.purpose;
     let applicationDate = Moment(data.application_date).format("DD MMM YYYY");
-    let loanAmnt = data.loan_model.loan_amount.toLocaleString();
+    let loanAmnt = "Rs." + data.loan_model.loan_amount.toLocaleString();
     let duration = data.loan_model.duration + " Months";
     let status = data.status;
     let comment = data.review_comments;
@@ -228,6 +192,7 @@ class LoanApprovalPage extends Component {
   };
 
   saveLoanAppData() {
+    // update loan application status, approved date, approved by, document fields (done by FPO admin only)
     let approvedBy;
     let userInfo = auth.getUserInfo();
     if (userInfo.contact) {
@@ -240,7 +205,6 @@ class LoanApprovalPage extends Component {
       approved_by: approvedBy,
       document: this.state.fileDataArray,
     };
-    console.log("-- postdata -- ", postData);
     serviceProvider
       .serviceProviderForPutRequest(
         process.env.REACT_APP_SERVER_URL + "loan-applications",
@@ -248,14 +212,28 @@ class LoanApprovalPage extends Component {
         postData
       )
       .then((loanAppRes) => {
-        console.log("--save res--", loanAppRes.data);
-        this.saveLoanAppTasks(loanAppRes.data);
+        if (this.state.values.selectedStatus === "Approved") {
+          this.saveLoanAppTasks(loanAppRes.data);
+          this.saveLoanAppInstallments(loanAppRes.data);
+          this.props.history.push({
+            pathname: "/loans",
+            state: { loanApproved: true },
+          });
+        } else {
+          this.props.history.push({
+            pathname: "/loans",
+            state: { loanApproved: true },
+          });
+        }
       })
       .catch((error) => {});
   }
 
   saveLoanAppTasks = (data) => {
-    console.log("--loanAppres--", data);
+    let appTaskArray = [];
+    data.loan_application_tasks.map((task1) => {
+      appTaskArray.push(task1.name);
+    });
     if (data.status === "Approved") {
       // if loan is approved, make entries in loan application tasks table
       serviceProvider
@@ -263,27 +241,22 @@ class LoanApprovalPage extends Component {
           process.env.REACT_APP_SERVER_URL + "loan-models/" + data.loan_model.id
         )
         .then((loanModelRes) => {
-          console.log("--loanModelRes-- ", loanModelRes.data);
           loanModelRes.data.loantasks.forEach((element) => {
             let postLoanTaskData = {
-              date: Moment().format("YYYY-MM-DD"),
-              status: true,
-              comments: data.review_comments,
+              status: "Scheduled",
               loan_application: data.id,
               name: element.name,
             };
-            console.log("--postloantaskdata-- ", postLoanTaskData);
-            serviceProvider
-              .serviceProviderForPostRequest(
-                process.env.REACT_APP_SERVER_URL + "loan-application-tasks",
-                postLoanTaskData
-              )
-              .then((res) => {
-                console.log("--loanAppTask save res-- ", res.data);
-              })
-              .catch((error) => {
-                console.log(error);
-              });
+
+            if (!appTaskArray.includes(element.name)) {
+              serviceProvider
+                .serviceProviderForPostRequest(
+                  process.env.REACT_APP_SERVER_URL + "loan-application-tasks",
+                  postLoanTaskData
+                )
+                .then((res) => {})
+                .catch((error) => {});
+            }
           });
         })
         .catch((error) => {
@@ -292,9 +265,54 @@ class LoanApprovalPage extends Component {
     }
   };
 
+  saveLoanAppInstallments = (data) => {
+    let appInstallmentsArray = [];
+    data.loan_app_installments.map((item) => {
+      appInstallmentsArray.push(item.expected_principal);
+    });
+
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "loan-models/" + data.loan_model.id
+      )
+      .then((res) => {
+        if (data.status === "Approved") {
+          res.data.emidetails.forEach((emi, index) => {
+            // To add a payment date from next of loan approval date
+            var startMonth = Moment().add(1, "M").format("YYYY-MM-DD");
+            var futureMonth = Moment(startMonth)
+              .add(index, "M")
+              .format("YYYY-MM-DD");
+            // To add month as emi number, if duration = 12months, emiNo = 1 to 12
+            var emiNo = index + 1;
+
+            let postEmiData = {
+              month: emiNo,
+              payment_date: futureMonth,
+              expected_principal: emi.principal,
+              expected_interest: emi.interest,
+              loan_application: data.id,
+            };
+
+            if (!appInstallmentsArray.includes(emi.principal)) {
+              serviceProvider
+                .serviceProviderForPostRequest(
+                  process.env.REACT_APP_SERVER_URL +
+                    "loan-application-installments",
+                  postEmiData
+                )
+                .then((res) => {})
+                .catch((error) => {});
+            }
+          });
+        }
+      })
+      .catch((error) => {});
+  };
+
   render() {
     const { classes } = this.props;
-    console.log("--data service-- ", this.state.data);
+
     let data = this.state.data;
     let statusValue = this.state.values.selectedStatus;
 
@@ -384,13 +402,26 @@ class LoanApprovalPage extends Component {
               <Divider />
               <Grid container spacing={3} style={{ padding: "20px 0px" }}>
                 <Grid item md={12}>
-                  Select Document &nbsp;&nbsp;&nbsp;
-                  <input
-                    required
-                    type="file"
-                    name="file"
-                    onChange={this.onChangeHandler}
-                  />
+                  <label htmlFor="upload-file">
+                    <input
+                      style={{ display: "none" }}
+                      required
+                      type="file"
+                      name="upload-file"
+                      id="upload-file"
+                      onChange={this.onChangeHandler}
+                    />
+                    <Fab
+                      color="primary"
+                      size="medium"
+                      component="span"
+                      aria-label="add"
+                      variant="extended"
+                    >
+                      <FileCopyIcon /> Upload loan application
+                    </Fab>
+                  </label>{" "}
+                  &nbsp;&nbsp;&nbsp;
                   {this.state.fileName !== "" ? (
                     <label style={{ color: "green", fontSize: "11px" }}>
                       Selected File: {this.state.fileName}

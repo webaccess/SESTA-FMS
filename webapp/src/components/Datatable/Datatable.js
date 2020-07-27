@@ -15,6 +15,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import AssignmentTurnedInIcon from "@material-ui/icons/AssignmentTurnedIn";
 import AssignmentIndIcon from "@material-ui/icons/AssignmentInd";
 import PrintIcon from "@material-ui/icons/Print";
+import auth from "../../components/Auth/Auth";
 
 const useStyles = makeStyles((theme) => ({
   editIcon: {
@@ -75,7 +76,6 @@ const Table = (props) => {
     }
   };
   const loanApproveData = (id) => {
-    console.log("--loanApproveData datatable -- ", id);
     if (props.title === "Loans") {
       props.loanApproveData(id);
     }
@@ -231,7 +231,8 @@ const Table = (props) => {
     {
       cell: (cell) => (
         <div onClick={(event) => loanApproveData(cell.id, cell[valueformodal])}>
-          {valueForMemberPage === "Loans" ? (
+          {valueForMemberPage === "Loans" &&
+          auth.getUserInfo().role.name === "FPO Admin" ? (
             <Tooltip title="Loan Approval">
               <IconButton aria-label="approve">
                 <EditIcon className={classes.editIcon} />
