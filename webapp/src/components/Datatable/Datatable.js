@@ -89,6 +89,9 @@ const Table = (props) => {
       props.loanApproveData(id);
     }
   };
+  const viewTask = (id) => {
+    props.viewTask(id);
+  };
 
   const customAction = (id) => {
     props.customAction(id);
@@ -138,128 +141,145 @@ const Table = (props) => {
   const [isDeleteShowing, setisDeleteShowing] = React.useState(false);
   const [isDeleteAllShowing, setisDeleteAllShowing] = React.useState(false);
   const [isActiveAllShowing, setisActiveAllShowing] = React.useState(false);
-
-  const column = [
-    {
-      cell: (cell) => (
-        <div onClick={(event) => editData(cell.id)} id={cell.id}>
-          {valueForMemberPage !== "Loans" ? (
+  let column = [];
+  if (valueForMemberPage !== "Loans") {
+    column = [
+      {
+        cell: (cell) => (
+          <div onClick={(event) => editData(cell.id)} id={cell.id}>
             <Tooltip title="Edit">
               <IconButton aria-label="edit" value={cell[valueformodal]}>
                 <EditIcon className={classes.editIcon} />
               </IconButton>
             </Tooltip>
-          ) : (
-            ""
-          )}
-        </div>
-      ),
-      button: true,
-    },
-    {
-      cell: (cell) => (
-        <div
-          onClick={(event) => deleteDataModal(cell.id, cell[valueformodal])}
-          id={cell.id}
-        >
-          {valueForMemberPage !== "Loans" ? (
+          </div>
+        ),
+        button: true,
+      },
+    ];
+  }
+  if ( valueForMemberPage !== "Loans" && valueForMemberPage !== "UpdateLoanTask" ) {
+    column = [
+      {
+        cell: (cell) => (
+          <div
+            onClick={(event) => deleteDataModal(cell.id, cell[valueformodal])}
+            id={cell.id}
+          >
             <Tooltip title="Delete">
               <IconButton aria-label="delete">
                 <DeleteIcon className={classes.deleteIcon} />
               </IconButton>
             </Tooltip>
-          ) : (
-            ""
-          )}
-        </div>
-      ),
-      button: true,
-    },
-    {
-      cell: (cell) => (
-        <div onClick={(event) => viewData(cell.id, cell[valueformodal])}>
-          {valueForMemberPage === "Members" ? (
+          </div>
+        ),
+        button: true,
+      },
+    ];
+  }
+  if (valueForMemberPage === "Members") {
+    column = [
+      {
+        cell: (cell) => (
+          <div onClick={(event) => editData(cell.id)} id={cell.id}>
+            <Tooltip title="Edit">
+              <IconButton aria-label="edit" value={cell[valueformodal]}>
+                <EditIcon className={classes.editIcon} />
+              </IconButton>
+            </Tooltip>
+          </div>
+        ),
+        button: true,
+      },
+      {
+        cell: (cell) => (
+          <div
+            onClick={(event) => deleteDataModal(cell.id, cell[valueformodal])}
+            id={cell.id}
+          >
+            <Tooltip title="Delete">
+              <IconButton aria-label="delete">
+                <DeleteIcon className={classes.deleteIcon} />
+              </IconButton>
+            </Tooltip>
+          </div>
+        ),
+        button: true,
+      },
+      {
+        cell: (cell) => (
+          <div onClick={(event) => viewData(cell.id, cell[valueformodal])}>
             <Tooltip title="Apply Loan">
               <IconButton aria-label="applyloan">
                 <MoneyIcon className={classes.MoneyIcon} />
               </IconButton>
             </Tooltip>
-          ) : (
-            ""
-          )}
-        </div>
-      ),
-      button: true,
-    },
-    {
-      cell: (cell) => (
-        <div onClick={(event) => customAction(cell.id, cell[valueformodal])}>
-          {valueForMemberPage === "Loans" ? (
-            <Tooltip title="Print">
-              <IconButton aria-label="print">
-                <PrintIcon className={classes.PrintIcon} />
-              </IconButton>
-            </Tooltip>
-          ) : (
-            ""
-          )}
-        </div>
-      ),
-      button: true,
-    },
-    {
-      cell: (cell) => (
-        <div onClick={(event) => viewData(cell.id, cell[valueformodal])}>
-          {valueForMemberPage === "Loans" ? (
-            <Tooltip title="EMI">
-              <IconButton aria-label="activity">
-                <AssignmentIndIcon className={classes.AssignmentTurnedInIcon} />
-              </IconButton>
-            </Tooltip>
-          ) : (
-            ""
-          )}
-        </div>
-      ),
-      button: true,
-    },
-    {
-      cell: (cell) => (
-        <div onClick={(event) => viewData(cell.id, cell[valueformodal])}>
-          {valueForMemberPage === "Loans" ? (
-            <Tooltip title="Task">
-              <IconButton aria-label="task">
-                <AssignmentTurnedInIcon
-                  className={classes.AssignmentTurnedInIcon}
-                />
-              </IconButton>
-            </Tooltip>
-          ) : (
-            ""
-          )}
-        </div>
-      ),
-      button: true,
-    },
-    {
-      cell: (cell) => (
-        <div onClick={(event) => loanApproveData(cell.id, cell[valueformodal])}>
-          {valueForMemberPage === "Loans" &&
-          auth.getUserInfo().role.name === "FPO Admin" ? (
-            <Tooltip title="Loan Approval">
-              <IconButton aria-label="approve">
-                <EditIcon className={classes.editIcon} />
-              </IconButton>
-            </Tooltip>
-          ) : (
-            ""
-          )}
-        </div>
-      ),
-      button: true,
-    },
-  ];
-
+          </div>
+        ),
+        button: true,
+      },
+    ];
+  }
+  if (valueForMemberPage === "Loans") {
+    column = [
+      {
+        cell: (cell) => (
+          <div>
+            <div
+              onClick={(event) => customAction(cell.id, cell[valueformodal])}
+              style={{ display: "inline-flex" }}
+            >
+              <Tooltip title="Print">
+                <IconButton aria-label="print">
+                  <PrintIcon className={classes.AssignmentTurnedInIcon} />
+                </IconButton>
+              </Tooltip>
+            </div>
+            <div
+              onClick={(event) => viewData(cell.id, cell[valueformodal])}
+              style={{ display: "inline-flex" }}
+            >
+              <Tooltip title="EMI">
+                <IconButton aria-label="activity">
+                  <AssignmentIndIcon
+                    className={classes.AssignmentTurnedInIcon}
+                  />
+                </IconButton>
+              </Tooltip>
+            </div>
+            <div
+              onClick={(event) => viewTask(cell.id, cell[valueformodal])}
+              style={{ display: "inline-flex" }}
+            >
+              <Tooltip title="Task">
+                <IconButton aria-label="task">
+                  <AssignmentTurnedInIcon
+                    className={classes.AssignmentTurnedInIcon}
+                  />
+                </IconButton>
+              </Tooltip>
+            </div>
+            <div
+              onClick={(event) => loanApproveData(cell.id, cell[valueformodal])}
+              style={{ display: "inline-flex" }}
+            >
+              {auth.getUserInfo().role.name === "FPO Admin" ? (
+                <Tooltip title="Loan Approval">
+                  <IconButton aria-label="approve">
+                    <EditIcon className={classes.editIcon} />
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                ""
+              )}
+            </div>
+          </div>
+        ),
+        button: true,
+        width: "200px",
+      },
+    ];
+  }
   const makeColumns = (columns) => {
     for (let Usercolumns in column) {
       columns.push(column[Usercolumns]);

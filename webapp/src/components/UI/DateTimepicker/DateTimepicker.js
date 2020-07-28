@@ -18,6 +18,7 @@ const DateTimepicker = ({ ...props }) => {
         inputVariant="outlined"
         value={props.value ? props.value : clearedDate}
         onChange={props.onChange}
+        format={props.format}
       />
     </MuiPickersUtilsProvider>
   );
