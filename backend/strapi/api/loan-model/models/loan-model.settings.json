@@ -36,8 +36,8 @@
       "via": "loan_model"
     },
     "loan_applications": {
-      "collection": "loan-application",
-      "via": "loan_model"
+      "via": "loan_model",
+      "collection": "loan-application"
     },
     "emidetails": {
       "collection": "emidetails",

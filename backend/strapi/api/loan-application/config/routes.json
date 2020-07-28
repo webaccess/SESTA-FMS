@@ -27,6 +27,14 @@
     {
       "method": "GET",
       "path": "/loan-applications/:id",
+      "handler": "loan-application.pdfGenFindOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/loan-applications/:id",
       "handler": "loan-application.findOne",
       "config": {
         "policies": []

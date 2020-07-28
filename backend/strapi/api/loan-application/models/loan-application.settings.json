@@ -10,7 +10,7 @@
   },
   "attributes": {
     "application_no": {
-      "type": "string",
+      "type": "integer",
       "required": true
     },
     "application_date": {
@@ -48,17 +48,28 @@
       "model": "contact",
       "via": "loan_app_approvedby"
     },
-    "loan_application_task": {
-      "model": "loan-application-tasks",
-      "via": "loan_application"
-    },
-    "loan_app_installments": {
-      "collection": "loan-application-installments",
-      "via": "loan_applications"
-    },
     "loan_model": {
       "via": "loan_applications",
       "model": "loan-model"
+    },
+    "document": {
+      "collection": "file",
+      "via": "related",
+      "allowedTypes": [
+        "files",
+        "images",
+        "videos"
+      ],
+      "plugin": "upload",
+      "required": false
+    },
+    "loan_application_tasks": {
+      "via": "loan_application",
+      "collection": "loan-application-tasks"
+    },
+    "loan_app_installments": {
+      "via": "loan_application",
+      "collection": "loan-application-installments"
     }
   }
 }

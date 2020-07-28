@@ -798,21 +798,6 @@ class ActivityPage extends Component {
                     </Snackbar>
                   ) : null}
                 </Grid>
-                <Grid item md={12} xs={12}>
-                  {/* {this.state.formSubmitted === false ? (
-                    <Snackbar severity="error" Showbutton={false}>
-                      {this.state.errorCode}
-                    </Snackbar>
-                  ) : null} */}
-                </Grid>
-                <Grid item md={12} xs={12}>
-                  {/* {this.state.DateTimepickerError === true ? (
-                    <Snackbar severity="error" Showbutton={false}>
-                      "Start Date Cannot be Greater than End Date"
-                    </Snackbar>
-                  ) : null} */}
-                </Grid>
-
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth

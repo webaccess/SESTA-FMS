@@ -117,7 +117,7 @@ class LoansPage extends Component {
       handlePurposeChange: "",
       isCancel: false,
       loan_model: [],
-      memberData: []
+      memberData: [],
     };
   }
 
@@ -130,8 +130,8 @@ class LoansPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/contact/?contact_type=organization&id=" +
-        shgid
+          "crm-plugin/contact/?contact_type=organization&id=" +
+          shgid
       )
       .then((res) => {
         // get VO assigned to selected SHG member
@@ -142,8 +142,8 @@ class LoansPage extends Component {
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/" +
-            VoContactId
+              "crm-plugin/contact/" +
+              VoContactId
           )
           .then((res) => {
             this.setState({ shgUnderVo: res.data });
@@ -195,7 +195,11 @@ class LoansPage extends Component {
     let assignLoanAppValues;
     let activeLoanPresent, loanApplied, loanAlreadyApplied;
     let postData = this.props.location.state;
-    if (this.state.memberData && this.state.memberData.length && this.state.memberData[0].hasOwnProperty('loan_applications')) {
+    if (
+      this.state.memberData &&
+      this.state.memberData.length &&
+      this.state.memberData[0].hasOwnProperty("loan_applications")
+    ) {
       postData = this.state.memberData[0];
     }
 
@@ -207,8 +211,8 @@ class LoansPage extends Component {
     loan_application_data = {
       contact: postData.id,
       loan_model: assignLoanAppValues.id,
-      application_no: (assignLoanAppValues.id).toString(),
-      application_date: Moment().format('YYYY-MM-DD'),
+      application_no: assignLoanAppValues.id.toString(),
+      application_date: Moment().format("YYYY-MM-DD"),
       purpose: assignLoanAppValues.product_name,
       status: "UnderReview",
     };
@@ -220,47 +224,84 @@ class LoansPage extends Component {
             loanAlreadyApplied = true;
             activeLoanPresent = false;
             loanApplied = false;
-            this.props.history.push({ pathname: "/loans", state: { loanAlreadyApplied: true, purpose: assignLoanAppValues.product_name } });
-          }
-          else if (loanapp.loan_model !== assignLoanAppValues.id) {
+            this.props.history.push({
+              pathname: "/loans",
+              state: {
+                loanAlreadyApplied: true,
+                purpose: assignLoanAppValues.product_name,
+              },
+            });
+          } else if (loanapp.loan_model !== assignLoanAppValues.id) {
             activeLoanPresent = true;
             loanAlreadyApplied = false;
             loanApplied = false;
-            this.props.history.push({ pathname: "/loans", state: { activeLoanPresent: true } });
+            this.props.history.push({
+              pathname: "/loans",
+              state: { activeLoanPresent: true },
+            });
           }
-        }
-
-        else if (loanapp.status == "Denied" || loanapp.status == "Cancelled") {
+        } else if (
+          loanapp.status == "Denied" ||
+          loanapp.status == "Cancelled"
+        ) {
           if (!loanApplied && !activeLoanPresent && !loanAlreadyApplied) {
-            this.saveApplyLoan(loan_application_data, postData.id);
+            this.saveApplyLoan(
+              loan_application_data,
+              postData.id,
+              assignLoanAppValues
+            );
             loanApplied = true;
             loanAlreadyApplied = false;
             activeLoanPresent = false;
-            this.props.history.push({ pathname: "/loans", state: { loanApplied: true, purpose: assignLoanAppValues.product_name } });
           }
         }
-      })
+      });
     } else {
-      this.saveApplyLoan(loan_application_data, postData.id);
+      this.saveApplyLoan(
+        loan_application_data,
+        postData.id,
+        assignLoanAppValues
+      );
       loanApplied = true;
       this.setState({ loanApplied: true });
-      this.props.history.push({ pathname: "/loans", state: { loanApplied: true, purpose: assignLoanAppValues.product_name } });
     }
   }
 
-  saveApplyLoan(postData, memberId) {
+  saveApplyLoan(postData, memberId, assignLoanAppValues) {
     serviceProvider
       .serviceProviderForPostRequest(
-        // process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
         process.env.REACT_APP_SERVER_URL + "loan-applications",
         postData
       )
       .then((res) => {
         this.getMemberData(memberId);
+
+        // put method to update application_no
+        let updateAppNo = res.data;
+        updateAppNo.application_no = res.data.id;
+
+        serviceProvider
+          .serviceProviderForPutRequest(
+            process.env.REACT_APP_SERVER_URL + "loan-applications",
+            res.data.id,
+            updateAppNo
+          )
+          .then((loanapp_res) => {});
+
+        this.props.history.push({
+          pathname: "/loans",
+          state: {
+            loanApplied: true,
+            purpose: assignLoanAppValues.product_name,
+            memberData: res.data,
+          },
+        });
       })
       .catch((error) => {
-        console.log('error applying loan ', error);
-        this.props.history.push({ pathname: "/loans", state: { loanNotApplied: true } });
+        this.props.history.push({
+          pathname: "/loans",
+          state: { loanNotApplied: true },
+        });
       });
   }
 
@@ -290,7 +331,11 @@ class LoansPage extends Component {
 
     // store memberData(props.history.push) from member page
     let data = this.props.location.state;
-    if (this.state.memberData && this.state.memberData.length && this.state.memberData[0].hasOwnProperty('loan_applications')) {
+    if (
+      this.state.memberData &&
+      this.state.memberData.length &&
+      this.state.memberData[0].hasOwnProperty("loan_applications")
+    ) {
       data = this.state.memberData[0];
     }
     let loan_model = this.state.loan_model;
@@ -316,7 +361,7 @@ class LoansPage extends Component {
 
     // To add a due date in emi installments
     this.state.loan_installments.map((row, i) => {
-      var futureMonth = Moment().add(i, 'M').format('DD MMM YYYY');
+      var futureMonth = Moment().add(i, "M").format("DD MMM YYYY");
       row.due_date = futureMonth;
     });
 
@@ -397,10 +442,10 @@ class LoansPage extends Component {
                     value={
                       handlePurposeChange
                         ? loan_model[
-                        loan_model.findIndex(function (item, i) {
-                          return item.id == handlePurposeChange.id;
-                        })
-                        ]
+                            loan_model.findIndex(function (item, i) {
+                              return item.id == handlePurposeChange.id;
+                            })
+                          ]
                         : loan_model[0]
                     }
                     renderInput={(params) => (
@@ -465,13 +510,12 @@ class LoansPage extends Component {
                           </tr>
                           {this.state.loan_installments
                             ? this.state.loan_installments.map((row) => (
-                              <tr>
-                                <td>{row.due_date}</td>
-                                <td>{row.principal}</td>
-                                <td>{row.interest}</td>
-
-                              </tr>
-                            ))
+                                <tr>
+                                  <td>{row.due_date}</td>
+                                  <td>{row.principal}</td>
+                                  <td>{row.interest}</td>
+                                </tr>
+                              ))
                             : null}
                         </table>
                       </b>
@@ -483,8 +527,7 @@ class LoansPage extends Component {
 
               <br />
               <Grid>
-                <Button
-                  onClick={this.SaveData.bind(this)}>Save</Button>
+                <Button onClick={this.SaveData.bind(this)}>Save</Button>
                 &nbsp;&nbsp;&nbsp;
                 <Button
                   color="secondary"

@@ -16,9 +16,9 @@ module.exports = {
     let idVal = ctx.params.id;
     try {
       console.log("services", strapi.services);
-      const application = await strapi.controllers["loan-application"].findOne(
-        ctx
-      );
+      const application = await strapi.controllers[
+        "loan-application"
+      ].pdfGenFindOne(ctx);
       // await strapi.services["loan-application"].findOne({
       //   id: idVal,
       // });
@@ -113,43 +113,6 @@ module.exports = {
       contentVal = contentVal.replace(/{LOAN_PURPOSE}/g, loan_purpose);
       contentVal = contentVal.replace(/{LOAN_AMOUNT}/g, loant_amt);
       contentVal = contentVal.replace(/{VO_NAME}/g, vo_name);
-      // LOAN_PURPOSE
-      // SHG_VILLAGE;
-      // SHG_NAME;
-      // VO_NAME;
-      // SHG_ACC_NO;
-      // SHG_BANK;
-      // SHG_BANK_BRANCH;
-      // SHG_BANK_IFSC;
-      //{MEMBER_NAME}
-      //MEMBER_HUSBAND_NAME
-      // await fs.writeFileSync(
-      //   path.resolve(__dirname, "../../../assets/files/Loan-Application1.html"),
-      //   contentVal
-      // );
-      // console.log("content");
-      // return ctx.send(contentVal);
-      // fs.writeFile(
-      //   __dirname,
-      //   "../../../assets/files/Loan-Application1.html",
-      //   "utf-8",
-      //   contentVal,
-      //   function (err, data) {
-      //     if (err) {
-      //       return console.log(err);
-      //     }
-      //     console.log(data);
-      //   }
-      // );
-      // fs.writeFileSync(
-      //   path.resolve(__dirname, "../../../assets/files/Loan-Application1.html"),
-      //   contentVal,
-      //   "utf-8"
-      // );
-      // const contentObt = fs.readFileSync(
-      //   path.resolve(__dirname, "../../../assets/files/Loan-Application.html"),
-      //   "utf-8"
-      // );
       const browser = await puppeteer.launch({ headless: true });
       const page = await browser.newPage();
       await page.setContent(contentVal);
@@ -158,16 +121,12 @@ module.exports = {
         printBackground: true,
         margin: {
           left: "0px",
-          top: "0px",
+          top: "50px",
           right: "50px",
-          bottom: "0px",
+          bottom: "70px",
         },
       });
       await browser.close();
-      console.log("enters this");
-      // ctx.type = "application/pdf; charset=utf-8";
-      // ctx.set("Content-Disposition: attachment; filename=Loan_application.pdf");
-      // ctx.body = buffer;
       return ctx.send(buffer);
     } catch (error) {
       console.error(error);
@@ -175,7 +134,7 @@ module.exports = {
       return ctx.badRequest(null, error.message);
     }
   },
-  findOne: async (ctx) => {
+  pdfGenFindOne: async (ctx) => {
     const { id } = ctx.params;
 
     var entity = await strapi.services["loan-application"].findOne({ id });

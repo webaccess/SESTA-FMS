@@ -11,17 +11,27 @@
   "attributes": {
     "date": {
       "type": "date",
-      "required": true
-    },
-    "status": {
-      "type": "boolean"
+      "required": false
     },
     "comments": {
       "type": "string"
     },
     "loan_application": {
-      "via": "loan_application_task",
-      "model": "loan-application"
+      "model": "loan-application",
+      "via": "loan_application_tasks"
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "Completed",
+        "Scheduled",
+        "Cancelled"
+      ],
+      "required": true
     }
   }
 }
