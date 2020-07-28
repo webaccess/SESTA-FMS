@@ -66,6 +66,12 @@ class LoanApprovalPage extends Component {
       fileDataArray: [],
       fileName: "",
       validations: {
+        statusValue: {
+          required: {
+            value: "true",
+            message: "Status is required",
+          },
+        },
         comment: {
           required: {
             value: "true",
@@ -363,77 +369,109 @@ class LoanApprovalPage extends Component {
               <Grid
                 container
                 spacing={3}
-                style={{ display: "inline-flex", padding: "20px 0px" }}
+                style={{ padding: "20px 0px", alignItems: "center" }}
               >
-                <PersonIcon className={classes.Icon} />
-                <b>
-                  <div className={classes.member}>
-                    LOANEE
-                    <br />
-                    <span className={classes.fieldValues}>{data.loanee}</span>
-                  </div>
-                </b>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <b>
-                  <div className={classes.member}>
-                    SHG GROUP <br />
-                    <span className={classes.fieldValues}>{data.shg}</span>
-                  </div>
-                </b>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <b>
-                  <div className={classes.member}>
-                    VILLAGE <br />
-                    <span className={classes.fieldValues}>{data.village}</span>
-                  </div>
-                </b>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <b>
-                  <div className={classes.member}>
-                    VILLAGE ORGANIZATION <br />
-                    <span className={classes.fieldValues}>{data.vo}</span>
-                  </div>
-                </b>
+                <Grid spacing={1} xs={1}>
+                  <PersonIcon className={classes.Icon} />
+                </Grid>
+                <Grid spacing={1} xs={11}>
+                  <Grid container spacing={3}>
+                    <Grid spacing={2} xs={3}>
+                      <b>
+                        <div className={classes.member}>
+                          LOANEE
+                          <br />
+                          <span className={classes.fieldValues}>
+                            {data.loanee}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
+                    <Grid spacing={2} xs={3}>
+                      <b>
+                        <div className={classes.member}>
+                          SHG GROUP <br />
+                          <span className={classes.fieldValues}>
+                            {data.shg}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
+                    <Grid spacing={2} xs={3}>
+                      <b>
+                        <div className={classes.member}>
+                          VILLAGE <br />
+                          <span className={classes.fieldValues}>
+                            {data.village}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
+                    <Grid spacing={2} xs={3}>
+                      <b>
+                        <div className={classes.member}>
+                          VILLAGE ORGANIZATION <br />
+                          <span className={classes.fieldValues}>{data.vo}</span>
+                        </div>
+                      </b>
+                    </Grid>
+                  </Grid>
+                </Grid>
               </Grid>
               <Divider />
               <Grid
                 container
                 spacing={3}
-                style={{ display: "inline-flex", padding: "20px 0px" }}
+                style={{ padding: "20px 0px", alignItems: "center" }}
               >
-                <MoneyIcon className={classes.Icon} />
-                <b>
-                  <div className={classes.member}>
-                    PURPOSE
-                    <br />
-                    <span className={classes.fieldValues}>{data.purpose}</span>
-                  </div>
-                </b>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <b>
-                  <div className={classes.member}>
-                    APPLICATION DATE <br />
-                    <span className={classes.fieldValues}>
-                      {data.applicationDate}
-                    </span>
-                  </div>
-                </b>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <b>
-                  <div className={classes.member}>
-                    LOAN AMOUNT <br />
-                    <span className={classes.fieldValues}>
-                      {data.loanAmount}
-                    </span>
-                  </div>
-                </b>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <b>
-                  <div className={classes.member}>
-                    LOAN DURATION <br />
-                    <span className={classes.fieldValues}>{data.duration}</span>
-                  </div>
-                </b>
+                <Grid spacing={1} xs={1}>
+                  <MoneyIcon className={classes.Icon} />
+                </Grid>
+                <Grid spacing={1} xs={11}>
+                  <Grid container spacing={3}>
+                    <Grid spacing={2} xs={3}>
+                      <b>
+                        <div className={classes.member}>
+                          PURPOSE
+                          <br />
+                          <span className={classes.fieldValues}>
+                            {data.purpose}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
+                    <Grid spacing={2} xs={3}>
+                      <b>
+                        <div className={classes.member}>
+                          APPLICATION DATE <br />
+                          <span className={classes.fieldValues}>
+                            {data.applicationDate}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
+                    <Grid spacing={2} xs={3}>
+                      <b>
+                        <div className={classes.member}>
+                          LOAN AMOUNT <br />
+                          <span className={classes.fieldValues}>
+                            {data.loanAmount}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
+                    <Grid spacing={2} xs={3}>
+                      <b>
+                        <div className={classes.member}>
+                          LOAN DURATION <br />
+                          <span className={classes.fieldValues}>
+                            {data.duration}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
+                  </Grid>
+                </Grid>
               </Grid>
               <Divider />
               <Grid container spacing={3} style={{ padding: "20px 0px" }}>
@@ -468,7 +506,7 @@ class LoanApprovalPage extends Component {
                     </label>
                   )}
                 </Grid>
-                <Grid item md={3} xs={12}>
+                <Grid item md={5} xs={12}>
                   <Autocomplete
                     id="selectStatus"
                     name="loanStatus"
@@ -489,6 +527,12 @@ class LoanApprovalPage extends Component {
                           ] || null
                         : null
                     }
+                    error={this.hasError("statusValue")}
+                    helperText={
+                      this.hasError("statusValue")
+                        ? this.state.errors.statusValue[0]
+                        : null
+                    }
                     renderInput={(params) => (
                       <Input
                         {...params}
@@ -500,7 +544,7 @@ class LoanApprovalPage extends Component {
                     )}
                   />
                 </Grid>
-                <Grid item md={9} xs={12}>
+                <Grid item md={7} xs={12}>
                   <Input
                     fullWidth
                     label="Comment"
