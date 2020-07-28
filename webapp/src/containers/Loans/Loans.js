@@ -12,6 +12,7 @@ import auth from "../../components/Auth/Auth.js";
 import Moment from "moment";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import { Link } from "react-router-dom";
+import Auth from "../../components/Auth/Auth.js";
 
 const useStyles = (theme) => ({
   root: {},
@@ -239,6 +240,59 @@ export class Loans extends React.Component {
     }
   }
 
+  customAction = (cellid) => {
+    let memberData;
+    // this.state.data.map((memData) => {
+    //   if (cellid == memData.id) {
+    //     memberData = memData;
+    //   }
+    // });
+    // serviceProvider
+    //   .serviceProviderForGetRequest(
+    //     process.env.REACT_APP_SERVER_URL + "loan-applications-print/" + cellid
+    //   )
+    //   .then((res) => {
+    //     console.log("done here");
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+    let token = Auth.getToken();
+    // window.location =
+    //   window.location.protocol +
+    //   "//" +
+    //   token +
+    //   "@" +
+    //   process.env.REACT_APP_SERVER_URL_BASE +
+    //   "loan-applications-print/" +
+    //   cellid;
+
+    // console.log(
+    //   "urk",
+    //   window.location.protocol +
+    //     "//" +
+    //     token +
+    //     "@" +
+    //     process.env.REACT_APP_SERVER_URL_BASE +
+    //     "loan-applications-print/" +
+    //     cellid
+    // );
+    serviceProvider
+      .serviceProviderForGetRequestDownloadPDFFile(
+        process.env.REACT_APP_SERVER_URL + "loan-applications-print/" + cellid
+      )
+      .then((res) => {
+        console.log("done here");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    // this.props.history.push(
+    //   process.env.REACT_APP_SERVER_URL + "loan-applications-print/" + cellid
+    // );
+  };
+
   render() {
     const { classes } = this.props;
     let data = this.state.data;
@@ -441,6 +495,8 @@ export class Loans extends React.Component {
               column={Usercolumns}
               loanApproveData={this.loanApproveData}
               viewData={this.viewData}
+              customAction={this.customAction}
+              // editData={this.editData}
               DeleteData={this.DeleteData}
               DeleteAll={this.DeleteAll}
               rowsSelected={this.rowsSelect}
