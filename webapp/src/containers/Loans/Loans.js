@@ -56,38 +56,38 @@ const useStyles = (theme) => ({
 
 const conditionalRowStyles = [
   {
-    when: row => row.status == "Approved",
+    when: (row) => row.status == "Approved",
     style: {
-      backgroundColor: '#c9e7b1',
-      color: 'black',
-      '&:hover': {
+      backgroundColor: "#c9e7b1",
+      color: "black",
+      "&:hover": {
         backgroundColor: "#bce09e",
-        cursor: 'pointer',
+        cursor: "pointer",
       },
     },
   },
   {
-    when: row => row.status == "Denied",
+    when: (row) => row.status == "Denied",
     style: {
-      backgroundColor: '#d7dbdb',
-      color: 'black',
-      '&:hover': {
+      backgroundColor: "#d7dbdb",
+      color: "black",
+      "&:hover": {
         backgroundColor: "#c9cfcf",
-        cursor: 'pointer',
+        cursor: "pointer",
       },
     },
   },
   {
-    when: row => row.status == "UnderReview" || row.status == "Cancelled",
+    when: (row) => row.status == "UnderReview" || row.status == "Cancelled",
     style: {
-      backgroundColor: '#ffd6cc',
-      color: 'black',
-      '&:hover': {
+      backgroundColor: "#ffd6cc",
+      color: "black",
+      "&:hover": {
         backgroundColor: "#ffc2b3",
-        cursor: 'pointer',
+        cursor: "pointer",
       },
     },
-  }
+  },
 ];
 export class Loans extends React.Component {
   constructor(props) {
@@ -116,13 +116,13 @@ export class Loans extends React.Component {
       )
       .then((res) => {
         this.getFormattedData(res.data);
-      })
+      });
 
     // get all SHGs
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG"
+          "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG"
       )
       .then((res) => {
         this.setState({ getShg: res.data });
@@ -135,8 +135,10 @@ export class Loans extends React.Component {
   getFormattedData = (data) => {
     let amount_due;
     data.map((loandata) => {
-      loandata.application_date = Moment(loandata.application_date).format("DD MMM YYYY");
-    })
+      loandata.application_date = Moment(loandata.application_date).format(
+        "DD MMM YYYY"
+      );
+    });
     this.setState({ data: data });
   };
 
@@ -153,26 +155,26 @@ export class Loans extends React.Component {
     this.searchData(searchData);
 
     if (this.state.filterShg) {
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals"
-      )
-      .then((res) => {
-        res.data.map(shgcontact=>{
-          if(this.state.filterShg.id == shgcontact.shg.id) {
-            searchData += searchData ? "&&" : "";
-            searchData += "contact.id=" + shgcontact.contact.id;
-            this.searchData(searchData);
-          } else {
-            searchData += searchData ? "&&" : "";
-            searchData += "contact.id=" + 0;
-            this.searchData(searchData);
-          }
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals"
+        )
+        .then((res) => {
+          res.data.map((shgcontact) => {
+            if (this.state.filterShg.id == shgcontact.shg.id) {
+              searchData += searchData ? "&&" : "";
+              searchData += "contact.id=" + shgcontact.contact.id;
+              this.searchData(searchData);
+            } else {
+              searchData += searchData ? "&&" : "";
+              searchData += "contact.id=" + 0;
+              this.searchData(searchData);
+            }
+          });
         })
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+        .catch((error) => {
+          console.log(error);
+        });
     }
   }
 
@@ -215,6 +217,16 @@ export class Loans extends React.Component {
 
   viewData = (cellid) => {
     this.props.history.push("/loans/view/:id");
+  };
+
+  loanApproveData = (cellid) => {
+    let loanAppData;
+    this.state.data.map((item) => {
+      if (cellid == item.id) {
+        loanAppData = item;
+      }
+    });
+    this.props.history.push("/loans/approve/" + cellid, loanAppData);
   };
 
   handleShgChange(event, value) {
@@ -265,13 +277,19 @@ export class Loans extends React.Component {
         name: "Amount Due",
         selector: "loan_app_installments.amount_due",
         sortable: true,
-        cell: row => row.loan_app_installments.amount_due? row.loan_app_installments.amount_due : '-'
+        cell: (row) =>
+          row.loan_app_installments.amount_due
+            ? row.loan_app_installments.amount_due
+            : "-",
       },
       {
         name: "Installment Date",
         selector: "loan_app_installments.payment_date",
         sortable: true,
-        cell: row => row.loan_app_installments.payment_date? row.loan_app_installments.payment_date : '-'
+        cell: (row) =>
+          row.loan_app_installments.payment_date
+            ? row.loan_app_installments.payment_date
+            : "-",
       },
     ];
     let selectors = [];
@@ -293,12 +311,14 @@ export class Loans extends React.Component {
 
           {loanState.loanApplied ? (
             <Snackbar severity="success">
-              You have successfully applied for the loan <b>{loanState.purpose}</b>
+              You have successfully applied for the loan{" "}
+              <b>{loanState.purpose}</b>
             </Snackbar>
           ) : null}
           {loanState.loanAlreadyApplied ? (
             <Snackbar severity="info">
-              You have already applied loan for the Purpose <b>{loanState.purpose}</b>
+              You have already applied loan for the Purpose{" "}
+              <b>{loanState.purpose}</b>
             </Snackbar>
           ) : null}
           {loanState.activeLoanPresent ? (
@@ -310,6 +330,9 @@ export class Loans extends React.Component {
             <Snackbar severity="error">
               An error occured - Please try again later!
             </Snackbar>
+          ) : null}
+          {loanState.loanApproved ? (
+            <Snackbar severity="success">Changes saved successfully</Snackbar>
           ) : null}
 
           <br></br>
@@ -416,9 +439,8 @@ export class Loans extends React.Component {
               filters={filters}
               data={data}
               column={Usercolumns}
-              // viewMemberData={this.viewMemberData}
+              loanApproveData={this.loanApproveData}
               viewData={this.viewData}
-              // editData={this.editData}
               DeleteData={this.DeleteData}
               DeleteAll={this.DeleteAll}
               rowsSelected={this.rowsSelect}
@@ -427,8 +449,8 @@ export class Loans extends React.Component {
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (
-              <h1>Loading...</h1>
-            )}
+            <h1>Loading...</h1>
+          )}
         </Grid>
       </Layout>
     );

@@ -538,6 +538,16 @@ const modules = {
     order: 20,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
+  "Loan Approval": {
+    is_active: true,
+    icon_class: "",
+    url: "/loans/approve/:id",
+    slug: "approve_loan",
+    displayNavigation: false,
+    module: "", //slug
+    order: 20,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
   "Loan Purpose": {
     is_active: true,
     icon_class: "people",
