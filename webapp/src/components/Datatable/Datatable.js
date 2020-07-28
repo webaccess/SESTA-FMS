@@ -135,7 +135,7 @@ const Table = (props) => {
     {
       cell: (cell) => (
         <div onClick={(event) => customAction(cell.id, cell[valueformodal])}>
-          {valueForMemberPage === "Loans" ? (
+          {props.customAction ? (
             <Tooltip title="Print Loan Applications">
               <IconButton aria-label="view">
                 <PrintIcon className={classes.PrintIcon} />

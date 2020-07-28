@@ -131,7 +131,7 @@
             >
               Loan application No
               <span style="font: bold 16px 'Calibri'; line-height: 19px;"
-                >35667899</span
+                >{APP_NO}</span
               >
             </p>
           </td>
@@ -156,7 +156,7 @@
             >
               Applied on dated
               <span style="font: bold 16px 'Calibri'; line-height: 19px;"
-                >12 March 2020</span
+                >{APP_DATE}</span
               >
             </p>
           </td>
@@ -260,7 +260,7 @@
                 line-height: 18px;
               "
             >
-              Date: 12 March 2020
+              Date: {APP_DATE}
             </p>
           </td>
         </tr>
@@ -330,7 +330,7 @@
                 line-height: 18px;
               "
             >
-              Birangana Women Producers Company Pvt. Ltd
+            {FPO_NAME}
             </p>
           </td>
           <td
@@ -376,7 +376,7 @@
                 line-height: 18px;
               "
             >
-              Address: Boitamari, Bongaigaon 783389
+              Address: {FPO_ADDR}
             </p>
           </td>
           <td
@@ -425,7 +425,7 @@
           >{VO_NAME} </span
         >hereby apply for a loan aggregating
         <span style="font: bold 15px 'Calibri'; line-height: 21px;"
-          >Rs.7,000 (Rupees Seven Thousand Only) </span
+          >Rs.{LOAN_AMOUNT} (Rupees Seven Thousand Only) </span
         >for <nobr>on-lending</nobr> to our SHG members.
       </p>
       <p
@@ -513,7 +513,7 @@
       >
         <span style="font: 15px 'Calibri'; line-height: 18px;"
           >Account Name: </span
-        >{SHG_NAME}
+        >{SHG_ACC_NAME}
       </p>
       <table
         cellpadding="0"
@@ -947,7 +947,7 @@
           line-height: 23px;
         "
       >
-        Birangana Women Producers Company Pvt. Ltd.
+      {FPO_NAME}
       </p>
       <p
         style="
@@ -966,10 +966,10 @@
         >, in presence of all its members, it is resolved that our SHG will seek
         loan of
         <span style="font: bold 15px 'Calibri'; line-height: 20px;"
-          >Rs. 7,000 (Seven Thousand Only) </span
+          >Rs. {LOAN_AMOUNT} (Seven Thousand Only) </span
         >from
         <span style="font: bold 15px 'Calibri'; line-height: 20px;"
-          >Birangana Women Producers Company Pvt. Ltd. </span
+        >{FPO_NAME} </span
         >for the member mentioned below.
       </p>
       <table
@@ -1119,7 +1119,7 @@
                 line-height: 18px;
               "
             >
-              7,000/-
+              {LOAN_AMOUNT}/-
             </p>
           </td>
         </tr>
@@ -1166,7 +1166,7 @@
                 line-height: 18px;
               "
             >
-              Motor Pump
+              {LOAN_PURPOSE}
             </p>
           </td>
         </tr>
@@ -1290,17 +1290,16 @@
       >
         On demand we
         <span style="font: bold 14px 'Calibri'; line-height: 22px;"
-          >Milan SHG </span
+          >{SHG_NAME} </span
         >and the members of
         <span style="font: bold 14px 'Calibri'; line-height: 22px;"
           >Nabojyoti </span
         >village
         <span style="font: bold 14px 'Calibri'; line-height: 22px;"
-          >Nabojyoti VO </span
+          >{VO_NAME} </span
         >jointly and severally promise to pay
         <span style="font: bold 14px 'Calibri'; line-height: 22px;"
-          >Birangana Women Producers Company Pvt. Ltd. </span
-        >the sum of <span>Rupees 7,000.</span>
+        >the sum of <span>Rupees {LOAN_AMOUNT}.</span>
       </p>
       <p
         style="
@@ -1315,10 +1314,10 @@
         If we fail to repay the loan as per the demand we will pay penalty as
         per the rules of
         <span style="font: bold 15px 'Calibri'; line-height: 18px;"
-          >Birangana</span
+          >{FPO_NAME}</span
         >
       </p>
-      <p
+      <!-- <p
         style="
           text-align: left;
           padding-left: 2px;
@@ -1329,7 +1328,7 @@
         "
       >
         Women Producers Company Pvt. Ltd
-      </p>
+      </p> -->
       <p
         style="
           text-align: left;
@@ -1342,10 +1341,10 @@
       >
         We all members hereby submit the agreed and signed Promissory Note to
         <span style="font: bold 15px 'Calibri'; line-height: 18px;"
-          >Birangana Women</span
+          >{FPO_NAME}</span
         >
       </p>
-      <p
+      <!-- <p
         style="
           text-align: left;
           padding-left: 2px;
@@ -1356,7 +1355,7 @@
         "
       >
         Producers Company Pvt. Ltd.
-      </p>
+      </p> -->
       <p
         style="
           text-align: left;

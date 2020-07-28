@@ -81,13 +81,13 @@ export class Loans extends React.Component {
       )
       .then((res) => {
         this.getFormattedData(res.data);
-      })
+      });
 
     // get all SHGs
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG"
+          "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG"
       )
       .then((res) => {
         this.setState({ getShg: res.data });
@@ -95,22 +95,24 @@ export class Loans extends React.Component {
       .catch((error) => {
         console.log(error);
       });
-
   }
 
   getFormattedData = (data) => {
     let amount_due;
     data.map((loandata) => {
-      loandata.application_date = Moment(loandata.application_date).format("DD MMM YYYY");
+      loandata.application_date = Moment(loandata.application_date).format(
+        "DD MMM YYYY"
+      );
 
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-          "loan-models/?id=" + loandata.loan_model.id
+            "loan-models/?id=" +
+            loandata.loan_model.id
         )
         .then((res) => {
           // this.setState({ getShg: res.data });
-        })
+        });
     });
     this.setState({ data: data });
   };
@@ -207,7 +209,7 @@ export class Loans extends React.Component {
   render() {
     const { classes } = this.props;
     let data = this.state.data;
-    console.log('data ==>', data);
+    console.log("data ==>", data);
 
     let shgFilter = this.state.getShg;
     let filterShg = this.state.filterShg;
@@ -270,12 +272,14 @@ export class Loans extends React.Component {
 
           {loanState.loanApplied ? (
             <Snackbar severity="success">
-              You have successfully applied for the loan <b>{loanState.purpose}</b>
+              You have successfully applied for the loan{" "}
+              <b>{loanState.purpose}</b>
             </Snackbar>
           ) : null}
           {loanState.loanAlreadyApplied ? (
             <Snackbar severity="info">
-              You have already applied loan for the Purpose <b>{loanState.purpose}</b>
+              You have already applied loan for the Purpose{" "}
+              <b>{loanState.purpose}</b>
             </Snackbar>
           ) : null}
           {loanState.activeLoanPresent ? (
@@ -404,8 +408,8 @@ export class Loans extends React.Component {
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (
-              <h1>Loading...</h1>
-            )}
+            <h1>Loading...</h1>
+          )}
         </Grid>
       </Layout>
     );
