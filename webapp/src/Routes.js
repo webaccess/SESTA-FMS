@@ -30,6 +30,8 @@ import LoansPage from "./containers/Loans/LoansPage";
 import LoanApprovalPage from "./containers/Loans/LoanApprovalPage";
 import Loanpurposes from "./containers/Loanpurpose/Loanpurposes";
 import LoanpurposePage from "./containers/Loanpurpose/LoanpurposePage";
+import LoanUpdateTaskPage from "./containers/Loans/LoanUpdateTaskPage";
+import LoanEditTask from "./containers/Loans/LoanEditTask";
 
 function Routes() {
   return (
@@ -99,7 +101,9 @@ function Routes() {
               exact
             />
             <PrivateRoute path="/loans" component={Loans} exact />
-            <PrivateRoute path="/loans/view/:id" component={LoansPage} exact />
+            <PrivateRoute path="/loans/apply/:id" component={LoansPage} exact />
+            <PrivateRoute path="/loan/update/:id" component={LoanUpdateTaskPage} exact />
+            <PrivateRoute path="/loan/task/edit/:id" component={LoanEditTask} exact />
             <PrivateRoute
               path="/loans/approve/:id"
               component={LoanApprovalPage}

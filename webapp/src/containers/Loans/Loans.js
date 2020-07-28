@@ -57,38 +57,38 @@ const useStyles = (theme) => ({
 
 const conditionalRowStyles = [
   {
-    when: (row) => row.status == "Approved",
+    when: row => row.status == "Approved",
     style: {
-      backgroundColor: "#c9e7b1",
-      color: "black",
-      "&:hover": {
+      backgroundColor: '#c9e7b1',
+      color: 'black',
+      '&:hover': {
         backgroundColor: "#bce09e",
-        cursor: "pointer",
+        cursor: 'pointer',
       },
     },
   },
   {
-    when: (row) => row.status == "Denied",
+    when: row => row.status == "UnderReview",
     style: {
-      backgroundColor: "#d7dbdb",
-      color: "black",
-      "&:hover": {
-        backgroundColor: "#c9cfcf",
-        cursor: "pointer",
-      },
-    },
-  },
-  {
-    when: (row) => row.status == "UnderReview" || row.status == "Cancelled",
-    style: {
-      backgroundColor: "#ffd6cc",
-      color: "black",
-      "&:hover": {
+      backgroundColor: '#ffd6cc',
+      color: 'black',
+      '&:hover': {
         backgroundColor: "#ffc2b3",
-        cursor: "pointer",
+        cursor: 'pointer',
       },
     },
   },
+  {
+    when: row => row.status == "Denied" || row.status == "Cancelled",
+    style: {
+      backgroundColor: '#d7dbdb',
+      color: 'black',
+      '&:hover': {
+        backgroundColor: "#c9cfcf",
+        cursor: 'pointer',
+      },
+    },
+  }
 ];
 export class Loans extends React.Component {
   constructor(props) {
@@ -216,8 +216,15 @@ export class Loans extends React.Component {
     }
   };
 
-  viewData = (cellid) => {
-    this.props.history.push("/loans/view/:id");
+  viewTask = (cellid) => {
+    console.log('cellid.. ',cellid);
+    let loanAppData;
+    this.state.data.map(e=> {
+      if(e.id == cellid) {
+        loanAppData = e;
+        this.props.history.push("/loan/update/" + cellid, {loanAppData: loanAppData});
+      }
+    })
   };
 
   loanApproveData = (cellid) => {
@@ -494,9 +501,8 @@ export class Loans extends React.Component {
               data={data}
               column={Usercolumns}
               loanApproveData={this.loanApproveData}
-              viewData={this.viewData}
               customAction={this.customAction}
-              // editData={this.editData}
+              viewTask={this.viewTask}
               DeleteData={this.DeleteData}
               DeleteAll={this.DeleteAll}
               rowsSelected={this.rowsSelect}

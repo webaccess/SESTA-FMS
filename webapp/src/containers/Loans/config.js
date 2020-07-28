@@ -1,11 +1,6 @@
-export const ADD_LOAN_BREADCRUMBS = {
+export const EDIT_LOAN_TASK_BREADCRUMBS = {
   home: "Home",
   list_loan: "Loans",
-  add_loan: "Add Loan",
-};
-
-export const EDIT_LOAN_BREADCRUMBS = {
-  home: "Home",
-  list_loan: "Loans",
-  edit_loan: "Edit Loan",
+  update_loan_task: "Loan Tasks",
+  edit_loan_task: "Edit Loan Task"
 };
