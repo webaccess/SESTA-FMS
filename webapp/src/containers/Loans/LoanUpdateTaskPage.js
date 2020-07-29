@@ -7,6 +7,7 @@ import * as serviceProvider from "../../api/Axios";
 import MoneyIcon from "@material-ui/icons/Money";
 import IconButton from "@material-ui/core/IconButton";
 import Table from "../../components/Datatable/Datatable.js";
+import Moment from "moment";
 
 const useStyles = (theme) => ({
   root: {},
@@ -89,14 +90,14 @@ class LoanUpdateTaskPage extends Component {
   async componentDidMount() {
     let memberData = this.props.location.state.loanAppData;
     this.getAllDetails(memberData);
-    
+
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "loan-application-tasks/?loan_application.id="+memberData.id+"&&_sort=id:ASC"
+        "loan-application-tasks/?loan_application.id=" + memberData.id + "&&_sort=id:ASC"
       )
       .then((res) => {
-        this.setState({loantasks: res.data});
+        this.setState({ loantasks: res.data });
       })
   }
 
@@ -106,12 +107,14 @@ class LoanUpdateTaskPage extends Component {
     let amount = memberData.loan_model.loan_amount;
     let duration = memberData.loan_model.duration + " Months";
     let emi = memberData.loan_model.emi;
-    
+    let pendingAmount = memberData.amount_due;
+    let loanEndsOn = memberData.application_date;
+
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/individuals/" +
-          memberData.contact.individual
+        "crm-plugin/individuals/" +
+        memberData.contact.individual
       )
       .then((res) => {
         let shgName = res.data.shg.name;
@@ -119,8 +122,8 @@ class LoanUpdateTaskPage extends Component {
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/contact/?organization.id=" +
-              res.data.shg.organization
+            "crm-plugin/contact/?organization.id=" +
+            res.data.shg.organization
           )
           .then((response) => {
             let villageName = response.data[0].villages[0].name;
@@ -130,9 +133,11 @@ class LoanUpdateTaskPage extends Component {
                 shg: shgName,
                 village: villageName,
                 purpose: purpose,
-                amount: amount,
+                amount: "Rs." + (amount).toLocaleString(),
                 duration: duration,
-                emi: emi
+                emi: "Rs." + (emi).toLocaleString(),
+                pendingAmount: "Rs." + (pendingAmount).toLocaleString(),
+                loanEndsOn: Moment(loanEndsOn).format("DD MMM YYYY")
               }
             })
           })
@@ -141,13 +146,14 @@ class LoanUpdateTaskPage extends Component {
 
   editData = (cellid) => {
     let loantask;
-    this.state.loantasks.map(data=>{
-      if(data.id == cellid) {
+    this.state.loantasks.map(data => {
+      if (data.id == cellid) {
         loantask = data;
       }
     });
-    
-    this.props.history.push("/loan/task/edit/" + cellid, {loantask:loantask, loanAppData: this.props.location.state.loanAppData
+
+    this.props.history.push("/loan/task/edit/" + cellid, {
+      loantask: loantask, loanAppData: this.props.location.state.loanAppData
     });
   }
 
@@ -155,6 +161,9 @@ class LoanUpdateTaskPage extends Component {
     const { classes } = this.props;
     let data = this.state.data;
     let loantasks = this.state.loantasks;
+    loantasks.map(task => {
+      task.date = Moment(task.date).format('DD MMM YYYY');
+    });
     const Usercolumns = [
       {
         name: "Tasks",
@@ -172,7 +181,7 @@ class LoanUpdateTaskPage extends Component {
         sortable: true,
       },
       {
-        name: "Commets",
+        name: "Comments",
         selector: "comments",
         sortable: true,
       },
@@ -184,84 +193,94 @@ class LoanUpdateTaskPage extends Component {
     let columnsvalue = selectors[0];
     let filters = this.state.values;
 
-    return(
+    return (
       <Layout>
         <Grid>
           <div className="App">
             <h5>LOAN</h5>
-            
-            <div style={{ display: "flex"}}>
-            <h2 style={{margin: "13px"}}>{data.loanee}</h2>
 
+            <div style={{ display: "flex" }}>
+              <h2 style={{ margin: "13px" }}>{data.loanee}</h2>
               <div className={classes.dataRow}><p>SHG GROUP <b>{data.shg}</b></p></div>
 
               <div className={classes.dataRow}><p>VILLAGE <b>{data.village}</b> </p></div>
-           
             </div>
-
           </div>
+
           <Card className={classes.mainContent}>
-            <Grid>
-            <IconButton aria-label="view">
-              <MoneyIcon className={classes.Icon} />
-                <b>
-                  <div className={classes.member}>
-                    PURPOSE
-                    <br />
-                    <span className={classes.fieldValues}>{data.purpose}</span>
-                  </div>
-                </b>
-              </IconButton>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <IconButton aria-label="view">
-                <b>
-                  <div className={classes.member}>
-                    AMOUNT
-                    <br />
-                    <span className={classes.fieldValues}>{data.amount}</span>
-                  </div>
-                </b>
-                </IconButton>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <IconButton aria-label="view">
-                <b>
-                  <div className={classes.member}>
-                    PENDING AMOUNT
-                    <br />
-                    <span className={classes.fieldValues}>{"-"}</span>
-                  </div>
-                </b>
-                </IconButton>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <IconButton aria-label="view">
-                <b>
-                  <div className={classes.member}>
-                    EMI
-                    <br />
-                    <span className={classes.fieldValues}>{data.emi}</span>
-                  </div>
-                </b>
-                </IconButton>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <IconButton aria-label="view">
-                <b>
-                  <div className={classes.member}>
-                    DURATION
-                    <br />
-                    <span className={classes.fieldValues}>{data.duration}</span>
-                  </div>
-                </b>
-                </IconButton>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <IconButton aria-label="view">
-                <b>
-                  <div className={classes.member}>
-                    LOAN ENDS ON
-                    <br />
-                    <span className={classes.fieldValues}>{"-"}</span>
-                  </div>
-                </b>
-                </IconButton>
+            <Grid
+              container
+              spacing={3}
+              style={{ padding: "20px 0px", alignItems: "center" }}
+            >
+              <Grid spacing={1} xs={1}>
+                <MoneyIcon className={classes.Icon} />
+              </Grid>
+              <Grid spacing={1} xs={11}>
+                <Grid container spacing={3}>
+                  <Grid spacing={2} xs={2}>
+                    <b>
+                      <div className={classes.member}>
+                        PURPOSE
+                          <br />
+                        <span className={classes.fieldValues}>
+                          {data.purpose}
+                        </span>
+                      </div>
+                    </b>
+                  </Grid>
+                  <Grid spacing={2} xs={2}>
+                    <b>
+                      <div className={classes.member}>
+                        AMOUNT <br />
+                        <span className={classes.fieldValues}>
+                          {data.shg}
+                        </span>
+                      </div>
+                    </b>
+                  </Grid>
+                  <Grid spacing={2} xs={2}>
+                    <b>
+                      <div className={classes.member}>
+                        PENDING AMOUNT <br />
+                        <span className={classes.fieldValues}>
+                          {data.pendingAmount}
+                        </span>
+                      </div>
+                    </b>
+                  </Grid>
+                  <Grid spacing={2} xs={2}>
+                    <b>
+                      <div className={classes.member}>
+                        EMI <br />
+                        <span className={classes.fieldValues}>
+                          {data.emi}
+                        </span>
+                      </div>
+                    </b>
+                  </Grid>
+                  <Grid spacing={2} xs={2}>
+                    <b>
+                      <div className={classes.member}>
+                        DURATION <br />
+                        <span className={classes.fieldValues}>
+                          {data.duration}
+                        </span>
+                      </div>
+                    </b>
+                  </Grid>
+                  <Grid spacing={2} xs={2}>
+                    <b>
+                      <div className={classes.member}>
+                        LOAN ENDS ON <br />
+                        <span className={classes.fieldValues}>
+                          {data.loanEndsOn}
+                        </span>
+                      </div>
+                    </b>
+                  </Grid>
+                </Grid>
+              </Grid>
             </Grid>
           </Card>
 
@@ -271,13 +290,10 @@ class LoanUpdateTaskPage extends Component {
               showSearch={false}
               filterData={false}
               filterBy={["name", "date", "status", "comments"]}
-             
               // filters={filters}
               data={loantasks}
               column={Usercolumns}
-              // viewData={this.viewData}
               editData={this.editData}
-              // DeleteData={this.DeleteData}
               rowsSelected={this.rowsSelect}
               columnsvalue={columnsvalue}
             />

@@ -45,15 +45,6 @@ const useStyles = makeStyles((theme) => ({
       color: "#282F2B",
     },
   },
-  PrintIcon: {
-    color: "#131514",
-    "&:hover": {
-      color: "#282F2B",
-    },
-    "&:active": {
-      color: "#282F2B",
-    },
-  },
 }));
 
 const Table = (props) => {
@@ -92,7 +83,6 @@ const Table = (props) => {
   const viewTask = (id) => {
     props.viewTask(id);
   };
-
   const customAction = (id) => {
     props.customAction(id);
   };
@@ -156,10 +146,6 @@ const Table = (props) => {
         ),
         button: true,
       },
-    ];
-  }
-  if ( valueForMemberPage !== "Loans" && valueForMemberPage !== "UpdateLoanTask" ) {
-    column = [
       {
         cell: (cell) => (
           <div
@@ -175,6 +161,22 @@ const Table = (props) => {
         ),
         button: true,
       },
+    ];
+  }
+  if (valueForMemberPage === "UpdateLoanTask") {
+    column = [
+      {
+        cell: (cell) => (
+          <div onClick={(event) => editData(cell.id)} id={cell.id}>
+            <Tooltip title="Edit">
+              <IconButton aria-label="edit" value={cell[valueformodal]}>
+                <EditIcon className={classes.editIcon} />
+              </IconButton>
+            </Tooltip>
+          </div>
+        ),
+        button: true,
+      }
     ];
   }
   if (valueForMemberPage === "Members") {
@@ -280,6 +282,7 @@ const Table = (props) => {
       },
     ];
   }
+
   const makeColumns = (columns) => {
     for (let Usercolumns in column) {
       columns.push(column[Usercolumns]);
