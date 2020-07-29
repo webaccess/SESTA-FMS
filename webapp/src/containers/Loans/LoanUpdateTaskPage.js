@@ -136,8 +136,8 @@ class LoanUpdateTaskPage extends Component {
                 amount: "Rs." + (amount).toLocaleString(),
                 duration: duration,
                 emi: "Rs." + (emi).toLocaleString(),
-                pendingAmount: "Rs." + (pendingAmount).toLocaleString(),
-                loanEndsOn: Moment(loanEndsOn).format("DD MMM YYYY")
+                pendingAmount: pendingAmount ? "Rs." + (pendingAmount).toLocaleString() : "-",
+                loanEndsOn: loanEndsOn ? Moment(loanEndsOn).format("DD MMM YYYY") : "-"
               }
             })
           })
@@ -162,7 +162,9 @@ class LoanUpdateTaskPage extends Component {
     let data = this.state.data;
     let loantasks = this.state.loantasks;
     loantasks.map(task => {
-      task.date = Moment(task.date).format('DD MMM YYYY');
+      if(task.date != null) {
+        task.date = Moment(task.date).format('DD MMM YYYY');
+      }
     });
     const Usercolumns = [
       {
@@ -234,7 +236,7 @@ class LoanUpdateTaskPage extends Component {
                       <div className={classes.member}>
                         AMOUNT <br />
                         <span className={classes.fieldValues}>
-                          {data.shg}
+                          {data.amount}
                         </span>
                       </div>
                     </b>
@@ -243,9 +245,9 @@ class LoanUpdateTaskPage extends Component {
                     <b>
                       <div className={classes.member}>
                         PENDING AMOUNT <br />
-                        <span className={classes.fieldValues}>
+                        {loantasks.length > 0 ? (<span className={classes.fieldValues}>
                           {data.pendingAmount}
-                        </span>
+                        </span>) : "-"}
                       </div>
                     </b>
                   </Grid>
@@ -273,9 +275,9 @@ class LoanUpdateTaskPage extends Component {
                     <b>
                       <div className={classes.member}>
                         LOAN ENDS ON <br />
-                        <span className={classes.fieldValues}>
+                        {loantasks.length > 0 ? (<span className={classes.fieldValues}>
                           {data.loanEndsOn}
-                        </span>
+                        </span>) : "-"}
                       </div>
                     </b>
                   </Grid>
