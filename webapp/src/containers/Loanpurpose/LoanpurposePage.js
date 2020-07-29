@@ -48,7 +48,6 @@ class LoanpurposePage extends Component {
       emidetails: {},
       taskdetails: {},
       values: {},
-      demo: {},
       addPurpose: "",
       users: [{ principal: "", interest: "" }],
       task: [{ name: "" }],
@@ -73,10 +72,10 @@ class LoanpurposePage extends Component {
           },
         },
         addFPO: {
-          // required: {
-          //   value: "true",
-          //   message: "FPO field is required",
-          // },
+          required: {
+            value: "true",
+            message: "FPO field is required",
+          },
         },
         addEMI: {
           required: {
@@ -131,24 +130,9 @@ class LoanpurposePage extends Component {
 
           if (res.data.emidetails) {
             let getEmi = res.data.emidetails;
-            console.log("getEmi---", getEmi);
-            //for (let i in getEmi) {
-            //this.setState({
-            //  emidetails: {
-            //    emId: res.data.emidetails[i].id,
-            //    addPrincipal: res.data.emidetails[i].principal,
-            //    addInterest: res.data.emidetails[i].interest,
-            //  },
-            //});
-            //}
-            this.state.demo = getEmi.map((obj) => {
-              return obj;
-            });
             this.state.users = getEmi.map((obj) => {
               return obj;
             });
-            console.log("demo--", this.state.demo);
-            console.log("--safter setting----", this.state.emidetails);
           }
 
           if (res.data.loantasks) {
@@ -187,13 +171,6 @@ class LoanpurposePage extends Component {
   }
 
   createUI() {
-    let u = 1;
-    let demo = this.state.demo;
-    if (this.state.demo.length > 1) {
-      console.log("--prinicpal--", this.state.demo[0].principal);
-      let u = this.state.demo.length;
-    }
-
     const { classes } = this.props;
     return this.state.users.map((el, i) => (
       <div key={i}>
@@ -210,6 +187,7 @@ class LoanpurposePage extends Component {
           onChange={this.handleUIChange.bind(this, i)}
           variant="outlined"
         />
+        &nbsp; &nbsp;
         <Input
           label="Interest"
           type="number"
@@ -269,14 +247,12 @@ class LoanpurposePage extends Component {
     let users = [...this.state.users];
     users[i] = { ...users[i], [name]: value };
     this.setState({ users });
-    console.log("users---", name, value);
   }
 
   removeClick(i, e) {
     let users = [...this.state.users];
     users.splice(i, 1);
     this.setState({ users });
-    console.log("---in remove ---", this.state.users);
   }
 
   handleTaskUIChange(i, e) {
@@ -284,7 +260,6 @@ class LoanpurposePage extends Component {
     let task = [...this.state.task];
     task[i] = { ...task[i], [name]: value };
     this.setState({ task });
-    console.log("task---", name, value);
   }
 
   removeTaskClick(i) {
@@ -337,7 +312,6 @@ class LoanpurposePage extends Component {
   };
 
   saveEmiDetails = async (data, Id) => {
-    console.log("demo present or not--", this.state.users);
     if (data.emidetails.length > 1) {
       for (let i in this.state.users) {
         if (this.state.users[i] && !data.emidetails[i]) {
@@ -355,7 +329,6 @@ class LoanpurposePage extends Component {
               console.log(error);
             });
         } else if (data.emidetails[i] && !this.state.users[i]) {
-          console.log("In remove loop----", this.state.users);
           serviceProvider
             .serviceProviderForDeleteRequest(
               process.env.REACT_APP_SERVER_URL + "emidetails",
@@ -366,7 +339,6 @@ class LoanpurposePage extends Component {
               console.log(error);
             });
         } else {
-          console.log("emideteails present or not--", data.emidetails[i].id);
           serviceProvider
             .serviceProviderForPutRequest(
               process.env.REACT_APP_SERVER_URL + "emidetails",
@@ -403,10 +375,8 @@ class LoanpurposePage extends Component {
   };
 
   saveTaskDetails = async (data, Id) => {
-    console.log("--task before", this.state.task);
     if (data.loantasks.length > 1) {
       for (let i in this.state.task) {
-        console.log("--task", this.state.task[i].name);
         if (this.state.task[i] && !data.loantasks[i]) {
           serviceProvider
             .serviceProviderForPostRequest(
@@ -421,7 +391,6 @@ class LoanpurposePage extends Component {
               console.log(error);
             });
         } else {
-          console.log("task present or not--", data.loantasks[i].id);
           serviceProvider
             .serviceProviderForPutRequest(
               process.env.REACT_APP_SERVER_URL + "loantasks",
@@ -466,7 +435,6 @@ class LoanpurposePage extends Component {
     let addAmount = this.state.values.addAmount;
     let addFPO = this.state.values.addFPO;
     let loanEmi = this.state.values.addEMI;
-    console.log("loanEmi----", loanEmi);
     let postLoan = {
       product_name: productName,
       duration: addDuration,
@@ -475,7 +443,6 @@ class LoanpurposePage extends Component {
       fpo: addFPO,
       emi: loanEmi,
     };
-    console.log("postLoan----", postLoan);
     //if (Object.keys(this.state.errors).length > 0) return;q
     if (this.state.editPage[0]) {
       // let bankIds = "";
@@ -521,7 +488,6 @@ class LoanpurposePage extends Component {
           let bankId = res.data.id;
           this.setState({ bankDeatilsId: bankId });
           if (this.state.users) {
-            console.log("--inside emi save loop--", res.data);
             this.saveEmiDetails(res.data, res.data.id);
           }
           if (this.state.task) {
@@ -544,9 +510,6 @@ class LoanpurposePage extends Component {
   };
 
   render() {
-    for (let u in this.state.demo) {
-      console.log("u-", this.state.demo.length);
-    }
     const { classes } = this.props;
     let fpoFilters = this.state.getFPO;
     let addFPO = this.state.values.addFPO;
@@ -717,10 +680,7 @@ class LoanpurposePage extends Component {
               EMI Installments
               <br />
               <br />
-              {/*for (let u in this.state.demo.length
-              ) {{ this: this.createUI() }}*/}
               {this.createUI()}
-              {/*{this.callFun()}*/}
               <IconButton aria-label="add" onClick={this.addClick.bind(this)}>
                 <AddCircleOutlined className={classes.Icon} />
                 <span className={classes.labelHeader}>Add EMI</span>
@@ -730,10 +690,7 @@ class LoanpurposePage extends Component {
               Tasks
               <br />
               <br />
-              {/*for (let u in this.state.demo.length
-              ) {{ this: this.createUI() }}*/}
               {this.createTaskUI()}
-              {/*{this.callFun()}*/}
               <IconButton
                 aria-label="add"
                 onClick={this.addTaskClick.bind(this)}
