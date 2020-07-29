@@ -80,3 +80,34 @@ export const serviceProviderForPostRequest = async (
       throw error;
     });
 };
+
+export const serviceProviderForGetRequestDownloadPDFFile = async (
+  url,
+  payload = {},
+  headers = {
+    "content-type": "application/json",
+    Authorization: `Bearer ${Auth.getToken()}`,
+
+    Accept: "application/pdf",
+  }
+) => {
+  const URL = url;
+  return await axios(URL, {
+    method: "GET",
+    responseType: "arraybuffer",
+    headers: headers,
+    params: payload,
+  })
+    .then((response) => {
+      console.log("res==", response.data);
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "loan-application.pdf"); //or any other extension
+      document.body.appendChild(link);
+      link.click();
+    })
+    .catch((error) => {
+      throw error;
+    });
+};

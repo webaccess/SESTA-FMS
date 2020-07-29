@@ -4,20 +4,7 @@ import auth from "../../components/Auth/Auth";
 import axios from "axios";
 
 class Dashboard extends Component {
-  async componentDidMount() {
-    await axios
-      .get(process.env.REACT_APP_SERVER_URL + "bankdetails", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
+  async componentDidMount() {}
 
   render() {
     const userInfo = auth.getUserInfo();

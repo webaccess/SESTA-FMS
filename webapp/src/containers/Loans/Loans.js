@@ -10,6 +10,9 @@ import Button from "../../components/UI/Button/Button";
 import Table from "../../components/Datatable/Datatable.js";
 import auth from "../../components/Auth/Auth.js";
 import Moment from "moment";
+import Snackbar from "../../components/UI/Snackbar/Snackbar";
+import { Link } from "react-router-dom";
+import Auth from "../../components/Auth/Auth.js";
 
 const useStyles = (theme) => ({
   root: {},
@@ -52,6 +55,41 @@ const useStyles = (theme) => ({
   },
 });
 
+const conditionalRowStyles = [
+  {
+    when: row => row.status == "Approved",
+    style: {
+      backgroundColor: '#c9e7b1',
+      color: 'black',
+      '&:hover': {
+        backgroundColor: "#bce09e",
+        cursor: 'pointer',
+      },
+    },
+  },
+  {
+    when: row => row.status == "UnderReview",
+    style: {
+      backgroundColor: '#ffd6cc',
+      color: 'black',
+      '&:hover': {
+        backgroundColor: "#ffc2b3",
+        cursor: 'pointer',
+      },
+    },
+  },
+  {
+    when: row => row.status == "Denied" || row.status == "Cancelled",
+    style: {
+      backgroundColor: '#d7dbdb',
+      color: 'black',
+      '&:hover': {
+        backgroundColor: "#c9cfcf",
+        cursor: 'pointer',
+      },
+    },
+  }
+];
 export class Loans extends React.Component {
   constructor(props) {
     super(props);
@@ -69,7 +107,6 @@ export class Loans extends React.Component {
       values: {},
       filterStatus: "",
       filterShg: "",
-      properties: props,
     };
   }
 
@@ -80,8 +117,6 @@ export class Loans extends React.Component {
       )
       .then((res) => {
         this.getFormattedData(res.data);
-
-        // this.setState({ data: res.data });
       });
 
     // get all SHGs
@@ -100,21 +135,10 @@ export class Loans extends React.Component {
 
   getFormattedData = (data) => {
     let amount_due;
-    data.map((installment) => {
-      installment.loan_app_installments.map((li) => {
-        let amount_due;
-        data.map((installment) => {
-          installment.application_date = Moment(
-            installment.application_date
-          ).format("DD MMM YYYY");
-          installment.loan_app_installments.map((li) => {
-            let payment_date = li.payment_date;
-            amount_due = li.expected_interest + li.expected_principal;
-            li.amount_due = amount_due;
-            li.payment_date = Moment(payment_date).format("DD MMM YYYY");
-          });
-        });
-      });
+    data.map((loandata) => {
+      loandata.application_date = Moment(loandata.application_date).format(
+        "DD MMM YYYY"
+      );
     });
     this.setState({ data: data });
   };
@@ -123,16 +147,39 @@ export class Loans extends React.Component {
     let searchData = "";
     if (this.state.values.addMember) {
       searchData += searchData ? "&&" : "";
-      searchData += "contacts.name_contains=" + this.state.values.addMember;
+      searchData += "contact.name_contains=" + this.state.values.addMember;
     }
     if (this.state.filterStatus) {
       searchData += searchData ? "&&" : "";
       searchData += "status=" + this.state.filterStatus.name;
     }
-    // if (this.state.filterShg) {
-    //   searchData += searchData ? "&&" : "";
-    //   searchData += "individual.shg=" + this.state.filterShg.id;
-    // }
+    this.searchData(searchData);
+
+    if (this.state.filterShg) {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals"
+        )
+        .then((res) => {
+          res.data.map((shgcontact) => {
+            if (this.state.filterShg.id == shgcontact.shg.id) {
+              searchData += searchData ? "&&" : "";
+              searchData += "contact.id=" + shgcontact.contact.id;
+              this.searchData(searchData);
+            } else {
+              searchData += searchData ? "&&" : "";
+              searchData += "contact.id=" + 0;
+              this.searchData(searchData);
+            }
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }
+
+  searchData(searchData) {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL + "loan-applications?" + searchData
@@ -169,13 +216,25 @@ export class Loans extends React.Component {
     }
   };
 
-  viewMemberData() {
-    // this.props.history.push("/villages/edit/" + cellid);
-  }
+  viewTask = (cellid) => {
+    console.log('cellid.. ',cellid);
+    let loanAppData;
+    this.state.data.map(e=> {
+      if(e.id == cellid) {
+        loanAppData = e;
+        this.props.history.push("/loan/update/" + cellid, {loanAppData: loanAppData});
+      }
+    })
+  };
 
-  viewData = (cellid) => {
-    // this.props.history.push("/loans/view" + cellid);
-    this.props.history.push("/loans/view/:id");
+  loanApproveData = (cellid) => {
+    let loanAppData;
+    this.state.data.map((item) => {
+      if (cellid == item.id) {
+        loanAppData = item;
+      }
+    });
+    this.props.history.push("/loans/approve/" + cellid, loanAppData);
   };
 
   handleShgChange(event, value) {
@@ -188,17 +247,62 @@ export class Loans extends React.Component {
     }
   }
 
+  customAction = (cellid) => {
+    let memberData;
+    // this.state.data.map((memData) => {
+    //   if (cellid == memData.id) {
+    //     memberData = memData;
+    //   }
+    // });
+    // serviceProvider
+    //   .serviceProviderForGetRequest(
+    //     process.env.REACT_APP_SERVER_URL + "loan-applications-print/" + cellid
+    //   )
+    //   .then((res) => {
+    //     console.log("done here");
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+    let token = Auth.getToken();
+    // window.location =
+    //   window.location.protocol +
+    //   "//" +
+    //   token +
+    //   "@" +
+    //   process.env.REACT_APP_SERVER_URL_BASE +
+    //   "loan-applications-print/" +
+    //   cellid;
+
+    // console.log(
+    //   "urk",
+    //   window.location.protocol +
+    //     "//" +
+    //     token +
+    //     "@" +
+    //     process.env.REACT_APP_SERVER_URL_BASE +
+    //     "loan-applications-print/" +
+    //     cellid
+    // );
+    serviceProvider
+      .serviceProviderForGetRequestDownloadPDFFile(
+        process.env.REACT_APP_SERVER_URL + "loan-applications-print/" + cellid
+      )
+      .then((res) => {
+        console.log("done here");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    // this.props.history.push(
+    //   process.env.REACT_APP_SERVER_URL + "loan-applications-print/" + cellid
+    // );
+  };
+
   render() {
     const { classes } = this.props;
-
-    let data = [];
-    this.state.data.map((cdata) => {
-      // show the loan application only members applied to
-      if (cdata.contacts && cdata.contacts.length) {
-        data.push(cdata);
-      }
-    });
-
+    let data = this.state.data;
     let shgFilter = this.state.getShg;
     let filterShg = this.state.filterShg;
     let statusFilter = this.state.getStatus;
@@ -207,7 +311,7 @@ export class Loans extends React.Component {
     const Usercolumns = [
       {
         name: "Member Name",
-        selector: "contacts[0].name",
+        selector: "contact.name",
         sortable: true,
       },
       {
@@ -234,11 +338,19 @@ export class Loans extends React.Component {
         name: "Amount Due",
         selector: "loan_app_installments.amount_due",
         sortable: true,
+        cell: (row) =>
+          row.loan_app_installments.amount_due
+            ? row.loan_app_installments.amount_due
+            : "-",
       },
       {
         name: "Installment Date",
         selector: "loan_app_installments.payment_date",
         sortable: true,
+        cell: (row) =>
+          row.loan_app_installments.payment_date
+            ? row.loan_app_installments.payment_date
+            : "-",
       },
     ];
     let selectors = [];
@@ -246,7 +358,10 @@ export class Loans extends React.Component {
       selectors.push(Usercolumns[i]["selector"]);
     }
     let columnsvalue = selectors[0];
-
+    let loanState = {};
+    if (this.props.location.state) {
+      loanState = this.props.location.state;
+    }
     return (
       <Layout>
         <Grid>
@@ -254,6 +369,32 @@ export class Loans extends React.Component {
             LOAN
             <h1 className={style.title}>Manage Loan Application</h1>
           </div>
+
+          {loanState.loanApplied ? (
+            <Snackbar severity="success">
+              You have successfully applied for the loan{" "}
+              <b>{loanState.purpose}</b>
+            </Snackbar>
+          ) : null}
+          {loanState.loanAlreadyApplied ? (
+            <Snackbar severity="info">
+              You have already applied loan for the Purpose{" "}
+              <b>{loanState.purpose}</b>
+            </Snackbar>
+          ) : null}
+          {loanState.activeLoanPresent ? (
+            <Snackbar severity="info">
+              You already have one active loan.
+            </Snackbar>
+          ) : null}
+          {loanState.loanNotApplied ? (
+            <Snackbar severity="error">
+              An error occured - Please try again later!
+            </Snackbar>
+          ) : null}
+          {loanState.loanApproved ? (
+            <Snackbar severity="success">Changes saved successfully</Snackbar>
+          ) : null}
 
           <br></br>
           <div className={classes.row}>
@@ -273,7 +414,7 @@ export class Loans extends React.Component {
                 </Grid>
               </div>
             </div>
-            {/* <div className={classes.searchInput}>
+            <div className={classes.searchInput}>
               <div className={style.Districts}>
                 <Grid item md={12} xs={12}>
                   <Autocomplete
@@ -302,7 +443,7 @@ export class Loans extends React.Component {
                   />
                 </Grid>
               </div>
-            </div> */}
+            </div>
             <div className={classes.searchInput}>
               <div className={style.Districts}>
                 <Grid item md={12} xs={12}>
@@ -348,7 +489,7 @@ export class Loans extends React.Component {
               filterData={true}
               Searchplaceholder={"Seacrh by Member name"}
               filterBy={[
-                "contacts[0].name",
+                "contact.name",
                 "purpose",
                 "application_date",
                 "loan_model.loan_amount",
@@ -359,13 +500,14 @@ export class Loans extends React.Component {
               filters={filters}
               data={data}
               column={Usercolumns}
-              // viewMemberData={this.viewMemberData}
-              viewData={this.viewData}
-              // editData={this.editData}
+              loanApproveData={this.loanApproveData}
+              customAction={this.customAction}
+              viewTask={this.viewTask}
               DeleteData={this.DeleteData}
               DeleteAll={this.DeleteAll}
               rowsSelected={this.rowsSelect}
               columnsvalue={columnsvalue}
+              conditionalRowStyles={conditionalRowStyles}
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (

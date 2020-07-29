@@ -112,14 +112,12 @@ class LoansPage extends Component {
       data: [],
       values: {},
       getShgVo: [],
-      loan_app: [],
       loan_installments: [],
       shgUnderVo: [],
       handlePurposeChange: "",
       isCancel: false,
-      loanApplied: "",
-      loanNotApplied: "",
-      loanAlreadyApplied: "",
+      loan_model: [],
+      memberData: [],
     };
   }
 
@@ -173,15 +171,13 @@ class LoansPage extends Component {
         this.setState({ getShgVo: res.data });
       });
 
-    // get purpose from loan application model
-    let memberId = this.props.location.state.id;
+    // get purpose from loan model
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "loan-applications/?_sort=id:ASC"
+        process.env.REACT_APP_SERVER_URL + "loan-models/?_sort=id:ASC"
       )
       .then((res) => {
-        this.setState({ loan_app: res.data });
-        this.setState({ loan_installments: res.data[0].loan_app_installments });
+        this.setState({ loan_model: res.data });
       });
   }
 
@@ -197,59 +193,125 @@ class LoansPage extends Component {
     // save loan application to contact
     let loan_application_data = [];
     let assignLoanAppValues;
+    let activeLoanPresent, loanApplied, loanAlreadyApplied;
     let postData = this.props.location.state;
-    delete postData.individual;
-    delete postData.user;
-    this.state.loanApplied = false;
+    if (
+      this.state.memberData &&
+      this.state.memberData.length &&
+      this.state.memberData[0].hasOwnProperty("loan_applications")
+    ) {
+      postData = this.state.memberData[0];
+    }
+
     if (this.state.handlePurposeChange) {
       assignLoanAppValues = this.state.handlePurposeChange;
     } else {
-      assignLoanAppValues = this.state.loan_app[0];
+      assignLoanAppValues = this.state.loan_model[0];
     }
-
     loan_application_data = {
-      id: assignLoanAppValues.id,
-      loan_model: assignLoanAppValues.assignLoanAppValues,
-      application_no: assignLoanAppValues.application_no,
-      application_date: assignLoanAppValues.application_date,
-      approved_by: assignLoanAppValues.approved_by,
-      approved_date: assignLoanAppValues.approved_date,
-      loan_application_task: assignLoanAppValues.loan_application_task,
-      purpose: assignLoanAppValues.purpose,
-      review_comments: assignLoanAppValues.review_comments,
-      status: assignLoanAppValues.status,
+      contact: postData.id,
+      loan_model: assignLoanAppValues.id,
+      application_no: assignLoanAppValues.id.toString(),
+      application_date: Moment().format("YYYY-MM-DD"),
+      purpose: assignLoanAppValues.product_name,
+      status: "UnderReview",
     };
 
-    if (postData.loan_applications && postData.loan_applications.length) {
+    if (postData.loan_applications && postData.loan_applications.length > 0) {
       postData.loan_applications.map((loanapp) => {
-        if (assignLoanAppValues.id === loanapp.id) {
-          this.setState({ loanAlreadyApplied: true });
-        } else {
-          postData.loan_applications.push(loan_application_data);
-          this.saveApplyLoan(postData);
-          this.setState({ loanApplied: true });
+        if (loanapp.status == "UnderReview" || loanapp.status == "Approved") {
+          if (loanapp.loan_model == assignLoanAppValues.id) {
+            loanAlreadyApplied = true;
+            activeLoanPresent = false;
+            loanApplied = false;
+            this.props.history.push({
+              pathname: "/loans",
+              state: {
+                loanAlreadyApplied: true,
+                purpose: assignLoanAppValues.product_name,
+              },
+            });
+          } else if (loanapp.loan_model !== assignLoanAppValues.id) {
+            activeLoanPresent = true;
+            loanAlreadyApplied = false;
+            loanApplied = false;
+            this.props.history.push({
+              pathname: "/loans",
+              state: { activeLoanPresent: true },
+            });
+          }
+        } else if (
+          loanapp.status == "Denied" ||
+          loanapp.status == "Cancelled"
+        ) {
+          if (!loanApplied && !activeLoanPresent && !loanAlreadyApplied) {
+            this.saveApplyLoan(
+              loan_application_data,
+              postData.id,
+              assignLoanAppValues
+            );
+            loanApplied = true;
+            loanAlreadyApplied = false;
+            activeLoanPresent = false;
+          }
         }
       });
     } else {
-      postData.loan_applications.push(loan_application_data);
-      this.saveApplyLoan(postData);
+      this.saveApplyLoan(
+        loan_application_data,
+        postData.id,
+        assignLoanAppValues
+      );
+      loanApplied = true;
       this.setState({ loanApplied: true });
     }
   }
 
-  saveApplyLoan(postData) {
+  saveApplyLoan(postData, memberId, assignLoanAppValues) {
     serviceProvider
-      .serviceProviderForPutRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
-        postData.id,
+      .serviceProviderForPostRequest(
+        process.env.REACT_APP_SERVER_URL + "loan-applications",
         postData
       )
       .then((res) => {
-        this.setState({ loanApplied: true });
-        this.setState({ loanAlreadyApplied: false });
+        this.getMemberData(memberId);
+
+        // put method to update application_no
+        let updateAppNo = res.data;
+        updateAppNo.application_no = res.data.id;
+
+        serviceProvider
+          .serviceProviderForPutRequest(
+            process.env.REACT_APP_SERVER_URL + "loan-applications",
+            res.data.id,
+            updateAppNo
+          )
+          .then((loanapp_res) => {});
+
+        this.props.history.push({
+          pathname: "/loans",
+          state: {
+            loanApplied: true,
+            purpose: assignLoanAppValues.product_name,
+            memberData: res.data,
+          },
+        });
       })
       .catch((error) => {
-        this.setState({ loanNotApplied: true });
+        this.props.history.push({
+          pathname: "/loans",
+          state: { loanNotApplied: true },
+        });
+      });
+  }
+
+  getMemberData(id) {
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/?id=" + id
+      )
+      .then((res) => {
+        this.setState({ memberData: res.data });
       });
   }
 
@@ -265,52 +327,54 @@ class LoansPage extends Component {
 
   render() {
     const { classes } = this.props;
-    let shgName, voName, loan_amnt, duration, specification;
-    let payment_date, expected_principal, expected_interest, loan_purpose;
-    let loan_installments = this.state.loan_installments;
+    let shgName, voName, loan_amnt, duration, specification, loan_purpose;
 
     // store memberData(props.history.push) from member page
     let data = this.props.location.state;
-    let loan_app = this.state.loan_app;
+    if (
+      this.state.memberData &&
+      this.state.memberData.length &&
+      this.state.memberData[0].hasOwnProperty("loan_applications")
+    ) {
+      data = this.state.memberData[0];
+    }
+    let loan_model = this.state.loan_model;
     let handlePurposeChange = this.state.handlePurposeChange;
-    this.state.loan_app.map((lap) => {
+
+    this.state.loan_model.map((loanmodel) => {
       if (handlePurposeChange) {
-        if (lap.id == this.state.handlePurposeChange.id) {
-          loan_amnt = lap.loan_model.loan_amount;
-          duration = lap.loan_model.duration;
-          specification = lap.loan_model.specification;
-          loan_purpose = lap.purpose;
-          this.state.loan_installments = lap.loan_app_installments;
+        if (loanmodel.id == this.state.handlePurposeChange.id) {
+          loan_amnt = loanmodel.loan_amount;
+          duration = loanmodel.duration;
+          specification = loanmodel.specification;
+          loan_purpose = loanmodel.product_name;
+          this.state.loan_installments = loanmodel.emidetails;
         }
       } else {
-        loan_amnt = loan_app[0].loan_model.loan_amount;
-        duration = loan_app[0].loan_model.duration;
-        specification = loan_app[0].loan_model.specification;
-        loan_purpose = loan_app[0].purpose;
+        loan_amnt = loan_model[0].loan_amount;
+        duration = loan_model[0].duration;
+        specification = loan_model[0].specification;
+        loan_purpose = loan_model[0].product_name;
+        this.state.loan_installments = loan_model[0].emidetails;
       }
     });
-    loan_installments.map((row) => {
-      payment_date = row.payment_date;
-      row.payment_date = Moment(payment_date).format("DD MMM YYYY");
+
+    // To add a due date in emi installments
+    this.state.loan_installments.map((row, i) => {
+      var futureMonth = Moment().add(i, "M").format("DD MMM YYYY");
+      row.due_date = futureMonth;
     });
+
+    this.state.loan_installments.sort((a, b) => {
+      return a.id - b.id;
+    });
+
     this.state.getShgVo.map((shgvo) => {
       shgName = shgvo.shg.name;
       voName = shgvo.vo.name;
     });
     let shgUnderVo = this.state.shgUnderVo.name;
-    let filters = this.state.values;
-    const Usercolumns = [
-      {
-        name: "Name",
-        selector: "name",
-        sortable: true,
-      },
-    ];
-    let selectors = [];
-    for (let i in Usercolumns) {
-      selectors.push(Usercolumns[i]["selector"]);
-    }
-    let columnsvalue = selectors[0];
+
     return (
       <Layout>
         <Grid>
@@ -319,22 +383,6 @@ class LoansPage extends Component {
             <h2 className={style.title}>Apply for Loan</h2>
 
             {/* <h4 align="right">Birangana Women Producers Company Pvt. Ltd</h4> */}
-
-            {this.state.loanApplied ? (
-              <Snackbar severity="success">
-                You have successfully applied for the loan.
-              </Snackbar>
-            ) : null}
-            {this.state.loanAlreadyApplied ? (
-              <Snackbar severity="info">
-                You have already applied loan for the Purpose {loan_purpose}.
-              </Snackbar>
-            ) : null}
-            {this.state.loanNotApplied ? (
-              <Snackbar severity="error">
-                An error occured - Please try again later!
-              </Snackbar>
-            ) : null}
 
             <Card className={classes.mainContent}>
               <Grid>
@@ -386,19 +434,19 @@ class LoansPage extends Component {
                   <Autocomplete
                     id="combo-box-demo"
                     disabled={false}
-                    options={loan_app}
-                    getOptionLabel={(option) => option.purpose}
+                    options={loan_model}
+                    getOptionLabel={(option) => option.product_name}
                     onChange={(event, value) => {
                       this.handleFieldChange(event, value);
                     }}
                     value={
                       handlePurposeChange
-                        ? loan_app[
-                            loan_app.findIndex(function (item, i) {
+                        ? loan_model[
+                            loan_model.findIndex(function (item, i) {
                               return item.id == handlePurposeChange.id;
                             })
                           ]
-                        : loan_app[0]
+                        : loan_model[0]
                     }
                     renderInput={(params) => (
                       <Input
@@ -463,9 +511,9 @@ class LoansPage extends Component {
                           {this.state.loan_installments
                             ? this.state.loan_installments.map((row) => (
                                 <tr>
-                                  <td>{row.payment_date}</td>
-                                  <td>{row.expected_principal}</td>
-                                  <td>{row.expected_interest}</td>
+                                  <td>{row.due_date}</td>
+                                  <td>{row.principal}</td>
+                                  <td>{row.interest}</td>
                                 </tr>
                               ))
                             : null}

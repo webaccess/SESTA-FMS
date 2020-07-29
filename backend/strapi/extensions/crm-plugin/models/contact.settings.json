@@ -99,10 +99,6 @@
       "via": "fpo",
       "model": "loan-model"
     },
-    "loan_applications": {
-      "via": "contacts",
-      "collection": "loan-application"
-    },
     "loan_app_approvedby": {
       "via": "approved_by",
       "model": "loan-application"
@@ -121,6 +117,10 @@
       "via": "fpo",
       "plugin": "crm-plugin",
       "model": "organization"
+    },
+    "loan_applications": {
+      "via": "contact",
+      "collection": "loan-application"
     }
   }
 }

@@ -508,31 +508,41 @@ const modules = {
     order: 19,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
-  "Add Loan": {
-    is_active: true,
-    icon_class: "",
-    url: "/loans/add",
-    slug: "add_loan",
-    displayNavigation: false,
-    module: "", //slug
-    order: 20,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
-  },
-  "Edit Loan": {
-    is_active: true,
-    icon_class: "",
-    url: "/loans/edit/:id",
-    slug: "edit_loan",
-    displayNavigation: false,
-    module: "", //slug
-    order: 20,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
-  },
   "Apply Loan": {
     is_active: true,
     icon_class: "",
-    url: "/loans/view/:id",
-    slug: "view_loan",
+    url: "/loans/apply/:id",
+    slug: "apply_loan",
+    displayNavigation: false,
+    module: "", //slug
+    order: 20,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Update Loan Tasks": {
+    is_active: true,
+    icon_class: "",
+    url: "/loans/update/:id",
+    slug: "update_loan_task",
+    displayNavigation: false,
+    module: "", //slug
+    order: 20,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Edit Loan Task": {
+    is_active: true,
+    icon_class: "",
+    url: "/loan/task/edit/:id",
+    slug: "edit_loan_task",
+    displayNavigation: false,
+    module: "", //slug
+    order: 20,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Loan Approval": {
+    is_active: true,
+    icon_class: "",
+    url: "/loans/approve/:id",
+    slug: "approve_loan",
     displayNavigation: false,
     module: "", //slug
     order: 20,

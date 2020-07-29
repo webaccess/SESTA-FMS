@@ -76,18 +76,7 @@ class ShgPage extends Component {
           required: { value: "true", message: "IFSC code is required" },
         },
       },
-      errors: {
-        addShg: [],
-        addState: [],
-        addDistrict: [],
-        addVillage: [],
-        addVo: [],
-        addAccountName: [],
-        addAccountNo: [],
-        addBankName: [],
-        addBranch: [],
-        addIfsc: [],
-      },
+      errors: {},
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
@@ -348,7 +337,7 @@ class ShgPage extends Component {
       },
       vos: shgVo,
     };
-
+    if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
       // edit SHG data
       serviceProvider
@@ -740,7 +729,7 @@ class ShgPage extends Component {
                     <Grid item md={6} xs={12}>
                       <Input
                         fullWidth
-                        label="Bank Account Name"
+                        label="Bank Account Name*"
                         disabled={checked ? false : true}
                         name="addAccountName"
                         error={this.hasError("addAccountName")}
@@ -757,7 +746,7 @@ class ShgPage extends Component {
                     <Grid item md={6} xs={12}>
                       <Input
                         fullWidth
-                        label="Account Number"
+                        label="Account Number*"
                         name="addAccountNo"
                         disabled={checked ? false : true}
                         error={this.hasError("addAccountNo")}
@@ -775,7 +764,7 @@ class ShgPage extends Component {
                       <Input
                         fullWidth
                         disabled={checked ? false : true}
-                        label="Bank Name"
+                        label="Bank Name*"
                         name="addBankName"
                         error={this.hasError("addBankName")}
                         helperText={
@@ -791,7 +780,7 @@ class ShgPage extends Component {
                     <Grid item md={6} xs={12}>
                       <Input
                         fullWidth
-                        label="Branch"
+                        label="Branch*"
                         disabled={checked ? false : true}
                         name="addBranch"
                         error={this.hasError("addBranch")}
@@ -808,7 +797,7 @@ class ShgPage extends Component {
                     <Grid item md={6} xs={12}>
                       <Input
                         fullWidth
-                        label="IFSC Code"
+                        label="IFSC Code*"
                         name="addIfsc"
                         disabled={checked ? false : true}
                         error={this.hasError("addIfsc")}

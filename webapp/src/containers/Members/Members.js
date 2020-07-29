@@ -372,7 +372,7 @@ export class Members extends React.Component {
         memberData = memData;
       }
     });
-    this.props.history.push("/loans/view/" + cellid, memberData);
+    this.props.history.push("/loans/apply/" + cellid, memberData);
   };
 
   render() {
