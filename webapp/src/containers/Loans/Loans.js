@@ -134,11 +134,16 @@ export class Loans extends React.Component {
   }
 
   getFormattedData = (data) => {
-    let amount_due;
     data.map((loandata) => {
       loandata.application_date = Moment(loandata.application_date).format(
         "DD MMM YYYY"
       );
+      if(loandata.loan_app_installments.length > 0) {
+        let loanDueId = loandata.loan_app_installments.length-1;
+        let loanDueData = loandata.loan_app_installments[loanDueId];
+        loandata.amount_due = (loanDueData.expected_interest + loanDueData.expected_principal).toLocaleString();
+        loandata.payment_date = Moment(loanDueData.payment_date).format('DD MMM YYYY');
+      }
     });
     this.setState({ data: data });
   };
@@ -154,30 +159,37 @@ export class Loans extends React.Component {
       searchData += "status=" + this.state.filterStatus.name;
     }
     this.searchData(searchData);
-
     if (this.state.filterShg) {
       serviceProvider
         .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals"
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/?shg.id=" +
+            this.state.filterShg.id
         )
         .then((res) => {
-          res.data.map((shgcontact) => {
-            if (this.state.filterShg.id == shgcontact.shg.id) {
-              searchData += searchData ? "&&" : "";
-              searchData += "contact.id=" + shgcontact.contact.id;
-              this.searchData(searchData);
-            } else {
-              searchData += searchData ? "&&" : "";
-              searchData += "contact.id=" + 0;
-              this.searchData(searchData);
-            }
-          });
+          if (res.data.length > 0) {
+            res.data.map((shgcontact) => {
+              if (
+                shgcontact.shg.id &&
+                this.state.filterShg.id === shgcontact.shg.id
+              ) {
+                searchData += searchData ? "&&" : "";
+                searchData += "contact.id=" + shgcontact.contact.id;
+                this.searchData(searchData);
+              }
+            });
+          } else {
+            searchData += searchData ? "&&" : "";
+            searchData += "contact.id=" + 0;
+            this.searchData(searchData);
+          }
         })
         .catch((error) => {
           console.log(error);
         });
     }
   }
+
 
   searchData(searchData) {
     serviceProvider
@@ -217,7 +229,6 @@ export class Loans extends React.Component {
   };
 
   viewTask = (cellid) => {
-    console.log('cellid.. ',cellid);
     let loanAppData;
     this.state.data.map(e=> {
       if(e.id == cellid) {
@@ -336,20 +347,20 @@ export class Loans extends React.Component {
       },
       {
         name: "Amount Due",
-        selector: "loan_app_installments.amount_due",
+        selector: "amount_due",
         sortable: true,
         cell: (row) =>
-          row.loan_app_installments.amount_due
-            ? row.loan_app_installments.amount_due
+          row.amount_due
+            ? row.amount_due
             : "-",
       },
       {
         name: "Installment Date",
-        selector: "loan_app_installments.payment_date",
+        selector: "payment_date",
         sortable: true,
         cell: (row) =>
-          row.loan_app_installments.payment_date
-            ? row.loan_app_installments.payment_date
+          row.payment_date
+            ? row.payment_date
             : "-",
       },
     ];
@@ -494,8 +505,8 @@ export class Loans extends React.Component {
                 "application_date",
                 "loan_model.loan_amount",
                 "status",
-                "loan_app_installments.amount_due",
-                "loan_app_installments.payment_date",
+                "amount_due",
+                "payment_date",
               ]}
               filters={filters}
               data={data}

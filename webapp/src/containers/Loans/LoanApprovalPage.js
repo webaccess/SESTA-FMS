@@ -66,12 +66,6 @@ class LoanApprovalPage extends Component {
       fileDataArray: [],
       fileName: "",
       validations: {
-        statusValue: {
-          required: {
-            value: "true",
-            message: "Status is required",
-          },
-        },
         comment: {
           required: {
             value: "true",
@@ -525,12 +519,6 @@ class LoanApprovalPage extends Component {
                               return item.id === statusValue;
                             })
                           ] || null
-                        : null
-                    }
-                    error={this.hasError("statusValue")}
-                    helperText={
-                      this.hasError("statusValue")
-                        ? this.state.errors.statusValue[0]
                         : null
                     }
                     renderInput={(params) => (
