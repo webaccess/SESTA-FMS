@@ -138,15 +138,13 @@ module.exports = {
     const { id } = ctx.params;
 
     var entity = await strapi.services["loan-application"].findOne({ id });
-    // if (entity.contact["individual"]) {
-    // console.log("val", entity.contact.individual);
+
     entity["individual"] = entity.contact.individual;
 
     let ind = await strapi.query("individual", "crm-plugin").findOne({
       id: entity.contact.individual,
     });
-    // console.log("vv", ind.shg);
-    // console.log("ind", ind);
+
     entity["individual"] = ind;
     if (entity["individual"].shg) {
       let shg = await strapi.query("contact", "crm-plugin").findOne({
@@ -154,11 +152,22 @@ module.exports = {
       });
       entity["shg"] = shg;
       console.log("shg", shg);
+
       if (entity["shg"]["organization"]["bankdetail"]) {
         entity["shg"]["bankdetail"] = await strapi.query("bankdetail").findOne({
           id: entity["shg"]["organization"]["bankdetail"],
         });
       }
+
+      // if (entity["shg"]["organization"]) {
+      entity["shg"]["organization"] = await strapi
+        .query("organization", "crm-plugin")
+        .findOne({
+          id: entity["shg"]["organization"]["id"],
+        });
+
+      // }
+      console.log("final shg", entity["shg"]);
       if (entity.loan_model.fpo) {
         entity.fpo = await strapi.query("contact", "crm-plugin").findOne({
           id: entity.loan_model.fpo,
