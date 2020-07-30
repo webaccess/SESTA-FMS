@@ -38,12 +38,12 @@ const useStyles = (theme) => ({
   },
 });
 
-class LoanUpdateTaskPage extends Component {
+class LoanEmiPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
       data: [],
-      loantasks: []
+      loanEmiData: []
     }
   }
 
@@ -54,10 +54,10 @@ class LoanUpdateTaskPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "loan-application-tasks/?loan_application.id=" + memberData.id + "&&_sort=id:ASC"
+        "loan-application-installments/?loan_application.id=" + memberData.id + "&&_sort=id:ASC"
       )
       .then((res) => {
-        this.setState({ loantasks: res.data });
+        this.setState({ loanEmiData: res.data });
       })
   }
 
@@ -105,46 +105,69 @@ class LoanUpdateTaskPage extends Component {
   }
 
   editData = (cellid) => {
-    let loantask;
-    this.state.loantasks.map(data => {
+    let loanEmiData;
+    this.state.loanEmiData.map(data => {
       if (data.id === cellid) {
-        loantask = data;
+        loanEmiData = data;
       }
     });
-
-    this.props.history.push("/loan/task/edit/" + cellid, {
-      loantask: loantask, loanAppData: this.props.location.state.loanAppData
-    });
+    this.props.history.push("/loan/emi/edit/" + cellid, {loanEmiData: loanEmiData});
   }
 
   render() {
     const { classes } = this.props;
     let data = this.state.data;
-    let loantasks = this.state.loantasks;
-    loantasks.map(task => {
-      if(task.date != null) {
-        task.date = Moment(task.date).format('DD MMM YYYY');
-      }
-    });
+    let loanEmiData = this.state.loanEmiData;
+    loanEmiData.map(emidata=>{
+      emidata.totalPaid = emidata.actual_principal + emidata.actual_interest;
+      let totalLoanAmnt = emidata.expected_principal + emidata.expected_interest;
+      emidata.outstanding = totalLoanAmnt - (emidata.actual_principal + emidata.actual_interest);
+    })
+
     const Usercolumns = [
       {
-        name: "Tasks",
-        selector: "name",
+        name: "Due Date",
+        selector: "payment_date",
         sortable: true,
       },
       {
-        name: "Date",
-        selector: "date",
+        name: "Principle",
+        selector: "expected_principal",
         sortable: true,
       },
       {
-        name: "Status",
-        selector: "status",
+        name: "Interest",
+        selector: "expected_interest",
         sortable: true,
       },
       {
-        name: "Comments",
-        selector: "comments",
+        name: "Payment Date",
+        selector: "actual_payment_date",
+        sortable: true,
+      },
+      {
+        name: "Priniciple Paid",
+        selector: "actual_principal",
+        sortable: true,
+      },
+      {
+        name: "Interest Paid",
+        selector: "actual_interest",
+        sortable: true,
+      },
+      {
+        name: "Fine",
+        selector: "fine",
+        sortable: true,
+      },
+      {
+        name: "Total Paid",
+        selector: "totalPaid",
+        sortable: true,
+      },
+      {
+        name: "Outstanding",
+        selector: "outstanding",
         sortable: true,
       },
     ];
@@ -167,7 +190,6 @@ class LoanUpdateTaskPage extends Component {
               <div className={classes.dataRow}><p>VILLAGE <b>{data.village}</b> </p></div>
             </div>
           </div>
-
           <Card className={classes.mainContent}>
             <Grid
               container
@@ -204,9 +226,9 @@ class LoanUpdateTaskPage extends Component {
                     <b>
                       <div className={classes.member}>
                         PENDING AMOUNT <br />
-                        {loantasks.length > 0 ? (<span className={classes.fieldValues}>
+                        <span className={classes.fieldValues}>
                           {data.pendingAmount}
-                        </span>) : "-"}
+                        </span>
                       </div>
                     </b>
                   </Grid>
@@ -234,9 +256,9 @@ class LoanUpdateTaskPage extends Component {
                     <b>
                       <div className={classes.member}>
                         LOAN ENDS ON <br />
-                        {loantasks.length > 0 ? (<span className={classes.fieldValues}>
+                        <span className={classes.fieldValues}>
                           {data.loanEndsOn}
-                        </span>) : "-"}
+                        </span>
                       </div>
                     </b>
                   </Grid>
@@ -245,14 +267,14 @@ class LoanUpdateTaskPage extends Component {
             </Grid>
           </Card>
 
-          {loantasks ? (
+          {loanEmiData ? (
             <Table
-              title={"UpdateLoanTask"}
+              title={"LoanEMI"}
+              data={loanEmiData}
               showSearch={false}
               filterData={false}
-              filterBy={["name", "date", "status", "comments"]}
+              filterBy={["payment_date", "expected_principal", "expected_interest", "actual_payment_date","actual_principal", "actual_interest", "fine", "totalPaid", "outstanding"]}
               // filters={filters}
-              data={loantasks}
               column={Usercolumns}
               editData={this.editData}
               rowsSelected={this.rowsSelect}
@@ -267,4 +289,4 @@ class LoanUpdateTaskPage extends Component {
   }
 }
 
-export default withStyles(useStyles)(LoanUpdateTaskPage);
+export default withStyles(useStyles)(LoanEmiPage);
