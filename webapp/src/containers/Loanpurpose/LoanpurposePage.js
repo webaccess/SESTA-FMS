@@ -9,6 +9,7 @@ import IconButton from "@material-ui/core/IconButton";
 import { AddCircleOutlined, RemoveCircleOutlined } from "@material-ui/icons";
 import Button from "../../components/UI/Button/Button";
 import Autotext from "../../components/Autotext/Autotext.js";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 import Input from "../../components/UI/Input/Input";
 import {
   Card,
@@ -52,6 +53,7 @@ class LoanpurposePage extends Component {
       users: [{ principal: "", interest: "" }],
       task: [{ name: "" }],
       getFPO: [],
+      actTypeFilter: [],
       validations: {
         addPurpose: {
           required: { value: "true", message: "Loan purpose is required" },
@@ -156,6 +158,19 @@ class LoanpurposePage extends Component {
         this.setState({ getFPO: res.data });
       })
       .catch((error) => {});
+
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/activitytypes/?_sort=name:ASC"
+      )
+      .then((res) => {
+        this.setState({ actTypeFilter: res.data });
+        console.log("--actypeFilter", res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   addClick() {
@@ -215,10 +230,11 @@ class LoanpurposePage extends Component {
 
   createTaskUI() {
     const { classes } = this.props;
+    let actTypeFilter = this.state.actTypeFilter;
     return this.state.task.map((el, i) => (
       <div key={i}>
         {i + 1}
-        <Input
+        {/*<Input
           label="Task"
           name="name"
           value={
@@ -228,7 +244,28 @@ class LoanpurposePage extends Component {
           }
           onChange={this.handleTaskUIChange.bind(this, i)}
           variant="outlined"
+        />*/}
+
+        <Autocomplete
+          id="select-role"
+          name="name"
+          value={el.name}
+          options={actTypeFilter}
+          variant="outlined"
+          getOptionLabel={(option) => option.name}
+          placeholder="Select Activity type"
+          onChange={this.handleTaskUIChange.bind(this, i)}
+          renderInput={(params) => (
+            <Input
+              {...params}
+              fullWidth
+              label="Select Activity type"
+              name="name"
+              variant="outlined"
+            />
+          )}
         />
+
         {this.state.task.length !== 1 && (
           <IconButton
             aria-label="remove"
@@ -257,9 +294,11 @@ class LoanpurposePage extends Component {
 
   handleTaskUIChange(i, e) {
     const { name, value } = e.target;
+    console.log("i,e", i, e);
     let task = [...this.state.task];
     task[i] = { ...task[i], [name]: value };
     this.setState({ task });
+    console.log(this.state.task);
   }
 
   removeTaskClick(i) {

@@ -102,8 +102,16 @@ function Routes() {
             />
             <PrivateRoute path="/loans" component={Loans} exact />
             <PrivateRoute path="/loans/apply/:id" component={LoansPage} exact />
-            <PrivateRoute path="/loan/update/:id" component={LoanUpdateTaskPage} exact />
-            <PrivateRoute path="/loan/task/edit/:id" component={LoanEditTask} exact />
+            <PrivateRoute
+              path="/loan/update/:id"
+              component={LoanUpdateTaskPage}
+              exact
+            />
+            <PrivateRoute
+              path="/loan/task/edit/:id"
+              component={LoanEditTask}
+              exact
+            />
             <PrivateRoute
               path="/loans/approve/:id"
               component={LoanApprovalPage}
