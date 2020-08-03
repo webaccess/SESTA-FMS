@@ -27,14 +27,14 @@ const useStyles = (theme) => ({
   },
   loanee: {
     display: "flex",
-    paddingLeft: "75px"
+    paddingLeft: "75px",
   },
   fieldValues: {
     fontSize: "13px !important",
   },
   dataRow: {
     display: "flex",
-    paddingLeft: "75px"
+    paddingLeft: "75px",
   },
 });
 
@@ -43,8 +43,8 @@ class LoanEmiPage extends Component {
     super(props);
     this.state = {
       data: [],
-      loanEmiData: []
-    }
+      loanEmiData: [],
+    };
   }
 
   async componentDidMount() {
@@ -54,11 +54,13 @@ class LoanEmiPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "loan-application-installments/?loan_application.id=" + memberData.id + "&&_sort=id:ASC"
+          "loan-application-installments/?loan_application.id=" +
+          memberData.id +
+          "&&_sort=id:ASC"
       )
       .then((res) => {
         this.setState({ loanEmiData: res.data });
-      })
+      });
   }
 
   getAllDetails = (memberData) => {
@@ -73,8 +75,8 @@ class LoanEmiPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/individuals/" +
-        memberData.contact.individual
+          "crm-plugin/individuals/" +
+          memberData.contact.individual
       )
       .then((res) => {
         let shgName = res.data.shg.name;
@@ -82,8 +84,8 @@ class LoanEmiPage extends Component {
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/?organization.id=" +
-            res.data.shg.organization
+              "crm-plugin/contact/?organization.id=" +
+              res.data.shg.organization
           )
           .then((response) => {
             let villageName = response.data[0].villages[0].name;
@@ -93,36 +95,45 @@ class LoanEmiPage extends Component {
                 shg: shgName,
                 village: villageName,
                 purpose: purpose,
-                amount: "Rs." + (amount).toLocaleString(),
+                amount: "Rs." + amount.toLocaleString(),
                 duration: duration,
-                emi: "Rs." + (emi).toLocaleString(),
-                pendingAmount: pendingAmount ? "Rs." + (pendingAmount).toLocaleString() : "-",
-                loanEndsOn: loanEndsOn ? Moment(loanEndsOn).format("DD MMM YYYY") : "-"
-              }
-            })
-          })
-      })
-  }
+                emi: "Rs." + emi.toLocaleString(),
+                pendingAmount: pendingAmount
+                  ? "Rs." + pendingAmount.toLocaleString()
+                  : "-",
+                loanEndsOn: loanEndsOn
+                  ? Moment(loanEndsOn).format("DD MMM YYYY")
+                  : "-",
+              },
+            });
+          });
+      });
+  };
 
   editData = (cellid) => {
     let loanEmiData;
-    this.state.loanEmiData.map(data => {
+    this.state.loanEmiData.map((data) => {
       if (data.id === cellid) {
         loanEmiData = data;
       }
     });
-    this.props.history.push("/loan/emi/edit/" + cellid, {loanEmiData: loanEmiData});
-  }
+    this.props.history.push("/loan/emi/edit/" + cellid, {
+      loanEmiData: loanEmiData,
+    });
+  };
 
   render() {
+    console.log("LOAN EMI");
     const { classes } = this.props;
     let data = this.state.data;
     let loanEmiData = this.state.loanEmiData;
-    loanEmiData.map(emidata=>{
+    loanEmiData.map((emidata) => {
       emidata.totalPaid = emidata.actual_principal + emidata.actual_interest;
-      let totalLoanAmnt = emidata.expected_principal + emidata.expected_interest;
-      emidata.outstanding = totalLoanAmnt - (emidata.actual_principal + emidata.actual_interest);
-    })
+      let totalLoanAmnt =
+        emidata.expected_principal + emidata.expected_interest;
+      emidata.outstanding =
+        totalLoanAmnt - (emidata.actual_principal + emidata.actual_interest);
+    });
 
     const Usercolumns = [
       {
@@ -185,9 +196,17 @@ class LoanEmiPage extends Component {
 
             <div style={{ display: "flex" }}>
               <h2 style={{ margin: "13px" }}>{data.loanee}</h2>
-              <div className={classes.dataRow}><p>SHG GROUP <b>{data.shg}</b></p></div>
+              <div className={classes.dataRow}>
+                <p>
+                  SHG GROUP <b>{data.shg}</b>
+                </p>
+              </div>
 
-              <div className={classes.dataRow}><p>VILLAGE <b>{data.village}</b> </p></div>
+              <div className={classes.dataRow}>
+                <p>
+                  VILLAGE <b>{data.village}</b>{" "}
+                </p>
+              </div>
             </div>
           </div>
           <Card className={classes.mainContent}>
@@ -205,7 +224,7 @@ class LoanEmiPage extends Component {
                     <b>
                       <div className={classes.member}>
                         PURPOSE
-                          <br />
+                        <br />
                         <span className={classes.fieldValues}>
                           {data.purpose}
                         </span>
@@ -236,9 +255,7 @@ class LoanEmiPage extends Component {
                     <b>
                       <div className={classes.member}>
                         EMI <br />
-                        <span className={classes.fieldValues}>
-                          {data.emi}
-                        </span>
+                        <span className={classes.fieldValues}>{data.emi}</span>
                       </div>
                     </b>
                   </Grid>
@@ -273,7 +290,17 @@ class LoanEmiPage extends Component {
               data={loanEmiData}
               showSearch={false}
               filterData={false}
-              filterBy={["payment_date", "expected_principal", "expected_interest", "actual_payment_date","actual_principal", "actual_interest", "fine", "totalPaid", "outstanding"]}
+              filterBy={[
+                "payment_date",
+                "expected_principal",
+                "expected_interest",
+                "actual_payment_date",
+                "actual_principal",
+                "actual_interest",
+                "fine",
+                "totalPaid",
+                "outstanding",
+              ]}
               // filters={filters}
               column={Usercolumns}
               editData={this.editData}
@@ -281,11 +308,11 @@ class LoanEmiPage extends Component {
               columnsvalue={columnsvalue}
             />
           ) : (
-              <h1>Loading...</h1>
-            )}
+            <h1>Loading...</h1>
+          )}
         </Grid>
       </Layout>
-    )
+    );
   }
 }
 
