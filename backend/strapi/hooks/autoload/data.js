@@ -578,6 +578,36 @@ const modules = {
     order: 22,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
+  "Activity Types": {
+    is_active: true,
+    icon_class: "people",
+    url: "/activitytypes",
+    slug: "list_activitytype",
+    displayNavigation: true,
+    module: "", //slug
+    order: 23,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Add Activity Type": {
+    is_active: true,
+    icon_class: "",
+    url: "/activitytypes/add",
+    slug: "add_activitytype",
+    displayNavigation: false,
+    module: "", //slug
+    order: 24,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Edit Activity Type": {
+    is_active: true,
+    icon_class: "",
+    url: "/activitytypes/edit/:id",
+    slug: "edit_activitytype",
+    displayNavigation: false,
+    module: "", //slug
+    order: 24,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
 };
 
 module.exports = Object.freeze({
