@@ -8,7 +8,6 @@ import {
   Divider,
   Grid,
 } from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
 import { EDIT_LOAN_TASK_BREADCRUMBS } from "./config";
 import Input from "../../components/UI/Input/Input";
 import Autotext from "../../components/Autotext/Autotext";
@@ -20,76 +19,6 @@ import * as serviceProvider from "../../api/Axios";
 import Moment from "moment";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
-
-const useStyles = (theme) => ({
-  root: {},
-  row: {
-    height: "42px",
-    display: "flex",
-    alignItems: "center",
-    marginTop: theme.spacing(1),
-  },
-  floatRow: {
-    height: "40px",
-    float: "right",
-  },
-  buttonRow: {
-    height: "42px",
-    float: "right",
-    marginTop: theme.spacing(1),
-  },
-  spacer: {
-    flexGrow: 1,
-  },
-  addButton: {
-    float: "right",
-    marginRight: theme.spacing(1),
-  },
-  searchInput: {
-    marginRight: theme.spacing(1),
-  },
-  Districts: {
-    marginRight: theme.spacing(1),
-  },
-  States: {
-    marginRight: theme.spacing(1),
-  },
-  Search: {
-    marginRight: theme.spacing(1),
-  },
-  Cancel: {
-    marginRight: theme.spacing(1),
-  },
-  Icon: {
-    fontSize: "40px",
-    color: "#008000",
-    "&:hover": {
-      color: "#008000",
-    },
-    "&:active": {
-      color: "#008000",
-    },
-  },
-  member: {
-    color: "black",
-    fontSize: "10px",
-  },
-  mainContent: {
-    padding: "25px",
-  },
-  loanee: {
-    display: "flex",
-    paddingLeft: "75px"
-  },
-  fieldValues: {
-    fontSize: "13px !important",
-  },
-  textField: {
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    width: 200,
-  },
-});
 
 class LoanEditTask extends Component {
   constructor(props) {
@@ -109,20 +38,19 @@ class LoanEditTask extends Component {
       },
       errors: {},
       formSubmitted: "",
-      errorCode: "",
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
       ]
     }
   }
-  
+
   async componentDidMount() {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "loan-application-tasks/" +
-          this.state.editPage[1]
+        "loan-application-tasks/" +
+        this.state.editPage[1]
       )
       .then((res) => {
         this.setState({
@@ -192,23 +120,23 @@ class LoanEditTask extends Component {
     let loanTaskData = this.props.location.state.loantask;
     let loanAppId = loanTaskData.id;
 
-    if(this.state.values) {
+    if (this.state.values) {
       loanTaskData.status = this.state.values.editStatus ? this.state.values.editStatus : loanTaskData.status;
       loanTaskData.date = this.state.values.editDate ? Moment(this.state.values.editDate).format('YYYY-MM-DD') : loanTaskData.date;
       loanTaskData.comments = this.state.values.comments ? this.state.values.comments : loanTaskData.comments;
     }
-    
+
     serviceProvider
-    .serviceProviderForPutRequest(
-      process.env.REACT_APP_SERVER_URL + "loan-application-tasks",
-      loanAppId,
-      loanTaskData
-    )
-    .then((res) => {
-      this.setState({ loantask: res.data });
-      this.setState({ formSubmitted: true });
-      this.props.history.push(this.props.history.goBack(), {loantask: res.data});
-    })
+      .serviceProviderForPutRequest(
+        process.env.REACT_APP_SERVER_URL + "loan-application-tasks",
+        loanAppId,
+        loanTaskData
+      )
+      .then((res) => {
+        this.setState({ loantask: res.data });
+        this.setState({ formSubmitted: true });
+        this.props.history.push(this.props.history.goBack(), { loantask: res.data });
+      })
   }
 
   cancelForm = () => {
@@ -218,7 +146,7 @@ class LoanEditTask extends Component {
       isCancel: true,
     });
     this.componentDidMount();
-    this.props.history.push(this.props.history.goBack(), {loantask: this.props.location.state.loantask});
+    this.props.history.push(this.props.history.goBack(), { loantask: this.props.location.state.loantask });
     //routing code #route to loan_application_list page
   };
 
@@ -226,12 +154,12 @@ class LoanEditTask extends Component {
     const { classes } = this.props;
     let loanTaskStatus = constants.LOAN_TASK_STATUS;
     let loantask = this.state.loantask;
-    if(this.props.location.state && this.props.location.state.loantask) {
+    if (this.props.location.state && this.props.location.state.loantask) {
       loantask = this.props.location.state.loantask;
     }
     let defaultStatus;
-    loanTaskStatus.map(status=>{
-      if(status.id == loantask.status) {
+    loanTaskStatus.map(status => {
+      if (status.id == loantask.status) {
         defaultStatus = status;
       }
     });
@@ -240,7 +168,7 @@ class LoanEditTask extends Component {
     return (
       <Layout
         breadcrumbs={
-           EDIT_LOAN_TASK_BREADCRUMBS
+          EDIT_LOAN_TASK_BREADCRUMBS
         }
       >
         <Card>
@@ -272,13 +200,13 @@ class LoanEditTask extends Component {
                     value={
                       statusValue
                         ? this.state.loanTaskStatus[
-                            this.state.loanTaskStatus.findIndex(function (
-                              item,
-                              i
-                            ) {
-                              return item.id === statusValue;
-                            })
-                          ] || null
+                        this.state.loanTaskStatus.findIndex(function (
+                          item,
+                          i
+                        ) {
+                          return item.id === statusValue;
+                        })
+                        ] || null
                         : null
                     }
                     error={this.hasError("editStatus")}
@@ -308,7 +236,7 @@ class LoanEditTask extends Component {
                         ? this.state.errors.editDate[0]
                         : null
                     }
-                    value={this.state.values.editDate ? this.state.values.editDate: loantask.date}
+                    value={this.state.values.editDate ? this.state.values.editDate : loantask.date}
                     format={"dd MMM yyyy"}
                     onChange={(value) =>
                       this.setState({
@@ -331,7 +259,7 @@ class LoanEditTask extends Component {
 
               </Grid>
             </CardContent>
-            
+
             <Divider />
 
             <CardActions>
@@ -339,21 +267,16 @@ class LoanEditTask extends Component {
               <Button
                 color="secondary"
                 clicked={this.cancelForm}
-                component={Link}
-                // to={this.props.history.goBack()}
-                >
+              >
                 cancel
               </Button>
             </CardActions>
           </form>
-          </Card>
-        
-        <Grid>
-        </Grid>
+        </Card>
       </Layout>
     )
   }
 
 }
 
-export default withStyles(useStyles)(LoanEditTask);
+export default LoanEditTask;

@@ -83,6 +83,9 @@ const Table = (props) => {
   const viewTask = (id) => {
     props.viewTask(id);
   };
+  const viewEmi = (id) => {
+    props.viewEmi(id);
+  };
   const customAction = (id) => {
     props.customAction(id);
   };
@@ -179,6 +182,22 @@ const Table = (props) => {
       }
     ];
   }
+  if (valueForMemberPage === "LoanEMI") {
+    column = [
+      {
+        cell: (cell) => (
+          <div onClick={(event) => editData(cell.id)} id={cell.id}>
+            <Tooltip title="Edit">
+              <IconButton aria-label="edit" value={cell[valueformodal]}>
+                <EditIcon className={classes.editIcon} />
+              </IconButton>
+            </Tooltip>
+          </div>
+        ),
+        button: true,
+      }
+    ];
+  }
   if (valueForMemberPage === "Members") {
     column = [
       {
@@ -238,7 +257,7 @@ const Table = (props) => {
               </Tooltip>
             </div>
             <div
-              onClick={(event) => viewData(cell.id, cell[valueformodal])}
+              onClick={(event) => viewEmi(cell.id, cell[valueformodal])}
               style={{ display: "inline-flex" }}
             >
               <Tooltip title="EMI">

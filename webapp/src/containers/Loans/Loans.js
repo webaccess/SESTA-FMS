@@ -238,6 +238,16 @@ export class Loans extends React.Component {
     })
   };
 
+  viewEmi = (cellid) => {
+    let loanAppData;
+    this.state.data.map(e=> {
+      if(e.id == cellid) {
+        loanAppData = e;
+        this.props.history.push("/loans/emi/" + cellid, {loanAppData: loanAppData});
+      }
+    })
+  };
+
   loanApproveData = (cellid) => {
     let loanAppData;
     this.state.data.map((item) => {
@@ -514,6 +524,7 @@ export class Loans extends React.Component {
               loanApproveData={this.loanApproveData}
               customAction={this.customAction}
               viewTask={this.viewTask}
+              viewEmi={this.viewEmi}
               DeleteData={this.DeleteData}
               DeleteAll={this.DeleteAll}
               rowsSelected={this.rowsSelect}
