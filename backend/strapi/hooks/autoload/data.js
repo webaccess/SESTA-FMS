@@ -162,7 +162,6 @@ const roles = {
         name: "bankdetail",
         action: [],
       },
-      ,
       {
         name: "shareinformation",
         action: [],
@@ -458,7 +457,7 @@ const modules = {
     order: 15,
     roles: [
       // "FPO Admin",
-      "Sesta Admin",
+      // "Sesta Admin",
       "Superadmin",
       "CSP (Community Service Provider)",
     ],
@@ -473,7 +472,7 @@ const modules = {
     order: 16,
     roles: [
       // "FPO Admin",
-      "Sesta Admin",
+      // "Sesta Admin",
       "Superadmin",
       "CSP (Community Service Provider)",
     ],
@@ -488,7 +487,7 @@ const modules = {
     order: 16,
     roles: [
       // "FPO Admin",
-      "Sesta Admin",
+      // "Sesta Admin",
       "Superadmin",
       "CSP (Community Service Provider)",
     ],
