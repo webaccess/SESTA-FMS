@@ -85,10 +85,16 @@ class ActivitytypePage extends Component {
             values: {
               addActivitytype: res.data.name,
               addRemuneration: res.data.remuneration,
-              addFpo: res.data.contact[0].id,
             },
+            addIsActive: res.data.is_active,
           });
-          this.setState({ addIsActive: res.data.is_active });
+          if (res.data.contact[0]) {
+            let tempValues = this.state.values;
+            tempValues["addFpo"] = res.data.contact[0].id;
+            this.setState({
+              values: tempValues,
+            });
+          }
         })
         .catch((error) => {
           console.log(error);
@@ -361,7 +367,7 @@ class ActivitytypePage extends Component {
                       renderInput={(params) => (
                         <Input
                           fullWidth
-                          label="FPO"
+                          label="FPO*"
                           name="addFpo"
                           variant="outlined"
                         />
