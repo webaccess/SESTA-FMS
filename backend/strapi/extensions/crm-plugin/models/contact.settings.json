@@ -76,9 +76,9 @@
       "via": "contact"
     },
     "activitytypes": {
+      "via": "contact",
       "plugin": "crm-plugin",
-      "collection": "activitytype",
-      "via": "contact"
+      "collection": "activitytype"
     },
     "block": {
       "type": "string"

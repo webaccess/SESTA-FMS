@@ -32,6 +32,8 @@ import Loanpurposes from "./containers/Loanpurpose/Loanpurposes";
 import LoanpurposePage from "./containers/Loanpurpose/LoanpurposePage";
 import LoanUpdateTaskPage from "./containers/Loans/LoanUpdateTaskPage";
 import LoanEditTask from "./containers/Loans/LoanEditTask";
+import ActivitytypePage from "./containers/Activitytypes/ActivitytypePage";
+import Activitytypes from "./containers/Activitytypes/Activitytypes";
 
 function Routes() {
   return (
@@ -85,6 +87,21 @@ function Routes() {
             <PrivateRoute path="/fpos" component={Fpos} exact />
             <PrivateRoute path="/fpos/add" component={FpoPage} exact />
             <PrivateRoute path="/fpos/edit/:id" component={FpoPage} exact />
+            <PrivateRoute
+              path="/activitytypes"
+              component={Activitytypes}
+              exact
+            />
+            <PrivateRoute
+              path="/activitytypes/add"
+              component={ActivitytypePage}
+              exact
+            />
+            <PrivateRoute
+              path="/activitytypes/edit/:id"
+              component={ActivitytypePage}
+              exact
+            />
             <PrivateRoute path="/my-account" component={Account} exact />
             <PrivateRoute path="/countries" component={countries} exact />
             <PrivateRoute path="/countries/add" component={CountryPage} exact />
