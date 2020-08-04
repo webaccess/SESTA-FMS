@@ -179,7 +179,7 @@ const Table = (props) => {
           </div>
         ),
         button: true,
-      }
+      },
     ];
   }
   if (valueForMemberPage === "LoanEMI") {
@@ -195,7 +195,7 @@ const Table = (props) => {
           </div>
         ),
         button: true,
-      }
+      },
     ];
   }
   if (valueForMemberPage === "Members") {
@@ -257,11 +257,18 @@ const Table = (props) => {
               </Tooltip>
             </div>
             <div
-              onClick={(event) => viewEmi(cell.id, cell[valueformodal])}
+              onClick={
+                cell.status === "Approved"
+                  ? (event) => viewEmi(cell.id, cell[valueformodal])
+                  : null
+              }
               style={{ display: "inline-flex" }}
             >
               <Tooltip title="EMI">
-                <IconButton aria-label="activity">
+                <IconButton
+                  aria-label="activity"
+                  disabled={cell.status === "Approved" ? false : true}
+                >
                   <AssignmentIndIcon
                     className={classes.AssignmentTurnedInIcon}
                   />
@@ -269,11 +276,18 @@ const Table = (props) => {
               </Tooltip>
             </div>
             <div
-              onClick={(event) => viewTask(cell.id, cell[valueformodal])}
+              onClick={
+                cell.status === "Approved"
+                  ? (event) => viewTask(cell.id, cell[valueformodal])
+                  : null
+              }
               style={{ display: "inline-flex" }}
             >
               <Tooltip title="Task">
-                <IconButton aria-label="task">
+                <IconButton
+                  aria-label="task"
+                  disabled={cell.status === "Approved" ? false : true}
+                >
                   <AssignmentTurnedInIcon
                     className={classes.AssignmentTurnedInIcon}
                   />
