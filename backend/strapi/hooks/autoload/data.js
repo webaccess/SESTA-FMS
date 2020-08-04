@@ -597,6 +597,26 @@ const modules = {
       "CSP (Community Service Provider)",
     ],
   },
+  "Loan EMI": {
+    is_active: true,
+    icon_class: "",
+    url: "/loans/emi/:id",
+    slug: "loan_emi",
+    displayNavigation: false,
+    module: "", //slug
+    order: 20,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Edit Loan EMI": {
+    is_active: true,
+    icon_class: "",
+    url: "/loan/emi/edit/:id",
+    slug: "edit_loan_emi",
+    displayNavigation: false,
+    module: "", //slug
+    order: 20,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
   "Loan Approval": {
     is_active: true,
     icon_class: "",

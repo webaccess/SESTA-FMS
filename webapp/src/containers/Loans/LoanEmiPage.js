@@ -28,24 +28,24 @@ const useStyles = (theme) => ({
   },
   loanee: {
     display: "flex",
-    paddingLeft: "75px"
+    paddingLeft: "75px",
   },
   fieldValues: {
     fontSize: "13px !important",
   },
   dataRow: {
     display: "flex",
-    paddingLeft: "75px"
+    paddingLeft: "75px",
   },
 });
 
-class LoanUpdateTaskPage extends Component {
+class LoanEmiPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
       data: [],
-      loantasks: []
-    }
+      loanEmiData: [],
+    };
   }
 
   async componentDidMount() {
@@ -55,11 +55,13 @@ class LoanUpdateTaskPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "loan-application-tasks/?loan_application.id=" + memberData.id + "&&_sort=id:ASC"
+        "loan-application-installments/?loan_application.id=" +
+        memberData.id +
+        "&&_sort=id:ASC"
       )
       .then((res) => {
-        this.setState({ loantasks: res.data });
-      })
+        this.setState({ loanEmiData: res.data });
+      });
   }
 
   getAllDetails = (memberData) => {
@@ -94,59 +96,115 @@ class LoanUpdateTaskPage extends Component {
                 shg: shgName,
                 village: villageName,
                 purpose: purpose,
-                amount: "Rs." + (amount).toLocaleString(),
+                amount: "Rs." + amount.toLocaleString(),
                 duration: duration,
-                emi: "Rs." + (emi).toLocaleString(),
-                pendingAmount: pendingAmount ? "Rs." + (pendingAmount).toLocaleString() : "-",
-                loanEndsOn: loanEndsOn ? Moment(loanEndsOn).format("DD MMM YYYY") : "-"
-              }
-            })
-          })
-      })
-  }
+                emi: "Rs." + emi.toLocaleString(),
+                pendingAmount: pendingAmount
+                  ? "Rs." + pendingAmount.toLocaleString()
+                  : "-",
+                loanEndsOn: loanEndsOn
+                  ? Moment(loanEndsOn).format("DD MMM YYYY")
+                  : "-",
+              },
+            });
+          });
+      });
+  };
 
   editData = (cellid) => {
-    let loantask;
-    this.state.loantasks.map(data => {
+    let loanEmiData;
+    this.state.loanEmiData.map((data) => {
       if (data.id === cellid) {
-        loantask = data;
+        loanEmiData = data;
       }
     });
-
-    this.props.history.push("/loan/task/edit/" + cellid, {
-      loantask: loantask, loanAppData: this.props.location.state.loanAppData
+    this.props.history.push("/loan/emi/edit/" + cellid, {
+      loanEmiData: loanEmiData,
+      loanAppData: this.props.location.state.loanAppData,
     });
-  }
+  };
 
   render() {
     const { classes } = this.props;
     let data = this.state.data;
-    let loantasks = this.state.loantasks;
-    loantasks.map(task => {
-      if (task.date != null) {
-        task.date = Moment(task.date).format('DD MMM YYYY');
-      }
+    let loanEmiData = this.state.loanEmiData;
+    loanEmiData.map((emidata) => {
+      emidata.totalPaid = (emidata.actual_principal + emidata.actual_interest).toLocaleString();
+      let totalLoanAmnt =
+        emidata.expected_principal + emidata.expected_interest;
+      emidata.outstanding =
+        (totalLoanAmnt - (emidata.actual_principal + emidata.actual_interest)).toLocaleString();
     });
+
     const Usercolumns = [
       {
-        name: "Tasks",
-        selector: "name",
+        name: "Due Date",
+        selector: "payment_date",
+        sortable: true,
+        cell: (row) =>
+          row.payment_date ?
+            Moment(row.payment_date).format('DD MMM YYYY') : null
+      },
+      {
+        name: "Principle",
+        selector: "expected_principal",
+        sortable: true,
+        cell: (row) =>
+          row.expected_principal ?
+            row.expected_principal.toLocaleString() : null
+      },
+      {
+        name: "Interest",
+        selector: "expected_interest",
+        sortable: true,
+        cell: (row) =>
+          row.expected_interest ?
+            row.expected_interest.toLocaleString() : null
+      },
+      {
+        name: "Payment Date",
+        selector: "actual_payment_date",
+        sortable: true,
+        cell: (row) =>
+          row.actual_payment_date ?
+            Moment(row.actual_payment_date).format('DD MMM YYYY') : null
+      },
+      {
+        name: "Priniciple Paid",
+        selector: "actual_principal",
+        sortable: true,
+        cell: (row) =>
+          row.actual_principal ?
+            row.actual_principal.toLocaleString() : null
+      },
+      {
+        name: "Interest Paid",
+        selector: "actual_interest",
+        sortable: true,
+        cell: (row) =>
+          row.actual_interest ?
+            row.actual_interest.toLocaleString() : null
+      },
+      {
+        name: "Fine",
+        selector: "fine",
         sortable: true,
       },
       {
-        name: "Date",
-        selector: "date",
+        name: "Total Paid",
+        selector: "totalPaid",
         sortable: true,
+        cell: (row) =>
+          row.totalPaid ?
+            row.totalPaid.toLocaleString() : null
       },
       {
-        name: "Status",
-        selector: "status",
+        name: "Outstanding",
+        selector: "outstanding",
         sortable: true,
-      },
-      {
-        name: "Comments",
-        selector: "comments",
-        sortable: true,
+        cell: (row) =>
+          row.outstanding ?
+            row.outstanding.toLocaleString() : null
       },
     ];
     let selectors = [];
@@ -155,12 +213,12 @@ class LoanUpdateTaskPage extends Component {
     }
     let columnsvalue = selectors[0];
 
-    let taskEditPage = false;
-    if (this.props.location.state && this.props.location.state.loanEditTaskPage) {
-      taskEditPage = true;
+    let emiEditPage = false;
+    if (this.props.location.state && this.props.location.state.loanEditEmiPage) {
+      emiEditPage = true;
     }
     if (this.props.history.action === 'POP') {
-      taskEditPage = false;
+      emiEditPage = false;
     }
 
     return (
@@ -171,14 +229,22 @@ class LoanUpdateTaskPage extends Component {
 
             <div style={{ display: "flex" }}>
               <h2 style={{ margin: "13px" }}>{data.loanee}</h2>
-              <div className={classes.dataRow}><p>SHG GROUP <b>{data.shg}</b></p></div>
+              <div className={classes.dataRow}>
+                <p>
+                  SHG GROUP <b>{data.shg}</b>
+                </p>
+              </div>
 
-              <div className={classes.dataRow}><p>VILLAGE <b>{data.village}</b> </p></div>
+              <div className={classes.dataRow}>
+                <p>
+                  VILLAGE <b>{data.village}</b>{" "}
+                </p>
+              </div>
             </div>
           </div>
           <Grid item md={12} xs={12}>
-            {taskEditPage === true ? (
-              <Snackbar severity="success">Loan Task Updated successfully.</Snackbar>
+            {emiEditPage === true ? (
+              <Snackbar severity="success">Loan EMI Updated successfully.</Snackbar>
             ) : null}
           </Grid>
           <Card className={classes.mainContent}>
@@ -196,7 +262,7 @@ class LoanUpdateTaskPage extends Component {
                     <b>
                       <div className={classes.member}>
                         PURPOSE
-                          <br />
+                        <br />
                         <span className={classes.fieldValues}>
                           {data.purpose}
                         </span>
@@ -217,9 +283,9 @@ class LoanUpdateTaskPage extends Component {
                     <b>
                       <div className={classes.member}>
                         PENDING AMOUNT <br />
-                        {loantasks.length > 0 ? (<span className={classes.fieldValues}>
+                        <span className={classes.fieldValues}>
                           {data.pendingAmount}
-                        </span>) : "-"}
+                        </span>
                       </div>
                     </b>
                   </Grid>
@@ -227,9 +293,7 @@ class LoanUpdateTaskPage extends Component {
                     <b>
                       <div className={classes.member}>
                         EMI <br />
-                        <span className={classes.fieldValues}>
-                          {data.emi}
-                        </span>
+                        <span className={classes.fieldValues}>{data.emi}</span>
                       </div>
                     </b>
                   </Grid>
@@ -247,9 +311,9 @@ class LoanUpdateTaskPage extends Component {
                     <b>
                       <div className={classes.member}>
                         LOAN ENDS ON <br />
-                        {loantasks.length > 0 ? (<span className={classes.fieldValues}>
+                        <span className={classes.fieldValues}>
                           {data.loanEndsOn}
-                        </span>) : "-"}
+                        </span>
                       </div>
                     </b>
                   </Grid>
@@ -258,14 +322,24 @@ class LoanUpdateTaskPage extends Component {
             </Grid>
           </Card>
 
-          {loantasks ? (
+          {loanEmiData ? (
             <Table
-              title={"UpdateLoanTask"}
+              title={"LoanEMI"}
+              data={loanEmiData}
               showSearch={false}
               filterData={false}
-              filterBy={["name", "date", "status", "comments"]}
+              filterBy={[
+                "payment_date",
+                "expected_principal",
+                "expected_interest",
+                "actual_payment_date",
+                "actual_principal",
+                "actual_interest",
+                "fine",
+                "totalPaid",
+                "outstanding",
+              ]}
               // filters={filters}
-              data={loantasks}
               column={Usercolumns}
               editData={this.editData}
               rowsSelected={this.rowsSelect}
@@ -276,8 +350,8 @@ class LoanUpdateTaskPage extends Component {
             )}
         </Grid>
       </Layout>
-    )
+    );
   }
 }
 
-export default withStyles(useStyles)(LoanUpdateTaskPage);
+export default withStyles(useStyles)(LoanEmiPage);
