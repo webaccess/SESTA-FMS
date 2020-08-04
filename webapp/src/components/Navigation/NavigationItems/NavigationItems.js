@@ -184,6 +184,7 @@ function NavigationItems(props) {
       "Pgs",
       "Countries",
       "Loan Purpose",
+      "Activity Types",
     ];
     let nav1 = map(modules, (module, key) => {
       if (module.modules.length <= 0) {
