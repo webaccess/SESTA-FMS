@@ -7,6 +7,7 @@ import MoneyIcon from "@material-ui/icons/Money";
 import Table from "../../components/Datatable/Datatable.js";
 import Moment from "moment";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
+import { LOAN_EMI_BREADCRUMBS } from "./config";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -57,7 +58,7 @@ class LoanEmiPage extends Component {
         process.env.REACT_APP_SERVER_URL +
         "loan-application-installments/?loan_application.id=" +
         memberData.id +
-        "&&_sort=id:ASC"
+        "&&_sort=payment_date:ASC"
       )
       .then((res) => {
         this.setState({ loanEmiData: res.data });
@@ -129,7 +130,11 @@ class LoanEmiPage extends Component {
     let data = this.state.data;
     let loanEmiData = this.state.loanEmiData;
     loanEmiData.map((emidata) => {
-      emidata.totalPaid = (emidata.actual_principal + emidata.actual_interest).toLocaleString();
+      if(emidata.fine !== null || emidata.fine !== 0) {
+        emidata.totalPaid = (emidata.fine + emidata.actual_principal + emidata.actual_interest).toLocaleString();
+      } else {
+        emidata.totalPaid = (emidata.actual_principal + emidata.actual_interest).toLocaleString();
+      }
       let totalLoanAmnt =
         emidata.expected_principal + emidata.expected_interest;
       emidata.outstanding =
@@ -222,7 +227,11 @@ class LoanEmiPage extends Component {
     }
 
     return (
-      <Layout>
+      <Layout
+        breadcrumbs={
+          LOAN_EMI_BREADCRUMBS
+        }
+      >
         <Grid>
           <div className="App">
             <h5>LOAN</h5>

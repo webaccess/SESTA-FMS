@@ -7,6 +7,7 @@ import MoneyIcon from "@material-ui/icons/Money";
 import Table from "../../components/Datatable/Datatable.js";
 import Moment from "moment";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
+import { LOAN_TASK_BREADCRUMBS } from "./config";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -164,7 +165,11 @@ class LoanUpdateTaskPage extends Component {
     }
 
     return (
-      <Layout>
+      <Layout
+        breadcrumbs={
+          LOAN_TASK_BREADCRUMBS
+        }
+      >
         <Grid>
           <div className="App">
             <h5>LOAN</h5>
