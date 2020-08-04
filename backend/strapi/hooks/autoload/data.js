@@ -162,7 +162,6 @@ const roles = {
         name: "bankdetail",
         action: [],
       },
-      ,
       {
         name: "shareinformation",
         action: [],
@@ -252,9 +251,7 @@ const modules = {
     slug: "list_village",
     displayNavigation: true,
     module: "", //slug
-
     order: 4,
-
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
   "Add Village": {
@@ -386,7 +383,11 @@ const modules = {
     displayNavigation: true,
     module: "", //slug
     order: 11,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+    roles: [
+      "Sesta Admin",
+      "Superadmin",
+      // "FPO Admin",
+    ],
   },
   "Add Fpo": {
     is_active: true,
@@ -396,7 +397,11 @@ const modules = {
     displayNavigation: false,
     module: "", //slug
     order: 12,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+    roles: [
+      "Sesta Admin",
+      "Superadmin",
+      // "FPO Admin",
+    ],
   },
   "Edit Fpo": {
     is_active: true,
@@ -406,7 +411,11 @@ const modules = {
     displayNavigation: false,
     module: "", //slug
     order: 12,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+    roles: [
+      "Sesta Admin",
+      "Superadmin",
+      // "FPO Admin",
+    ],
   },
   Countries: {
     is_active: true,
@@ -446,7 +455,12 @@ const modules = {
     displayNavigation: true,
     module: "", //slug
     order: 15,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+    roles: [
+      // "FPO Admin",
+      // "Sesta Admin",
+      "Superadmin",
+      "CSP (Community Service Provider)",
+    ],
   },
   "Add Activity": {
     is_active: true,
@@ -456,7 +470,12 @@ const modules = {
     displayNavigation: false,
     module: "", //slug
     order: 16,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+    roles: [
+      // "FPO Admin",
+      // "Sesta Admin",
+      "Superadmin",
+      "CSP (Community Service Provider)",
+    ],
   },
   "Edit Activity": {
     is_active: true,
@@ -466,7 +485,12 @@ const modules = {
     displayNavigation: false,
     module: "", //slug
     order: 16,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+    roles: [
+      // "FPO Admin",
+      // "Sesta Admin",
+      "Superadmin",
+      "CSP (Community Service Provider)",
+    ],
   },
   Members: {
     is_active: true,
@@ -476,7 +500,12 @@ const modules = {
     displayNavigation: true,
     module: "", //slug
     order: 17,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+    roles: [
+      "FPO Admin",
+      "Sesta Admin",
+      "Superadmin",
+      "CSP (Community Service Provider)",
+    ],
   },
   "Add Member": {
     is_active: true,
@@ -486,7 +515,12 @@ const modules = {
     displayNavigation: false,
     module: "", //slug
     order: 18,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+    roles: [
+      "FPO Admin",
+      "Sesta Admin",
+      "Superadmin",
+      "CSP (Community Service Provider)",
+    ],
   },
   "Edit Member": {
     is_active: true,
@@ -496,7 +530,12 @@ const modules = {
     displayNavigation: false,
     module: "", //slug
     order: 18,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+    roles: [
+      "FPO Admin",
+      "Sesta Admin",
+      "Superadmin",
+      "CSP (Community Service Provider)",
+    ],
   },
   Loans: {
     is_active: true,
@@ -506,7 +545,12 @@ const modules = {
     displayNavigation: true,
     module: "", //slug
     order: 19,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+    roles: [
+      "FPO Admin",
+      "Sesta Admin",
+      "Superadmin",
+      "CSP (Community Service Provider)",
+    ],
   },
   "Apply Loan": {
     is_active: true,
@@ -516,7 +560,12 @@ const modules = {
     displayNavigation: false,
     module: "", //slug
     order: 20,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+    roles: [
+      "FPO Admin",
+      "Sesta Admin",
+      "Superadmin",
+      "CSP (Community Service Provider)",
+    ],
   },
   "Update Loan Tasks": {
     is_active: true,
@@ -526,7 +575,12 @@ const modules = {
     displayNavigation: false,
     module: "", //slug
     order: 20,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+    roles: [
+      "FPO Admin",
+      "Sesta Admin",
+      "Superadmin",
+      "CSP (Community Service Provider)",
+    ],
   },
   "Edit Loan Task": {
     is_active: true,
@@ -536,7 +590,12 @@ const modules = {
     displayNavigation: false,
     module: "", //slug
     order: 20,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+    roles: [
+      "FPO Admin",
+      "Sesta Admin",
+      "Superadmin",
+      "CSP (Community Service Provider)",
+    ],
   },
   "Loan Approval": {
     is_active: true,

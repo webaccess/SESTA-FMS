@@ -240,38 +240,42 @@ function NavigationItems(props) {
     return (
       <React.Fragment>
         {otherMenu}
-        <List
-          subheader={
-            <ListSubheader
-              component="div"
-              id="nested-list-subheader"
-              button
-              onClick={handleClick}
-              className={clsx(classes.masterMenuSubHeader, className)}
-            >
-              <QueuePlayNextIcon
-                className={clsx(classes.masterMenuIcon, className)}
-              ></QueuePlayNextIcon>
-              <span
-                id="master-menu-label"
-                className={clsx(classes.masterMenuSpan, className)}
+        {auth.getUserInfo().role.name !== "CSP (Community Service Provider)" ? (
+          <List
+            subheader={
+              <ListSubheader
+                component="div"
+                id="nested-list-subheader"
+                button
+                onClick={handleClick}
+                className={clsx(classes.masterMenuSubHeader, className)}
               >
-                Masters{" "}
-              </span>
-              {openMenu ? (
-                <ExpandLess
-                  className={clsx(classes.masterMenuExtendIcon, className)}
-                />
-              ) : (
-                <ExpandMore
-                  className={clsx(classes.masterMenuExtendIcon, className)}
-                />
-              )}
-            </ListSubheader>
-          }
-        >
-          {masterMenu}
-        </List>
+                <QueuePlayNextIcon
+                  className={clsx(classes.masterMenuIcon, className)}
+                ></QueuePlayNextIcon>
+                <span
+                  id="master-menu-label"
+                  className={clsx(classes.masterMenuSpan, className)}
+                >
+                  Masters{" "}
+                </span>
+                {openMenu ? (
+                  <ExpandLess
+                    className={clsx(classes.masterMenuExtendIcon, className)}
+                  />
+                ) : (
+                  <ExpandMore
+                    className={clsx(classes.masterMenuExtendIcon, className)}
+                  />
+                )}
+              </ListSubheader>
+            }
+          >
+            {masterMenu}
+          </List>
+        ) : (
+          ""
+        )}
       </React.Fragment>
     );
   };
