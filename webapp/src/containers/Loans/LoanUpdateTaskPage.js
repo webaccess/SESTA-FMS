@@ -6,6 +6,7 @@ import * as serviceProvider from "../../api/Axios";
 import MoneyIcon from "@material-ui/icons/Money";
 import Table from "../../components/Datatable/Datatable.js";
 import Moment from "moment";
+import Snackbar from "../../components/UI/Snackbar/Snackbar";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -122,7 +123,7 @@ class LoanUpdateTaskPage extends Component {
     let data = this.state.data;
     let loantasks = this.state.loantasks;
     loantasks.map(task => {
-      if(task.date != null) {
+      if (task.date != null) {
         task.date = Moment(task.date).format('DD MMM YYYY');
       }
     });
@@ -154,6 +155,14 @@ class LoanUpdateTaskPage extends Component {
     }
     let columnsvalue = selectors[0];
 
+    let taskEditPage = false;
+    if (this.props.location.state && this.props.location.state.loanEditTaskPage) {
+      taskEditPage = true;
+    }
+    if (this.props.history.action === 'POP') {
+      taskEditPage = false;
+    }
+
     return (
       <Layout>
         <Grid>
@@ -167,7 +176,11 @@ class LoanUpdateTaskPage extends Component {
               <div className={classes.dataRow}><p>VILLAGE <b>{data.village}</b> </p></div>
             </div>
           </div>
-
+          <Grid item md={12} xs={12}>
+            {taskEditPage === true ? (
+              <Snackbar severity="success">Loan Task Updated successfully.</Snackbar>
+            ) : null}
+          </Grid>
           <Card className={classes.mainContent}>
             <Grid
               container

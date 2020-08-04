@@ -123,7 +123,7 @@ export class Loans extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG"
+        "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG"
       )
       .then((res) => {
         this.setState({ getShg: res.data });
@@ -138,8 +138,9 @@ export class Loans extends React.Component {
       loandata.application_date = Moment(loandata.application_date).format(
         "DD MMM YYYY"
       );
-      if(loandata.loan_app_installments.length > 0) {
-        let loanDueId = loandata.loan_app_installments.length-1;
+      loandata.loan_model.loan_amount = loandata.loan_model.loan_amount.toLocaleString();
+      if (loandata.loan_app_installments.length > 0) {
+        let loanDueId = loandata.loan_app_installments.length - 1;
         let loanDueData = loandata.loan_app_installments[loanDueId];
         loandata.amount_due = (loanDueData.expected_interest + loanDueData.expected_principal).toLocaleString();
         loandata.payment_date = Moment(loanDueData.payment_date).format('DD MMM YYYY');
@@ -163,8 +164,8 @@ export class Loans extends React.Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/individuals/?shg.id=" +
-            this.state.filterShg.id
+          "crm-plugin/individuals/?shg.id=" +
+          this.state.filterShg.id
         )
         .then((res) => {
           if (res.data.length > 0) {
@@ -230,20 +231,20 @@ export class Loans extends React.Component {
 
   viewTask = (cellid) => {
     let loanAppData;
-    this.state.data.map(e=> {
-      if(e.id == cellid) {
+    this.state.data.map(e => {
+      if (e.id == cellid) {
         loanAppData = e;
-        this.props.history.push("/loan/update/" + cellid, {loanAppData: loanAppData});
+        this.props.history.push("/loan/update/" + cellid, { loanAppData: loanAppData });
       }
     })
   };
 
   viewEmi = (cellid) => {
     let loanAppData;
-    this.state.data.map(e=> {
-      if(e.id == cellid) {
+    this.state.data.map(e => {
+      if (e.id == cellid) {
         loanAppData = e;
-        this.props.history.push("/loans/emi/" + cellid, {loanAppData: loanAppData});
+        this.props.history.push("/loans/emi/" + cellid, { loanAppData: loanAppData });
       }
     })
   };
@@ -270,41 +271,7 @@ export class Loans extends React.Component {
 
   customAction = (cellid) => {
     let memberData;
-    // this.state.data.map((memData) => {
-    //   if (cellid == memData.id) {
-    //     memberData = memData;
-    //   }
-    // });
-    // serviceProvider
-    //   .serviceProviderForGetRequest(
-    //     process.env.REACT_APP_SERVER_URL + "loan-applications-print/" + cellid
-    //   )
-    //   .then((res) => {
-    //     console.log("done here");
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
     let token = Auth.getToken();
-    // window.location =
-    //   window.location.protocol +
-    //   "//" +
-    //   token +
-    //   "@" +
-    //   process.env.REACT_APP_SERVER_URL_BASE +
-    //   "loan-applications-print/" +
-    //   cellid;
-
-    // console.log(
-    //   "urk",
-    //   window.location.protocol +
-    //     "//" +
-    //     token +
-    //     "@" +
-    //     process.env.REACT_APP_SERVER_URL_BASE +
-    //     "loan-applications-print/" +
-    //     cellid
-    // );
     serviceProvider
       .serviceProviderForGetRequestDownloadPDFFile(
         process.env.REACT_APP_SERVER_URL + "loan-applications-print/" + cellid
@@ -315,10 +282,6 @@ export class Loans extends React.Component {
       .catch((error) => {
         console.log(error);
       });
-
-    // this.props.history.push(
-    //   process.env.REACT_APP_SERVER_URL + "loan-applications-print/" + cellid
-    // );
   };
 
   render() {
@@ -533,8 +496,8 @@ export class Loans extends React.Component {
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (
-            <h1>Loading...</h1>
-          )}
+              <h1>Loading...</h1>
+            )}
         </Grid>
       </Layout>
     );

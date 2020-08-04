@@ -6,6 +6,7 @@ import * as serviceProvider from "../../api/Axios";
 import MoneyIcon from "@material-ui/icons/Money";
 import Table from "../../components/Datatable/Datatable.js";
 import Moment from "moment";
+import Snackbar from "../../components/UI/Snackbar/Snackbar";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -54,9 +55,9 @@ class LoanEmiPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "loan-application-installments/?loan_application.id=" +
-          memberData.id +
-          "&&_sort=id:ASC"
+        "loan-application-installments/?loan_application.id=" +
+        memberData.id +
+        "&&_sort=id:ASC"
       )
       .then((res) => {
         this.setState({ loanEmiData: res.data });
@@ -75,8 +76,8 @@ class LoanEmiPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/individuals/" +
-          memberData.contact.individual
+        "crm-plugin/individuals/" +
+        memberData.contact.individual
       )
       .then((res) => {
         let shgName = res.data.shg.name;
@@ -84,8 +85,8 @@ class LoanEmiPage extends Component {
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/contact/?organization.id=" +
-              res.data.shg.organization
+            "crm-plugin/contact/?organization.id=" +
+            res.data.shg.organization
           )
           .then((response) => {
             let villageName = response.data[0].villages[0].name;
@@ -119,20 +120,20 @@ class LoanEmiPage extends Component {
     });
     this.props.history.push("/loan/emi/edit/" + cellid, {
       loanEmiData: loanEmiData,
+      loanAppData: this.props.location.state.loanAppData,
     });
   };
 
   render() {
-    console.log("LOAN EMI");
     const { classes } = this.props;
     let data = this.state.data;
     let loanEmiData = this.state.loanEmiData;
     loanEmiData.map((emidata) => {
-      emidata.totalPaid = emidata.actual_principal + emidata.actual_interest;
+      emidata.totalPaid = (emidata.actual_principal + emidata.actual_interest).toLocaleString();
       let totalLoanAmnt =
         emidata.expected_principal + emidata.expected_interest;
       emidata.outstanding =
-        totalLoanAmnt - (emidata.actual_principal + emidata.actual_interest);
+        (totalLoanAmnt - (emidata.actual_principal + emidata.actual_interest)).toLocaleString();
     });
 
     const Usercolumns = [
@@ -140,31 +141,49 @@ class LoanEmiPage extends Component {
         name: "Due Date",
         selector: "payment_date",
         sortable: true,
+        cell: (row) =>
+          row.payment_date ?
+            Moment(row.payment_date).format('DD MMM YYYY') : null
       },
       {
         name: "Principle",
         selector: "expected_principal",
         sortable: true,
+        cell: (row) =>
+          row.expected_principal ?
+            row.expected_principal.toLocaleString() : null
       },
       {
         name: "Interest",
         selector: "expected_interest",
         sortable: true,
+        cell: (row) =>
+          row.expected_interest ?
+            row.expected_interest.toLocaleString() : null
       },
       {
         name: "Payment Date",
         selector: "actual_payment_date",
         sortable: true,
+        cell: (row) =>
+          row.actual_payment_date ?
+            Moment(row.actual_payment_date).format('DD MMM YYYY') : null
       },
       {
         name: "Priniciple Paid",
         selector: "actual_principal",
         sortable: true,
+        cell: (row) =>
+          row.actual_principal ?
+            row.actual_principal.toLocaleString() : null
       },
       {
         name: "Interest Paid",
         selector: "actual_interest",
         sortable: true,
+        cell: (row) =>
+          row.actual_interest ?
+            row.actual_interest.toLocaleString() : null
       },
       {
         name: "Fine",
@@ -175,11 +194,17 @@ class LoanEmiPage extends Component {
         name: "Total Paid",
         selector: "totalPaid",
         sortable: true,
+        cell: (row) =>
+          row.totalPaid ?
+            row.totalPaid.toLocaleString() : null
       },
       {
         name: "Outstanding",
         selector: "outstanding",
         sortable: true,
+        cell: (row) =>
+          row.outstanding ?
+            row.outstanding.toLocaleString() : null
       },
     ];
     let selectors = [];
@@ -187,6 +212,14 @@ class LoanEmiPage extends Component {
       selectors.push(Usercolumns[i]["selector"]);
     }
     let columnsvalue = selectors[0];
+
+    let emiEditPage = false;
+    if (this.props.location.state && this.props.location.state.loanEditEmiPage) {
+      emiEditPage = true;
+    }
+    if (this.props.history.action === 'POP') {
+      emiEditPage = false;
+    }
 
     return (
       <Layout>
@@ -209,6 +242,11 @@ class LoanEmiPage extends Component {
               </div>
             </div>
           </div>
+          <Grid item md={12} xs={12}>
+            {emiEditPage === true ? (
+              <Snackbar severity="success">Loan EMI Updated successfully.</Snackbar>
+            ) : null}
+          </Grid>
           <Card className={classes.mainContent}>
             <Grid
               container
@@ -308,8 +346,8 @@ class LoanEmiPage extends Component {
               columnsvalue={columnsvalue}
             />
           ) : (
-            <h1>Loading...</h1>
-          )}
+              <h1>Loading...</h1>
+            )}
         </Grid>
       </Layout>
     );

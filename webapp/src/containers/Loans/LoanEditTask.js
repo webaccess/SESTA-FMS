@@ -135,7 +135,11 @@ class LoanEditTask extends Component {
       .then((res) => {
         this.setState({ loantask: res.data });
         this.setState({ formSubmitted: true });
-        this.props.history.push(this.props.history.goBack(), { loantask: res.data });
+        let app_id = res.data.loan_application["id"];
+        this.props.history.push("/loan/update/" + app_id, {
+          loanAppData: this.props.location.state.loanAppData,
+          loanEditTaskPage: true
+        });
       })
   }
 
@@ -276,7 +280,6 @@ class LoanEditTask extends Component {
       </Layout>
     )
   }
-
 }
 
 export default LoanEditTask;
