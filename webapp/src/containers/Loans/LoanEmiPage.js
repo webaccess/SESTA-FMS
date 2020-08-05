@@ -97,11 +97,11 @@ class LoanEmiPage extends Component {
                 shg: shgName,
                 village: villageName,
                 purpose: purpose,
-                amount: "Rs." + amount.toLocaleString(),
+                amount: amount,
                 duration: duration,
                 emi: "Rs." + emi.toLocaleString(),
                 pendingAmount: pendingAmount
-                  ? "Rs." + pendingAmount.toLocaleString()
+                  ? pendingAmount
                   : "-",
                 loanEndsOn: loanEndsOn
                   ? Moment(loanEndsOn).format("DD MMM YYYY")
@@ -129,8 +129,10 @@ class LoanEmiPage extends Component {
     const { classes } = this.props;
     let data = this.state.data;
     let loanEmiData = this.state.loanEmiData;
+
+    let paid = 0;
     loanEmiData.map((emidata) => {
-      if(emidata.fine !== null || emidata.fine !== 0) {
+      if (emidata.fine !== null || emidata.fine !== 0) {
         emidata.totalPaid = (emidata.fine + emidata.actual_principal + emidata.actual_interest).toLocaleString();
       } else {
         emidata.totalPaid = (emidata.actual_principal + emidata.actual_interest).toLocaleString();
@@ -139,7 +141,21 @@ class LoanEmiPage extends Component {
         emidata.expected_principal + emidata.expected_interest;
       emidata.outstanding =
         (totalLoanAmnt - (emidata.actual_principal + emidata.actual_interest)).toLocaleString();
+
+      emidata.totalPaid = parseInt(emidata.totalPaid.replace(/,/g, ''));
+      paid = paid + emidata.totalPaid;
     });
+
+    // Pending Amount = Actual amount + Fine - Total installment paid
+    let pendingAmount;
+    if (data.amount) {
+      let totalamount = parseInt(data.amount.replace(/,/g, ''));
+      pendingAmount = totalamount - paid;
+      if (pendingAmount < 0) {
+        pendingAmount = 0;
+      }
+      pendingAmount = "Rs. " + pendingAmount.toLocaleString();
+    }
 
     const Usercolumns = [
       {
@@ -293,7 +309,7 @@ class LoanEmiPage extends Component {
                       <div className={classes.member}>
                         PENDING AMOUNT <br />
                         <span className={classes.fieldValues}>
-                          {data.pendingAmount}
+                          {pendingAmount}
                         </span>
                       </div>
                     </b>
