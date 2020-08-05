@@ -53,10 +53,10 @@ class LoanEditEmiPage extends Component {
       .then((res) => {
         this.setState({
           values: {
-            actual_payment_date: res.data.actual_payment_date,
-            actual_principal: res.data.actual_principal,
-            actual_interest: res.data.actual_interest,
-            fine: res.data.fine
+            actual_payment_date: res.data[0].actual_payment_date,
+            actual_principal: res.data[0].actual_principal,
+            actual_interest: res.data[0].actual_interest,
+            fine: res.data[0].fine
           }
         });
       })
@@ -102,20 +102,24 @@ class LoanEditEmiPage extends Component {
     let loanEmiData = this.props.location.state.loanEmiData;
     let loanEmiId = loanEmiData.id;
 
-    if (this.state.values) {
-      loanEmiData.actual_payment_date = this.state.values.actual_payment_date ? Moment(this.state.values.actual_payment_date).format('YYYY-MM-DD') : loanEmiData.actual_payment_date;
-      loanEmiData.actual_principal = this.state.values.actual_principal ? this.state.values.actual_principal : loanEmiData.actual_principal;
-      loanEmiData.actual_interest = this.state.values.actual_interest ? this.state.values.actual_interest : loanEmiData.actual_interest;
-      loanEmiData.fine = this.state.values.fine ? this.state.values.fine : loanEmiData.fine;
+    let actual_payment_date = this.state.values.actual_payment_date;
+    let actual_principal = this.state.values.actual_principal;
+    let actual_interest = this.state.values.actual_interest;
+    let fine = this.state.values.fine;
+    let postData = {
+      actual_payment_date: actual_payment_date,
+      actual_principal: actual_principal,
+      actual_interest: actual_interest,
+      fine: fine
     }
+
     serviceProvider
       .serviceProviderForPutRequest(
         process.env.REACT_APP_SERVER_URL + "loan-application-installments",
         loanEmiId,
-        loanEmiData
+        postData
       )
       .then((res) => {
-        this.setState({ loanEmiData: res.data });
         let app_id = res.data.loan_application["id"];
         this.props.history.push("/loans/emi/" + app_id, {
           loanAppData: this.props.location.state.loanAppData,
@@ -137,15 +141,6 @@ class LoanEditEmiPage extends Component {
 
   render() {
     const { classes } = this.props;
-    let loanEmiData = this.state.loanEmiData;
-    if (this.props.location.state && this.props.location.state.loanEmiData) {
-      loanEmiData = this.props.location.state.loanEmiData;
-    }
-
-    this.state.values.actual_principal = this.state.values.actual_principal ? this.state.values.actual_principal : loanEmiData.actual_principal;
-    this.state.values.actual_interest = this.state.values.actual_interest ? this.state.values.actual_interest : loanEmiData.actual_interest;
-    this.state.values.actual_payment_date = this.state.values.actual_payment_date ? this.state.values.actual_payment_date : loanEmiData.actual_payment_date;
-    this.state.values.fine = this.state.values.fine ? this.state.values.fine : loanEmiData.fine;
 
     return (
       <Layout
@@ -174,7 +169,7 @@ class LoanEditEmiPage extends Component {
                     fullWidth
                     label="Principle Paid*"
                     name="actual_principal"
-                    value={this.state.values.actual_principal ? this.state.values.actual_principal : loanEmiData.actual_principal}
+                    value={this.state.values.actual_principal || ""}
                     error={this.hasError("actual_principal")}
                     helperText={
                       this.hasError("actual_principal")
@@ -190,7 +185,7 @@ class LoanEditEmiPage extends Component {
                     fullWidth
                     label="Interest Paid*"
                     name="actual_interest"
-                    value={this.state.values.actual_interest ? this.state.values.actual_interest : loanEmiData.actual_interest}
+                    value={this.state.values.actual_interest || ""}
                     error={this.hasError("actual_interest")}
                     helperText={
                       this.hasError("actual_interest")
@@ -211,7 +206,7 @@ class LoanEditEmiPage extends Component {
                         ? this.state.errors.actual_payment_date[0]
                         : null
                     }
-                    value={this.state.values.actual_payment_date ? this.state.values.actual_payment_date : loanEmiData.actual_payment_date}
+                    value={this.state.values.actual_payment_date || ""}
                     format={"dd MMM yyyy"}
                     onChange={(value) =>
                       this.setState({
@@ -225,7 +220,7 @@ class LoanEditEmiPage extends Component {
                     fullWidth
                     label="Fine"
                     name="fine"
-                    value={this.state.values.fine ? this.state.values.fine : loanEmiData.fine}
+                    value={this.state.values.fine || ""}
                     onChange={this.handleChange}
                     variant="outlined"
                   />

@@ -27,7 +27,6 @@ class LoanEditTask extends Component {
       loanTaskStatus: constants.LOAN_TASK_STATUS,
       data: [],
       values: {},
-      loantask: {},
       validations: {
         editStatus: {
           required: { value: "true", message: "Status field is required" },
@@ -120,20 +119,22 @@ class LoanEditTask extends Component {
     let loanTaskData = this.props.location.state.loantask;
     let loanAppId = loanTaskData.id;
 
-    if (this.state.values) {
-      loanTaskData.status = this.state.values.editStatus ? this.state.values.editStatus : loanTaskData.status;
-      loanTaskData.date = this.state.values.editDate ? Moment(this.state.values.editDate).format('YYYY-MM-DD') : loanTaskData.date;
-      loanTaskData.comments = this.state.values.comments ? this.state.values.comments : loanTaskData.comments;
+    let status = this.state.values.editStatus;
+    let editDate = this.state.values.editDate;
+    let comments = this.state.values.comments;
+    let postData = {
+      status: status,
+      date: editDate,
+      comments: comments
     }
 
     serviceProvider
       .serviceProviderForPutRequest(
         process.env.REACT_APP_SERVER_URL + "loan-application-tasks",
         loanAppId,
-        loanTaskData
+        postData
       )
       .then((res) => {
-        this.setState({ loantask: res.data });
         this.setState({ formSubmitted: true });
         let app_id = res.data.loan_application["id"];
         this.props.history.push("/loan/update/" + app_id, {
@@ -157,16 +158,6 @@ class LoanEditTask extends Component {
   render() {
     const { classes } = this.props;
     let loanTaskStatus = constants.LOAN_TASK_STATUS;
-    let loantask = this.state.loantask;
-    if (this.props.location.state && this.props.location.state.loantask) {
-      loantask = this.props.location.state.loantask;
-    }
-    let defaultStatus;
-    loanTaskStatus.map(status => {
-      if (status.id == loantask.status) {
-        defaultStatus = status;
-      }
-    });
     let statusValue = this.state.values.editStatus;
 
     return (
@@ -240,7 +231,7 @@ class LoanEditTask extends Component {
                         ? this.state.errors.editDate[0]
                         : null
                     }
-                    value={this.state.values.editDate ? this.state.values.editDate : loantask.date}
+                    value={this.state.values.editDate || ""}
                     format={"dd MMM yyyy"}
                     onChange={(value) =>
                       this.setState({
@@ -255,7 +246,7 @@ class LoanEditTask extends Component {
                     fullWidth
                     label="Comments"
                     name="comments"
-                    value={this.state.values.comments ? this.state.values.comments : loantask.comments}
+                    value={this.state.values.comments || ""}
                     onChange={this.handleChange}
                     variant="outlined"
                   />
@@ -263,7 +254,6 @@ class LoanEditTask extends Component {
 
               </Grid>
             </CardContent>
-
             <Divider />
 
             <CardActions>
