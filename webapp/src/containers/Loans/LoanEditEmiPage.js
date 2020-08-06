@@ -56,7 +56,9 @@ class LoanEditEmiPage extends Component {
             actual_payment_date: res.data[0].actual_payment_date,
             actual_principal: res.data[0].actual_principal,
             actual_interest: res.data[0].actual_interest,
-            fine: res.data[0].fine
+            fine: res.data[0].fine,
+            expected_principal: res.data[0].expected_principal,
+            expected_interest: res.data[0].expected_interest
           }
         });
       })
@@ -96,8 +98,15 @@ class LoanEditEmiPage extends Component {
 
   handleSubmit = async (e) => {
     e.preventDefault();
+    if (this.state.values.actual_principal == null) {
+      this.state.values.actual_principal = this.state.values.expected_principal;
+    }
+    if (this.state.values.actual_interest == null) {
+      this.state.values.actual_interest = this.state.values.expected_interest;
+    }
     this.validate();
     this.setState({ formSubmitted: "" });
+
     if (Object.keys(this.state.errors).length > 0) return;
     let loanEmiData = this.props.location.state.loanEmiData;
     let loanEmiId = loanEmiData.id;
@@ -141,7 +150,6 @@ class LoanEditEmiPage extends Component {
 
   render() {
     const { classes } = this.props;
-
     return (
       <Layout
         breadcrumbs={
@@ -169,7 +177,7 @@ class LoanEditEmiPage extends Component {
                     fullWidth
                     label="Principle Paid*"
                     name="actual_principal"
-                    value={this.state.values.actual_principal || ""}
+                    value={this.state.values.actual_principal ? this.state.values.actual_principal : this.state.values.expected_principal || ""}
                     error={this.hasError("actual_principal")}
                     helperText={
                       this.hasError("actual_principal")
@@ -185,7 +193,7 @@ class LoanEditEmiPage extends Component {
                     fullWidth
                     label="Interest Paid*"
                     name="actual_interest"
-                    value={this.state.values.actual_interest || ""}
+                    value={this.state.values.actual_interest ? this.state.values.actual_interest : this.state.values.expected_interest || ""}
                     error={this.hasError("actual_interest")}
                     helperText={
                       this.hasError("actual_interest")

@@ -129,6 +129,7 @@ class LoanEmiPage extends Component {
     const { classes } = this.props;
     let data = this.state.data;
     let loanEmiData = this.state.loanEmiData;
+    let loanAppData = this.props.location.state.loanAppData;
 
     let paid = 0;
     loanEmiData.map((emidata) => {
@@ -156,6 +157,11 @@ class LoanEmiPage extends Component {
       }
       pendingAmount = "Rs. " + pendingAmount.toLocaleString();
     }
+
+    // get Loan Ends On Date
+    let sortedPaymentDate = loanAppData.loan_app_installments.sort((a, b) => new Date(...a.payment_date.split('/').reverse()) - new Date(...b.payment_date.split('/').reverse()));
+      let len = sortedPaymentDate.length -1;
+      data.loanEndsOn = Moment(sortedPaymentDate[len].payment_date).format('DD MMM YYYY');
 
     const Usercolumns = [
       {

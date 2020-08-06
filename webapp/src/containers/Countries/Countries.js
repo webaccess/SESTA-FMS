@@ -411,6 +411,7 @@ export class Countries extends React.Component {
                 ActiveAll={this.ActiveAll}
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
+                selectableRows
                 DeleteMessage={"Are you Sure you want to Delete"}
                 ActiveMessage={
                   "Are you Sure you want to Deactivate selected Country"
