@@ -39,13 +39,12 @@
       "via": "loan_model"
     },
     "loantasks": {
-      "collection": "loantask",
-      "via": "loan_model"
+      "via": "loan_model",
+      "collection": "loantask"
     },
     "fpo": {
       "plugin": "crm-plugin",
-      "model": "contact",
-      "via": "loan_model"
+      "model": "contact"
     }
   }
 }

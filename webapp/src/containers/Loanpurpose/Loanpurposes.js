@@ -149,12 +149,8 @@ export class Loanpurposes extends React.Component {
       for (let i in selectedId) {
         serviceProvider
           .serviceProviderForDeleteRequest(
-            process.env.REACT_APP_SERVER_URL + "loan-models" + selectedId[i],
-            {
-              headers: {
-                Authorization: "Bearer " + auth.getToken() + "",
-              },
-            }
+            process.env.REACT_APP_SERVER_URL + "loan-models",
+            selectedId[i]
           )
           .then((res) => {
             if (res.data.emidetails) {

@@ -117,10 +117,6 @@
     "loan_applications": {
       "collection": "loan-application",
       "via": "contact"
-    },
-    "loan_model": {
-      "via": "fpo",
-      "model": "loan-model"
     }
   }
 }

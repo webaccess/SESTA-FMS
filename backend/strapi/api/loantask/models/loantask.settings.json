@@ -11,11 +11,8 @@
   },
   "attributes": {
     "loan_model": {
-      "via": "loantasks",
-      "model": "loan-model"
-    },
-    "name": {
-      "type": "string"
+      "model": "loan-model",
+      "via": "loantasks"
     },
     "activitytype": {
       "plugin": "crm-plugin",
