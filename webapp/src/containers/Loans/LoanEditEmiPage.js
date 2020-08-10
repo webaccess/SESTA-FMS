@@ -10,13 +10,13 @@ import {
 } from "@material-ui/core";
 import { EDIT_LOAN_EMI_BREADCRUMBS } from "./config";
 import Input from "../../components/UI/Input/Input";
-import DateTimepicker from "../../components/UI/DateTimepicker/DateTimepicker.js";
+import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 import Button from "../../components/UI/Button/Button";
 import { Link } from "react-router-dom";
 import * as serviceProvider from "../../api/Axios";
-import Moment from "moment";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
+import auth from "../../components/Auth/Auth.js";
 
 class LoanEditEmiPage extends Component {
   constructor(props) {
@@ -56,7 +56,9 @@ class LoanEditEmiPage extends Component {
             actual_payment_date: res.data[0].actual_payment_date,
             actual_principal: res.data[0].actual_principal,
             actual_interest: res.data[0].actual_interest,
-            fine: res.data[0].fine
+            fine: res.data[0].fine,
+            expected_principal: res.data[0].expected_principal,
+            expected_interest: res.data[0].expected_interest
           }
         });
       })
@@ -96,8 +98,15 @@ class LoanEditEmiPage extends Component {
 
   handleSubmit = async (e) => {
     e.preventDefault();
+    if (this.state.values.actual_principal == null) {
+      this.state.values.actual_principal = this.state.values.expected_principal;
+    }
+    if (this.state.values.actual_interest == null) {
+      this.state.values.actual_interest = this.state.values.expected_interest;
+    }
     this.validate();
     this.setState({ formSubmitted: "" });
+
     if (Object.keys(this.state.errors).length > 0) return;
     let loanEmiData = this.props.location.state.loanEmiData;
     let loanEmiId = loanEmiData.id;
@@ -141,7 +150,6 @@ class LoanEditEmiPage extends Component {
 
   render() {
     const { classes } = this.props;
-
     return (
       <Layout
         breadcrumbs={
@@ -169,7 +177,7 @@ class LoanEditEmiPage extends Component {
                     fullWidth
                     label="Principle Paid*"
                     name="actual_principal"
-                    value={this.state.values.actual_principal || ""}
+                    value={this.state.values.actual_principal ? this.state.values.actual_principal : this.state.values.expected_principal || ""}
                     error={this.hasError("actual_principal")}
                     helperText={
                       this.hasError("actual_principal")
@@ -185,7 +193,7 @@ class LoanEditEmiPage extends Component {
                     fullWidth
                     label="Interest Paid*"
                     name="actual_interest"
-                    value={this.state.values.actual_interest || ""}
+                    value={this.state.values.actual_interest ? this.state.values.actual_interest : this.state.values.expected_interest || ""}
                     error={this.hasError("actual_interest")}
                     helperText={
                       this.hasError("actual_interest")
@@ -197,7 +205,7 @@ class LoanEditEmiPage extends Component {
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <DateTimepicker
+                  <Datepicker
                     label="Payment Date*"
                     name="actual_payment_date"
                     error={this.hasError("actual_payment_date")}
