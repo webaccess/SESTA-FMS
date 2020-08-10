@@ -30,14 +30,9 @@
       "type": "decimal",
       "required": true
     },
-    "fpo": {
-      "plugin": "crm-plugin",
-      "model": "contact",
-      "via": "loan_model"
-    },
     "loan_applications": {
-      "via": "loan_model",
-      "collection": "loan-application"
+      "collection": "loan-application",
+      "via": "loan_model"
     },
     "emidetails": {
       "collection": "emidetails",
@@ -45,6 +40,11 @@
     },
     "loantasks": {
       "collection": "loantask",
+      "via": "loan_model"
+    },
+    "fpo": {
+      "plugin": "crm-plugin",
+      "model": "contact",
       "via": "loan_model"
     }
   }

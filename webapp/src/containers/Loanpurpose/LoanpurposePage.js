@@ -6,7 +6,11 @@ import auth from "../../components/Auth/Auth";
 import { withStyles } from "@material-ui/core/styles";
 import style from "./Loanpurpose.module.css";
 import IconButton from "@material-ui/core/IconButton";
-import { AddCircleOutlined, RemoveCircleOutlined } from "@material-ui/icons";
+import {
+  AddCircleOutlined,
+  RemoveCircleOutlined,
+  ContactPhoneOutlined,
+} from "@material-ui/icons";
 import Button from "../../components/UI/Button/Button";
 import Autotext from "../../components/Autotext/Autotext.js";
 import Autocomplete from "@material-ui/lab/Autocomplete";
@@ -51,7 +55,8 @@ class LoanpurposePage extends Component {
       values: {},
       addPurpose: "",
       users: [{ principal: "", interest: "" }],
-      task: [{ name: "" }],
+      task: [{ activitytype: "" }],
+      //task: "",
       getFPO: [],
       actTypeFilter: [],
       validations: {
@@ -85,6 +90,12 @@ class LoanpurposePage extends Component {
             message: "EMI field is required",
           },
         },
+        task: {
+          required: {
+            value: "true",
+            message: "Task name field is required",
+          },
+        },
       },
       errors: {
         addPurpose: [],
@@ -93,6 +104,7 @@ class LoanpurposePage extends Component {
         addAmount: [],
         addFPO: [],
         addEMI: [],
+        task: [],
         addVillage: [],
       },
       formSubmitted: "",
@@ -166,7 +178,6 @@ class LoanpurposePage extends Component {
       )
       .then((res) => {
         this.setState({ actTypeFilter: res.data });
-        console.log("--actypeFilter", res.data);
       })
       .catch((error) => {
         console.log(error);
@@ -187,6 +198,7 @@ class LoanpurposePage extends Component {
 
   createUI() {
     const { classes } = this.props;
+
     return this.state.users.map((el, i) => (
       <div key={i}>
         {i + 1}
@@ -231,30 +243,31 @@ class LoanpurposePage extends Component {
   createTaskUI() {
     const { classes } = this.props;
     let actTypeFilter = this.state.actTypeFilter;
+
     return this.state.task.map((el, i) => (
       <div key={i}>
         {i + 1}
-        {/*<Input
-          label="Task"
-          name="name"
-          value={
-            //this.state.users.length > 1 && i < this.state.users.length
-            //  ? this.state.users[i].principal
-            el.name
-          }
-          onChange={this.handleTaskUIChange.bind(this, i)}
-          variant="outlined"
-        />*/}
-
+        {/*{i}*/}
+        {/*{el.activitytype.name}*/}
+        {/*{el[i]["activitytype"]}*/}
+        {/*{this.state.task[i].name}*/}
+        {/*{el.name}*/}
+        {/*{this.state.taselk[i].activitytype["name"]}*/}
         <Autocomplete
-          id="select-role"
-          name="name"
-          value={el.name}
+          id="name"
+          //name="name"
+          //value={this.state.editPage[0] ? el.activitytype.name : el.name.name}
+          value={el.activitytype}
           options={actTypeFilter}
           variant="outlined"
           getOptionLabel={(option) => option.name}
           placeholder="Select Activity type"
-          onChange={this.handleTaskUIChange.bind(this, i)}
+          //onChange={this.handleTaskUIChange.bind(this, i)}
+          onChange={(event, value, i) => {
+            this.handleTaskUIChange({
+              target: { name: "activitytype", value: value },
+            });
+          }}
           renderInput={(params) => (
             <Input
               {...params}
@@ -262,10 +275,13 @@ class LoanpurposePage extends Component {
               label="Select Activity type"
               name="name"
               variant="outlined"
+              //error={this.hasError("task")}
+              //helperText={
+              //  this.hasError("task") ? this.state.errors.task[0] : null
+              //}
             />
           )}
         />
-
         {this.state.task.length !== 1 && (
           <IconButton
             aria-label="remove"
@@ -292,13 +308,23 @@ class LoanpurposePage extends Component {
     this.setState({ users });
   }
 
-  handleTaskUIChange(i, e) {
-    const { name, value } = e.target;
-    console.log("i,e", i, e);
+  handleTaskUIChange(event) {
+    let taskData = this.state.task;
+    let i;
+
+    if (taskData) {
+      i = taskData.length - 1;
+    } else {
+      i = 0;
+    }
+
+    const { name, value, j } = event.target;
+
     let task = [...this.state.task];
     task[i] = { ...task[i], [name]: value };
+    i++;
+
     this.setState({ task });
-    console.log(this.state.task);
   }
 
   removeTaskClick(i) {
@@ -421,7 +447,8 @@ class LoanpurposePage extends Component {
             .serviceProviderForPostRequest(
               process.env.REACT_APP_SERVER_URL + "loantasks/",
               {
-                name: this.state.task[i].name,
+                //name: this.state.task[i].name,
+                activitytype: this.state.task[i].activitytype,
                 loan_model: Id,
               }
             )
@@ -435,7 +462,8 @@ class LoanpurposePage extends Component {
               process.env.REACT_APP_SERVER_URL + "loantasks",
               data.loantasks[i].id,
               {
-                name: this.state.task[i].name,
+                //name: this.state.task[i].name,
+                activitytype: this.state.task[i].activitytype,
                 loan_model: Id,
               }
             )
@@ -451,7 +479,8 @@ class LoanpurposePage extends Component {
           .serviceProviderForPostRequest(
             process.env.REACT_APP_SERVER_URL + "loantasks/",
             {
-              name: this.state.task[i].name,
+              //name: this.state.task[i].name,
+              activitytype: this.state.task[i].activitytype,
               loan_model: Id,
             }
           )
@@ -474,6 +503,7 @@ class LoanpurposePage extends Component {
     let addAmount = this.state.values.addAmount;
     let addFPO = this.state.values.addFPO;
     let loanEmi = this.state.values.addEMI;
+
     let postLoan = {
       product_name: productName,
       duration: addDuration,

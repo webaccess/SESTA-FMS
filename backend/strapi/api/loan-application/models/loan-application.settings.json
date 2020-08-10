@@ -39,14 +39,14 @@
       "type": "string"
     },
     "contact": {
+      "via": "loan_applications",
       "plugin": "crm-plugin",
-      "model": "contact",
-      "via": "loan_applications"
+      "model": "contact"
     },
     "approved_by": {
+      "via": "loan_app_approvedby",
       "plugin": "crm-plugin",
-      "model": "contact",
-      "via": "loan_app_approvedby"
+      "model": "contact"
     },
     "loan_model": {
       "via": "loan_applications",
