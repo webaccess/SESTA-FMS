@@ -5,9 +5,10 @@ import Layout from "../../hoc/Layout/Layout";
 import Button from "../../components/UI/Button/Button";
 import { withStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
-import style from "./Countries.module.css";
+import style from "./Activitytypes.module.css";
 import { Grid } from "@material-ui/core";
 import Input from "../../components/UI/Input/Input";
+import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Modal from "../../components/UI/Modal/Modal.js";
 import Switch from "../../components/UI/Switch/Switch";
@@ -37,7 +38,7 @@ const useStyles = (theme) => ({
   Districts: {
     marginRight: theme.spacing(1),
   },
-  Countries: {
+  Activitytypes: {
     marginRight: theme.spacing(1),
   },
   Search: {
@@ -48,19 +49,16 @@ const useStyles = (theme) => ({
   },
 });
 
-export class Countries extends React.Component {
+export class Activitytypes extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       values: {},
-      filterCountry: "",
+      filterActivitytype: "",
       Result: [],
       data: [],
       selectedid: 0,
       open: false,
-      isSetActive: false,
-      isSetInActive: false,
-      isActiveAllShowing: false,
       columnsvalue: [],
       DeleteData: false,
       properties: props,
@@ -68,8 +66,6 @@ export class Countries extends React.Component {
       dataCellId: [],
       singleDelete: "",
       multipleDelete: "",
-      active: {},
-      allIsActive: [],
     };
   }
 
@@ -77,14 +73,17 @@ export class Countries extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/countries/?_sort=name:ASC"
+          "crm-plugin/activitytypes/?_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ data: res.data });
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }
 
-  StateFilter(event, value, target) {
+  activityFilter(event, value, target) {
     this.setState({
       values: { ...this.state.values, [event.target.name]: event.target.value },
     });
@@ -92,24 +91,28 @@ export class Countries extends React.Component {
 
   getData(result) {
     for (let i in result) {
-      let countries = [];
-      for (let j in result[i].countries) {
-        countries.push(result[i].countries[j].name + " ");
+      let activitytypes = [];
+      let contacts = [];
+      for (let j in result[i].activitytypes) {
+        activitytypes.push(result[i].activitytypes[j].name + " ");
+        activitytypes.push(result[i].activitytypes[j].remuneration + " ");
+        activitytypes.push(result[i].activitytypes[j].contacts + " ");
       }
-      result[i]["countries"] = countries;
+      result[i]["activitytypes"] = activitytypes;
     }
+
     return result;
   }
 
   handleSearch() {
     let searchData = "";
-    if (this.state.values.filterCountry) {
-      searchData += "name_contains=" + this.state.values.filterCountry;
+    if (this.state.values.filterActivitytype) {
+      searchData += "name_contains=" + this.state.values.filterActivitytype;
     }
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/countries/?" +
+          "crm-plugin/activitytypes/?" +
           searchData +
           "&&_sort=name:ASC"
       )
@@ -117,17 +120,17 @@ export class Countries extends React.Component {
         this.setState({ data: this.getData(res.data) });
       })
       .catch((err) => {
-        console.log(err);
+        console.log("err", err);
       });
   }
 
   editData = (cellid) => {
-    this.props.history.push("/countries/edit/" + cellid);
+    this.props.history.push("/activitytypes/edit/" + cellid);
   };
 
   cancelForm = () => {
     this.setState({
-      filterCountry: "",
+      filterActivitytype: "",
       values: {},
       formSubmitted: "",
       stateSelected: false,
@@ -141,7 +144,7 @@ export class Countries extends React.Component {
       this.setState({ singleDelete: "", multipleDelete: "" });
       serviceProvider
         .serviceProviderForDeleteRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/countries",
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
           cellid
         )
         .then((res) => {
@@ -162,7 +165,7 @@ export class Countries extends React.Component {
       for (let i in selectedId) {
         serviceProvider
           .serviceProviderForDeleteRequest(
-            process.env.REACT_APP_SERVER_URL + "crm-plugin/countries",
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
             selectedId[i]
           )
           .then((res) => {
@@ -171,140 +174,38 @@ export class Countries extends React.Component {
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
-            console.log(error);
+            console.log("err", error);
           });
       }
     }
-  };
-
-  ActiveAll = (selectedId, selected) => {
-    if (selectedId.length !== 0) {
-      let numberOfIsActive = [];
-      for (let i in selected) {
-        numberOfIsActive.push(selected[i]["is_active"]);
-      }
-      this.setState({ allIsActive: numberOfIsActive });
-      let IsActive = "";
-      numberOfIsActive.forEach((element, index) => {
-        if (numberOfIsActive[index] === true) {
-          IsActive = false;
-        } else {
-          IsActive = true;
-        }
-
-        let setActiveId = selectedId[index];
-        serviceProvider
-          .serviceProviderForPutRequest(
-            process.env.REACT_APP_SERVER_URL + "crm-plugin/countries",
-            setActiveId,
-            {
-              is_active: IsActive,
-            }
-          )
-          .then((res) => {
-            this.setState({ formSubmitted: true });
-            this.componentDidMount({ editData: true });
-            this.props.history.push({ pathname: "/countries", editData: true });
-          })
-          .catch((error) => {
-            this.setState({ formSubmitted: false });
-            if (error.response !== undefined) {
-              this.setState({
-                errorCode:
-                  error.response.data.statusCode +
-                  " Error- " +
-                  error.response.data.error +
-                  " Message- " +
-                  error.response.data.message +
-                  " Please try again!",
-              });
-            } else {
-              this.setState({ errorCode: "Network Error - Please try again!" });
-            }
-            console.log(error);
-          });
-      });
-    }
-  };
-
-  confirmActive = (event) => {
-    this.setState({ isActiveAllShowing: true });
-    this.setState({ setActiveId: event.target.id });
-    this.setState({ IsActive: event.target.checked });
   };
 
   handleClose = () => {
     this.setState({ open: false });
   };
 
-  handleActive = (event) => {
-    this.setState({ isActiveAllShowing: false });
-    let setActiveId = this.state.setActiveId;
-    let IsActive = this.state.IsActive;
-    serviceProvider
-      .serviceProviderForPutRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/countries",
-        setActiveId,
-        {
-          is_active: IsActive,
-        }
-      )
-      .then((res) => {
-        this.setState({ formSubmitted: true });
-        this.setState({ open: true });
-        this.componentDidMount({ editData: true });
-        this.props.history.push({ pathname: "/countries", editData: true });
-      })
-      .catch((error) => {
-        this.setState({ formSubmitted: false });
-        if (error.response !== undefined) {
-          this.setState({
-            errorCode:
-              error.response.data.statusCode +
-              " Error- " +
-              error.response.data.error +
-              " Message- " +
-              error.response.data.message +
-              " Please try again!",
-          });
-        } else {
-          this.setState({ errorCode: "Network Error - Please try again!" });
-        }
-        console.log(error);
-      });
-  };
-
-  closeActiveAllModalHandler = (event) => {
-    this.setState({ isActiveAllShowing: false });
-  };
-
   handleCheckBox = (event) => {
     this.setState({ [event.target.name]: event.target.checked });
-    this.setState({ addIsActive: true });
   };
 
   render() {
     let data = this.state.data;
     const Usercolumns = [
       {
-        name: "Country",
+        name: "Activity Type",
         selector: "name",
         sortable: true,
       },
       {
-        name: "Active",
-        cell: (cell) => (
-          <Switch
-            id={cell.id}
-            onChange={(e) => {
-              this.confirmActive(e);
-            }}
-            defaultChecked={cell.is_active}
-            Small={true}
-          />
-        ),
+        name: "FPO",
+        selector: "contact[0].name",
         sortable: true,
-        button: true,
+        cell: (row) => (row.contact[0] ? row.contact[0].name : "-"),
+      },
+      {
+        name: "Remuneration",
+        selector: "remuneration",
+        sortable: true,
       },
     ];
 
@@ -320,33 +221,33 @@ export class Countries extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>Manage Countries</h1>
+            <h1 className={style.title}>Manage Activity Types</h1>
             <div className={classes.row}>
               <div className={classes.buttonRow}>
                 <Button
                   variant="contained"
                   component={Link}
-                  to="/countries/add"
+                  to="/activitytypes/add"
                 >
-                  Add Country
+                  Add Activity Type
                 </Button>
               </div>
             </div>
             {this.props.location.addData ? (
               <Snackbar severity="success">
-                Country added successfully.
+                Activity type added successfully.
               </Snackbar>
             ) : null}
             {this.props.location.editData ? (
               <Snackbar severity="success">
-                Country edited successfully.
+                Activity type edited successfully.
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
             this.state.singleDelete !== "" &&
             this.state.singleDelete ? (
               <Snackbar severity="success" Showbutton={false}>
-                Country {this.state.singleDelete} deleted successfully!
+                Activity type {this.state.singleDelete} deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.singleDelete === false ? (
@@ -356,7 +257,7 @@ export class Countries extends React.Component {
             ) : null}
             {this.state.multipleDelete === true ? (
               <Snackbar severity="success" Showbutton={false}>
-                Countries deleted successfully!
+                Activity types deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.multipleDelete === false ? (
@@ -371,13 +272,13 @@ export class Countries extends React.Component {
                   <Grid item md={12} xs={12}>
                     <Input
                       fullWidth
-                      label="Country Name"
-                      name="filterCountry"
+                      label="Activity Type"
+                      name="filterActivitytype"
                       variant="outlined"
                       onChange={(event, value) => {
-                        this.StateFilter(event, value);
+                        this.activityFilter(event, value);
                       }}
-                      value={this.state.values.filterCountry || ""}
+                      value={this.state.values.filterActivitytype || ""}
                     />
                   </Grid>
                 </div>
@@ -393,12 +294,10 @@ export class Countries extends React.Component {
             <br></br>
             {data ? (
               <Table
-                showSetAllActive={true}
-                title={"Countries"}
+                title={"Activitytypes"}
                 showSearch={false}
                 filterData={true}
-                allIsActive={this.state.allIsActive}
-                Searchplaceholder={"Search by Country Name"}
+                Searchplaceholder={"Search by Activity Type Name"}
                 filterBy={["name"]}
                 filters={filters}
                 data={data}
@@ -407,41 +306,18 @@ export class Countries extends React.Component {
                 DeleteData={this.DeleteData}
                 clearSelected={this.clearSelected}
                 DeleteAll={this.DeleteAll}
-                handleActive={this.handleActive}
-                ActiveAll={this.ActiveAll}
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 selectableRows
                 DeleteMessage={"Are you Sure you want to Delete"}
-                ActiveMessage={
-                  "Are you Sure you want to Deactivate selected Country"
-                }
               />
             ) : (
               <h1>Loading...</h1>
             )}
-            <Modal
-              className="modal"
-              show={this.state.isActiveAllShowing}
-              close={this.closeActiveAllModalHandler}
-              displayCross={{ display: "none" }}
-              handleEventChange={true}
-              event={this.handleActive}
-              footer={{
-                footerSaveName: "OKAY",
-                footerCloseName: "CLOSE",
-                displayClose: { display: "true" },
-                displaySave: { display: "true" },
-              }}
-            >
-              {this.state.IsActive
-                ? " Do you want to activate selected country ?"
-                : "Do you want to deactivate selected country ?"}
-            </Modal>
           </div>
         </Grid>
       </Layout>
     );
   }
 }
-export default withStyles(useStyles)(Countries);
+export default withStyles(useStyles)(Activitytypes);

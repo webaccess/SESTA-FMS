@@ -45,15 +45,6 @@ const useStyles = makeStyles((theme) => ({
       color: "#282F2B",
     },
   },
-  PrintIcon: {
-    color: "#131514",
-    "&:hover": {
-      color: "#282F2B",
-    },
-    "&:active": {
-      color: "#282F2B",
-    },
-  },
 }));
 
 const Table = (props) => {
@@ -92,7 +83,9 @@ const Table = (props) => {
   const viewTask = (id) => {
     props.viewTask(id);
   };
-
+  const viewEmi = (id) => {
+    props.viewEmi(id);
+  };
   const customAction = (id) => {
     props.customAction(id);
   };
@@ -156,10 +149,6 @@ const Table = (props) => {
         ),
         button: true,
       },
-    ];
-  }
-  if ( valueForMemberPage !== "Loans" && valueForMemberPage !== "UpdateLoanTask" ) {
-    column = [
       {
         cell: (cell) => (
           <div
@@ -169,6 +158,38 @@ const Table = (props) => {
             <Tooltip title="Delete">
               <IconButton aria-label="delete">
                 <DeleteIcon className={classes.deleteIcon} />
+              </IconButton>
+            </Tooltip>
+          </div>
+        ),
+        button: true,
+      },
+    ];
+  }
+  if (valueForMemberPage === "UpdateLoanTask") {
+    column = [
+      {
+        cell: (cell) => (
+          <div onClick={(event) => editData(cell.id)} id={cell.id}>
+            <Tooltip title="Edit">
+              <IconButton aria-label="edit" value={cell[valueformodal]}>
+                <EditIcon className={classes.editIcon} />
+              </IconButton>
+            </Tooltip>
+          </div>
+        ),
+        button: true,
+      },
+    ];
+  }
+  if (valueForMemberPage === "LoanEMI") {
+    column = [
+      {
+        cell: (cell) => (
+          <div onClick={(event) => editData(cell.id)} id={cell.id}>
+            <Tooltip title="Edit">
+              <IconButton aria-label="edit" value={cell[valueformodal]}>
+                <EditIcon className={classes.editIcon} />
               </IconButton>
             </Tooltip>
           </div>
@@ -236,11 +257,18 @@ const Table = (props) => {
               </Tooltip>
             </div>
             <div
-              onClick={(event) => viewData(cell.id, cell[valueformodal])}
+              onClick={
+                cell.status === "Approved"
+                  ? (event) => viewEmi(cell.id, cell[valueformodal])
+                  : null
+              }
               style={{ display: "inline-flex" }}
             >
               <Tooltip title="EMI">
-                <IconButton aria-label="activity">
+                <IconButton
+                  aria-label="activity"
+                  disabled={cell.status === "Approved" ? false : true}
+                >
                   <AssignmentIndIcon
                     className={classes.AssignmentTurnedInIcon}
                   />
@@ -248,11 +276,18 @@ const Table = (props) => {
               </Tooltip>
             </div>
             <div
-              onClick={(event) => viewTask(cell.id, cell[valueformodal])}
+              onClick={
+                cell.status === "Approved"
+                  ? (event) => viewTask(cell.id, cell[valueformodal])
+                  : null
+              }
               style={{ display: "inline-flex" }}
             >
               <Tooltip title="Task">
-                <IconButton aria-label="task">
+                <IconButton
+                  aria-label="task"
+                  disabled={cell.status === "Approved" ? false : true}
+                >
                   <AssignmentTurnedInIcon
                     className={classes.AssignmentTurnedInIcon}
                   />
@@ -280,6 +315,7 @@ const Table = (props) => {
       },
     ];
   }
+
   const makeColumns = (columns) => {
     for (let Usercolumns in column) {
       columns.push(column[Usercolumns]);
@@ -387,7 +423,7 @@ const Table = (props) => {
             contextActions={contextActions}
             actions={handleEditEvent}
             onSelectedRowsChange={handleChange}
-            selectableRows
+            selectableRows={props.selectableRows}
             searchFilter={searchFilter}
             highlightOnHover
             clearSelectedRows={toggleCleared}
