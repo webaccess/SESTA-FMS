@@ -30,22 +30,21 @@
       "type": "decimal",
       "required": true
     },
-    "fpo": {
-      "plugin": "crm-plugin",
-      "model": "contact",
-      "via": "loan_model"
-    },
     "loan_applications": {
-      "via": "loan_model",
-      "collection": "loan-application"
+      "collection": "loan-application",
+      "via": "loan_model"
     },
     "emidetails": {
       "collection": "emidetails",
       "via": "loan_model"
     },
     "loantasks": {
-      "collection": "loantask",
-      "via": "loan_model"
+      "via": "loan_model",
+      "collection": "loantask"
+    },
+    "fpo": {
+      "plugin": "crm-plugin",
+      "model": "contact"
     }
   }
 }

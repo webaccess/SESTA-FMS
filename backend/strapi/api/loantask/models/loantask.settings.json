@@ -11,11 +11,12 @@
   },
   "attributes": {
     "loan_model": {
-      "via": "loantasks",
-      "model": "loan-model"
+      "model": "loan-model",
+      "via": "loantasks"
     },
-    "name": {
-      "type": "string"
+    "activitytype": {
+      "plugin": "crm-plugin",
+      "model": "activitytype"
     }
   }
 }

@@ -95,32 +95,28 @@
       "model": "user",
       "via": "contact"
     },
-    "loan_model": {
-      "via": "fpo",
-      "model": "loan-model"
-    },
     "loan_app_approvedby": {
-      "via": "approved_by",
-      "model": "loan-application"
+      "model": "loan-application",
+      "via": "approved_by"
     },
     "organization": {
-      "via": "contact",
       "plugin": "crm-plugin",
-      "model": "organization"
+      "model": "organization",
+      "via": "contact"
     },
     "org_vos": {
-      "via": "vos",
       "plugin": "crm-plugin",
-      "collection": "organization"
+      "collection": "organization",
+      "via": "vos"
     },
     "org_fpo": {
-      "via": "fpo",
       "plugin": "crm-plugin",
-      "model": "organization"
+      "model": "organization",
+      "via": "fpo"
     },
     "loan_applications": {
-      "via": "contact",
-      "collection": "loan-application"
+      "collection": "loan-application",
+      "via": "contact"
     }
   }
 }
