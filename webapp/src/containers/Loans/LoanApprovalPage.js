@@ -281,7 +281,8 @@ class LoanApprovalPage extends Component {
             let postLoanTaskData = {
               status: "Scheduled",
               loan_application: data.id,
-              name: element.name,
+              // name: element.name,
+              name: element.activitytype.name,
             };
 
             if (!appTaskArray.includes(element.name)) {
