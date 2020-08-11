@@ -14,7 +14,7 @@
       "required": true
     },
     "payment_date": {
-      "type": "date"
+      "type": "datetime"
     },
     "expected_principal": {
       "type": "decimal",
@@ -40,7 +40,7 @@
       "via": "loan_app_installments"
     },
     "actual_payment_date": {
-      "type": "date"
+      "type": "datetime"
     }
   }
 }

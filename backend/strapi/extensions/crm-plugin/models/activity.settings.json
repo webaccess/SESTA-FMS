@@ -24,14 +24,20 @@
       "type": "richtext"
     },
     "activitytype": {
-      "via": "activities",
       "plugin": "crm-plugin",
-      "model": "activitytype"
+      "model": "activitytype",
+      "via": "activities"
     },
     "activityassignees": {
       "plugin": "crm-plugin",
-      "via": "activity",
-      "collection": "activityassignee"
+      "collection": "activityassignee",
+      "via": "activity"
+    },
+    "loan_application_installment": {
+      "model": "loan-application-installments"
+    },
+    "loan_application_task": {
+      "model": "loan-application-tasks"
     }
   }
 }

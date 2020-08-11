@@ -148,9 +148,11 @@ class LoanUpdateTaskPage extends Component {
     pendingAmount = "Rs. " + pendingAmount.toLocaleString();
 
     // get Loan Ends On Date
-    let sortedPaymentDate = loanAppData.loan_app_installments.sort((a, b) => new Date(...a.payment_date.split('/').reverse()) - new Date(...b.payment_date.split('/').reverse()));
-    let len = sortedPaymentDate.length - 1;
-    data.loanEndsOn = Moment(sortedPaymentDate[len].payment_date).format('DD MMM YYYY');
+    if (loanAppData.loan_app_installments.length > 0) {
+      let sortedPaymentDate = loanAppData.loan_app_installments.sort((a, b) => new Date(...a.payment_date.split('/').reverse()) - new Date(...b.payment_date.split('/').reverse()));
+      let len = sortedPaymentDate.length - 1;
+      data.loanEndsOn = Moment(sortedPaymentDate[len].payment_date).format('DD MMM YYYY');
+    }
 
     loantasks.map(task => {
       if (task.date != null) {

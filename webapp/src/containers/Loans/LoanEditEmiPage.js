@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import { EDIT_LOAN_EMI_BREADCRUMBS } from "./config";
 import Input from "../../components/UI/Input/Input";
-import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
+import DateTimepicker from "../../components/UI/DateTimepicker/DateTimepicker.js";
 import Button from "../../components/UI/Button/Button";
 import { Link } from "react-router-dom";
 import * as serviceProvider from "../../api/Axios";
@@ -129,11 +129,126 @@ class LoanEditEmiPage extends Component {
         postData
       )
       .then((res) => {
-        let app_id = res.data.loan_application["id"];
-        this.props.history.push("/loans/emi/" + app_id, {
-          loanAppData: this.props.location.state.loanAppData,
-          loanEditEmiPage: true
-        });
+        let updateActivityFlag;
+        if (auth.getUserInfo().role.name === 'CSP (Community Service Provider)') {
+
+          //get all activities
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
+            )
+            .then((resp) => {
+              resp.data.map(fdata => {
+
+                // Updated activity while updating loan emi by csp
+                if (fdata.loan_application_installment != null) {
+                  if (fdata.loan_application_installment.id === loanEmiId) {
+                    updateActivityFlag = true;
+                    fdata.start_datetime = this.state.values.actual_payment_date;
+                    fdata.end_datetime = this.state.values.actual_payment_date;
+                    delete fdata.contacts;
+                    fdata.contact = {
+                      id: auth.getUserInfo().contact.id
+                    }
+
+                    serviceProvider
+                      .serviceProviderForPutRequest(
+                        process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
+                        fdata.id,
+                        fdata
+                      )
+                      .then((activityRes) => { });
+                  }
+                }
+              })
+              if (!updateActivityFlag && resp.data.length !== 0) {
+                this.addActivity();
+              }
+
+              if (resp.data.length == 0) {
+                this.addActivity();
+              }
+            })
+
+          let app_id = res.data.loan_application["id"];
+          this.props.history.push("/loans/emi/" + app_id, {
+            loanAppData: this.props.location.state.loanAppData,
+            loanEditEmiPage: true
+          });
+        }
+      })
+  }
+
+  addActivity() {
+    let loanEmiId = this.props.location.state.loanEmiData.id;
+    let principalId, interestId;
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
+      )
+      .then((activityTypeResp) => {
+        activityTypeResp.data.map(type => {
+          if (type.name == "Collection of principal amount") {
+            principalId = type.id;
+          }
+          if (type.name == "Interest collection") {
+            interestId = type.id;
+          }
+        })
+
+        // add activity records while updating loan emi for the first time by csp
+        let activities = [
+          {
+            title: "Priniciple paid",
+            start_datetime: this.state.values.actual_payment_date,
+            end_datetime: this.state.values.actual_payment_date,
+            description: "",
+            activitytype: {
+              id: principalId,
+            },
+            loan_application_installment: {
+              id: loanEmiId
+            }
+          },
+          {
+            title: "Interest paid",
+            start_datetime: this.state.values.actual_payment_date,
+            end_datetime: this.state.values.actual_payment_date,
+            description: "",
+            activitytype: {
+              id: interestId,
+            },
+            loan_application_installment: {
+              id: loanEmiId
+            }
+          },
+        ];
+        activities.map(postdata => {
+          serviceProvider
+            .serviceProviderForPostRequest(
+              process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
+              postdata
+            )
+            .then((resp) => {
+              let cid = resp.data.id;
+
+              // add activityassingnees
+              let activityassignee = {
+                contact: {
+                  id: auth.getUserInfo().contact.id
+                },
+                activity: {
+                  id: cid
+                }
+              }
+              serviceProvider
+                .serviceProviderForPostRequest(
+                  process.env.REACT_APP_SERVER_URL + "crm-plugin/activityassignees",
+                  activityassignee
+                )
+                .then((assigneeResp) => {})
+            })
+        })
       })
   }
 
@@ -205,7 +320,7 @@ class LoanEditEmiPage extends Component {
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <Datepicker
+                  <DateTimepicker
                     label="Payment Date*"
                     name="actual_payment_date"
                     error={this.hasError("actual_payment_date")}
@@ -215,7 +330,7 @@ class LoanEditEmiPage extends Component {
                         : null
                     }
                     value={this.state.values.actual_payment_date || ""}
-                    format={"dd MMM yyyy"}
+                    // format={"dd MMM yyyy"}
                     onChange={(value) =>
                       this.setState({
                         values: { ...this.state.values, actual_payment_date: value }
