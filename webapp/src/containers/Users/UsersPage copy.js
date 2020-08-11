@@ -1,0 +1,627 @@
+import React, { Component } from "react";
+import Layout from "../../hoc/Layout/Layout";
+import * as serviceProvider from "../../api/Axios";
+import auth from "../../components/Auth/Auth";
+import Button from "../../components/UI/Button/Button";
+import Input from "../../components/UI/Input/Input";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardActions,
+  Divider,
+  Grid,
+} from "@material-ui/core";
+import { map } from "lodash";
+import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
+import { ADD_USERS_BREADCRUMBS, EDIT_USERS_BREADCRUMBS } from "./config";
+import { Link } from "react-router-dom";
+import Snackbar from "../../components/UI/Snackbar/Snackbar";
+import FormControl from "@material-ui/core/FormControl";
+import OutlinedInput from "@material-ui/core/OutlinedInput";
+import InputLabel from "@material-ui/core/InputLabel";
+import Autocomplete from "@material-ui/lab/Autocomplete";
+import Autotext from "../../components/Autotext/Autotext";
+
+class UsersPage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      values: {},
+      editContactId: "",
+      formSubmitted: "",
+      errorCode: "",
+      validations: {
+        firstName: {
+          required: { value: "true", message: "First name is required" },
+        },
+        lastName: {
+          required: { value: "true", message: "Last name is required" },
+        },
+        addEmail: {
+          required: {
+            value: "true",
+            message: "Email is required",
+          },
+          email: {
+            value: "true",
+            message: "Please enter valid email id",
+          },
+        },
+        addPhone: {
+          phone: {
+            value: "true",
+            message: "Please enter valid phone number",
+          },
+        },
+        username: {
+          required: { value: "true", message: "Username is required" },
+        },
+        password: {
+          required: { value: "true", message: "Password is required" },
+        },
+        role: {
+          required: { value: "true", message: "Role is required" },
+        },
+        selectField: {
+          required: { value: "true", message: "Field is required" },
+        },
+      },
+      rolesList: [],
+      roleWiseData: [],
+      errors: {},
+      editPage: [
+        this.props.match.params.id !== undefined ? true : false,
+        this.props.match.params.id,
+      ],
+    };
+  }
+
+  async componentDidMount() {
+    this.getRoles();
+  }
+
+  getRoles = () => {
+    let newRoleArray = [];
+    let roleArray = [];
+    // get all roles
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "users-permissions/roles"
+      )
+      .then((res) => {
+        if (auth.getUserInfo().role.name === "Sesta Admin") {
+          roleArray = [
+            "Sesta Admin",
+            "FPO Admin",
+            "CSP (Community Service Provider)",
+          ];
+        }
+        if (auth.getUserInfo().role.name === "FPO Admin") {
+          roleArray = ["FPO Admin", "CSP (Community Service Provider)"];
+        }
+
+        roleArray.forEach((e, i) => {
+          res.data.roles
+            .filter((item) => item.name === e)
+            .map((filteredRole) => {
+              newRoleArray.push(filteredRole);
+            });
+        });
+        this.setState({ rolesList: newRoleArray }, function () {
+          this.getDetails();
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  getDetails = () => {
+    if (this.state.editPage[0]) {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + "users/" + this.state.editPage[1]
+        )
+        .then((res) => {
+          console.log("--onload res --", res.data);
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/individuals/" +
+                res.data.contact.individual
+            )
+            .then((indRes) => {
+              this.handleRoleChange("", res.data.role);
+              let selectedField = "";
+              console.log("--indres--", indRes.data);
+              if (res.data.role.name === "FPO Admin") {
+                selectedField = indRes.fpo;
+              }
+              if (res.data.role.name === "CSP (Community Service Provider)") {
+                selectedField = indRes.vo;
+              }
+              console.log("--res.data.role--", res.data.role);
+              console.log("--res.selectedField.role--", selectedField);
+              this.setState({
+                values: {
+                  firstName: indRes.data.first_name,
+                  lastName: indRes.data.last_name,
+                  addPhone: res.data.contact.phone,
+                  addEmail: res.data.email,
+                  username: res.data.username,
+                  role: res.data.role,
+                  selectField: selectedField,
+                },
+                editContactId: res.data.contact.id,
+              });
+            })
+            .catch((error) => {});
+        })
+        .catch((error) => {});
+    }
+  };
+
+  hasError = (field) => {
+    if (this.state.errors[field] !== undefined) {
+      return Object.keys(this.state.errors).length > 0 &&
+        this.state.errors[field].length > 0
+        ? true
+        : false;
+    }
+  };
+
+  validate = () => {
+    const values = this.state.values;
+    const validations = this.state.validations;
+    map(validations, (validation, key) => {
+      let value = values[key] ? values[key] : "";
+      const errors = validateInput(value, validation);
+      let errorset = this.state.errors;
+      if (errors.length > 0) errorset[key] = errors;
+      else delete errorset[key];
+      this.setState({ errors: errorset });
+    });
+  };
+
+  handleChange = ({ target }) => {
+    this.setState({
+      values: { ...this.state.values, [target.name]: target.value },
+    });
+  };
+
+  handleRoleChange = (event, value) => {
+    console.log("--handlerolechange0--", value);
+    let apiUrl;
+    if (value !== null) {
+      this.setState({
+        values: {
+          ...this.state.values,
+          role: value,
+          roleName: value.name,
+        },
+      });
+      if (value.name === "CSP (Community Service Provider)") {
+        apiUrl =
+          "crm-plugin/contact/?contact_type=organization&organization.sub_type=VO&_sort=name:ASC";
+      } else if (value.name === "FPO Admin") {
+        apiUrl =
+          "crm-plugin/contact/?contact_type=organization&organization.sub_type=FPO&_sort=name:ASC";
+      }
+
+      // get all FPO/VO for role FPO admin/CSP respectively
+      serviceProvider
+        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + apiUrl)
+        .then((res) => {
+          this.setState({ roleWiseData: res.data });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      this.setState({
+        values: {
+          ...this.state.values,
+          role: "",
+          roleName: "",
+        },
+      });
+    }
+  };
+
+  handleFieldChange = (event, value) => {
+    if (value !== null) {
+      this.setState({
+        values: { ...this.state.values, selectField: value },
+      });
+    } else {
+      this.setState({
+        values: {
+          ...this.state.values,
+          selectField: "",
+        },
+      });
+    }
+  };
+
+  handleSubmit = async (e) => {
+    e.preventDefault();
+    this.validate();
+    this.setState({ formSubmitted: "" });
+    // if (Object.keys(this.state.errors).length > 0) return;
+
+    let fName = this.state.values.firstName;
+    let lName = this.state.values.lastName;
+    let emailAdd = this.state.values.addEmail;
+    let phoneNo = this.state.values.addPhone;
+    let postData = {
+      name: fName + " " + lName,
+      phone: phoneNo,
+      email: emailAdd,
+      contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
+        "Individual"
+      ][0],
+      first_name: fName,
+      last_name: lName,
+    };
+
+    if (this.state.editPage[0]) {
+      // edit present contact/individual record (update API)
+      serviceProvider
+        .serviceProviderForPutRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+          this.state.editContactId,
+          postData
+        )
+        .then((res) => {
+          console.log("--contact edit res--", res.data);
+          this.saveUser(res.data);
+        })
+        .catch((error) => {});
+    } else {
+      // entry gets saved in contact & individual table
+      serviceProvider
+        .serviceProviderForPostRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",
+          postData
+        )
+        .then((res) => {
+          console.log("--contact save res--", res.data);
+          this.saveUser(res.data);
+        })
+        .catch((error) => {});
+    }
+  };
+
+  saveUser = async (data) => {
+    let emailAdd = this.state.values.addEmail;
+    let username = this.state.values.username;
+    let password = this.state.values.password;
+    let roleId = this.state.values.role;
+    let selectFieldId = this.state.values.selectField;
+    let postUserData = {
+      username: username,
+      password: password,
+      role: roleId,
+      confirmed: true,
+      contact: data.id,
+      email: emailAdd,
+    };
+
+    let postIndividualData = {};
+    if (roleId) {
+      if (roleId.name === "CSP (Community Service Provider)") {
+        postIndividualData = {
+          vo: selectFieldId,
+          shg: 0,
+          fpo: 0,
+        };
+      }
+      if (roleId.name === "FPO Admin") {
+        postIndividualData = {
+          vo: 0,
+          shg: 0,
+          fpo: selectFieldId,
+        };
+      }
+    } else {
+      postIndividualData = {
+        vo: 0,
+        shg: 0,
+        fpo: 0,
+      };
+    }
+
+    if (this.state.editPage[0]) {
+      // edit user in Users table
+      serviceProvider
+        .serviceProviderForPutRequest(
+          process.env.REACT_APP_SERVER_URL + "users",
+          this.state.editPage[1],
+          postUserData
+        )
+        .then((res) => {
+          console.log("--edit user ers--", res.data);
+          // edit fpo/vo in Individuals table based on selected role
+          serviceProvider
+            .serviceProviderForPutRequest(
+              process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
+              data.individual.id,
+              postIndividualData
+            )
+            .then((res) => {
+              console.log("--edit ind ers--", res.data);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        })
+        .catch((error) => {});
+    } else {
+      // add user in Users table
+      serviceProvider
+        .serviceProviderForPostRequest(
+          process.env.REACT_APP_SERVER_URL + "users/",
+          postUserData
+        )
+        .then((res) => {
+          // add fpo/vo in Individuals table based on selected role
+          serviceProvider
+            .serviceProviderForPutRequest(
+              process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
+              data.individual.id,
+              postIndividualData
+            )
+            .then((res) => {})
+            .catch((error) => {
+              console.log(error);
+            });
+        })
+        .catch((error) => {});
+    }
+  };
+
+  cancelForm = () => {
+    this.setState({
+      values: {},
+      formSubmitted: "",
+    });
+  };
+
+  render() {
+    let loggedInUserRole = auth.getUserInfo().role.name;
+    let role = this.state.values.role;
+    let roleFilter = this.state.rolesList;
+    let roleName = this.state.values.roleName;
+    let selectField = this.state.values.selectField;
+    let roleWiseData = this.state.roleWiseData;
+
+    console.log("--render selectfield--", selectField);
+    return (
+      <Layout
+        breadcrumbs={
+          this.state.editPage[0]
+            ? EDIT_USERS_BREADCRUMBS
+            : ADD_USERS_BREADCRUMBS
+        }
+      >
+        <Card>
+          <form
+            autoComplete="off"
+            noValidate
+            onSubmit={this.handleSubmit}
+            method="post"
+          >
+            <CardHeader
+              title={this.state.editPage[0] ? "Edit user" : "Add user"}
+              subheader={
+                this.state.editPage[0]
+                  ? "You can edit user data here!"
+                  : "You can add new user data here!"
+              }
+            />
+            <Divider />
+            <CardContent>
+              <Grid container spacing={3}>
+                <Grid item md={12} xs={12}>
+                  {this.state.formSubmitted === false ? (
+                    <Snackbar severity="error" Showbutton={false}>
+                      {this.state.errorCode}
+                    </Snackbar>
+                  ) : null}
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Input
+                    fullWidth
+                    label="First Name*"
+                    name="firstName"
+                    error={this.hasError("firstName")}
+                    helperText={
+                      this.hasError("firstName")
+                        ? this.state.errors.firstName[0]
+                        : null
+                    }
+                    value={this.state.values.firstName || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Last Name*"
+                    name="lastName"
+                    error={this.hasError("lastName")}
+                    helperText={
+                      this.hasError("lastName")
+                        ? this.state.errors.lastName[0]
+                        : null
+                    }
+                    value={this.state.values.lastName || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Email*"
+                    type="email"
+                    name="addEmail"
+                    error={this.hasError("addEmail")}
+                    helperText={
+                      this.hasError("addEmail")
+                        ? this.state.errors["addEmail"].map((error) => {
+                            return error + " ";
+                          })
+                        : null
+                    }
+                    value={this.state.values.addEmail || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Phone Number"
+                    type="tel"
+                    name="addPhone"
+                    error={this.hasError("addPhone")}
+                    helperText={
+                      this.hasError("addPhone")
+                        ? this.state.errors.addPhone[0]
+                        : null
+                    }
+                    value={this.state.values.addPhone || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Username*"
+                    name="username"
+                    error={this.hasError("username")}
+                    helperText={
+                      this.hasError("username")
+                        ? this.state.errors.username[0]
+                        : null
+                    }
+                    value={this.state.values.username || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <FormControl variant="outlined">
+                    <InputLabel htmlFor="outlined-adornment-password">
+                      Password*
+                    </InputLabel>
+                    <OutlinedInput
+                      fullWidth
+                      name="password"
+                      type="password"
+                      error={this.hasError("password")}
+                      // value={this.state.password}
+                      onChange={this.handleChange}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Autocomplete
+                    id="select-role"
+                    name="role"
+                    value={role}
+                    options={roleFilter}
+                    variant="outlined"
+                    getOptionLabel={(option) => option.name}
+                    placeholder="Select Role*"
+                    onChange={this.handleRoleChange}
+                    renderInput={(params) => (
+                      <Input
+                        {...params}
+                        fullWidth
+                        label="Select Role*"
+                        name="role"
+                        variant="outlined"
+                        error={this.hasError("role")}
+                      />
+                    )}
+                  />
+                </Grid>
+                {(loggedInUserRole === "Sesta Admin" &&
+                  roleName === "FPO Admin") ||
+                (loggedInUserRole === "Sesta Admin" &&
+                  roleName === "CSP (Community Service Provider)") ||
+                (loggedInUserRole === "FPO Admin" &&
+                  roleName === "CSP (Community Service Provider)") ? (
+                  <Grid item md={6} xs={12}>
+                    <Autotext
+                      id="select-field"
+                      options={roleWiseData}
+                      variant="outlined"
+                      label={
+                        roleName === "CSP (Community Service Provider)"
+                          ? "Select Village Organization*"
+                          : roleName === "FPO Admin"
+                          ? "Select FPO*"
+                          : null
+                      }
+                      name="selectField"
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handleFieldChange(event, value);
+                      }}
+                      defaultValue={[]}
+                      value={
+                        selectField
+                          ? roleWiseData[
+                              roleWiseData.findIndex(function (item, i) {
+                                return item === selectField;
+                              })
+                            ] || null
+                          : null
+                      }
+                      error={this.hasError("selectField")}
+                      renderInput={(params) => (
+                        <Input
+                          {...params}
+                          fullWidth
+                          label={
+                            roleName === "CSP (Community Service Provider)"
+                              ? "Select Village Organization*"
+                              : roleName === "FPO Admin"
+                              ? "Select FPO*"
+                              : null
+                          }
+                          name="selectField"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                ) : null}
+              </Grid>
+            </CardContent>
+            <Divider />
+            <CardActions>
+              <Button type="submit">Save</Button>
+              <Button
+                color="secondary"
+                clicked={this.cancelForm}
+                component={Link}
+                to="/users"
+              >
+                Cancel
+              </Button>
+            </CardActions>
+          </form>
+        </Card>
+      </Layout>
+    );
+  }
+}
+
+export default UsersPage;
