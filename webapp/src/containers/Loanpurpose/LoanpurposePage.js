@@ -32,12 +32,12 @@ import Aux from "../../hoc/Auxiliary/Auxiliary.js";
 const useStyles = (theme) => ({
   Icon: {
     fontSize: "20px",
-    color: "#008000",
+    color: "black",
     "&:hover": {
-      color: "#008000",
+      color: "black",
     },
     "&:active": {
-      color: "#008000",
+      color: "black",
     },
   },
   labelHeader: {
@@ -198,11 +198,13 @@ class LoanpurposePage extends Component {
 
   createUI() {
     const { classes } = this.props;
-
     return this.state.users.map((el, i) => (
-      <div key={i}>
-        {i + 1}
+      <div key={i} class="emiTxtbox">
+        <span style={{ "font-weight": "bolder" }}>{i + 1}</span>
+
+        {/*<Grid item md={6} xs={12}>*/}
         <Input
+          style={{ "margin-left": "10px" }}
           label="Principal"
           type="number"
           name="principal"
@@ -214,8 +216,12 @@ class LoanpurposePage extends Component {
           onChange={this.handleUIChange.bind(this, i)}
           variant="outlined"
         />
-        &nbsp; &nbsp;
+        {/*</Grid>*/}
+
         <Input
+          style={{ "margin-left": "5%" }}
+          //style={{backgroundColor: "lightblue"}}
+
           label="Interest"
           type="number"
           name="interest"
@@ -231,6 +237,7 @@ class LoanpurposePage extends Component {
           <IconButton
             aria-label="remove"
             onClick={this.removeClick.bind(this, i)}
+            style={{ "margin-left": "3%" }}
           >
             <RemoveCircleOutlined className={classes.Icon} />
             <span className={classes.labelHeader}>Remove</span>
@@ -296,16 +303,20 @@ class LoanpurposePage extends Component {
   }
 
   handleUIChange(i, e) {
+    //console.log("i,e. in emi ---", e.target, e.target.value, i);
+
     const { name, value } = e.target;
     let users = [...this.state.users];
     users[i] = { ...users[i], [name]: value };
     this.setState({ users });
+    console.log("this.state.users in handleuichangev---", this.state.users);
   }
 
   removeClick(i, e) {
     let users = [...this.state.users];
     users.splice(i, 1);
     this.setState({ users });
+    console.log("this.state.users---", this.state.users);
   }
 
   handleTaskUIChange(event) {
@@ -319,11 +330,9 @@ class LoanpurposePage extends Component {
     }
 
     const { name, value, j } = event.target;
-
     let task = [...this.state.task];
     task[i] = { ...task[i], [name]: value };
     i++;
-
     this.setState({ task });
   }
 
@@ -377,9 +386,13 @@ class LoanpurposePage extends Component {
   };
 
   saveEmiDetails = async (data, Id) => {
-    if (data.emidetails.length > 1) {
+    console.log("---data, Id", data, Id);
+    console.log("this.state.users in saveemidetails---", this.state.users);
+    if (data.emidetails.length > 0) {
+      console.log("---emidetails length in update---", data.emidetails.length);
       for (let i in this.state.users) {
         if (this.state.users[i] && !data.emidetails[i]) {
+          console.log("--In first condition---");
           serviceProvider
             .serviceProviderForPostRequest(
               process.env.REACT_APP_SERVER_URL + "emidetails/",
@@ -393,17 +406,8 @@ class LoanpurposePage extends Component {
             .catch((error) => {
               console.log(error);
             });
-        } else if (data.emidetails[i] && !this.state.users[i]) {
-          serviceProvider
-            .serviceProviderForDeleteRequest(
-              process.env.REACT_APP_SERVER_URL + "emidetails",
-              data.emidetails[i].id
-            )
-            .then((res) => {})
-            .catch((error) => {
-              console.log(error);
-            });
         } else {
+          console.log("--In third condition---");
           serviceProvider
             .serviceProviderForPutRequest(
               process.env.REACT_APP_SERVER_URL + "emidetails",
@@ -420,7 +424,27 @@ class LoanpurposePage extends Component {
             });
         }
       }
+      if (data.emidetails.length > this.state.users.length) {
+        console.log("--In remove condition---");
+        for (let i in data.emidetails) {
+          console.log("--In remove condition for loop---");
+          if (!this.state.users[i] && data.emidetails[i]) {
+            console.log("--In remove condition if loop---");
+            serviceProvider
+              .serviceProviderForDeleteRequest(
+                process.env.REACT_APP_SERVER_URL + "emidetails",
+                data.emidetails[i].id
+              )
+              .then((res) => {})
+              .catch((error) => {
+                console.log(error);
+              });
+          }
+        }
+      }
+      //} else if (!this.state.users[i] && data.emidetails[i]) {
     } else {
+      console.log("---emidetails length in create---", data.emidetails.length);
       for (let i in this.state.users) {
         serviceProvider
           .serviceProviderForPostRequest(
@@ -440,14 +464,13 @@ class LoanpurposePage extends Component {
   };
 
   saveTaskDetails = async (data, Id) => {
-    if (data.loantasks.length > 1) {
+    if (data.loantasks.length > 0) {
       for (let i in this.state.task) {
         if (this.state.task[i] && !data.loantasks[i]) {
           serviceProvider
             .serviceProviderForPostRequest(
               process.env.REACT_APP_SERVER_URL + "loantasks/",
               {
-                //name: this.state.task[i].name,
                 activitytype: this.state.task[i].activitytype,
                 loan_model: Id,
               }
@@ -462,7 +485,6 @@ class LoanpurposePage extends Component {
               process.env.REACT_APP_SERVER_URL + "loantasks",
               data.loantasks[i].id,
               {
-                //name: this.state.task[i].name,
                 activitytype: this.state.task[i].activitytype,
                 loan_model: Id,
               }
@@ -473,13 +495,30 @@ class LoanpurposePage extends Component {
             });
         }
       }
+      if (data.loantasks.length > this.state.task.length) {
+        console.log("--In remove condition task---");
+        for (let i in data.loantasks) {
+          console.log("--In remove condition for loop---");
+          if (!this.state.task[i] && data.loantasks[i]) {
+            console.log("--In remove condition if loop---");
+            serviceProvider
+              .serviceProviderForDeleteRequest(
+                process.env.REACT_APP_SERVER_URL + "loantasks",
+                data.loantasks[i].id
+              )
+              .then((res) => {})
+              .catch((error) => {
+                console.log(error);
+              });
+          }
+        }
+      }
     } else {
       for (let i in this.state.task) {
         serviceProvider
           .serviceProviderForPostRequest(
             process.env.REACT_APP_SERVER_URL + "loantasks/",
             {
-              //name: this.state.task[i].name,
               activitytype: this.state.task[i].activitytype,
               loan_model: Id,
             }
@@ -503,7 +542,6 @@ class LoanpurposePage extends Component {
     let addAmount = this.state.values.addAmount;
     let addFPO = this.state.values.addFPO;
     let loanEmi = this.state.values.addEMI;
-
     let postLoan = {
       product_name: productName,
       duration: addDuration,
@@ -522,6 +560,10 @@ class LoanpurposePage extends Component {
           postLoan
         )
         .then((res) => {
+          console.log(
+            "---this.state.users.length in update",
+            this.state.users.length
+          );
           if (this.state.users) {
             this.saveEmiDetails(res.data, res.data.id);
           }
@@ -556,10 +598,14 @@ class LoanpurposePage extends Component {
         .then((res) => {
           let bankId = res.data.id;
           this.setState({ bankDeatilsId: bankId });
-          if (this.state.users) {
+          console.log("this.state.users", this.state.users.length);
+
+          if (this.state.users.length) {
+            console.log("this.state.users", this.state.users.length);
             this.saveEmiDetails(res.data, res.data.id);
           }
           if (this.state.task) {
+            console.log("this.state.task--", this.state.task);
             this.saveTaskDetails(res.data, res.data.id);
           }
           this.props.history.push({ pathname: "/loanpurposes", addData: true });
@@ -579,6 +625,8 @@ class LoanpurposePage extends Component {
   };
 
   render() {
+    //console.log("this.state.task in rener---", this.state.task);
+
     const { classes } = this.props;
     let fpoFilters = this.state.getFPO;
     let addFPO = this.state.values.addFPO;
@@ -746,7 +794,10 @@ class LoanpurposePage extends Component {
               </Grid>
               <Divider className="style.border " />
               <br />
-              EMI Installments
+              <span style={{ "margin-left": "10px", "font-weight": "bolder" }}>
+                {" "}
+                EMI Installments
+              </span>
               <br />
               <br />
               {this.createUI()}
