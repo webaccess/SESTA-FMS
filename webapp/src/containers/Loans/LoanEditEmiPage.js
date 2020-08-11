@@ -157,7 +157,7 @@ class LoanEditEmiPage extends Component {
                         fdata.id,
                         fdata
                       )
-                      .then((activityRes) => {});
+                      .then((activityRes) => { });
                   }
                 }
               })
@@ -181,61 +181,75 @@ class LoanEditEmiPage extends Component {
 
   addActivity() {
     let loanEmiId = this.props.location.state.loanEmiData.id;
-
-    // add activity records while updating loan emi for the first time by csp
-    let activities = [
-      {
-        title: "Priniciple paid",
-        start_datetime: this.state.values.actual_payment_date,
-        end_datetime: this.state.values.actual_payment_date,
-        description: "",
-        activitytype: {
-          id: 1,
-        },
-        loan_application_installment: {
-          id: loanEmiId
-        }
-      },
-      {
-        title: "Interest paid",
-        start_datetime: this.state.values.actual_payment_date,
-        end_datetime: this.state.values.actual_payment_date,
-        description: "",
-        activitytype: {
-          id: 2,
-        },
-        loan_application_installment: {
-          id: loanEmiId
-        }
-      },
-    ];
-    activities.map(postdata => {
-      serviceProvider
-        .serviceProviderForPostRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
-          postdata
-        )
-        .then((resp) => {
-          let cid = resp.data.id;
-
-          // add activityassingnees
-          let activityassignee = {
-            contact: {
-              id: auth.getUserInfo().contact.id
-            },
-            activity: {
-              id: cid
-            }
+    let principalId, interestId;
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
+      )
+      .then((activityTypeResp) => {
+        activityTypeResp.data.map(type => {
+          if (type.name == "Collection of principal amount") {
+            principalId = type.id;
           }
-          serviceProvider
-            .serviceProviderForPostRequest(
-              process.env.REACT_APP_SERVER_URL + "crm-plugin/activityassignees",
-              activityassignee
-            )
-            .then((assigneeResp) => {})
+          if (type.name == "Interest collection") {
+            interestId = type.id;
+          }
         })
 
-    })
+        // add activity records while updating loan emi for the first time by csp
+        let activities = [
+          {
+            title: "Priniciple paid",
+            start_datetime: this.state.values.actual_payment_date,
+            end_datetime: this.state.values.actual_payment_date,
+            description: "",
+            activitytype: {
+              id: principalId,
+            },
+            loan_application_installment: {
+              id: loanEmiId
+            }
+          },
+          {
+            title: "Interest paid",
+            start_datetime: this.state.values.actual_payment_date,
+            end_datetime: this.state.values.actual_payment_date,
+            description: "",
+            activitytype: {
+              id: interestId,
+            },
+            loan_application_installment: {
+              id: loanEmiId
+            }
+          },
+        ];
+        activities.map(postdata => {
+          serviceProvider
+            .serviceProviderForPostRequest(
+              process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
+              postdata
+            )
+            .then((resp) => {
+              let cid = resp.data.id;
+
+              // add activityassingnees
+              let activityassignee = {
+                contact: {
+                  id: auth.getUserInfo().contact.id
+                },
+                activity: {
+                  id: cid
+                }
+              }
+              serviceProvider
+                .serviceProviderForPostRequest(
+                  process.env.REACT_APP_SERVER_URL + "crm-plugin/activityassignees",
+                  activityassignee
+                )
+                .then((assigneeResp) => {})
+            })
+        })
+      })
   }
 
   cancelForm = () => {

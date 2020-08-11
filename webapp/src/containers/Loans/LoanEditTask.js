@@ -197,6 +197,7 @@ class LoanEditTask extends Component {
 
             let activitiyData = {
               title: loanTaskData.name,
+              start_datetime: this.state.values.editDate,
               description: loanTaskData.comments,
               activitytype: {
                 id: activityTypeId,
@@ -323,7 +324,7 @@ class LoanEditTask extends Component {
                         : null
                     }
                     value={this.state.values.editDate || ""}
-                    format={"dd MMM yyyy"}
+                    // format={"dd MMM yyyy"}
                     onChange={(value) =>
                       this.setState({
                         values: { ...this.state.values, editDate: value }
