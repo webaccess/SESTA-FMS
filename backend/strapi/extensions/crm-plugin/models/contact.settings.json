@@ -113,6 +113,11 @@
       "collection": "organization",
       "via": "vos"
     },
+    "org_fpo": {
+      "plugin": "crm-plugin",
+      "model": "organization",
+      "via": "fpo"
+    },
     "loan_applications": {
       "collection": "loan-application",
       "via": "contact"

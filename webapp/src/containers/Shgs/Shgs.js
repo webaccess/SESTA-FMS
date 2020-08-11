@@ -561,6 +561,7 @@ export class Shgs extends React.Component {
               rowsSelected={this.rowsSelect}
               modalHandle={this.modalHandle}
               columnsvalue={columnsvalue}
+              selectableRows
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (

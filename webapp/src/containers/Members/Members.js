@@ -598,6 +598,7 @@ export class Members extends React.Component {
                 DeleteData={this.DeleteData}
                 DeleteAll={this.DeleteAll}
                 columnsvalue={columnsvalue}
+                selectableRows
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (

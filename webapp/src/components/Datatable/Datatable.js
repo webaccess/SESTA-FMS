@@ -423,7 +423,7 @@ const Table = (props) => {
             contextActions={contextActions}
             actions={handleEditEvent}
             onSelectedRowsChange={handleChange}
-            selectableRows
+            selectableRows={props.selectableRows}
             searchFilter={searchFilter}
             highlightOnHover
             clearSelectedRows={toggleCleared}

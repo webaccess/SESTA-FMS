@@ -19,6 +19,7 @@ import * as serviceProvider from "../../api/Axios";
 import Moment from "moment";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
+import auth from "../../components/Auth/Auth.js";
 
 class LoanEditTask extends Component {
   constructor(props) {
@@ -135,12 +136,103 @@ class LoanEditTask extends Component {
         postData
       )
       .then((res) => {
+        let updateActivityFlag;
+        if (auth.getUserInfo().role.name === 'CSP (Community Service Provider)') {
+
+          //get all activities
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
+            )
+            .then((resp) => {
+              resp.data.map(fdata => {
+                if (fdata.loan_application_task != null) {
+                  if (fdata.loan_application_task.id == loanTaskData.id) {
+                    updateActivityFlag = true;
+                    delete fdata.contacts;
+                    fdata.contact = {
+                      id: auth.getUserInfo().contact.id
+                    }
+                    fdata.description = loanTaskData.comments;
+                    serviceProvider
+                      .serviceProviderForPutRequest(
+                        process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
+                        fdata.id,
+                        fdata
+                      )
+                      .then((activtyRes) => { });
+                  }
+                }
+              })
+              if (!updateActivityFlag && resp.data.length !== 0) {
+                this.addActivity();
+              }
+
+              if (resp.data.length == 0) {
+                this.addActivity();
+              }
+            })
+        }
         this.setState({ formSubmitted: true });
         let app_id = res.data.loan_application["id"];
         this.props.history.push("/loan/update/" + app_id, {
           loanAppData: this.props.location.state.loanAppData,
           loanEditTaskPage: true
         });
+      })
+  }
+
+  addActivity() {
+    let loanTaskData = this.props.location.state.loantask;
+    let loanAppId = this.props.location.state.loantask.id;
+
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
+      )
+      .then((activityTypeResp) => {
+        activityTypeResp.data.map(type => {
+          if (type.name == loanTaskData.name) {
+            let activityTypeId = type.id;
+
+            let activitiyData = {
+              title: loanTaskData.name,
+              start_datetime: this.state.values.editDate,
+              description: loanTaskData.comments,
+              activitytype: {
+                id: activityTypeId,
+              },
+              loan_application_task: {
+                id: loanAppId
+              }
+            }
+
+            serviceProvider
+              .serviceProviderForPostRequest(
+                process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
+                activitiyData
+              )
+              .then((resp) => {
+                let cid = resp.data.id;
+
+                // add activityassingnees
+                let activityassignee = {
+                  contact: {
+                    id: auth.getUserInfo().contact.id
+                  },
+                  activity: {
+                    id: cid
+                  }
+                }
+                serviceProvider
+                  .serviceProviderForPostRequest(
+                    process.env.REACT_APP_SERVER_URL + "crm-plugin/activityassignees",
+                    activityassignee
+                  )
+                  .then((assigneeResp) => {})
+              })
+          }
+        })
       })
   }
 
@@ -232,7 +324,7 @@ class LoanEditTask extends Component {
                         : null
                     }
                     value={this.state.values.editDate || ""}
-                    format={"dd MMM yyyy"}
+                    // format={"dd MMM yyyy"}
                     onChange={(value) =>
                       this.setState({
                         values: { ...this.state.values, editDate: value }

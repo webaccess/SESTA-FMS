@@ -42,6 +42,7 @@
       "dominant": true
     },
     "fpo": {
+      "via": "org_fpo",
       "plugin": "crm-plugin",
       "model": "contact"
     }

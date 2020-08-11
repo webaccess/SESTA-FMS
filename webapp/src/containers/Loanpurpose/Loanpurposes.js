@@ -1,7 +1,7 @@
 import React from "react";
-import axios from "axios";
 import Table from "../../components/Datatable/Datatable.js";
 import Layout from "../../hoc/Layout/Layout";
+import * as serviceProvider from "../../api/Axios";
 import Button from "../../components/UI/Button/Button";
 import { withStyles, ThemeProvider } from "@material-ui/core/styles";
 import style from "./Loanpurpose.module.css";
@@ -72,12 +72,10 @@ export class Loanpurposes extends React.Component {
   }
   async componentDidMount() {
     //api call for loanpurpose filter
-    await axios
-      .get(process.env.REACT_APP_SERVER_URL + "loan-models/", {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "loan-models/"
+      )
       .then((res) => {
         this.setState({ data: res.data });
       })
@@ -98,12 +96,11 @@ export class Loanpurposes extends React.Component {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
-      axios
-        .delete(process.env.REACT_APP_SERVER_URL + "loan-models/" + cellid, {
-          headers: {
-            Authorization: "Bearer " + auth.getToken() + "",
-          },
-        })
+      serviceProvider
+        .serviceProviderForDeleteRequest(
+          process.env.REACT_APP_SERVER_URL + "loan-models",
+          cellid
+        )
         .then((res) => {
           if (res.data.emidetails) {
             this.deleteEmiDet(res.data.emidetails);
@@ -123,14 +120,10 @@ export class Loanpurposes extends React.Component {
 
   deleteEmiDet = (emiDet) => {
     for (let i in emiDet) {
-      axios
-        .delete(
-          process.env.REACT_APP_SERVER_URL + "emidetails/" + emiDet[i].id,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+      serviceProvider
+        .serviceProviderForDeleteRequest(
+          process.env.REACT_APP_SERVER_URL + "emidetails",
+          emiDet[i].id
         )
         .then((res) => {})
         .catch((error) => {
@@ -140,12 +133,11 @@ export class Loanpurposes extends React.Component {
   };
 
   deleteTaskDet = (id) => {
-    axios
-      .delete(process.env.REACT_APP_SERVER_URL + "loantasks/" + id, {
-        headers: {
-          Authorization: "Bearer " + auth.getToken() + "",
-        },
-      })
+    serviceProvider
+      .serviceProviderForDeleteRequest(
+        process.env.REACT_APP_SERVER_URL + "loantasks",
+        id
+      )
       .then((res) => {})
       .catch((error) => {
         console.log(error);
@@ -155,14 +147,10 @@ export class Loanpurposes extends React.Component {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       for (let i in selectedId) {
-        axios
-          .delete(
-            process.env.REACT_APP_SERVER_URL + "loan-models/" + selectedId[i],
-            {
-              headers: {
-                Authorization: "Bearer " + auth.getToken() + "",
-              },
-            }
+        serviceProvider
+          .serviceProviderForDeleteRequest(
+            process.env.REACT_APP_SERVER_URL + "loan-models",
+            selectedId[i]
           )
           .then((res) => {
             if (res.data.emidetails) {
@@ -194,16 +182,11 @@ export class Loanpurposes extends React.Component {
   handleSearch() {
     if (this.state.filterProduct) {
       //call api for searching product name
-      axios
-        .get(
+      serviceProvider
+        .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "loan-models?product_name_contains=" +
-            this.state.filterProduct,
-          {
-            headers: {
-              Authorization: "Bearer " + auth.getToken() + "",
-            },
-          }
+            this.state.filterProduct
         )
         .then((res) => {
           this.setState({ data: res.data });
@@ -347,6 +330,7 @@ export class Loanpurposes extends React.Component {
                 rowsSelected={this.rowsSelect}
                 modalHandle={this.modalHandle}
                 columnsvalue={columnsvalue}
+                selectableRows
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (

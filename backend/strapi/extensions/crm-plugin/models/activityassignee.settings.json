@@ -11,14 +11,14 @@
   },
   "attributes": {
     "activity": {
-      "plugin": "crm-plugin",
-      "model": "activity",
-      "via": "activityassignees"
-    },
-    "contact": {
       "via": "activityassignees",
       "plugin": "crm-plugin",
-      "model": "contact"
+      "model": "activity"
+    },
+    "contact": {
+      "plugin": "crm-plugin",
+      "model": "contact",
+      "via": "activityassignees"
     }
   }
 }

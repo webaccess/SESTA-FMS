@@ -20,9 +20,9 @@
       "default": true
     },
     "activities": {
+      "via": "activitytype",
       "plugin": "crm-plugin",
-      "collection": "activity",
-      "via": "activitytype"
+      "collection": "activity"
     },
     "remuneration": {
       "type": "decimal",

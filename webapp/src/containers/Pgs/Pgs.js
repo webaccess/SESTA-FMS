@@ -356,6 +356,7 @@ export class Pgs extends React.Component {
                 DeleteAll={this.DeleteAll}
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
+                selectableRows
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (
