@@ -76,9 +76,9 @@
       "via": "contact"
     },
     "activitytypes": {
-      "via": "contact",
       "plugin": "crm-plugin",
-      "collection": "activitytype"
+      "collection": "activitytype",
+      "via": "contact"
     },
     "block": {
       "type": "string"
@@ -96,31 +96,30 @@
       "via": "contact"
     },
     "loan_model": {
-      "via": "fpo",
-      "model": "loan-model"
+      "model": "loan-model",
+      "via": "fpo"
     },
     "loan_app_approvedby": {
-      "via": "approved_by",
-      "model": "loan-application"
+      "model": "loan-application",
+      "via": "approved_by"
     },
     "organization": {
-      "via": "contact",
       "plugin": "crm-plugin",
-      "model": "organization"
+      "model": "organization",
+      "via": "contact"
     },
     "org_vos": {
-      "via": "vos",
       "plugin": "crm-plugin",
-      "collection": "organization"
-    },
-    "org_fpo": {
-      "via": "fpo",
-      "plugin": "crm-plugin",
-      "model": "organization"
+      "collection": "organization",
+      "via": "vos"
     },
     "loan_applications": {
-      "via": "contact",
-      "collection": "loan-application"
+      "collection": "loan-application",
+      "via": "contact"
+    },
+    "creator_id": {
+      "plugin": "crm-plugin",
+      "model": "contact"
     }
   }
 }

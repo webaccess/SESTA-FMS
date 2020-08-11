@@ -108,7 +108,7 @@ class VoPage extends Component {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
-    // if (Object.keys(this.state.errors).length > 0) return;
+    if (Object.keys(this.state.errors).length > 0) return;
     let voName = this.state.values.addVo;
     let voAddress = this.state.values.addVoAddress;
     let person = this.state.values.addPerson;
@@ -125,8 +125,8 @@ class VoPage extends Component {
       address_1: voAddress,
       block: block,
       gp: gp,
+      creator_id: auth.getUserInfo().contact.id,
     };
-    if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
       // for edit Vo page
       serviceProvider

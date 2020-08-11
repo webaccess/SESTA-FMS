@@ -10,8 +10,6 @@ import { Grid } from "@material-ui/core";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import Modal from "../../components/UI/Modal/Modal.js";
-import Switch from "../../components/UI/Switch/Switch";
 import Autocomplete from "../../components/Autocomplete/Autocomplete";
 import { map } from "lodash";
 
@@ -75,24 +73,11 @@ export class Members extends React.Component {
       dataCellId: [],
       singleDelete: "",
       multipleDelete: "",
-      rolesList: [],
     };
   }
 
   async componentDidMount() {
-    // get all roles
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "users-permissions/roles"
-      )
-      .then((res) => {
-        this.setState({ rolesList: res.data.roles }, function () {
-          this.getMembers();
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    this.getMembers();
 
     // get all SHGs
     serviceProvider
@@ -109,13 +94,19 @@ export class Members extends React.Component {
   }
 
   getMembers = () => {
+    let newDataArray = [];
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
           "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC"
       )
       .then((res) => {
-        this.updateRoleIdWithName(res.data);
+        res.data.map((e, i) => {
+          if (e.user === null) {
+            newDataArray.push(e); // add only those contacts having contact type=individual & users===null
+          }
+        });
+        this.setState({ data: newDataArray });
       })
       .catch((error) => {
         console.log(error);
@@ -132,26 +123,6 @@ export class Members extends React.Component {
       .catch((error) => {
         console.log(error);
       });
-  };
-
-  updateRoleIdWithName = (data, index) => {
-    data.forEach((element, index) => {
-      if (element.user) {
-        this.state.rolesList
-          .filter((role) => role.id === element.user.role)
-          .map((filteredRole) => {
-            Object.assign(data[index], {
-              userRole: filteredRole.name ? filteredRole.name : "",
-            });
-            this.setState({ data: data });
-          });
-      } else {
-        Object.assign(data[index], {
-          userRole: "",
-        });
-        this.setState({ data: data });
-      }
-    });
   };
 
   handleStateChange = async (event, value) => {
@@ -264,6 +235,7 @@ export class Members extends React.Component {
     }
 
     //api call after search filter
+    let newDataArray = [];
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
@@ -271,11 +243,12 @@ export class Members extends React.Component {
           searchData
       )
       .then((res) => {
-        if (res.data.length > 0) {
-          this.updateRoleIdWithName(res.data);
-        } else {
-          this.setState({ data: res.data });
-        }
+        res.data.map((e, i) => {
+          if (e.user === null) {
+            newDataArray.push(e);
+          }
+        });
+        this.setState({ data: newDataArray });
       })
       .catch((error) => {
         console.log(error);
@@ -298,9 +271,6 @@ export class Members extends React.Component {
         .then((res) => {
           if (res.data.shareinformation) {
             this.deleteShareInfo(res.data.shareinformation.id);
-          }
-          if (res.data.user) {
-            this.deleteUserInfo(res.data.user.id);
           }
           this.setState({ singleDelete: res.data.name });
           this.setState({ dataCellId: "" });
@@ -325,18 +295,6 @@ export class Members extends React.Component {
       });
   };
 
-  deleteUserInfo = async (id) => {
-    serviceProvider
-      .serviceProviderForDeleteRequest(
-        process.env.REACT_APP_SERVER_URL + "users",
-        id
-      )
-      .then((res) => {})
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
@@ -350,9 +308,6 @@ export class Members extends React.Component {
           .then((res) => {
             if (res.data.shareinformation) {
               this.deleteShareInfo(res.data.shareinformation.id);
-            }
-            if (res.data.user) {
-              this.deleteUserInfo(res.data.user.id);
             }
             this.setState({ multipleDelete: true });
             this.componentDidMount();
@@ -417,11 +372,6 @@ export class Members extends React.Component {
       {
         name: "Name",
         selector: "name",
-        sortable: true,
-      },
-      {
-        name: "Role",
-        selector: "userRole",
         sortable: true,
       },
       {
@@ -636,7 +586,6 @@ export class Members extends React.Component {
                 filterData={true}
                 filterBy={[
                   "name",
-                  "userRole",
                   "villages[0].name",
                   "district.name",
                   "phone",

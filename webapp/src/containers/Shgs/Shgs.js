@@ -69,6 +69,7 @@ export class Shgs extends React.Component {
       isCancel: false,
       singleDelete: "",
       multipleDelete: "",
+      creatorId: auth.getUserInfo().contact.id,
     };
   }
 
@@ -76,7 +77,9 @@ export class Shgs extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC"
+          "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&creator_id=" +
+          this.state.creatorId +
+          "&_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ data: res.data });
@@ -280,7 +283,9 @@ export class Shgs extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC&&" +
+          "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&creator_id=" +
+          this.state.creatorId +
+          "&_sort=name:ASC" +
           searchData
       )
       .then((res) => {

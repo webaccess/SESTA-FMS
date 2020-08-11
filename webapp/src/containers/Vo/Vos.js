@@ -74,6 +74,7 @@ export class Vos extends React.Component {
       isCancel: false,
       singleDelete: "",
       multipleDelete: "",
+      creatorId: auth.getUserInfo().contact.id,
     };
   }
 
@@ -81,7 +82,9 @@ export class Vos extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&organization.sub_type=VO&_sort=name:ASC"
+          "crm-plugin/contact/?contact_type=organization&organization.sub_type=VO&creator_id=" +
+          this.state.creatorId +
+          "&_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ data: res.data });
@@ -255,7 +258,9 @@ export class Vos extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC&&" +
+          "crm-plugin/contact/?contact_type=organization&organization.sub_type=VO&creator_id=" +
+          this.state.creatorId +
+          "&_sort=name:ASC&" +
           searchData
       )
       .then((res) => {
@@ -268,9 +273,6 @@ export class Vos extends React.Component {
 
   render() {
     let data = this.state.data;
-    if (data.length !== 0) {
-    }
-
     const Usercolumns = [
       {
         name: "Village Organization",

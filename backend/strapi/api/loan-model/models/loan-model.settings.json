@@ -31,9 +31,9 @@
       "required": true
     },
     "fpo": {
+      "via": "loan_model",
       "plugin": "crm-plugin",
-      "model": "contact",
-      "via": "loan_model"
+      "model": "contact"
     },
     "loan_applications": {
       "via": "loan_model",

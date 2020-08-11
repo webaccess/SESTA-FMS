@@ -36,6 +36,7 @@ class ShgPage extends Component {
       getVillageOrganization: [],
       bankInfoId: "",
       formSubmitted: "",
+      creatorId: auth.getUserInfo().contact.id,
       validations: {
         addShg: {
           required: { value: "true", message: "Shg name is required" },
@@ -158,7 +159,9 @@ class ShgPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&organization.sub_type=VO&&_sort=name:ASC"
+          "crm-plugin/contact/?contact_type=organization&organization.sub_type=VO&creator_id=" +
+          this.state.creatorId +
+          "&_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ getVillageOrganization: res.data });
@@ -310,6 +313,7 @@ class ShgPage extends Component {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
+    if (Object.keys(this.state.errors).length > 0) return;
     let shgName = this.state.values.addShg;
     let shgAddress = this.state.values.addAddress;
     let shgPersonInCharge = this.state.values.addPointOfContact;
@@ -336,8 +340,8 @@ class ShgPage extends Component {
         id: shgVillage,
       },
       vos: shgVo,
+      creator_id: auth.getUserInfo().contact.id,
     };
-    if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
       // edit SHG data
       serviceProvider
