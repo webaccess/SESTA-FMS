@@ -165,7 +165,6 @@ export class Loanpurposes extends React.Component {
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
-
             console.log("err", error);
           });
       }
@@ -327,9 +326,9 @@ export class Loanpurposes extends React.Component {
                 column={Usercolumns}
                 editData={this.editData}
                 DeleteData={this.DeleteData}
+                clearSelected={this.clearSelected}
                 DeleteAll={this.DeleteAll}
                 rowsSelected={this.rowsSelect}
-                modalHandle={this.modalHandle}
                 columnsvalue={columnsvalue}
                 selectableRows
                 DeleteMessage={"Are you Sure you want to Delete"}

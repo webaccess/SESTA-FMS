@@ -353,7 +353,6 @@ class LoanpurposePage extends Component {
     let users = [...this.state.users];
     users.splice(i, 1);
     this.setState({ users });
-    console.log("this.state.users---", this.state.users);
   }
 
   handleTaskUIChange(event) {
