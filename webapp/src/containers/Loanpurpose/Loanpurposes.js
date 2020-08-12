@@ -7,7 +7,6 @@ import { withStyles, ThemeProvider } from "@material-ui/core/styles";
 import style from "./Loanpurpose.module.css";
 import { Link } from "react-router-dom";
 import { Grid } from "@material-ui/core";
-import auth from "../../components/Auth/Auth.js";
 import Input from "../../components/UI/Input/Input";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 
@@ -309,7 +308,6 @@ export class Loanpurposes extends React.Component {
               <Button
                 color="secondary"
                 variant="contained"
-                // clicked={this.cancelForm}
                 onClick={this.cancelForm.bind(this)}
               >
                 Reset

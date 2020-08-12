@@ -1,16 +1,10 @@
 import React, { Component, useState } from "react";
 import Layout from "../../hoc/Layout/Layout";
 import * as serviceProvider from "../../api/Axios";
-import axios from "axios";
 import auth from "../../components/Auth/Auth";
 import { withStyles } from "@material-ui/core/styles";
-import style from "./Loanpurpose.module.css";
 import IconButton from "@material-ui/core/IconButton";
-import {
-  AddCircleOutlined,
-  RemoveCircleOutlined,
-  ContactPhoneOutlined,
-} from "@material-ui/icons";
+import { AddCircleOutlined, RemoveCircleOutlined } from "@material-ui/icons";
 import Button from "../../components/UI/Button/Button";
 import Autotext from "../../components/Autotext/Autotext.js";
 import Autocomplete from "@material-ui/lab/Autocomplete";
@@ -31,7 +25,6 @@ import {
 } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import Aux from "../../hoc/Auxiliary/Auxiliary.js";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -60,7 +53,6 @@ class LoanpurposePage extends Component {
       addPurpose: "",
       users: [{ principal: "", interest: "" }],
       task: [{ activitytype: "" }],
-      //task: "",
       getFPO: [],
       actTypeFilter: [],
       validations: {
@@ -188,20 +180,24 @@ class LoanpurposePage extends Component {
       });
   }
 
+  //adds input fields corresponding to no of clicks
   addClick() {
     this.setState((prevState) => ({
       users: [...prevState.users, { principal: "", interest: "" }],
     }));
   }
 
+  //adds input fields corresponding to no of clicks
   addTaskClick() {
     this.setState((prevState) => ({
       task: [...prevState.task, { name: "" }],
     }));
   }
 
+  // displays EMI installment part
   createUI() {
     const { classes } = this.props;
+    // displays no of input field pairs as per the EMI entries present
     return this.state.users.map((el, i) => (
       <div key={i} class="emiTxtbox">
         <Grid container spacing={2}>
@@ -269,10 +265,11 @@ class LoanpurposePage extends Component {
     ));
   }
 
+  // displays loan tasks part
   createTaskUI() {
     const { classes } = this.props;
     let actTypeFilter = this.state.actTypeFilter;
-
+    // displays no of input fields  as per the loan tasks present
     return this.state.task.map((el, i) => (
       <div key={i}>
         <Grid container spacing={2}>
@@ -296,12 +293,6 @@ class LoanpurposePage extends Component {
               }}
             >
               <Autocomplete
-                //style={{
-                //width: "48%",
-                //  position: "relative",
-                //  left: "30px",
-                //  bottom: "25px",
-                //}}
                 id="name"
                 value={el.activitytype}
                 options={actTypeFilter}
@@ -341,7 +332,7 @@ class LoanpurposePage extends Component {
       </div>
     ));
   }
-
+  // handles the change of EMI installments
   handleUIChange(i, e) {
     const { name, value } = e.target;
     let users = [...this.state.users];
@@ -349,16 +340,19 @@ class LoanpurposePage extends Component {
     this.setState({ users });
   }
 
+  // removing input field on click along with the data present in it
   removeClick(i, e) {
     let users = [...this.state.users];
     users.splice(i, 1);
     this.setState({ users });
   }
 
+  // handles the change of loan tasks
   handleTaskUIChange(event) {
     let taskData = this.state.task;
     let i;
 
+    // passing index to be stored against each entry
     if (taskData) {
       i = taskData.length - 1;
     } else {
@@ -372,6 +366,7 @@ class LoanpurposePage extends Component {
     this.setState({ task });
   }
 
+  // removing input field on click along with the data present in it
   removeTaskClick(i) {
     let task = [...this.state.task];
     task.splice(i, 1);
@@ -422,8 +417,10 @@ class LoanpurposePage extends Component {
   };
 
   saveEmiDetails = async (data, Id) => {
+    // checking if EMI details for resp. loan model already exist
     if (data.emidetails.length > 0) {
       for (let i in this.state.users) {
+        // creating new EMI entry for existing loan model
         if (this.state.users[i] && !data.emidetails[i]) {
           serviceProvider
             .serviceProviderForPostRequest(
@@ -439,6 +436,7 @@ class LoanpurposePage extends Component {
               console.log(error);
             });
         } else {
+          // updating  EMI entry of exisiting loan model
           serviceProvider
             .serviceProviderForPutRequest(
               process.env.REACT_APP_SERVER_URL + "emidetails",
@@ -455,6 +453,7 @@ class LoanpurposePage extends Component {
             });
         }
       }
+      // deleting an EMI entry of exisiting loan model
       if (data.emidetails.length > this.state.users.length) {
         for (let i in data.emidetails) {
           if (!this.state.users[i] && data.emidetails[i]) {
@@ -470,7 +469,8 @@ class LoanpurposePage extends Component {
           }
         }
       }
-    } else {
+    } // creating new EMI entry for newly added loan model
+    else {
       for (let i in this.state.users) {
         serviceProvider
           .serviceProviderForPostRequest(
@@ -490,8 +490,10 @@ class LoanpurposePage extends Component {
   };
 
   saveTaskDetails = async (data, Id) => {
+    // checking if loan tasks for resp. loan model already exist
     if (data.loantasks.length > 0) {
       for (let i in this.state.task) {
+        // creating new loan task  for exisiting. loan model
         if (this.state.task[i] && !data.loantasks[i]) {
           serviceProvider
             .serviceProviderForPostRequest(
@@ -506,6 +508,7 @@ class LoanpurposePage extends Component {
               console.log(error);
             });
         } else {
+          // updating loan task of exisiting loan model
           serviceProvider
             .serviceProviderForPutRequest(
               process.env.REACT_APP_SERVER_URL + "loantasks",
@@ -521,6 +524,7 @@ class LoanpurposePage extends Component {
             });
         }
       }
+      // deleting loan task of exisiting loan model
       if (data.loantasks.length > this.state.task.length) {
         for (let i in data.loantasks) {
           if (!this.state.task[i] && data.loantasks[i]) {
@@ -536,7 +540,8 @@ class LoanpurposePage extends Component {
           }
         }
       }
-    } else {
+    } // creating loan task for newly added loan model
+    else {
       for (let i in this.state.task) {
         serviceProvider
           .serviceProviderForPostRequest(
@@ -573,9 +578,7 @@ class LoanpurposePage extends Component {
       fpo: addFPO,
       emi: loanEmi,
     };
-    //if (Object.keys(this.state.errors).length > 0) return;q
     if (this.state.editPage[0]) {
-      // let bankIds = "";
       serviceProvider
         .serviceProviderForPutRequest(
           process.env.REACT_APP_SERVER_URL + "loan-models",
