@@ -1,16 +1,10 @@
 import React, { Component, useState } from "react";
 import Layout from "../../hoc/Layout/Layout";
 import * as serviceProvider from "../../api/Axios";
-import axios from "axios";
 import auth from "../../components/Auth/Auth";
 import { withStyles } from "@material-ui/core/styles";
-import style from "./Loanpurpose.module.css";
 import IconButton from "@material-ui/core/IconButton";
-import {
-  AddCircleOutlined,
-  RemoveCircleOutlined,
-  ContactPhoneOutlined,
-} from "@material-ui/icons";
+import { AddCircleOutlined, RemoveCircleOutlined } from "@material-ui/icons";
 import Button from "../../components/UI/Button/Button";
 import Autotext from "../../components/Autotext/Autotext.js";
 import Autocomplete from "@material-ui/lab/Autocomplete";
@@ -31,7 +25,6 @@ import {
 } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import Aux from "../../hoc/Auxiliary/Auxiliary.js";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -60,7 +53,6 @@ class LoanpurposePage extends Component {
       addPurpose: "",
       users: [{ principal: "", interest: "" }],
       task: [{ activitytype: "" }],
-      //task: "",
       getFPO: [],
       actTypeFilter: [],
       validations: {
@@ -188,177 +180,179 @@ class LoanpurposePage extends Component {
       });
   }
 
+  //adds input fields corresponding to no of clicks
   addClick() {
     this.setState((prevState) => ({
       users: [...prevState.users, { principal: "", interest: "" }],
     }));
   }
 
+  //adds input fields corresponding to no of clicks
   addTaskClick() {
     this.setState((prevState) => ({
       task: [...prevState.task, { name: "" }],
     }));
   }
 
+  // displays EMI installment part
   createUI() {
     const { classes } = this.props;
+    // displays no of input field pairs as per the EMI entries present
     return this.state.users.map((el, i) => (
-      <div
-        key={i}
-        class="emiTxtbox"
-        style={{
-          position: "relative",
-          //bottom: "26px"
-        }}
-      >
-        <span style={{ "font-weight": "bolder", "font-size": "large" }}>
-          {i + 1}
-        </span>
+      <div key={i} class="emiTxtbox">
+        <Grid container spacing={2}>
+          <Grid item md={6} xs={12}>
+            <span
+              style={{
+                "font-weight": "bolder",
+                "font-size": "large",
+                display: "inline-block",
+                width: "25px",
+                "vertical-align": "middle",
+              }}
+            >
+              {i + 1}
+            </span>
 
-        {/*<Grid item md={6} xs={12}>*/}
-        {/*<div style={{ position: "relative", left: "23px", bottom: "25px" }}>*/}
-        <Input
-          style={{ "margin-left": "10px", "margin-bottom": "15px" }}
-          label="Principal"
-          type="number"
-          name="principal"
-          value={
-            //this.state.users.length > 1 && i < this.state.users.length
-            //  ? this.state.users[i].principal
-            el.principal
-          }
-          onChange={this.handleUIChange.bind(this, i)}
-          variant="outlined"
-        />
-        <Input
-          style={{ "margin-left": "5%" }}
-          //style={{backgroundColor: "lightblue"}}
+            <span
+              style={{
+                display: "inline-block",
+                width: "calc(100% - 25px)",
+                "vertical-align": "middle",
+              }}
+            >
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <Input
+                    style={{ "margin-left": "2%" }}
+                    label="Principal"
+                    type="number"
+                    name="principal"
+                    value={el.principal}
+                    onChange={this.handleUIChange.bind(this, i)}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <Input
+                    style={{ "margin-left": "5%" }}
+                    label="Interest"
+                    type="number"
+                    name="interest"
+                    value={el.interest}
+                    onChange={this.handleUIChange.bind(this, i)}
+                    variant="outlined"
+                  />
+                </Grid>
+              </Grid>
+            </span>
+          </Grid>
 
-          label="Interest"
-          type="number"
-          name="interest"
-          value={
-            //this.state.users.length > 1 && i < this.state.users.length
-            //  ? this.state.users[i].interest
-            el.interest
-          }
-          onChange={this.handleUIChange.bind(this, i)}
-          variant="outlined"
-        />
-        {/*</div>*/}
-        {/*<div style={{ position: "relative", bottom: "37px", left: "60%" }}>*/}
-
-        {this.state.users.length !== 1 && (
-          <IconButton
-            aria-label="remove"
-            onClick={this.removeClick.bind(this, i)}
-            style={{ "margin-left": "3%" }}
-          >
-            <RemoveCircleOutlined className={classes.Icon} />
-            <span className={classes.labelHeader}>Remove</span>
-          </IconButton>
-        )}
-        {/*</div>*/}
+          <Grid item md={6} xs={12}>
+            {this.state.users.length !== 1 && (
+              <IconButton
+                aria-label="remove"
+                onClick={this.removeClick.bind(this, i)}
+                style={{ "margin-left": "3%" }}
+              >
+                <RemoveCircleOutlined className={classes.Icon} />
+                <span className={classes.labelHeader}>Remove</span>
+              </IconButton>
+            )}
+          </Grid>
+        </Grid>
       </div>
     ));
   }
 
+  // displays loan tasks part
   createTaskUI() {
     const { classes } = this.props;
     let actTypeFilter = this.state.actTypeFilter;
-
+    // displays no of input fields  as per the loan tasks present
     return this.state.task.map((el, i) => (
       <div key={i}>
-        <span style={{ "font-weight": "bolder", "font-size": "large" }}>
-          {i + 1}
-        </span>
-        {/*<Grid item md={} xs={12}>*/}
-        <div
-        //style={{
-        //  width: "50%",
-        //  position: "relative",
-        //  left: "30px",
-        //  bottom: "25px",
-        //}}
-        >
-          <Autocomplete
-            //style={{ width: "50%", position: "relative", left: "30px" }}
-            style={{
-              width: "50%",
-              position: "relative",
-              left: "30px",
-              bottom: "25px",
-            }}
-            id="name"
-            value={el.activitytype}
-            options={actTypeFilter}
-            variant="outlined"
-            getOptionLabel={(option) => option.name}
-            placeholder="Select Activity type"
-            //onChange={this.handleTaskUIChange.bind(this, i)}
-            onChange={(event, value, i) => {
-              this.handleTaskUIChange({
-                target: { name: "activitytype", value: value },
-              });
-            }}
-            renderInput={(params) => (
-              <Input
-                {...params}
-                //fullWidth
-                label="Select Activity type"
-                name="name"
-                variant="outlined"
-                //error={this.hasError("task")}
-                //helperText={
-                //  this.hasError("task") ? this.state.errors.task[0] : null
-                //}
-              />
-            )}
-          />
-        </div>
-        <div
-          style={{
-            //float: "right",
-            position: "relative",
-            left: " 68%",
-            bottom: "50px",
-          }}
-        >
-          {this.state.task.length !== 1 && (
-            <IconButton
-              aria-label="remove"
-              onClick={this.removeTaskClick.bind(this, i)}
+        <Grid container spacing={2}>
+          <Grid item md={6} xs={12}>
+            <span
+              style={{
+                "font-weight": "bolder",
+                "font-size": "large",
+                display: "inline-block",
+                width: "30px",
+                "vertical-align": "middle",
+              }}
             >
-              <RemoveCircleOutlined className={classes.Icon} />
-              <span className={classes.labelHeader}>Remove</span>
-            </IconButton>
-          )}
-        </div>
+              {i + 1}
+            </span>
+            <span
+              style={{
+                display: "inline-block",
+                width: "calc(100% - 30px)",
+                "vertical-align": "middle",
+              }}
+            >
+              <Autocomplete
+                id="name"
+                value={el.activitytype}
+                options={actTypeFilter}
+                variant="outlined"
+                getOptionLabel={(option) => option.name}
+                placeholder="Select Activity type"
+                onChange={(event, value, i) => {
+                  this.handleTaskUIChange({
+                    target: { name: "activitytype", value: value },
+                  });
+                }}
+                renderInput={(params) => (
+                  <Input
+                    {...params}
+                    //fullWidth
+                    label="Select Activity type"
+                    name="name"
+                    variant="outlined"
+                  />
+                )}
+              />
+            </span>
+          </Grid>
+          <Grid item md={6} xs={12}>
+            {this.state.task.length !== 1 && (
+              <IconButton
+                aria-label="remove"
+                onClick={this.removeTaskClick.bind(this, i)}
+                style={{ "margin-left": "3%" }}
+              >
+                <RemoveCircleOutlined className={classes.Icon} />
+                <span className={classes.labelHeader}>Remove</span>
+              </IconButton>
+            )}
+          </Grid>
+        </Grid>
       </div>
     ));
   }
-
+  // handles the change of EMI installments
   handleUIChange(i, e) {
-    //console.log("i,e. in emi ---", e.target, e.target.value, i);
-
     const { name, value } = e.target;
     let users = [...this.state.users];
     users[i] = { ...users[i], [name]: value };
     this.setState({ users });
-    console.log("this.state.users in handleuichangev---", this.state.users);
   }
 
+  // removing input field on click along with the data present in it
   removeClick(i, e) {
     let users = [...this.state.users];
     users.splice(i, 1);
     this.setState({ users });
-    console.log("this.state.users---", this.state.users);
   }
 
+  // handles the change of loan tasks
   handleTaskUIChange(event) {
     let taskData = this.state.task;
     let i;
 
+    // passing index to be stored against each entry
     if (taskData) {
       i = taskData.length - 1;
     } else {
@@ -372,6 +366,7 @@ class LoanpurposePage extends Component {
     this.setState({ task });
   }
 
+  // removing input field on click along with the data present in it
   removeTaskClick(i) {
     let task = [...this.state.task];
     task.splice(i, 1);
@@ -422,13 +417,11 @@ class LoanpurposePage extends Component {
   };
 
   saveEmiDetails = async (data, Id) => {
-    console.log("---data, Id", data, Id);
-    console.log("this.state.users in saveemidetails---", this.state.users);
+    // checking if EMI details for resp. loan model already exist
     if (data.emidetails.length > 0) {
-      console.log("---emidetails length in update---", data.emidetails.length);
       for (let i in this.state.users) {
+        // creating new EMI entry for existing loan model
         if (this.state.users[i] && !data.emidetails[i]) {
-          console.log("--In first condition---");
           serviceProvider
             .serviceProviderForPostRequest(
               process.env.REACT_APP_SERVER_URL + "emidetails/",
@@ -443,7 +436,7 @@ class LoanpurposePage extends Component {
               console.log(error);
             });
         } else {
-          console.log("--In third condition---");
+          // updating  EMI entry of exisiting loan model
           serviceProvider
             .serviceProviderForPutRequest(
               process.env.REACT_APP_SERVER_URL + "emidetails",
@@ -460,12 +453,10 @@ class LoanpurposePage extends Component {
             });
         }
       }
+      // deleting an EMI entry of exisiting loan model
       if (data.emidetails.length > this.state.users.length) {
-        console.log("--In remove condition---");
         for (let i in data.emidetails) {
-          console.log("--In remove condition for loop---");
           if (!this.state.users[i] && data.emidetails[i]) {
-            console.log("--In remove condition if loop---");
             serviceProvider
               .serviceProviderForDeleteRequest(
                 process.env.REACT_APP_SERVER_URL + "emidetails",
@@ -478,9 +469,8 @@ class LoanpurposePage extends Component {
           }
         }
       }
-      //} else if (!this.state.users[i] && data.emidetails[i]) {
-    } else {
-      console.log("---emidetails length in create---", data.emidetails.length);
+    } // creating new EMI entry for newly added loan model
+    else {
       for (let i in this.state.users) {
         serviceProvider
           .serviceProviderForPostRequest(
@@ -500,8 +490,10 @@ class LoanpurposePage extends Component {
   };
 
   saveTaskDetails = async (data, Id) => {
+    // checking if loan tasks for resp. loan model already exist
     if (data.loantasks.length > 0) {
       for (let i in this.state.task) {
+        // creating new loan task  for exisiting. loan model
         if (this.state.task[i] && !data.loantasks[i]) {
           serviceProvider
             .serviceProviderForPostRequest(
@@ -516,6 +508,7 @@ class LoanpurposePage extends Component {
               console.log(error);
             });
         } else {
+          // updating loan task of exisiting loan model
           serviceProvider
             .serviceProviderForPutRequest(
               process.env.REACT_APP_SERVER_URL + "loantasks",
@@ -531,12 +524,10 @@ class LoanpurposePage extends Component {
             });
         }
       }
+      // deleting loan task of exisiting loan model
       if (data.loantasks.length > this.state.task.length) {
-        console.log("--In remove condition task---");
         for (let i in data.loantasks) {
-          console.log("--In remove condition for loop---");
           if (!this.state.task[i] && data.loantasks[i]) {
-            console.log("--In remove condition if loop---");
             serviceProvider
               .serviceProviderForDeleteRequest(
                 process.env.REACT_APP_SERVER_URL + "loantasks",
@@ -549,7 +540,8 @@ class LoanpurposePage extends Component {
           }
         }
       }
-    } else {
+    } // creating loan task for newly added loan model
+    else {
       for (let i in this.state.task) {
         serviceProvider
           .serviceProviderForPostRequest(
@@ -586,9 +578,7 @@ class LoanpurposePage extends Component {
       fpo: addFPO,
       emi: loanEmi,
     };
-    //if (Object.keys(this.state.errors).length > 0) return;q
     if (this.state.editPage[0]) {
-      // let bankIds = "";
       serviceProvider
         .serviceProviderForPutRequest(
           process.env.REACT_APP_SERVER_URL + "loan-models",
@@ -634,14 +624,11 @@ class LoanpurposePage extends Component {
         .then((res) => {
           let bankId = res.data.id;
           this.setState({ bankDeatilsId: bankId });
-          console.log("this.state.users", this.state.users.length);
 
           if (this.state.users.length) {
-            console.log("this.state.users", this.state.users.length);
             this.saveEmiDetails(res.data, res.data.id);
           }
           if (this.state.task) {
-            console.log("this.state.task--", this.state.task);
             this.saveTaskDetails(res.data, res.data.id);
           }
           this.props.history.push({ pathname: "/loanpurposes", addData: true });
@@ -661,8 +648,6 @@ class LoanpurposePage extends Component {
   };
 
   render() {
-    //console.log("this.state.task in rener---", this.state.task);
-
     const { classes } = this.props;
     let fpoFilters = this.state.getFPO;
     let addFPO = this.state.values.addFPO;
@@ -830,7 +815,8 @@ class LoanpurposePage extends Component {
                   />
                 </Grid>
               </Grid>
-              <Divider className="style.border " />
+              <br></br>
+              <Divider className="style.border " style={{ height: "2px" }} />
               <br />
               <span style={{ "margin-left": "10px", "font-weight": "bolder" }}>
                 EMI Installments
@@ -841,12 +827,12 @@ class LoanpurposePage extends Component {
               <IconButton
                 aria-label="add"
                 onClick={this.addClick.bind(this)}
-                style={{ position: "relative", left: "7px" }}
+                style={{ position: "relative", left: "15px" }}
               >
                 <AddCircleOutlined className={classes.Icon} />
                 <span className={classes.labelHeader}>Add EMI</span>
               </IconButton>
-              <Divider className="style.border " />
+              <Divider className="style.border " style={{ height: "2px" }} />
               <br />
               <span style={{ "margin-left": "10px", "font-weight": "bolder" }}>
                 Tasks
@@ -866,7 +852,7 @@ class LoanpurposePage extends Component {
             <CardActions>
               <Button type="submit">Save</Button>
               <Button
-                color="default"
+                color="secondary"
                 clicked={this.cancelForm}
                 component={Link}
                 to="/loanpurposes"

@@ -7,7 +7,6 @@ import { withStyles, ThemeProvider } from "@material-ui/core/styles";
 import style from "./Loanpurpose.module.css";
 import { Link } from "react-router-dom";
 import { Grid } from "@material-ui/core";
-import auth from "../../components/Auth/Auth.js";
 import Input from "../../components/UI/Input/Input";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 
@@ -165,7 +164,6 @@ export class Loanpurposes extends React.Component {
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
-
             console.log("err", error);
           });
       }
@@ -310,7 +308,6 @@ export class Loanpurposes extends React.Component {
               <Button
                 color="secondary"
                 variant="contained"
-                // clicked={this.cancelForm}
                 onClick={this.cancelForm.bind(this)}
               >
                 Reset
@@ -327,9 +324,9 @@ export class Loanpurposes extends React.Component {
                 column={Usercolumns}
                 editData={this.editData}
                 DeleteData={this.DeleteData}
+                clearSelected={this.clearSelected}
                 DeleteAll={this.DeleteAll}
                 rowsSelected={this.rowsSelect}
-                modalHandle={this.modalHandle}
                 columnsvalue={columnsvalue}
                 selectableRows
                 DeleteMessage={"Are you Sure you want to Delete"}
