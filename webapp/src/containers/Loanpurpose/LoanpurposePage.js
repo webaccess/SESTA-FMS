@@ -25,6 +25,10 @@ import {
 } from "@material-ui/core";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
+import {
+  EDIT_LOANPURPOSE_BREADCRUMBS,
+  ADD_LOANPURPOSE_BREADCRUMBS,
+} from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Aux from "../../hoc/Auxiliary/Auxiliary.js";
@@ -199,12 +203,22 @@ class LoanpurposePage extends Component {
   createUI() {
     const { classes } = this.props;
     return this.state.users.map((el, i) => (
-      <div key={i} class="emiTxtbox">
-        <span style={{ "font-weight": "bolder" }}>{i + 1}</span>
+      <div
+        key={i}
+        class="emiTxtbox"
+        style={{
+          position: "relative",
+          //bottom: "26px"
+        }}
+      >
+        <span style={{ "font-weight": "bolder", "font-size": "large" }}>
+          {i + 1}
+        </span>
 
         {/*<Grid item md={6} xs={12}>*/}
+        {/*<div style={{ position: "relative", left: "23px", bottom: "25px" }}>*/}
         <Input
-          style={{ "margin-left": "10px" }}
+          style={{ "margin-left": "10px", "margin-bottom": "15px" }}
           label="Principal"
           type="number"
           name="principal"
@@ -216,8 +230,6 @@ class LoanpurposePage extends Component {
           onChange={this.handleUIChange.bind(this, i)}
           variant="outlined"
         />
-        {/*</Grid>*/}
-
         <Input
           style={{ "margin-left": "5%" }}
           //style={{backgroundColor: "lightblue"}}
@@ -233,6 +245,9 @@ class LoanpurposePage extends Component {
           onChange={this.handleUIChange.bind(this, i)}
           variant="outlined"
         />
+        {/*</div>*/}
+        {/*<div style={{ position: "relative", bottom: "37px", left: "60%" }}>*/}
+
         {this.state.users.length !== 1 && (
           <IconButton
             aria-label="remove"
@@ -243,6 +258,7 @@ class LoanpurposePage extends Component {
             <span className={classes.labelHeader}>Remove</span>
           </IconButton>
         )}
+        {/*</div>*/}
       </div>
     ));
   }
@@ -253,51 +269,71 @@ class LoanpurposePage extends Component {
 
     return this.state.task.map((el, i) => (
       <div key={i}>
-        {i + 1}
-        {/*{i}*/}
-        {/*{el.activitytype.name}*/}
-        {/*{el[i]["activitytype"]}*/}
-        {/*{this.state.task[i].name}*/}
-        {/*{el.name}*/}
-        {/*{this.state.taselk[i].activitytype["name"]}*/}
-        <Autocomplete
-          id="name"
-          //name="name"
-          //value={this.state.editPage[0] ? el.activitytype.name : el.name.name}
-          value={el.activitytype}
-          options={actTypeFilter}
-          variant="outlined"
-          getOptionLabel={(option) => option.name}
-          placeholder="Select Activity type"
-          //onChange={this.handleTaskUIChange.bind(this, i)}
-          onChange={(event, value, i) => {
-            this.handleTaskUIChange({
-              target: { name: "activitytype", value: value },
-            });
+        <span style={{ "font-weight": "bolder", "font-size": "large" }}>
+          {i + 1}
+        </span>
+        {/*<Grid item md={} xs={12}>*/}
+        <div
+        //style={{
+        //  width: "50%",
+        //  position: "relative",
+        //  left: "30px",
+        //  bottom: "25px",
+        //}}
+        >
+          <Autocomplete
+            //style={{ width: "50%", position: "relative", left: "30px" }}
+            style={{
+              width: "50%",
+              position: "relative",
+              left: "30px",
+              bottom: "25px",
+            }}
+            id="name"
+            value={el.activitytype}
+            options={actTypeFilter}
+            variant="outlined"
+            getOptionLabel={(option) => option.name}
+            placeholder="Select Activity type"
+            //onChange={this.handleTaskUIChange.bind(this, i)}
+            onChange={(event, value, i) => {
+              this.handleTaskUIChange({
+                target: { name: "activitytype", value: value },
+              });
+            }}
+            renderInput={(params) => (
+              <Input
+                {...params}
+                //fullWidth
+                label="Select Activity type"
+                name="name"
+                variant="outlined"
+                //error={this.hasError("task")}
+                //helperText={
+                //  this.hasError("task") ? this.state.errors.task[0] : null
+                //}
+              />
+            )}
+          />
+        </div>
+        <div
+          style={{
+            //float: "right",
+            position: "relative",
+            left: " 68%",
+            bottom: "50px",
           }}
-          renderInput={(params) => (
-            <Input
-              {...params}
-              fullWidth
-              label="Select Activity type"
-              name="name"
-              variant="outlined"
-              //error={this.hasError("task")}
-              //helperText={
-              //  this.hasError("task") ? this.state.errors.task[0] : null
-              //}
-            />
+        >
+          {this.state.task.length !== 1 && (
+            <IconButton
+              aria-label="remove"
+              onClick={this.removeTaskClick.bind(this, i)}
+            >
+              <RemoveCircleOutlined className={classes.Icon} />
+              <span className={classes.labelHeader}>Remove</span>
+            </IconButton>
           )}
-        />
-        {this.state.task.length !== 1 && (
-          <IconButton
-            aria-label="remove"
-            onClick={this.removeTaskClick.bind(this, i)}
-          >
-            <RemoveCircleOutlined className={classes.Icon} />
-            <span className={classes.labelHeader}>Remove</span>
-          </IconButton>
-        )}
+        </div>
       </div>
     ));
   }
@@ -633,9 +669,11 @@ class LoanpurposePage extends Component {
     let isCancel = this.state.isCancel;
     return (
       <Layout
-      // breadcrumbs={
-      // //   this.state.editPage[0] ? EDIT__BREADCRUMBS : ADD_BREADCRUMBS
-      // // }
+        breadcrumbs={
+          this.state.editPage[0]
+            ? EDIT_LOANPURPOSE_BREADCRUMBS
+            : ADD_LOANPURPOSE_BREADCRUMBS
+        }
       >
         <Card>
           <form
@@ -795,23 +833,29 @@ class LoanpurposePage extends Component {
               <Divider className="style.border " />
               <br />
               <span style={{ "margin-left": "10px", "font-weight": "bolder" }}>
-                {" "}
                 EMI Installments
               </span>
               <br />
               <br />
               {this.createUI()}
-              <IconButton aria-label="add" onClick={this.addClick.bind(this)}>
+              <IconButton
+                aria-label="add"
+                onClick={this.addClick.bind(this)}
+                style={{ position: "relative", left: "7px" }}
+              >
                 <AddCircleOutlined className={classes.Icon} />
                 <span className={classes.labelHeader}>Add EMI</span>
               </IconButton>
               <Divider className="style.border " />
               <br />
-              Tasks
+              <span style={{ "margin-left": "10px", "font-weight": "bolder" }}>
+                Tasks
+              </span>
               <br />
               <br />
               {this.createTaskUI()}
               <IconButton
+                style={{ position: "relative", left: "15px" }}
                 aria-label="add"
                 onClick={this.addTaskClick.bind(this)}
               >
