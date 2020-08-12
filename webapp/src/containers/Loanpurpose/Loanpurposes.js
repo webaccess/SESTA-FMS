@@ -7,7 +7,6 @@ import { withStyles, ThemeProvider } from "@material-ui/core/styles";
 import style from "./Loanpurpose.module.css";
 import { Link } from "react-router-dom";
 import { Grid } from "@material-ui/core";
-import auth from "../../components/Auth/Auth.js";
 import Input from "../../components/UI/Input/Input";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 
@@ -146,6 +145,7 @@ export class Loanpurposes extends React.Component {
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
+
       for (let i in selectedId) {
         serviceProvider
           .serviceProviderForDeleteRequest(
@@ -156,7 +156,7 @@ export class Loanpurposes extends React.Component {
             if (res.data.emidetails) {
               this.deleteEmiDet(res.data.emidetails);
             }
-            if (res.data.loantasks[0].id) {
+            if (res.data.loantasks) {
               this.deleteTaskDet(res.data.loantasks[0].id);
             }
             this.setState({ multipleDelete: true });
@@ -164,7 +164,6 @@ export class Loanpurposes extends React.Component {
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
-
             console.log("err", error);
           });
       }
@@ -251,11 +250,11 @@ export class Loanpurposes extends React.Component {
                 </div>
               </div>
             </h1>
-            {this.props.location.addVoData ? (
+            {this.props.location.addData ? (
               <Snackbar severity="success">
                 Loan Purpose added successfully.
               </Snackbar>
-            ) : this.props.location.editVoData ? (
+            ) : this.props.location.editData ? (
               <Snackbar severity="success">
                 Loan Purpose edited successfully.
               </Snackbar>
@@ -309,7 +308,6 @@ export class Loanpurposes extends React.Component {
               <Button
                 color="secondary"
                 variant="contained"
-                // clicked={this.cancelForm}
                 onClick={this.cancelForm.bind(this)}
               >
                 Reset
@@ -326,9 +324,9 @@ export class Loanpurposes extends React.Component {
                 column={Usercolumns}
                 editData={this.editData}
                 DeleteData={this.DeleteData}
+                clearSelected={this.clearSelected}
                 DeleteAll={this.DeleteAll}
                 rowsSelected={this.rowsSelect}
-                modalHandle={this.modalHandle}
                 columnsvalue={columnsvalue}
                 selectableRows
                 DeleteMessage={"Are you Sure you want to Delete"}
