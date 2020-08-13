@@ -276,7 +276,6 @@ export class Loans extends React.Component {
     let loanAppData;
     this.state.data.map(e => {
       if (e.id == cellid) {
-        console.log('loane data',e);
         loanAppData = e;
         this.props.history.push("/loan/emi/view/" + cellid, { loanAppData: loanAppData });
       }
