@@ -169,13 +169,12 @@ class LoanEditEmiPage extends Component {
                 this.addActivity();
               }
             })
-
-          let app_id = res.data.loan_application["id"];
-          this.props.history.push("/loans/emi/" + app_id, {
-            loanAppData: this.props.location.state.loanAppData,
-            loanEditEmiPage: true
-          });
         }
+        let app_id = res.data.loan_application["id"];
+        this.props.history.push("/loans/emi/" + app_id, {
+          loanAppData: this.props.location.state.loanAppData,
+          loanEditEmiPage: true
+        });
       })
   }
 

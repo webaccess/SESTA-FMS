@@ -139,11 +139,34 @@ export class Loans extends React.Component {
         "DD MMM YYYY"
       );
       loandata.loan_model.loan_amount = loandata.loan_model.loan_amount.toLocaleString();
-      if (loandata.loan_app_installments.length > 0) {
+      if (loandata.loan_app_installments.length > 0 && loandata.status == "Approved") {
         let loanDueId = loandata.loan_app_installments.length - 1;
         let loanDueData = loandata.loan_app_installments[loanDueId];
         loandata.amount_due = (loanDueData.expected_interest + loanDueData.expected_principal).toLocaleString();
         loandata.payment_date = Moment(loanDueData.payment_date).format('DD MMM YYYY');
+
+        let paid = 0;
+        loandata.loan_app_installments.map(emidata => {
+          if (emidata.fine !== null || emidata.fine !== 0) {
+            emidata.totalPaid = (emidata.fine + emidata.actual_principal + emidata.actual_interest);
+          } else {
+            emidata.totalPaid = (emidata.actual_principal + emidata.actual_interest);
+          }
+          let totalLoanAmnt =
+            emidata.expected_principal + emidata.expected_interest;
+          emidata.outstanding =
+            (totalLoanAmnt - (emidata.actual_principal + emidata.actual_interest)).toLocaleString();
+
+          paid = paid + emidata.totalPaid;
+        })
+
+        let totalamount = parseInt(loandata.loan_model.loan_amount.replace(/,/g, ''));
+        let outstandingAmount = totalamount - paid;
+
+        if (outstandingAmount < 0) {
+          loandata.outstandingAmount = 0;
+        }
+        loandata.outstandingAmount = "Rs. " + outstandingAmount.toLocaleString();
       }
     });
     this.setState({ data: data });
@@ -319,6 +342,15 @@ export class Loans extends React.Component {
         sortable: true,
       },
       {
+        name: "Outstanding amount",
+        selector: "outstandingAmount",
+        sortable: true,
+        cell: (row) =>
+          row.outstandingAmount
+            ? row.outstandingAmount
+            : "-",
+      },
+      {
         name: "Amount Due",
         selector: "amount_due",
         sortable: true,
@@ -478,6 +510,7 @@ export class Loans extends React.Component {
                 "application_date",
                 "loan_model.loan_amount",
                 "status",
+                "outstandingAmount",
                 "amount_due",
                 "payment_date",
               ]}
