@@ -36,6 +36,7 @@ import ActivitytypePage from "./containers/Activitytypes/ActivitytypePage";
 import Activitytypes from "./containers/Activitytypes/Activitytypes";
 import LoanEmiPage from "./containers/Loans/LoanEmiPage";
 import LoanEditEmiPage from "./containers/Loans/LoanEditEmiPage";
+import LoanEmiViewPage from "./containers/Loans/LoanEmiViewPage";
 
 function Routes() {
   return (
@@ -135,6 +136,11 @@ function Routes() {
             <PrivateRoute
               path="/loan/emi/edit/:id"
               component={LoanEditEmiPage}
+              exact
+            />
+            <PrivateRoute
+              path="/loan/emi/view/:id"
+              component={LoanEmiViewPage}
               exact
             />
             <PrivateRoute

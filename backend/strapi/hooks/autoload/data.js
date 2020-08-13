@@ -605,7 +605,12 @@ const modules = {
     displayNavigation: false,
     module: "", //slug
     order: 20,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+    roles: [
+      "FPO Admin",
+      "Sesta Admin",
+      "Superadmin",
+      "CSP (Community Service Provider)",
+    ],
   },
   "Edit Loan EMI": {
     is_active: true,
@@ -615,7 +620,27 @@ const modules = {
     displayNavigation: false,
     module: "", //slug
     order: 20,
-    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+    roles: [
+      "FPO Admin",
+      "Sesta Admin",
+      "Superadmin",
+      "CSP (Community Service Provider)",
+    ],
+  },
+  "View Loan EMI": {
+    is_active: true,
+    icon_class: "",
+    url: "/loan/emi/view/:id",
+    slug: "view_loan_emi",
+    displayNavigation: false,
+    module: "", //slug
+    order: 20,
+    roles: [
+      "FPO Admin",
+      "Sesta Admin",
+      "Superadmin",
+      "CSP (Community Service Provider)",
+    ],
   },
   "Loan Approval": {
     is_active: true,
