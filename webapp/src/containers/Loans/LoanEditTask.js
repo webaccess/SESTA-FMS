@@ -198,6 +198,7 @@ class LoanEditTask extends Component {
             let activitiyData = {
               title: loanTaskData.name,
               start_datetime: this.state.values.editDate,
+              end_datetime: this.state.values.editDate,
               description: loanTaskData.comments,
               activitytype: {
                 id: activityTypeId,

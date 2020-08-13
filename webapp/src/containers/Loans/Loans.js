@@ -166,7 +166,7 @@ export class Loans extends React.Component {
         if (outstandingAmount < 0) {
           loandata.outstandingAmount = 0;
         }
-        loandata.outstandingAmount = "Rs. " + outstandingAmount.toLocaleString();
+        loandata.outstandingAmount = outstandingAmount.toLocaleString();
       }
     });
     this.setState({ data: data });
@@ -268,6 +268,17 @@ export class Loans extends React.Component {
       if (e.id == cellid) {
         loanAppData = e;
         this.props.history.push("/loans/emi/" + cellid, { loanAppData: loanAppData });
+      }
+    })
+  };
+
+  viewLoanEmi = (cellid) => {
+    let loanAppData;
+    this.state.data.map(e => {
+      if (e.id == cellid) {
+        console.log('loane data',e);
+        loanAppData = e;
+        this.props.history.push("/loan/emi/view/" + cellid, { loanAppData: loanAppData });
       }
     })
   };
@@ -521,6 +532,7 @@ export class Loans extends React.Component {
               customAction={this.customAction}
               viewTask={this.viewTask}
               viewEmi={this.viewEmi}
+              viewLoanEmi={this.viewLoanEmi}
               DeleteData={this.DeleteData}
               DeleteAll={this.DeleteAll}
               rowsSelected={this.rowsSelect}
