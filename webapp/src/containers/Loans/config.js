@@ -18,3 +18,8 @@ export const EDIT_LOAN_EMI_BREADCRUMBS = {
   list_loan: "Loans",
   edit_loan_emi: "Edit Loan EMI"
 };
+export const VIEW_LOAN_EMI_BREADCRUMBS = {
+  home: "Home",
+  list_loan: "Loans",
+  edit_loan_emi: "View Loan EMI"
+};

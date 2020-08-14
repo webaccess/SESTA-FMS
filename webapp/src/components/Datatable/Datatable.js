@@ -16,6 +16,7 @@ import AssignmentTurnedInIcon from "@material-ui/icons/AssignmentTurnedIn";
 import AssignmentIndIcon from "@material-ui/icons/AssignmentInd";
 import PrintIcon from "@material-ui/icons/Print";
 import auth from "../../components/Auth/Auth";
+import VisibilityIcon from '@material-ui/icons/Visibility';
 
 const useStyles = makeStyles((theme) => ({
   editIcon: {
@@ -86,6 +87,9 @@ const Table = (props) => {
   const viewEmi = (id) => {
     props.viewEmi(id);
   };
+  const viewLoanEmi = (id) => {
+    props.viewLoanEmi(id);
+  };
   const customAction = (id) => {
     props.customAction(id);
   };
@@ -135,7 +139,7 @@ const Table = (props) => {
   const [isDeleteAllShowing, setisDeleteAllShowing] = React.useState(false);
   const [isActiveAllShowing, setisActiveAllShowing] = React.useState(false);
   let column = [];
-  if (valueForMemberPage !== "Loans") {
+  if (valueForMemberPage !== "Loans" && valueForMemberPage !== "ViewLoanEMI") {
     column = [
       {
         cell: (cell) => (
@@ -247,6 +251,26 @@ const Table = (props) => {
         cell: (cell) => (
           <div>
             <div
+              onClick={
+                cell.status === "Approved"
+                  ? (event) => viewLoanEmi(cell.id, cell[valueformodal])
+                  : null
+              }
+              style={{ display: "inline-flex" }}
+            >
+              <Tooltip title="View EMI">
+                <IconButton
+                  aria-label="task"
+                  disabled={cell.status === "Approved" ? false : true}
+                >
+                  <VisibilityIcon
+                    className={classes.VisibilityIcon}
+                  />
+                </IconButton>
+              </Tooltip>
+            </div>
+
+            <div
               onClick={(event) => customAction(cell.id, cell[valueformodal])}
               style={{ display: "inline-flex" }}
             >
@@ -311,7 +335,7 @@ const Table = (props) => {
           </div>
         ),
         button: true,
-        width: "200px",
+        width: "250px",
       },
     ];
   }

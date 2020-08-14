@@ -38,6 +38,7 @@ import LoanEmiPage from "./containers/Loans/LoanEmiPage";
 import LoanEditEmiPage from "./containers/Loans/LoanEditEmiPage";
 import Users from "./containers/Users/Users";
 import UsersPage from "./containers/Users/UsersPage";
+import LoanEmiViewPage from "./containers/Loans/LoanEmiViewPage";
 
 function Routes() {
   return (
@@ -137,6 +138,11 @@ function Routes() {
             <PrivateRoute
               path="/loan/emi/edit/:id"
               component={LoanEditEmiPage}
+              exact
+            />
+            <PrivateRoute
+              path="/loan/emi/view/:id"
+              component={LoanEmiViewPage}
               exact
             />
             <PrivateRoute

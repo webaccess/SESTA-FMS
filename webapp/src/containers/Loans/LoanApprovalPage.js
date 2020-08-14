@@ -251,10 +251,6 @@ class LoanApprovalPage extends Component {
         if (this.state.values.selectedStatus === "Approved") {
           this.saveLoanAppTasks(loanAppRes.data);
           this.saveLoanAppInstallments(loanAppRes.data);
-          this.props.history.push({
-            pathname: "/loans",
-            state: { loanApproved: true },
-          });
         } else {
           this.props.history.push({
             pathname: "/loans",
@@ -338,7 +334,18 @@ class LoanApprovalPage extends Component {
                     "loan-application-installments",
                   postEmiData
                 )
-                .then((res) => {})
+                .then((res) => {
+                  serviceProvider
+                  .serviceProviderForGetRequest(
+                    process.env.REACT_APP_SERVER_URL + "loan-applications"
+                  )
+                  .then((resp) => {
+                    this.props.history.push({
+                      pathname: "/loans",
+                      state: { loanApproved: true, loanAppResData: resp.data},
+                    });
+                  });
+                })
                 .catch((error) => {});
             }
           });
