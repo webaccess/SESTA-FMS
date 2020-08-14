@@ -73,6 +73,7 @@ export class Members extends React.Component {
       dataCellId: [],
       singleDelete: "",
       multipleDelete: "",
+      loggedInUserRole: auth.getUserInfo().role.name,
     };
   }
 
@@ -80,26 +81,64 @@ export class Members extends React.Component {
     this.getMembers();
 
     // get all SHGs
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG"
-      )
-      .then((res) => {
-        this.setState({ getShg: res.data });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    let url =
+      "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC";
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      url += "&creator_id=" + auth.getUserInfo().contact.id;
+      serviceProvider
+        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .then((res) => {
+          this.setState({ getShg: res.data });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else if (
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/contact/?individual=" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((res) => {
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/contact/?id=" +
+                res.data[0].individual.vo
+            )
+            .then((response) => {
+              this.setState({ getShg: response.data[0].org_vos });
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      serviceProvider
+        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .then((res) => {
+          this.setState({ getShg: res.data });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }
 
   getMembers = () => {
     let newDataArray = [];
+    let url = "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC";
+    if (
+      this.state.loggedInUserRole === "CSP (Community Service Provider)" ||
+      this.state.loggedInUserRole === "FPO Admin"
+    ) {
+      url += "&creator_id=" + auth.getUserInfo().contact.id;
+    }
     serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC"
-      )
+      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
         res.data.map((e, i) => {
           if (e.user === null) {
@@ -208,6 +247,7 @@ export class Members extends React.Component {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
+      filterShg: "",
       isCancel: true,
     });
 
@@ -216,7 +256,6 @@ export class Members extends React.Component {
 
   handleSearch() {
     let searchData = "";
-
     if (this.state.filterState) {
       searchData += searchData ? "&&" : "";
       searchData += "state=" + this.state.filterState.id;
@@ -231,16 +270,25 @@ export class Members extends React.Component {
     }
     if (this.state.filterShg) {
       searchData += searchData ? "&&" : "";
-      searchData += "individual.shg=" + this.state.filterShg.id;
+      if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
+        searchData += "individual.shg=" + this.state.filterShg.contact;
+      } else {
+        searchData += "individual.shg=" + this.state.filterShg.id;
+      }
     }
 
     //api call after search filter
     let newDataArray = [];
+    let url = "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC";
+    if (
+      this.state.loggedInUserRole === "CSP (Community Service Provider)" ||
+      this.state.loggedInUserRole === "FPO Admin"
+    ) {
+      url += "&creator_id=" + auth.getUserInfo().contact.id;
+    }
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&" +
-          searchData
+        process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
       )
       .then((res) => {
         res.data.map((e, i) => {

@@ -36,7 +36,7 @@ class ShgPage extends Component {
       getVillageOrganization: [],
       bankInfoId: "",
       formSubmitted: "",
-      creatorId: auth.getUserInfo().contact.id,
+      loggedInUserRole: auth.getUserInfo().role.name,
       validations: {
         addShg: {
           required: { value: "true", message: "Shg name is required" },
@@ -156,13 +156,16 @@ class ShgPage extends Component {
     }
 
     // get all VOs
+    let url =
+      "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC";
+    if (
+      this.state.loggedInUserRole === "FPO Admin" ||
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      url += "&&creator_id=" + auth.getUserInfo().contact.id;
+    }
     serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&organization.sub_type=VO&creator_id=" +
-          this.state.creatorId +
-          "&_sort=name:ASC"
-      )
+      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
         this.setState({ getVillageOrganization: res.data });
       })

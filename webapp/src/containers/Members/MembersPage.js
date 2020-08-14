@@ -25,6 +25,7 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
+import { constants } from "buffer";
 
 class ActivityPage extends Component {
   constructor(props) {
@@ -43,7 +44,7 @@ class ActivityPage extends Component {
       formSubmitted: "",
       errorCode: "",
       shareInfoId: "",
-      creatorId: auth.getUserInfo().contact.id,
+      loggedInUserRole: auth.getUserInfo().role.name,
       validations: {
         firstName: {
           required: { value: "true", message: "First name is required" },
@@ -112,18 +113,6 @@ class ActivityPage extends Component {
   }
 
   async componentDidMount() {
-    // get all roles
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "users-permissions/roles"
-      )
-      .then((res) => {
-        this.setState({ rolesList: res.data.roles });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
     if (this.state.editPage[0]) {
       serviceProvider
         .serviceProviderForGetRequest(
@@ -190,17 +179,50 @@ class ActivityPage extends Component {
     // get all shgs
     let url =
       "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC";
-    if (auth.getUserInfo().role.name === "FPO Admin") {
-      url += "&creator_id=" + this.state.creatorId;
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      url += "&creator_id=" + auth.getUserInfo().contact.id;
+      serviceProvider
+        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .then((res) => {
+          this.setState({ getShgs: res.data });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else if (
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      let shgArray = [];
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/contact/?individual=" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((res) => {
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/contact/?id=" +
+                res.data[0].individual.vo
+            )
+            .then((response) => {
+              this.setState({ getShgs: response.data[0].org_vos });
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      serviceProvider
+        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .then((res) => {
+          this.setState({ getShgs: res.data });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
-    serviceProvider
-      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
-      .then((res) => {
-        this.setState({ getShgs: res.data });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
 
     if (this.state.values.addState) {
       this.setState({ stateSelected: true });
@@ -339,9 +361,15 @@ class ActivityPage extends Component {
 
   handleShgChange(event, value) {
     if (value !== null) {
-      this.setState({
-        values: { ...this.state.values, addShg: value.id },
-      });
+      if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
+        this.setState({
+          values: { ...this.state.values, addShg: value.contact },
+        });
+      } else {
+        this.setState({
+          values: { ...this.state.values, addShg: value.id },
+        });
+      }
     } else {
       this.setState({
         values: {
@@ -392,6 +420,7 @@ class ActivityPage extends Component {
       },
       block: block,
       gp: gp,
+      creator_id: auth.getUserInfo().contact.id,
       first_name: fName,
       last_name: lName,
       partner_name: hName,
@@ -844,7 +873,18 @@ class ActivityPage extends Component {
                       this.handleShgChange(event, value);
                     }}
                     value={
-                      addShg
+                      this.state.loggedInUserRole ===
+                      "CSP (Community Service Provider)"
+                        ? addShg
+                          ? this.state.isCancel === true
+                            ? null
+                            : shgFilters[
+                                shgFilters.findIndex(function (item, i) {
+                                  return item.contact === addShg;
+                                })
+                              ] || null
+                          : null
+                        : addShg
                         ? this.state.isCancel === true
                           ? null
                           : shgFilters[

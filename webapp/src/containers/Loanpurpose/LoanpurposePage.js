@@ -586,10 +586,6 @@ class LoanpurposePage extends Component {
           postLoan
         )
         .then((res) => {
-          console.log(
-            "---this.state.users.length in update",
-            this.state.users.length
-          );
           if (this.state.users) {
             this.saveEmiDetails(res.data, res.data.id);
           }
@@ -612,14 +608,7 @@ class LoanpurposePage extends Component {
       serviceProvider
         .serviceProviderForPostRequest(
           process.env.REACT_APP_SERVER_URL + "loan-models/",
-          {
-            product_name: productName,
-            duration: addDuration,
-            specification: addSpecification,
-            loan_amount: addAmount,
-            fpo: addFPO,
-            emi: loanEmi,
-          }
+          postLoan
         )
         .then((res) => {
           let bankId = res.data.id;

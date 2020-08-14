@@ -68,21 +68,22 @@ export class Users extends React.Component {
       singleDelete: "",
       multipleDelete: "",
       getRoles: [],
-      creatorId: auth.getUserInfo().contact.id,
+      loggedInUserRole: auth.getUserInfo().role.name,
     };
   }
 
   async componentDidMount() {
     // get all users
+    let url = "users/?_sort=username:ASC";
+    if (
+      this.state.loggedInUserRole === "FPO Admin" ||
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      url += "&&contact.creator_id=" + auth.getUserInfo().contact.id;
+    }
     serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "users/?contact.creator_id=" +
-          this.state.creatorId +
-          "&&_sort=username:ASC"
-      )
+      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
-        console.log("--table users--", res.data);
         this.setState({ data: res.data });
       })
       .catch((error) => {
@@ -90,14 +91,17 @@ export class Users extends React.Component {
       });
 
     let roleArray = [];
-    if (auth.getUserInfo().role.name === "Sesta Admin") {
+    if (
+      this.state.loggedInUserRole === "Sesta Admin" ||
+      this.state.loggedInUserRole === "Superadmin"
+    ) {
       roleArray = [
         { id: 1, name: "Sesta Admin" },
         { id: 2, name: "FPO Admin" },
         { id: 3, name: "CSP (Community Service Provider)" },
       ];
     }
-    if (auth.getUserInfo().role.name === "FPO Admin") {
+    if (this.state.loggedInUserRole === "FPO Admin") {
       roleArray = [
         { id: 1, name: "FPO Admin" },
         { id: 2, name: "CSP (Community Service Provider)" },
@@ -190,13 +194,16 @@ export class Users extends React.Component {
       searchData += "role.name=" + this.state.roleStatus.name;
     }
     //api call after search filter
+    let url = "users/?_sort=username:ASC";
+    if (
+      this.state.loggedInUserRole === "FPO Admin" ||
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      url += "&&contact.creator_id=" + auth.getUserInfo().contact.id;
+    }
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "users/?contact.creator_id=" +
-          this.state.creatorId +
-          "&&_sort=username:ASC" +
-          searchData
+        process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
       )
       .then((res) => {
         this.setState({ data: res.data });
@@ -346,6 +353,7 @@ export class Users extends React.Component {
                 filterData={true}
                 filterBy={["username", "email", "role.name"]}
                 // filters={filters}
+                selectableRows
                 data={data}
                 column={Usercolumns}
                 editData={this.editData}

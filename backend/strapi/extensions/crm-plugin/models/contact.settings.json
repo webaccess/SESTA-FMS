@@ -95,13 +95,9 @@
       "model": "user",
       "via": "contact"
     },
-    "loan_model": {
-      "model": "loan-model",
-      "via": "fpo"
-    },
     "loan_app_approvedby": {
-      "model": "loan-application",
-      "via": "approved_by"
+      "via": "approved_by",
+      "model": "loan-application"
     },
     "organization": {
       "plugin": "crm-plugin",
@@ -119,8 +115,8 @@
       "via": "fpo"
     },
     "loan_applications": {
-      "collection": "loan-application",
-      "via": "contact"
+      "via": "contact",
+      "collection": "loan-application"
     },
     "creator_id": {
       "plugin": "crm-plugin",

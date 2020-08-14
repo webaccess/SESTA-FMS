@@ -207,6 +207,7 @@ class FpoPage extends Component {
       block: fpoBlock,
       email: fpoEmail,
       phone: fpoPhone,
+      creator_id: auth.getUserInfo().contact.id,
     };
     if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {

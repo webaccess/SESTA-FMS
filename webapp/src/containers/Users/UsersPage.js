@@ -69,8 +69,8 @@ class UsersPage extends Component {
       },
       rolesList: [],
       roleWiseData: [],
+      loggedInUserRole: auth.getUserInfo().role.name,
       errors: {},
-      creatorId: auth.getUserInfo().contact.id,
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
@@ -87,14 +87,17 @@ class UsersPage extends Component {
         process.env.REACT_APP_SERVER_URL + "users-permissions/roles"
       )
       .then((res) => {
-        if (auth.getUserInfo().role.name === "Sesta Admin") {
+        if (
+          this.state.loggedInUserRole === "Sesta Admin" ||
+          this.state.loggedInUserRole === "Superadmin"
+        ) {
           roleArray = [
             "Sesta Admin",
             "FPO Admin",
             "CSP (Community Service Provider)",
           ];
         }
-        if (auth.getUserInfo().role.name === "FPO Admin") {
+        if (this.state.loggedInUserRole === "FPO Admin") {
           roleArray = ["FPO Admin", "CSP (Community Service Provider)"];
         }
 
@@ -197,14 +200,16 @@ class UsersPage extends Component {
       });
       if (value.name === "CSP (Community Service Provider)") {
         apiUrl =
-          "crm-plugin/contact/?contact_type=organization&organization.sub_type=VO&creator_id=" +
-          this.state.creatorId +
-          "&_sort=name:ASC";
+          "crm-plugin/contact/?contact_type=organization&organization.sub_type=VO&_sort=name:ASC";
+        if (this.state.loggedInUserRole === "FPO Admin") {
+          apiUrl += "&&creator_id=" + auth.getUserInfo().contact.id;
+        }
       } else if (value.name === "FPO Admin") {
         apiUrl =
-          "crm-plugin/contact/?contact_type=organization&organization.sub_type=FPO&creator_id=" +
-          this.state.creatorId +
-          "&_sort=name:ASC";
+          "crm-plugin/contact/?contact_type=organization&organization.sub_type=FPO&_sort=name:ASC";
+        if (this.state.loggedInUserRole === "FPO Admin") {
+          apiUrl += "&&creator_id=" + auth.getUserInfo().contact.id;
+        }
       }
 
       // get all FPO/VO for role FPO admin/CSP respectively
@@ -422,7 +427,7 @@ class UsersPage extends Component {
   };
 
   render() {
-    let loggedInUserRole = auth.getUserInfo().role.name;
+    let loggedInUserRole = this.state.loggedInUserRole;
     let role = {};
     let roleName = "";
     if (this.state.values.role) {
@@ -590,9 +595,11 @@ class UsersPage extends Component {
                     )}
                   />
                 </Grid>
-                {(loggedInUserRole === "Sesta Admin" &&
+                {((loggedInUserRole === "Sesta Admin" ||
+                  loggedInUserRole === "Superadmin") &&
                   roleName === "FPO Admin") ||
-                (loggedInUserRole === "Sesta Admin" &&
+                ((loggedInUserRole === "Sesta Admin" ||
+                  loggedInUserRole === "Superadmin") &&
                   roleName === "CSP (Community Service Provider)") ||
                 (loggedInUserRole === "FPO Admin" &&
                   roleName === "CSP (Community Service Provider)") ? (

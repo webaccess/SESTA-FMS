@@ -204,6 +204,7 @@ class LoansPage extends Component {
       application_date: Moment().format("YYYY-MM-DD"),
       purpose: assignLoanAppValues.product_name,
       status: "UnderReview",
+      creator_id: auth.getUserInfo().contact.id,
     };
 
     if (postData.loan_applications && postData.loan_applications.length > 0) {
