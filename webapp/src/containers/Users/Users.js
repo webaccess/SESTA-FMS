@@ -10,8 +10,6 @@ import { Grid } from "@material-ui/core";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import Modal from "../../components/UI/Modal/Modal.js";
-import Switch from "../../components/UI/Switch/Switch";
 import Autocomplete from "../../components/Autocomplete/Autocomplete";
 import { map } from "lodash";
 
@@ -73,7 +71,7 @@ export class Users extends React.Component {
   }
 
   async componentDidMount() {
-    // get all users
+    /** get all users */
     let url = "users/?_sort=username:ASC";
     if (
       this.state.loggedInUserRole === "FPO Admin" ||
@@ -125,8 +123,6 @@ export class Users extends React.Component {
         )
         .then((res) => {
           this.deleteContact(res.data.contact.id);
-          this.setState({ singleDelete: res.data.username, dataCellId: "" });
-          this.componentDidMount();
         })
         .catch((error) => {
           this.setState({ singleDelete: false });
@@ -141,7 +137,10 @@ export class Users extends React.Component {
         process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
         id
       )
-      .then((res) => {})
+      .then((res) => {
+        this.setState({ singleDelete: res.data.username, dataCellId: "" });
+        this.componentDidMount();
+      })
       .catch((error) => {
         console.log(error);
       });
@@ -160,7 +159,6 @@ export class Users extends React.Component {
           .then((res) => {
             this.deleteContact(res.data.contact.id);
             this.setState({ multipleDelete: true });
-            this.componentDidMount();
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
@@ -193,7 +191,7 @@ export class Users extends React.Component {
       searchData += searchData ? "&&" : "";
       searchData += "role.name=" + this.state.roleStatus.name;
     }
-    //api call after search filter
+    /** api call after search filter */
     let url = "users/?_sort=username:ASC";
     if (
       this.state.loggedInUserRole === "FPO Admin" ||
@@ -352,7 +350,6 @@ export class Users extends React.Component {
                 showSearch={false}
                 filterData={true}
                 filterBy={["username", "email", "role.name"]}
-                // filters={filters}
                 selectableRows
                 data={data}
                 column={Usercolumns}

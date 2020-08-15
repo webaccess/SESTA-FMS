@@ -17,11 +17,12 @@ import validateInput from "../../components/Validation/ValidateInput/ValidateInp
 import { ADD_USERS_BREADCRUMBS, EDIT_USERS_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import FormControl from "@material-ui/core/FormControl";
-import OutlinedInput from "@material-ui/core/OutlinedInput";
-import InputLabel from "@material-ui/core/InputLabel";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import Autotext from "../../components/Autotext/Autotext";
+import Visibility from "@material-ui/icons/Visibility";
+import VisibilityOff from "@material-ui/icons/VisibilityOff";
+import IconButton from "@material-ui/core/IconButton";
+import InputAdornment from "@material-ui/core/InputAdornment";
 
 class UsersPage extends Component {
   constructor(props) {
@@ -63,9 +64,6 @@ class UsersPage extends Component {
         role: {
           required: { value: "true", message: "Role is required" },
         },
-        selectField: {
-          required: { value: "true", message: "Field is required" },
-        },
       },
       rolesList: [],
       roleWiseData: [],
@@ -81,7 +79,7 @@ class UsersPage extends Component {
   async componentDidMount() {
     let newRoleArray = [];
     let roleArray = [];
-    // get all roles
+    /** get all roles*/
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL + "users-permissions/roles"
@@ -124,6 +122,8 @@ class UsersPage extends Component {
           process.env.REACT_APP_SERVER_URL + "users/" + this.state.editPage[1]
         )
         .then((res) => {
+          delete this.state.validations["password"]; // remove password validation while editing the user
+          delete this.state.errors["password"];
           this.handleRoleChange("", res.data.role);
           serviceProvider
             .serviceProviderForGetRequest(
@@ -139,6 +139,7 @@ class UsersPage extends Component {
                   addPhone: res.data.contact.phone,
                   addEmail: res.data.email,
                   username: res.data.username,
+                  password: undefined,
                   role: res.data.role,
                 },
                 editContactId: res.data.contact.id,
@@ -189,6 +190,29 @@ class UsersPage extends Component {
   };
 
   handleRoleChange = (event, value) => {
+    /** add selectfield validation based on loggedInUserRole & selected role*/
+    let loggedInUserRole = this.state.loggedInUserRole;
+    if (
+      ((loggedInUserRole === "Sesta Admin" ||
+        loggedInUserRole === "Superadmin") &&
+        value.name === "FPO Admin") ||
+      ((loggedInUserRole === "Sesta Admin" ||
+        loggedInUserRole === "Superadmin") &&
+        value.name === "CSP (Community Service Provider)") ||
+      (loggedInUserRole === "FPO Admin" &&
+        value.name === "CSP (Community Service Provider)")
+    ) {
+      Object.assign(this.state.validations, {
+        selectField: {
+          required: { value: "true", message: "Field is required" },
+        },
+      });
+    } else {
+      delete this.state.validations["selectField"];
+      delete this.state.errors["selectField"];
+    }
+
+    /** get FPO/VO as per selected role */
     let apiUrl;
     if (value !== null) {
       this.setState({
@@ -211,8 +235,6 @@ class UsersPage extends Component {
           apiUrl += "&&creator_id=" + auth.getUserInfo().contact.id;
         }
       }
-
-      // get all FPO/VO for role FPO admin/CSP respectively
       serviceProvider
         .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + apiUrl)
         .then((res) => {
@@ -247,11 +269,24 @@ class UsersPage extends Component {
     }
   };
 
+  handleClickShowPassword = () => {
+    this.setState({
+      values: {
+        ...this.state.values,
+        showPassword: !this.state.values.showPassword,
+      },
+    });
+  };
+
+  handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
   handleSubmit = async (e) => {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
-    // if (Object.keys(this.state.errors).length > 0) return;
+    if (Object.keys(this.state.errors).length > 0) return;
 
     let fName = this.state.values.firstName;
     let lName = this.state.values.lastName;
@@ -270,7 +305,7 @@ class UsersPage extends Component {
     };
 
     if (this.state.editPage[0]) {
-      // edit present contact/individual record (update API)
+      /** edit present contact/individual record (update API) */
       serviceProvider
         .serviceProviderForPutRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
@@ -280,7 +315,6 @@ class UsersPage extends Component {
         .then((res) => {
           this.saveUser(res.data);
           this.setState({ formSubmitted: true });
-          this.props.history.push({ pathname: "/users", editData: true });
         })
         .catch((error) => {
           this.setState({ formSubmitted: false });
@@ -299,7 +333,7 @@ class UsersPage extends Component {
           }
         });
     } else {
-      // save data in contact & individual table
+      /** save data in contact & individual table */
       serviceProvider
         .serviceProviderForPostRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",
@@ -309,10 +343,6 @@ class UsersPage extends Component {
           this.saveUser(res.data);
           this.setState({
             formSubmitted: true,
-          });
-          this.props.history.push({
-            pathname: "/users",
-            addData: true,
           });
         })
         .catch((error) => {
@@ -374,7 +404,7 @@ class UsersPage extends Component {
     }
 
     if (this.state.editPage[0]) {
-      // edit user in Users table
+      /** edit user in Users table */
       serviceProvider
         .serviceProviderForPutRequest(
           process.env.REACT_APP_SERVER_URL + "users",
@@ -382,35 +412,42 @@ class UsersPage extends Component {
           postUserData
         )
         .then((res) => {
-          // edit fpo/vo in Individuals table based on selected role
+          /** edit fpo/vo in Individuals table based on selected role */
           serviceProvider
             .serviceProviderForPutRequest(
               process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
               data.individual.id,
               postIndividualData
             )
-            .then((res) => {})
+            .then((res) => {
+              this.props.history.push({ pathname: "/users", editData: true });
+            })
             .catch((error) => {
               console.log(error);
             });
         })
         .catch((error) => {});
     } else {
-      // add user in Users table
+      /** add user in Users table */
       serviceProvider
         .serviceProviderForPostRequest(
           process.env.REACT_APP_SERVER_URL + "users/",
           postUserData
         )
         .then((res) => {
-          // add fpo/vo in Individuals table based on selected role
+          /** add fpo/vo in Individuals table based on selected role */
           serviceProvider
             .serviceProviderForPutRequest(
               process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
               data.individual.id,
               postIndividualData
             )
-            .then((res) => {})
+            .then((res) => {
+              this.props.history.push({
+                pathname: "/users",
+                addData: true,
+              });
+            })
             .catch((error) => {
               console.log(error);
             });
@@ -559,19 +596,39 @@ class UsersPage extends Component {
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <FormControl variant="outlined">
-                    <InputLabel htmlFor="outlined-adornment-password">
-                      Password*
-                    </InputLabel>
-                    <OutlinedInput
-                      fullWidth
-                      name="password"
-                      type="password"
-                      error={this.hasError("password")}
-                      // value={this.state.password}
-                      onChange={this.handleChange}
-                    />
-                  </FormControl>
+                  <Input
+                    variant="outlined"
+                    id="standard-adornment-password"
+                    name="password"
+                    label="Password*"
+                    error={this.hasError("password")}
+                    helperText={
+                      this.hasError("password")
+                        ? this.state.errors.password[0]
+                        : null
+                    }
+                    type={this.state.values.showPassword ? "text" : "password"}
+                    value={this.state.values.password || ""}
+                    onChange={this.handleChange}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={this.handleClickShowPassword}
+                            onMouseDown={this.handleMouseDownPassword}
+                          >
+                            {this.state.values.showPassword ? (
+                              <Visibility />
+                            ) : (
+                              <VisibilityOff />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  {/* </FormControl> */}
                 </Grid>
                 <Grid item md={6} xs={12}>
                   <Autocomplete
@@ -591,6 +648,11 @@ class UsersPage extends Component {
                         name="role"
                         variant="outlined"
                         error={this.hasError("role")}
+                        helperText={
+                          this.hasError("role")
+                            ? this.state.errors.role[0]
+                            : null
+                        }
                       />
                     )}
                   />
@@ -631,6 +693,11 @@ class UsersPage extends Component {
                           : null
                       }
                       error={this.hasError("selectField")}
+                      helperText={
+                        this.hasError("selectField")
+                          ? this.state.errors.selectField[0]
+                          : null
+                      }
                       renderInput={(params) => (
                         <Input
                           {...params}
