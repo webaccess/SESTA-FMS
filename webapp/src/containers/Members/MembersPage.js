@@ -420,7 +420,6 @@ class ActivityPage extends Component {
       },
       block: block,
       gp: gp,
-      creator_id: auth.getUserInfo().contact.id,
       first_name: fName,
       last_name: lName,
       partner_name: hName,
@@ -457,6 +456,9 @@ class ActivityPage extends Component {
         });
     } else {
       // add new member API (entry gets saved in contact & individual table)
+      Object.assign(postData, {
+        creator_id: auth.getUserInfo().contact.id,
+      });
       serviceProvider
         .serviceProviderForPostRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",

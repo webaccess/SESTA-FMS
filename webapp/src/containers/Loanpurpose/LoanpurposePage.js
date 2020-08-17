@@ -4,7 +4,11 @@ import * as serviceProvider from "../../api/Axios";
 import auth from "../../components/Auth/Auth";
 import { withStyles } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
-import { AddCircleOutlined, RemoveCircleOutlined } from "@material-ui/icons";
+import {
+  AddCircleOutlined,
+  RemoveCircleOutlined,
+  PhotoSizeSelectLargeOutlined,
+} from "@material-ui/icons";
 import Button from "../../components/UI/Button/Button";
 import Autotext from "../../components/Autotext/Autotext.js";
 import Autocomplete from "@material-ui/lab/Autocomplete";
@@ -109,6 +113,8 @@ class LoanpurposePage extends Component {
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
       ],
+      loggedInUserRole: auth.getUserInfo().role.name,
+      assignedFPO: "",
     };
   }
 
@@ -178,6 +184,20 @@ class LoanpurposePage extends Component {
       .catch((error) => {
         console.log(error);
       });
+
+    /** get FPO assigned to logged in FPO admn user */
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((indRes) => {
+          this.setState({ assignedFPO: indRes.data.fpo.id });
+        })
+        .catch((error) => {});
+    }
   }
 
   //adds input fields corresponding to no of clicks
@@ -568,16 +588,30 @@ class LoanpurposePage extends Component {
     let addDuration = this.state.values.addDuration;
     let addSpecification = this.state.values.addSpecification;
     let addAmount = this.state.values.addAmount;
-    let addFPO = this.state.values.addFPO;
     let loanEmi = this.state.values.addEMI;
     let postLoan = {
       product_name: productName,
       duration: addDuration,
       specification: addSpecification,
       loan_amount: addAmount,
-      fpo: addFPO,
       emi: loanEmi,
     };
+    /** save fpo selected from the drop down if roles are sesta admin & superadmin
+     * save FPO belongs to logged in user if role is FPO admin
+     */
+    if (
+      this.state.loggedInUserRole === "Sesta Admin" ||
+      this.state.loggedInUserRole === "Superadmin"
+    ) {
+      Object.assign(postLoan, {
+        fpo: this.state.values.addFPO,
+      });
+    } else {
+      Object.assign(postLoan, {
+        fpo: this.state.assignedFPO,
+      });
+    }
+
     if (this.state.editPage[0]) {
       serviceProvider
         .serviceProviderForPutRequest(
@@ -749,43 +783,46 @@ class LoanpurposePage extends Component {
                     variant="outlined"
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
-                  <Autotext
-                    id="combo-box-demo"
-                    options={fpoFilters}
-                    variant="outlined"
-                    label="FPO"
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, value) => {
-                      this.handleFpoChange(event, value);
-                    }}
-                    value={
-                      addFPO
-                        ? this.state.isCancel === true
-                          ? null
-                          : fpoFilters[
-                              fpoFilters.findIndex(function (item, i) {
-                                return item.id === addFPO;
-                              })
-                            ] || null
-                        : null
-                    }
-                    error={this.hasError("addFPO")}
-                    helperText={
-                      this.hasError("addFPO")
-                        ? this.state.errors.addFPO[0]
-                        : null
-                    }
-                    renderInput={(params) => (
-                      <Input
-                        fullWidth
-                        label="FPO"
-                        name="addFPO"
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                </Grid>
+                {this.state.loggedInUserRole === "Sesta Admin" ||
+                this.state.loggedInUserRole === "Superadmin" ? (
+                  <Grid item md={6} xs={12}>
+                    <Autotext
+                      id="combo-box-demo"
+                      options={fpoFilters}
+                      variant="outlined"
+                      label="FPO"
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handleFpoChange(event, value);
+                      }}
+                      value={
+                        addFPO
+                          ? this.state.isCancel === true
+                            ? null
+                            : fpoFilters[
+                                fpoFilters.findIndex(function (item, i) {
+                                  return item.id === addFPO;
+                                })
+                              ] || null
+                          : null
+                      }
+                      error={this.hasError("addFPO")}
+                      helperText={
+                        this.hasError("addFPO")
+                          ? this.state.errors.addFPO[0]
+                          : null
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          fullWidth
+                          label="FPO"
+                          name="addFPO"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                ) : null}
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth

@@ -74,6 +74,7 @@ export class Members extends React.Component {
       singleDelete: "",
       multipleDelete: "",
       loggedInUserRole: auth.getUserInfo().role.name,
+      bankDetailsFound: true,
     };
   }
 
@@ -375,7 +376,36 @@ export class Members extends React.Component {
         memberData = memData;
       }
     });
-    this.props.history.push("/loans/apply/" + cellid, memberData);
+    /** check bandetails present for the SHG of the selected member
+     * if yes, allow member to apply for the loan
+     * else, display warning message
+     */
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/contact/?id=" +
+          memberData.individual.shg
+      )
+      .then((res) => {
+        serviceProvider
+          .serviceProviderForGetRequest(
+            process.env.REACT_APP_SERVER_URL +
+              "bankdetails/?organization=" +
+              res.data[0].organization.id
+          )
+          .then((res) => {
+            let bankData = res.data;
+            this.setState({ bankDetailsFound: true });
+            if (bankData.length > 0) {
+              this.props.history.push("/loans/apply/" + cellid, memberData);
+            } else {
+              this.setState({ bankDetailsFound: false });
+            }
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   render() {
@@ -457,6 +487,12 @@ export class Members extends React.Component {
                 </Button>
               </div>
             </div>
+            {!this.state.bankDetailsFound ? (
+              <Snackbar severity="info">
+                No bank details found for SHG of this member
+              </Snackbar>
+            ) : null}
+
             {this.props.location.addData ? (
               <Snackbar severity="success">Member added successfully.</Snackbar>
             ) : this.props.location.editData ? (

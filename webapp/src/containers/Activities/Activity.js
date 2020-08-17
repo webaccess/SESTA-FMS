@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import Input from "../../components/UI/Input/Input";
 import Button from "../../components/UI/Button/Button";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
+import auth from "../../components/Auth/Auth";
 
 const useStyles = (theme) => ({
   root: {},
@@ -58,12 +59,21 @@ export class Activity extends React.Component {
   }
 
   async componentDidMount() {
+    let filteredArray = [];
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL + "crm-plugin/activities/"
       )
       .then((res) => {
-        this.setState({ data: res.data });
+        res.data.map((e, i) => {
+          e.activityassignees.map((item) => {});
+          e.activityassignees
+            .filter((item) => item.contact === auth.getUserInfo().contact.id)
+            .map((filteredData) => {
+              filteredArray.push(e);
+            });
+        });
+        this.setState({ data: filteredArray });
       })
       .catch((error) => {
         console.log(error);
@@ -158,7 +168,16 @@ export class Activity extends React.Component {
           searchData
       )
       .then((res) => {
-        this.setState({ data: res.data });
+        let filteredArray = [];
+        res.data.map((e, i) => {
+          e.activityassignees.map((item) => {});
+          e.activityassignees
+            .filter((item) => item.contact === auth.getUserInfo().contact.id)
+            .map((filteredData) => {
+              filteredArray.push(e);
+            });
+        });
+        this.setState({ data: filteredArray });
       })
       .catch((err) => {
         console.log(err);

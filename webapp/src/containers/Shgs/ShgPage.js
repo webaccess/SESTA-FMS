@@ -343,7 +343,6 @@ class ShgPage extends Component {
         id: shgVillage,
       },
       vos: shgVo,
-      creator_id: auth.getUserInfo().contact.id,
     };
     if (this.state.editPage[0]) {
       // edit SHG data
@@ -376,6 +375,9 @@ class ShgPage extends Component {
         });
     } else {
       // create SHG
+      Object.assign(postShgData, {
+        creator_id: auth.getUserInfo().contact.id,
+      });
       serviceProvider
         .serviceProviderForPostRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",

@@ -112,18 +112,16 @@ export class Loans extends React.Component {
   }
 
   async componentDidMount() {
-    console.log("auth--", auth.getUserInfo());
-    let url = "loan-applications";
-    // if (
-    //   this.state.loggedInUserRole === "FPO Admin" ||
-    //   this.state.loggedInUserRole === "CSP (Community Service Provider)"
-    // ) {
-    //   url += "&&creator_id=" + auth.getUserInfo().contact.id;
-    // }
+    let url = "loan-applications/";
+    if (
+      // this.state.loggedInUserRole === "FPO Admin" ||
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      url += "?creator_id=" + auth.getUserInfo().contact.id;
+    }
     serviceProvider
       .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
-        console.log("--res--", res.data);
         this.getFormattedData(res.data);
       });
 
@@ -274,13 +272,13 @@ export class Loans extends React.Component {
   }
 
   searchData(searchData) {
-    let url = "loan-applications";
-    // if (
-    //   this.state.loggedInUserRole === "FPO Admin" ||
-    //   this.state.loggedInUserRole === "CSP (Community Service Provider)"
-    // ) {
-    //   url += "&&creator_id=" + auth.getUserInfo().contact.id;
-    // }
+    let url = "loan-applications/";
+    if (
+      // this.state.loggedInUserRole === "FPO Admin" ||
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      url += "?creator_id=" + auth.getUserInfo().contact.id;
+    }
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL + url + "&&" + searchData

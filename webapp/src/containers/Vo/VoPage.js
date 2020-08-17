@@ -125,7 +125,6 @@ class VoPage extends Component {
       address_1: voAddress,
       block: block,
       gp: gp,
-      creator_id: auth.getUserInfo().contact.id,
     };
     if (this.state.editPage[0]) {
       // for edit Vo page
@@ -148,6 +147,9 @@ class VoPage extends Component {
         });
     } else {
       //for add VO page
+      Object.assign(postData, {
+        creator_id: auth.getUserInfo().contact.id,
+      });
       serviceProvider
         .serviceProviderForPostRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",

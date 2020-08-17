@@ -299,7 +299,6 @@ class UsersPage extends Component {
       contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
         "Individual"
       ][0],
-      creator_id: auth.getUserInfo().contact.id,
       first_name: fName,
       last_name: lName,
     };
@@ -334,6 +333,9 @@ class UsersPage extends Component {
         });
     } else {
       /** save data in contact & individual table */
+      Object.assign(postData, {
+        creator_id: auth.getUserInfo().contact.id,
+      });
       serviceProvider
         .serviceProviderForPostRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",
@@ -388,12 +390,35 @@ class UsersPage extends Component {
           fpo: 0,
         };
       }
-      if (roleId.name === "FPO Admin") {
+      if (
+        roleId.name === "FPO Admin" &&
+        (this.state.loggedInUserRole === "Superadmin" ||
+          this.state.loggedInUserRole === "Sesta Admin")
+      ) {
         postIndividualData = {
           vo: 0,
           shg: 0,
           fpo: selectFieldId,
         };
+      }
+      if (
+        roleId.name === "FPO Admin" &&
+        this.state.loggedInUserRole === "FPO Admin"
+      ) {
+        serviceProvider
+          .serviceProviderForGetRequest(
+            process.env.REACT_APP_SERVER_URL +
+              "crm-plugin/individuals/" +
+              auth.getUserInfo().contact.individual
+          )
+          .then((indRes) => {
+            postIndividualData = {
+              vo: 0,
+              shg: 0,
+              fpo: indRes.data.fpo.id,
+            };
+          })
+          .catch((error) => {});
       }
     } else {
       postIndividualData = {
