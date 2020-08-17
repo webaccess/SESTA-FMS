@@ -199,6 +199,7 @@ class LoanApprovalPage extends Component {
     this.setState({
       selectedFile: event.target.files[0],
       loaded: 0,
+      fileName: event.target.files[0].name,
     });
   };
 
@@ -336,15 +337,18 @@ class LoanApprovalPage extends Component {
                 )
                 .then((res) => {
                   serviceProvider
-                  .serviceProviderForGetRequest(
-                    process.env.REACT_APP_SERVER_URL + "loan-applications"
-                  )
-                  .then((resp) => {
-                    this.props.history.push({
-                      pathname: "/loans",
-                      state: { loanApproved: true, loanAppResData: resp.data},
+                    .serviceProviderForGetRequest(
+                      process.env.REACT_APP_SERVER_URL + "loan-applications"
+                    )
+                    .then((resp) => {
+                      this.props.history.push({
+                        pathname: "/loans",
+                        state: {
+                          loanApproved: true,
+                          loanAppResData: resp.data,
+                        },
+                      });
                     });
-                  });
                 })
                 .catch((error) => {});
             }
