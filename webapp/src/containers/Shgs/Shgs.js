@@ -569,6 +569,7 @@ export class Shgs extends React.Component {
               modalHandle={this.modalHandle}
               columnsvalue={columnsvalue}
               selectableRows
+              pagination
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (

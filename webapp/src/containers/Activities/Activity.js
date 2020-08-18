@@ -360,6 +360,7 @@ export class Activity extends React.Component {
                 DeleteAll={this.DeleteAll}
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
+                pagination
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (

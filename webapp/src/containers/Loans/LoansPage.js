@@ -130,8 +130,8 @@ class LoansPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&id=" +
-          shgid
+        "crm-plugin/contact/?contact_type=organization&id=" +
+        shgid
       )
       .then((res) => {
         // get VO assigned to selected SHG member
@@ -264,6 +264,7 @@ class LoansPage extends Component {
         postData
       )
       .then((res) => {
+        this.addActivity(res.data)
         this.getMemberData(memberId);
 
         // put method to update application_no
@@ -276,7 +277,7 @@ class LoansPage extends Component {
             res.data.id,
             updateAppNo
           )
-          .then((loanapp_res) => {});
+          .then((loanapp_res) => { });
 
         this.props.history.push({
           pathname: "/loans",
@@ -293,6 +294,58 @@ class LoansPage extends Component {
           state: { loanNotApplied: true },
         });
       });
+  }
+
+  addActivity(loanRes) {
+    let loanApplicationId, loanApplicationName;
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
+      )
+      .then((activityTypeResp) => {
+        activityTypeResp.data.map(type => {
+          if (type.name == "Loan application collection") {
+            loanApplicationId = type.id;
+            loanApplicationName = type.name;
+          }
+        })
+
+        // add activity records while updating loan emi for the first time by csp
+        let activityData = {
+          title: loanRes.contact.name + ": " + loanApplicationName + " for " + loanRes.purpose,
+          start_datetime: new Date(),
+          end_datetime: new Date(),
+          unit: 1,
+          description: "",
+          activitytype: {
+            id: loanApplicationId,
+          },
+        };
+        serviceProvider
+          .serviceProviderForPostRequest(
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
+            activityData
+          )
+          .then((resp) => {
+            let cid = resp.data.id;
+
+            // add activityassingnees
+            let activityassignee = {
+              contact: {
+                id: auth.getUserInfo().contact.id
+              },
+              activity: {
+                id: cid
+              }
+            }
+            serviceProvider
+              .serviceProviderForPostRequest(
+                process.env.REACT_APP_SERVER_URL + "crm-plugin/activityassignees",
+                activityassignee
+              )
+              .then((assigneeResp) => { })
+          })
+      })
   }
 
   getMemberData(id) {
@@ -431,10 +484,10 @@ class LoansPage extends Component {
                     value={
                       handlePurposeChange
                         ? loan_model[
-                            loan_model.findIndex(function (item, i) {
-                              return item.id == handlePurposeChange.id;
-                            })
-                          ]
+                        loan_model.findIndex(function (item, i) {
+                          return item.id == handlePurposeChange.id;
+                        })
+                        ]
                         : loan_model[0]
                     }
                     renderInput={(params) => (
@@ -499,12 +552,12 @@ class LoansPage extends Component {
                           </tr>
                           {this.state.loan_installments
                             ? this.state.loan_installments.map((row) => (
-                                <tr>
-                                  <td>{row.due_date}</td>
-                                  <td>{row.principal}</td>
-                                  <td>{row.interest}</td>
-                                </tr>
-                              ))
+                              <tr>
+                                <td>{row.due_date}</td>
+                                <td>{row.principal}</td>
+                                <td>{row.interest}</td>
+                              </tr>
+                            ))
                             : null}
                         </table>
                       </b>

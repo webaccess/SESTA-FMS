@@ -683,6 +683,7 @@ export class Members extends React.Component {
                 DeleteAll={this.DeleteAll}
                 columnsvalue={columnsvalue}
                 selectableRows
+                pagination
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (
