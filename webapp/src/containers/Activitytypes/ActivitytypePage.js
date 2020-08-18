@@ -68,11 +68,12 @@ class ActivitytypePage extends Component {
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
       ],
+      assignedFPO: "",
+      loggedInUserRole: auth.getUserInfo().role.name,
     };
   }
 
   async componentDidMount() {
-    this.state.userInfo = auth.getUserInfo();
     if (this.state.editPage[0]) {
       serviceProvider
         .serviceProviderForGetRequest(
@@ -111,6 +112,20 @@ class ActivitytypePage extends Component {
       .catch((error) => {
         console.log(error);
       });
+
+    /** get FPO assigned to logged in FPO admn user */
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((indRes) => {
+          this.setState({ assignedFPO: indRes.data.fpo.id });
+        })
+        .catch((error) => {});
+    }
   }
 
   handleChange = ({ target, event }) => {
@@ -170,15 +185,27 @@ class ActivitytypePage extends Component {
     let activitytypeName = this.state.values.addActivitytype;
     let IsActive = this.state.addIsActive;
     let remunerate = this.state.values.addRemuneration;
-    let fpo = this.state.values.addFpo;
-
     let formData = {
       name: activitytypeName,
       remuneration: remunerate,
       is_active: IsActive,
       autocreated: false,
-      contact: fpo,
     };
+    /** save fpo selected from the drop down if roles are sesta admin & superadmin
+     * save FPO belongs to logged in user if role is FPO admin
+     */
+    if (
+      this.state.loggedInUserRole === "Sesta Admin" ||
+      this.state.loggedInUserRole === "Superadmin"
+    ) {
+      Object.assign(formData, {
+        contact: this.state.values.addFpo,
+      });
+    } else {
+      Object.assign(formData, {
+        contact: this.state.assignedFPO,
+      });
+    }
 
     if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
@@ -336,45 +363,46 @@ class ActivitytypePage extends Component {
                     variant="outlined"
                   />
                 </Grid>
-                {userInfo.role.name == "Sesta Admin" && (
-                  <Grid item md={12} xs={12}>
-                    <Autotext
-                      id="combo-box-demo"
-                      options={fposFilter}
-                      variant="outlined"
-                      label="FPO"
-                      getOptionLabel={(option) => option.name}
-                      onChange={(event, value) => {
-                        this.handleFpoChange(event, value);
-                      }}
-                      value={
-                        addFpo
-                          ? this.state.isCancel === true
-                            ? null
-                            : fposFilter[
-                                fposFilter.findIndex(function (item, i) {
-                                  return item.id === addFpo;
-                                })
-                              ] || null
-                          : null
-                      }
-                      error={this.hasError("addFpo")}
-                      helperText={
-                        this.hasError("addFpo")
-                          ? this.state.errors.addFpo[0]
-                          : null
-                      }
-                      renderInput={(params) => (
-                        <Input
-                          fullWidth
-                          label="FPO*"
-                          name="addFpo"
-                          variant="outlined"
-                        />
-                      )}
-                    />
-                  </Grid>
-                )}
+                {userInfo.role.name == "Sesta Admin" ||
+                  (userInfo.role.name == "Superadmin" && (
+                    <Grid item md={12} xs={12}>
+                      <Autotext
+                        id="combo-box-demo"
+                        options={fposFilter}
+                        variant="outlined"
+                        label="FPO"
+                        getOptionLabel={(option) => option.name}
+                        onChange={(event, value) => {
+                          this.handleFpoChange(event, value);
+                        }}
+                        value={
+                          addFpo
+                            ? this.state.isCancel === true
+                              ? null
+                              : fposFilter[
+                                  fposFilter.findIndex(function (item, i) {
+                                    return item.id === addFpo;
+                                  })
+                                ] || null
+                            : null
+                        }
+                        error={this.hasError("addFpo")}
+                        helperText={
+                          this.hasError("addFpo")
+                            ? this.state.errors.addFpo[0]
+                            : null
+                        }
+                        renderInput={(params) => (
+                          <Input
+                            fullWidth
+                            label="FPO*"
+                            name="addFpo"
+                            variant="outlined"
+                          />
+                        )}
+                      />
+                    </Grid>
+                  ))}
 
                 <Grid item xs={12}>
                   <FormControlLabel

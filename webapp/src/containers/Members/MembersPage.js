@@ -25,14 +25,7 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
-import VisibilityIcon from "@material-ui/icons/Visibility";
-import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import FormControl from "@material-ui/core/FormControl";
-import IconButton from "@material-ui/core/IconButton";
-import OutlinedInput from "@material-ui/core/OutlinedInput";
-import InputLabel from "@material-ui/core/InputLabel";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import { constants } from "buffer";
 
 class ActivityPage extends Component {
   constructor(props) {
@@ -41,25 +34,20 @@ class ActivityPage extends Component {
       getState: [],
       getDistrict: [],
       getVillage: [],
+      getShgs: [],
       stateSelected: false,
       districtSelected: false,
       values: {
         addIsActive: false,
       },
       isShareholder: false,
-      createUser: false,
-      password: "",
-      showPassword: false,
       formSubmitted: "",
       errorCode: "",
-      rolesList: [],
-      roleName: "",
-      roleWiseData: [],
       shareInfoId: "",
-      createUserId: "",
+      loggedInUserRole: auth.getUserInfo().role.name,
       validations: {
         firstName: {
-          required: { value: "true", message: "First name field is required" },
+          required: { value: "true", message: "First name is required" },
         },
         lastName: {
           required: { value: "true", message: "Last name is required" },
@@ -95,6 +83,9 @@ class ActivityPage extends Component {
             message: "Please enter valid email id",
           },
         },
+        addShg: {
+          required: { value: "true", message: "SHG is required" },
+        },
       },
       validationsShareholder: {
         noOfShares: {
@@ -113,20 +104,6 @@ class ActivityPage extends Component {
           required: { value: "true", message: "Nominee is required" },
         },
       },
-      validationsCreateuser: {
-        username: {
-          required: { value: "true", message: "Username is required" },
-        },
-        password: {
-          required: { value: "true", message: "Password is required" },
-        },
-        role: {
-          required: { value: "true", message: "Role is required" },
-        },
-        selectField: {
-          required: { value: "true", message: "Field is required" },
-        },
-      },
       errors: {},
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
@@ -136,18 +113,6 @@ class ActivityPage extends Component {
   }
 
   async componentDidMount() {
-    // get all roles
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "users-permissions/roles"
-      )
-      .then((res) => {
-        this.setState({ rolesList: res.data.roles });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
     if (this.state.editPage[0]) {
       serviceProvider
         .serviceProviderForGetRequest(
@@ -158,6 +123,7 @@ class ActivityPage extends Component {
         .then((res) => {
           this.handleStateChange(res.data.state);
           this.handleDistrictChange(res.data.district);
+          this.handleShgChange("", res.data.individual.shg);
 
           this.setState({
             values: {
@@ -173,6 +139,7 @@ class ActivityPage extends Component {
               addPincode: res.data.pincode,
               addPhone: res.data.phone,
               addEmail: res.data.email,
+              addShg: res.data.individual.shg,
             },
           });
 
@@ -190,51 +157,6 @@ class ActivityPage extends Component {
               isShareholder: true,
               values: tempValues,
             });
-          }
-          // if createUser is checked
-          if (res.data.user) {
-            this.setState({ createUserId: res.data.user.id });
-            serviceProvider
-              .serviceProviderForGetRequest(
-                process.env.REACT_APP_SERVER_URL +
-                  "users/?role.id=" +
-                  res.data.user.role +
-                  "&&contact.id=" +
-                  res.data.id
-              )
-              .then((response) => {
-                let tempUserValues = this.state.values;
-                tempUserValues["username"] = res.data.user.username;
-                tempUserValues["role"] = response.data[0].role;
-                // to get the role obj from role id
-                serviceProvider
-                  .serviceProviderForGetRequest(
-                    process.env.REACT_APP_SERVER_URL +
-                      "users-permissions/roles/" +
-                      res.data.user.role
-                  )
-                  .then((roleRes) => {
-                    if (roleRes.data.role.name === "SHG Member") {
-                      tempUserValues["selectField"] = res.data.individual.shg;
-                    }
-                    if (
-                      roleRes.data.role.name ===
-                      "CSP (Community Service Provider)"
-                    ) {
-                      tempUserValues["selectField"] = res.data.individual.vo;
-                    }
-
-                    this.handleRoleChange("", roleRes.data.role);
-                  })
-                  .catch((error) => {});
-                this.setState({
-                  createUser: true,
-                  values: tempUserValues,
-                });
-              })
-              .catch((error) => {
-                console.log(error);
-              });
           }
         })
         .catch((error) => {
@@ -254,6 +176,54 @@ class ActivityPage extends Component {
         console.log(error);
       });
 
+    // get all shgs
+    let url =
+      "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC";
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      url += "&creator_id=" + auth.getUserInfo().contact.id;
+      serviceProvider
+        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .then((res) => {
+          this.setState({ getShgs: res.data });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else if (
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      let shgArray = [];
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/contact/?individual=" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((res) => {
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/contact/?id=" +
+                res.data[0].individual.vo
+            )
+            .then((response) => {
+              this.setState({ getShgs: response.data[0].org_vos });
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      serviceProvider
+        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .then((res) => {
+          this.setState({ getShgs: res.data });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+
     if (this.state.values.addState) {
       this.setState({ stateSelected: true });
     }
@@ -272,7 +242,6 @@ class ActivityPage extends Component {
     const values = this.state.values;
     const validations = this.state.validations;
     const validationsShareholder = this.state.validationsShareholder;
-    const validationsCreateuser = this.state.validationsCreateuser;
     const allValiations = validations;
     if (this.state.isShareholder) {
       Object.assign(allValiations, validationsShareholder);
@@ -282,14 +251,6 @@ class ActivityPage extends Component {
       delete allValiations["shareAmt"];
       delete allValiations["noOfShares"];
       delete allValiations["certificateNo"];
-    }
-    if (this.state.createUser) {
-      Object.assign(allValiations, validationsCreateuser);
-    } else {
-      delete allValiations["username"];
-      delete allValiations["password"];
-      delete allValiations["role"];
-      delete allValiations["selectField"];
     }
     map(allValiations, (validation, key) => {
       let value = values[key] ? values[key] : "";
@@ -390,69 +351,6 @@ class ActivityPage extends Component {
     });
   };
 
-  handleOnUserCheck = (event, type) => {
-    this.setState({
-      createUser: !this.state.createUser,
-    });
-  };
-
-  handleRoleChange = (event, value) => {
-    let apiUrl;
-    if (value !== null) {
-      this.setState({
-        values: {
-          ...this.state.values,
-          role: value,
-          roleName: value.name,
-        },
-      });
-
-      if (value.name === "CSP (Community Service Provider)") {
-        apiUrl =
-          "crm-plugin/contact/?contact_type=organization&organization.sub_type=VO&_sort=name:ASC";
-      } else if (value.name === "SHG Member") {
-        apiUrl =
-          "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&_sort=name:ASC";
-      } else if (value.name === "FPO Admin") {
-        apiUrl =
-          "crm-plugin/contact/?contact_type=organization&organization.sub_type=FPO&_sort=name:ASC";
-      }
-
-      // get all VO for role CSP
-      serviceProvider
-        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + apiUrl)
-        .then((res) => {
-          this.setState({ roleWiseData: res.data });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else {
-      this.setState({
-        values: {
-          ...this.state.values,
-          role: "",
-          roleName: "",
-        },
-      });
-    }
-  };
-
-  handleFieldChange = (event, value) => {
-    if (value !== null) {
-      this.setState({
-        values: { ...this.state.values, selectField: value.id },
-      });
-    } else {
-      this.setState({
-        values: {
-          ...this.state.values,
-          selectField: "",
-        },
-      });
-    }
-  };
-
   handleClickShowPassword = () => {
     this.setState({ showPassword: !this.state.showPassword });
   };
@@ -461,10 +359,33 @@ class ActivityPage extends Component {
     event.preventDefault();
   };
 
+  handleShgChange(event, value) {
+    if (value !== null) {
+      if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
+        this.setState({
+          values: { ...this.state.values, addShg: value.contact },
+        });
+      } else {
+        this.setState({
+          values: { ...this.state.values, addShg: value.id },
+        });
+      }
+    } else {
+      this.setState({
+        values: {
+          ...this.state.values,
+          addShg: "",
+        },
+      });
+    }
+  }
+
   handleSubmit = async (e) => {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
+    if (Object.keys(this.state.errors).length > 0) return;
+
     let fName = this.state.values.firstName;
     let lName = this.state.values.lastName;
     let hName = this.state.values.husbandName;
@@ -477,6 +398,7 @@ class ActivityPage extends Component {
     let emailAdd = this.state.values.addEmail;
     let pincodeNo = this.state.values.addPincode;
     let villageId = this.state.values.addVillage;
+    let shgId = this.state.values.addShg;
 
     let postData = {
       name: fName + " " + lName,
@@ -501,8 +423,8 @@ class ActivityPage extends Component {
       first_name: fName,
       last_name: lName,
       partner_name: hName,
+      shg: shgId,
     };
-    if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
       // edit present member (update API)
       serviceProvider
@@ -512,12 +434,7 @@ class ActivityPage extends Component {
           postData
         )
         .then((res) => {
-          // if (this.state.isShareholder) {
           this.saveShareInfo(res.data);
-          // }
-          // if (this.state.createUser) {
-          this.saveUser(res.data);
-          // }
           this.setState({ formSubmitted: true });
           this.props.history.push({ pathname: "/members", editData: true });
         })
@@ -539,6 +456,9 @@ class ActivityPage extends Component {
         });
     } else {
       // add new member API (entry gets saved in contact & individual table)
+      Object.assign(postData, {
+        creator_id: auth.getUserInfo().contact.id,
+      });
       serviceProvider
         .serviceProviderForPostRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",
@@ -547,9 +467,6 @@ class ActivityPage extends Component {
         .then((res) => {
           if (this.state.isShareholder) {
             this.saveShareInfo(res.data);
-          }
-          if (this.state.createUser) {
-            this.saveUser(res.data);
           }
           this.setState({
             formSubmitted: true,
@@ -634,116 +551,6 @@ class ActivityPage extends Component {
     }
   };
 
-  saveUser = async (data) => {
-    let username = this.state.values.username;
-    let password = this.state.values.password;
-    let roleId = this.state.values.role;
-    let selectFieldId = this.state.values.selectField;
-
-    let postUserData = {
-      username: username,
-      password: password,
-      role: roleId,
-      contact: data.id,
-      email: this.state.values.addEmail,
-      first_name: this.state.values.firstName,
-      last_name: this.state.values.lastName,
-    };
-
-    let postIndividualData = {};
-    if (roleId) {
-      if (roleId.name === "SHG Member") {
-        postIndividualData = {
-          shg: selectFieldId,
-          vo: 0,
-        };
-      } else if (roleId.name === "CSP (Community Service Provider)") {
-        postIndividualData = {
-          vo: selectFieldId,
-          shg: 0,
-        };
-      }
-    } else {
-      postIndividualData = {
-        vo: 0,
-        shg: 0,
-      };
-    }
-
-    if (data.user) {
-      // update user in Users table
-      if (this.state.createUser) {
-        // if createUser checkbox is checked
-        serviceProvider
-          .serviceProviderForPutRequest(
-            process.env.REACT_APP_SERVER_URL + "users",
-            this.state.createUserId,
-            postUserData
-          )
-          .then((res) => {
-            serviceProvider
-              .serviceProviderForPutRequest(
-                process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
-                data.individual.id,
-                postIndividualData
-              )
-              .then((res) => {})
-              .catch((error) => {});
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      } else {
-        if (this.state.createUserId) {
-          // if createUSer is selected previously but unchecked later
-          serviceProvider
-            .serviceProviderForDeleteRequest(
-              process.env.REACT_APP_SERVER_URL + "users",
-              this.state.createUserId
-            )
-            .then((res) => {
-              serviceProvider
-                .serviceProviderForPutRequest(
-                  process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
-                  data.individual.id,
-                  { shg: 0, vo: 0 }
-                )
-                .then((res) => {})
-                .catch((error) => {
-                  console.log(error);
-                });
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        }
-      }
-    } else {
-      // add user in Users table
-      serviceProvider
-        .serviceProviderForPostRequest(
-          process.env.REACT_APP_SERVER_URL + "users/",
-          postUserData
-        )
-        .then((res) => {
-          // add shg/vo in Individuals table based on selected role
-          serviceProvider
-            .serviceProviderForPutRequest(
-              process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
-              data.individual.id,
-              postIndividualData
-            )
-            .then((res) => {})
-            .catch((error) => {
-              console.log(error);
-            });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-  };
-
   cancelForm = () => {
     this.setState({
       values: {},
@@ -760,10 +567,8 @@ class ActivityPage extends Component {
     let addDistrict = this.state.values.addDistrict;
     let villageFilter = this.state.getVillage;
     let addVillage = this.state.values.addVillage;
-    let roleFilter = this.state.rolesList;
-    let role = this.state.values.role;
-    let roleName = this.state.values.roleName;
-    let selectField = this.state.values.selectField;
+    let shgFilters = this.state.getShgs;
+    let addShg = this.state.values.addShg;
 
     return (
       <Layout
@@ -1059,6 +864,54 @@ class ActivityPage extends Component {
                     variant="outlined"
                   />
                 </Grid>
+                <Grid item md={6} xs={12}>
+                  <Autotext
+                    id="combo-box-demo"
+                    options={shgFilters}
+                    variant="outlined"
+                    label="Select SHG*"
+                    getOptionLabel={(option) => option.name}
+                    onChange={(event, value) => {
+                      this.handleShgChange(event, value);
+                    }}
+                    value={
+                      this.state.loggedInUserRole ===
+                      "CSP (Community Service Provider)"
+                        ? addShg
+                          ? this.state.isCancel === true
+                            ? null
+                            : shgFilters[
+                                shgFilters.findIndex(function (item, i) {
+                                  return item.contact === addShg;
+                                })
+                              ] || null
+                          : null
+                        : addShg
+                        ? this.state.isCancel === true
+                          ? null
+                          : shgFilters[
+                              shgFilters.findIndex(function (item, i) {
+                                return item.id === addShg;
+                              })
+                            ] || null
+                        : null
+                    }
+                    error={this.hasError("addShg")}
+                    helperText={
+                      this.hasError("addShg")
+                        ? this.state.errors.addShg[0]
+                        : null
+                    }
+                    renderInput={(params) => (
+                      <Input
+                        fullWidth
+                        label="Select SHG"
+                        name="addShg"
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                </Grid>
 
                 <Grid item xs={12}>
                   <FormControlLabel
@@ -1164,152 +1017,6 @@ class ActivityPage extends Component {
                         variant="outlined"
                       />
                     </Grid>
-                  </Grid>
-                ) : null}
-
-                <Grid item xs={12}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={this.state.createUser}
-                        onChange={this.handleOnUserCheck}
-                        name="createUser"
-                        color="secondary"
-                      />
-                    }
-                    label="Create User"
-                  />
-                </Grid>
-                <Divider />
-                {this.state.createUser ? (
-                  <Grid container spacing={3}>
-                    <Grid item md={6} xs={12}>
-                      <Input
-                        fullWidth
-                        label="Username*"
-                        name="username"
-                        error={this.hasError("username")}
-                        helperText={
-                          this.hasError("username")
-                            ? this.state.errors.username[0]
-                            : null
-                        }
-                        value={this.state.values.username || ""}
-                        onChange={this.handleChange}
-                        variant="outlined"
-                      />
-                    </Grid>
-                    <Grid item md={6} xs={12}>
-                      <FormControl variant="outlined">
-                        <InputLabel htmlFor="outlined-adornment-password">
-                          Password*
-                        </InputLabel>
-                        <OutlinedInput
-                          fullWidth
-                          name="password"
-                          type={this.state.showPassword ? "text" : "password"}
-                          error={this.hasError("username")}
-                          // value={this.state.password}
-                          onChange={this.handleChange}
-                          endadornment={
-                            <InputAdornment position="end">
-                              <IconButton
-                                aria-label="toggle password visibility"
-                                onClick={this.handleClickShowPassword}
-                                onMouseDown={this.handleMouseDownPassword}
-                                edge="end"
-                              >
-                                <VisibilityIcon />
-                                {this.state.showPassword ? (
-                                  <VisibilityIcon />
-                                ) : (
-                                  <VisibilityOffIcon />
-                                )}
-                              </IconButton>
-                            </InputAdornment>
-                          }
-                        />
-                      </FormControl>
-                    </Grid>
-                    <Grid item md={6} xs={12}>
-                      <Autocomplete
-                        id="select-role"
-                        name="role"
-                        value={role}
-                        options={roleFilter}
-                        variant="outlined"
-                        getOptionLabel={(option) => option.name}
-                        placeholder="Select Role*"
-                        onChange={this.handleRoleChange}
-                        renderInput={(params) => (
-                          <Input
-                            {...params}
-                            fullWidth
-                            label="Select Role*"
-                            name="role"
-                            variant="outlined"
-                            error={this.hasError("role")}
-                          />
-                        )}
-                      />
-                    </Grid>
-                    {roleName === "CSP (Community Service Provider)" ||
-                    roleName === "SHG Member" ||
-                    roleName === "FPO Admin" ||
-                    roleName === "" ? (
-                      <Grid item md={6} xs={12}>
-                        <Autotext
-                          id="select-field"
-                          options={this.state.roleWiseData}
-                          variant="outlined"
-                          label={
-                            roleName === "CSP (Community Service Provider)"
-                              ? "Select Village Organization*"
-                              : roleName === "SHG Member"
-                              ? "Select SHGs*"
-                              : roleName === "FPO Admin"
-                              ? "Select FPO*"
-                              : null
-                          }
-                          name="selectField"
-                          getOptionLabel={(option) => option.name}
-                          onChange={(event, value) => {
-                            this.handleFieldChange(event, value);
-                          }}
-                          defaultValue={[]}
-                          value={
-                            selectField
-                              ? this.state.roleWiseData[
-                                  this.state.roleWiseData.findIndex(function (
-                                    item,
-                                    i
-                                  ) {
-                                    return item.id === selectField;
-                                  })
-                                ] || null
-                              : null
-                          }
-                          error={this.hasError("selectField")}
-                          renderInput={(params) => (
-                            <Input
-                              {...params}
-                              fullWidth
-                              label={
-                                roleName === "CSP (Community Service Provider)"
-                                  ? "Select Village Organization*"
-                                  : roleName === "SHG Member"
-                                  ? "Select SHGs*"
-                                  : roleName === "FPO Admin"
-                                  ? "Select FPO*"
-                                  : null
-                              }
-                              name="selectField"
-                              variant="outlined"
-                            />
-                          )}
-                        />
-                      </Grid>
-                    ) : null}
                   </Grid>
                 ) : null}
               </Grid>

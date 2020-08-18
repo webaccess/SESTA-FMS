@@ -74,15 +74,21 @@ export class Vos extends React.Component {
       isCancel: false,
       singleDelete: "",
       multipleDelete: "",
+      loggedInUserRole: auth.getUserInfo().role.name,
     };
   }
 
   async componentDidMount() {
+    let url =
+      "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC";
+    if (
+      this.state.loggedInUserRole === "FPO Admin" ||
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      url += "&&creator_id=" + auth.getUserInfo().contact.id;
+    }
     serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&organization.sub_type=VO&_sort=name:ASC"
-      )
+      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
         this.setState({ data: res.data });
       });
@@ -252,11 +258,17 @@ export class Vos extends React.Component {
     }
 
     //api call after search filter
+    let url =
+      "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC";
+    if (
+      this.state.loggedInUserRole === "FPO Admin" ||
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      url += "&&creator_id=" + auth.getUserInfo().contact.id;
+    }
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC&&" +
-          searchData
+        process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
       )
       .then((res) => {
         this.setState({ data: res.data });
@@ -268,9 +280,6 @@ export class Vos extends React.Component {
 
   render() {
     let data = this.state.data;
-    if (data.length !== 0) {
-    }
-
     const Usercolumns = [
       {
         name: "Village Organization",

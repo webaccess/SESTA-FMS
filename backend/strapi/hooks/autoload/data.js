@@ -712,6 +712,36 @@ const modules = {
     order: 24,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
+  Users: {
+    is_active: true,
+    icon_class: "personadd",
+    url: "/users",
+    slug: "list_users",
+    displayNavigation: true,
+    module: "", //slug
+    order: 25,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Add User": {
+    is_active: true,
+    icon_class: "",
+    url: "/users/add",
+    slug: "add_user",
+    displayNavigation: false,
+    module: "", //slug
+    order: 26,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
+  "Edit User": {
+    is_active: true,
+    icon_class: "",
+    url: "/users/edit/:id",
+    slug: "edit_user",
+    displayNavigation: false,
+    module: "", //slug
+    order: 26,
+    roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
+  },
 };
 
 module.exports = Object.freeze({

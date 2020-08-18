@@ -113,7 +113,7 @@ class LoansPage extends Component {
       values: {},
       getShgVo: [],
       loan_installments: [],
-      shgUnderVo: [],
+      shgUnderVo: "",
       handlePurposeChange: "",
       isCancel: false,
       loan_model: [],
@@ -135,22 +135,11 @@ class LoansPage extends Component {
       )
       .then((res) => {
         // get VO assigned to selected SHG member
-        let VoContactId;
-        if (res.data) {
-          VoContactId = res.data[0].organization.vos[0].id;
-        }
-        serviceProvider
-          .serviceProviderForGetRequest(
-            process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/contact/" +
-              VoContactId
-          )
-          .then((res) => {
-            this.setState({ shgUnderVo: res.data });
-          })
-          .catch((error) => {
-            console.log(error);
+        res.data.map((e, i) => {
+          e.organization.vos.map((item) => {
+            this.setState({ shgUnderVo: item.name });
           });
+        });
       })
       .catch((error) => {
         console.log(error);
@@ -215,6 +204,7 @@ class LoansPage extends Component {
       application_date: Moment().format("YYYY-MM-DD"),
       purpose: assignLoanAppValues.product_name,
       status: "UnderReview",
+      creator_id: auth.getUserInfo().contact.id,
     };
 
     if (postData.loan_applications && postData.loan_applications.length > 0) {
@@ -327,7 +317,7 @@ class LoansPage extends Component {
 
   render() {
     const { classes } = this.props;
-    let shgName, voName, loan_amnt, duration, specification, loan_purpose;
+    let shgName, loan_amnt, duration, specification, loan_purpose;
 
     // store memberData(props.history.push) from member page
     let data = this.props.location.state;
@@ -371,9 +361,8 @@ class LoansPage extends Component {
 
     this.state.getShgVo.map((shgvo) => {
       shgName = shgvo.shg.name;
-      voName = shgvo.vo.name;
     });
-    let shgUnderVo = this.state.shgUnderVo.name;
+    let shgUnderVo = this.state.shgUnderVo;
 
     return (
       <Layout>

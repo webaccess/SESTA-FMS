@@ -36,8 +36,8 @@
       "type": "decimal"
     },
     "loan_application": {
-      "model": "loan-application",
-      "via": "loan_app_installments"
+      "via": "loan_app_installments",
+      "model": "loan-application"
     },
     "actual_payment_date": {
       "type": "datetime"

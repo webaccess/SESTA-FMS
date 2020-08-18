@@ -57,38 +57,38 @@ const useStyles = (theme) => ({
 
 const conditionalRowStyles = [
   {
-    when: row => row.status == "Approved",
+    when: (row) => row.status == "Approved",
     style: {
-      backgroundColor: '#c9e7b1',
-      color: 'black',
-      '&:hover': {
+      backgroundColor: "#c9e7b1",
+      color: "black",
+      "&:hover": {
         backgroundColor: "#bce09e",
-        cursor: 'pointer',
+        cursor: "pointer",
       },
     },
   },
   {
-    when: row => row.status == "UnderReview",
+    when: (row) => row.status == "UnderReview",
     style: {
-      backgroundColor: '#ffd6cc',
-      color: 'black',
-      '&:hover': {
+      backgroundColor: "#ffd6cc",
+      color: "black",
+      "&:hover": {
         backgroundColor: "#ffc2b3",
-        cursor: 'pointer',
+        cursor: "pointer",
       },
     },
   },
   {
-    when: row => row.status == "Denied" || row.status == "Cancelled",
+    when: (row) => row.status == "Denied" || row.status == "Cancelled",
     style: {
-      backgroundColor: '#d7dbdb',
-      color: 'black',
-      '&:hover': {
+      backgroundColor: "#d7dbdb",
+      color: "black",
+      "&:hover": {
         backgroundColor: "#c9cfcf",
-        cursor: 'pointer',
+        cursor: "pointer",
       },
     },
-  }
+  },
 ];
 export class Loans extends React.Component {
   constructor(props) {
@@ -107,30 +107,74 @@ export class Loans extends React.Component {
       values: {},
       filterStatus: "",
       filterShg: "",
+      loggedInUserRole: auth.getUserInfo().role.name,
     };
   }
 
   async componentDidMount() {
+    let url = "loan-applications/";
+    if (
+      // this.state.loggedInUserRole === "FPO Admin" ||
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      url += "?creator_id=" + auth.getUserInfo().contact.id;
+    }
     serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "loan-applications"
-      )
+      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
         this.getFormattedData(res.data);
       });
 
     // get all SHGs
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG"
-      )
-      .then((res) => {
-        this.setState({ getShg: res.data });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    let getShgurl =
+      "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC";
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      url += "&creator_id=" + auth.getUserInfo().contact.id;
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + getShgurl
+        )
+        .then((res) => {
+          this.setState({ getShg: res.data });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else if (
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/contact/?individual=" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((res) => {
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/contact/?id=" +
+                res.data[0].individual.vo
+            )
+            .then((response) => {
+              this.setState({ getShg: response.data[0].org_vos });
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + getShgurl
+        )
+        .then((res) => {
+          this.setState({ getShg: res.data });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }
 
   getFormattedData = (data) => {
@@ -139,28 +183,41 @@ export class Loans extends React.Component {
         "DD MMM YYYY"
       );
       loandata.loan_model.loan_amount = loandata.loan_model.loan_amount.toLocaleString();
-      if (loandata.loan_app_installments.length > 0 && loandata.status == "Approved") {
+      if (
+        loandata.loan_app_installments.length > 0 &&
+        loandata.status == "Approved"
+      ) {
         let loanDueId = loandata.loan_app_installments.length - 1;
         let loanDueData = loandata.loan_app_installments[loanDueId];
-        loandata.amount_due = (loanDueData.expected_interest + loanDueData.expected_principal).toLocaleString();
-        loandata.payment_date = Moment(loanDueData.payment_date).format('DD MMM YYYY');
+        loandata.amount_due = (
+          loanDueData.expected_interest + loanDueData.expected_principal
+        ).toLocaleString();
+        loandata.payment_date = Moment(loanDueData.payment_date).format(
+          "DD MMM YYYY"
+        );
 
         let paid = 0;
-        loandata.loan_app_installments.map(emidata => {
+        loandata.loan_app_installments.map((emidata) => {
           if (emidata.fine !== null || emidata.fine !== 0) {
-            emidata.totalPaid = (emidata.fine + emidata.actual_principal + emidata.actual_interest);
+            emidata.totalPaid =
+              emidata.fine + emidata.actual_principal + emidata.actual_interest;
           } else {
-            emidata.totalPaid = (emidata.actual_principal + emidata.actual_interest);
+            emidata.totalPaid =
+              emidata.actual_principal + emidata.actual_interest;
           }
           let totalLoanAmnt =
             emidata.expected_principal + emidata.expected_interest;
-          emidata.outstanding =
-            (totalLoanAmnt - (emidata.actual_principal + emidata.actual_interest)).toLocaleString();
+          emidata.outstanding = (
+            totalLoanAmnt -
+            (emidata.actual_principal + emidata.actual_interest)
+          ).toLocaleString();
 
           paid = paid + emidata.totalPaid;
-        })
+        });
 
-        let totalamount = parseInt(loandata.loan_model.loan_amount.replace(/,/g, ''));
+        let totalamount = parseInt(
+          loandata.loan_model.loan_amount.replace(/,/g, "")
+        );
         let outstandingAmount = totalamount - paid;
 
         if (outstandingAmount < 0) {
@@ -187,8 +244,8 @@ export class Loans extends React.Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/individuals/?shg.id=" +
-          this.state.filterShg.id
+            "crm-plugin/individuals/?shg.id=" +
+            this.state.filterShg.id
         )
         .then((res) => {
           if (res.data.length > 0) {
@@ -214,11 +271,17 @@ export class Loans extends React.Component {
     }
   }
 
-
   searchData(searchData) {
+    let url = "loan-applications/";
+    if (
+      // this.state.loggedInUserRole === "FPO Admin" ||
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      url += "?creator_id=" + auth.getUserInfo().contact.id;
+    }
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "loan-applications?" + searchData
+        process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
       )
       .then((res) => {
         this.getFormattedData(res.data);
@@ -254,32 +317,38 @@ export class Loans extends React.Component {
 
   viewTask = (cellid) => {
     let loanAppData;
-    this.state.data.map(e => {
+    this.state.data.map((e) => {
       if (e.id == cellid) {
         loanAppData = e;
-        this.props.history.push("/loan/update/" + cellid, { loanAppData: loanAppData });
+        this.props.history.push("/loan/update/" + cellid, {
+          loanAppData: loanAppData,
+        });
       }
-    })
+    });
   };
 
   viewEmi = (cellid) => {
     let loanAppData;
-    this.state.data.map(e => {
+    this.state.data.map((e) => {
       if (e.id == cellid) {
         loanAppData = e;
-        this.props.history.push("/loans/emi/" + cellid, { loanAppData: loanAppData });
+        this.props.history.push("/loans/emi/" + cellid, {
+          loanAppData: loanAppData,
+        });
       }
-    })
+    });
   };
 
   viewLoanEmi = (cellid) => {
     let loanAppData;
-    this.state.data.map(e => {
+    this.state.data.map((e) => {
       if (e.id == cellid) {
         loanAppData = e;
-        this.props.history.push("/loan/emi/view/" + cellid, { loanAppData: loanAppData });
+        this.props.history.push("/loan/emi/view/" + cellid, {
+          loanAppData: loanAppData,
+        });
       }
-    })
+    });
   };
 
   loanApproveData = (cellid) => {
@@ -355,28 +424,19 @@ export class Loans extends React.Component {
         name: "Outstanding amount",
         selector: "outstandingAmount",
         sortable: true,
-        cell: (row) =>
-          row.outstandingAmount
-            ? row.outstandingAmount
-            : "-",
+        cell: (row) => (row.outstandingAmount ? row.outstandingAmount : "-"),
       },
       {
         name: "Amount Due",
         selector: "amount_due",
         sortable: true,
-        cell: (row) =>
-          row.amount_due
-            ? row.amount_due
-            : "-",
+        cell: (row) => (row.amount_due ? row.amount_due : "-"),
       },
       {
         name: "Installment Date",
         selector: "payment_date",
         sortable: true,
-        cell: (row) =>
-          row.payment_date
-            ? row.payment_date
-            : "-",
+        cell: (row) => (row.payment_date ? row.payment_date : "-"),
       },
     ];
     let selectors = [];
@@ -540,8 +600,8 @@ export class Loans extends React.Component {
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (
-              <h1>Loading...</h1>
-            )}
+            <h1>Loading...</h1>
+          )}
         </Grid>
       </Layout>
     );

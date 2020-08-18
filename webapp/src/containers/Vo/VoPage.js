@@ -108,7 +108,7 @@ class VoPage extends Component {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
-    // if (Object.keys(this.state.errors).length > 0) return;
+    if (Object.keys(this.state.errors).length > 0) return;
     let voName = this.state.values.addVo;
     let voAddress = this.state.values.addVoAddress;
     let person = this.state.values.addPerson;
@@ -126,7 +126,6 @@ class VoPage extends Component {
       block: block,
       gp: gp,
     };
-    if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
       // for edit Vo page
       serviceProvider
@@ -148,6 +147,9 @@ class VoPage extends Component {
         });
     } else {
       //for add VO page
+      Object.assign(postData, {
+        creator_id: auth.getUserInfo().contact.id,
+      });
       serviceProvider
         .serviceProviderForPostRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",

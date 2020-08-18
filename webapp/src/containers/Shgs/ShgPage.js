@@ -36,6 +36,7 @@ class ShgPage extends Component {
       getVillageOrganization: [],
       bankInfoId: "",
       formSubmitted: "",
+      loggedInUserRole: auth.getUserInfo().role.name,
       validations: {
         addShg: {
           required: { value: "true", message: "Shg name is required" },
@@ -155,11 +156,16 @@ class ShgPage extends Component {
     }
 
     // get all VOs
+    let url =
+      "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC";
+    if (
+      this.state.loggedInUserRole === "FPO Admin" ||
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      url += "&&creator_id=" + auth.getUserInfo().contact.id;
+    }
     serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&organization.sub_type=VO&&_sort=name:ASC"
-      )
+      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
         this.setState({ getVillageOrganization: res.data });
       })
@@ -310,6 +316,7 @@ class ShgPage extends Component {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
+    if (Object.keys(this.state.errors).length > 0) return;
     let shgName = this.state.values.addShg;
     let shgAddress = this.state.values.addAddress;
     let shgPersonInCharge = this.state.values.addPointOfContact;
@@ -337,7 +344,6 @@ class ShgPage extends Component {
       },
       vos: shgVo,
     };
-    if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
       // edit SHG data
       serviceProvider
@@ -369,6 +375,9 @@ class ShgPage extends Component {
         });
     } else {
       // create SHG
+      Object.assign(postShgData, {
+        creator_id: auth.getUserInfo().contact.id,
+      });
       serviceProvider
         .serviceProviderForPostRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",

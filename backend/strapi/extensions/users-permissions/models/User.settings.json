@@ -56,11 +56,11 @@
     },
     "first_name": {
       "type": "string",
-      "required": true
+      "required": false
     },
     "last_name": {
       "type": "string",
-      "required": true
+      "required": false
     },
     "mobile": {
       "type": "string"

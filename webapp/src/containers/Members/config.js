@@ -1,11 +1,11 @@
 export const ADD_MEMBERS_BREADCRUMBS = {
   home: "Home",
-  list_country: "Members",
-  add_country: "Add Member",
+  list_members: "Members",
+  add_member: "Add Member",
 };
 
 export const EDIT_MEMBERS_BREADCRUMBS = {
   home: "Home",
-  list_country: "Members",
-  edit_country: "Edit Member",
+  list_members: "Members",
+  edit_member: "Edit Member",
 };

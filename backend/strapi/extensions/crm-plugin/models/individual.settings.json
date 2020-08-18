@@ -32,6 +32,10 @@
     "vo": {
       "plugin": "crm-plugin",
       "model": "contact"
+    },
+    "fpo": {
+      "plugin": "crm-plugin",
+      "model": "contact"
     }
   }
 }
