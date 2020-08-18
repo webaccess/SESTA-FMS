@@ -38,6 +38,9 @@
     },
     "loan_application_task": {
       "model": "loan-application-tasks"
+    },
+    "unit": {
+      "type": "string"
     }
   }
 }

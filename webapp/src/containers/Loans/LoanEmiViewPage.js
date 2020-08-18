@@ -6,7 +6,6 @@ import * as serviceProvider from "../../api/Axios";
 import MoneyIcon from "@material-ui/icons/Money";
 import Table from "../../components/Datatable/Datatable.js";
 import Moment from "moment";
-import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import { VIEW_LOAN_EMI_BREADCRUMBS } from "./config";
 
 const useStyles = (theme) => ({
@@ -240,14 +239,6 @@ class LoanEmiViewPage extends Component {
     }
     let columnsvalue = selectors[0];
 
-    let emiEditPage = false;
-    if (this.props.location.state && this.props.location.state.loanEditEmiPage) {
-      emiEditPage = true;
-    }
-    if (this.props.history.action === 'POP') {
-      emiEditPage = false;
-    }
-
     return (
       <Layout
         breadcrumbs={
@@ -273,11 +264,7 @@ class LoanEmiViewPage extends Component {
               </div>
             </div>
           </div>
-          <Grid item md={12} xs={12}>
-            {emiEditPage === true ? (
-              <Snackbar severity="success">Loan EMI Updated successfully.</Snackbar>
-            ) : null}
-          </Grid>
+
           <Card className={classes.mainContent}>
             <Grid
               container

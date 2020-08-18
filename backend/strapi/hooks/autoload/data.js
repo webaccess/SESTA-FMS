@@ -244,6 +244,21 @@ const modules = {
       "Superadmin",
     ],
   },
+  "Dashboard view more details": {
+    is_active: true,
+    icon_class: "dashboard",
+    url: "/view/more",
+    slug: "dashboard_view_more",
+    displayNavigation: false,
+    module: "", //slug
+    order: 1,
+    roles: [
+      "FPO Admin",
+      "Sesta Admin",
+      "CSP (Community Service Provider)",
+      "Superadmin",
+    ],
+  },
   Villages: {
     is_active: true,
     icon_class: "people",

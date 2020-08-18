@@ -183,6 +183,10 @@ export class Loans extends React.Component {
         "DD MMM YYYY"
       );
       loandata.loan_model.loan_amount = loandata.loan_model.loan_amount.toLocaleString();
+
+       //sort installments date by id
+       loandata.loan_app_installments.sort((a, b) => new Date(...a.payment_date.split('/').reverse()) - new Date(...b.payment_date.split('/').reverse()));
+
       if (
         loandata.loan_app_installments.length > 0 &&
         loandata.status == "Approved"
@@ -597,6 +601,7 @@ export class Loans extends React.Component {
               rowsSelected={this.rowsSelect}
               columnsvalue={columnsvalue}
               conditionalRowStyles={conditionalRowStyles}
+              pagination
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (

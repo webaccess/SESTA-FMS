@@ -357,6 +357,7 @@ export class Users extends React.Component {
                 DeleteData={this.DeleteData}
                 DeleteAll={this.DeleteAll}
                 columnsvalue={columnsvalue}
+                pagination
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (

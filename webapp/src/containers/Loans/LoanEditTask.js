@@ -150,6 +150,7 @@ class LoanEditTask extends Component {
                   if (fdata.loan_application_task.id == loanTaskData.id) {
                     updateActivityFlag = true;
                     delete fdata.contacts;
+                    fdata.unit = 1;
                     fdata.contact = {
                       id: auth.getUserInfo().contact.id
                     }
@@ -199,6 +200,7 @@ class LoanEditTask extends Component {
               title: loanTaskData.name,
               start_datetime: this.state.values.editDate,
               end_datetime: this.state.values.editDate,
+              unit: 1,
               description: loanTaskData.comments,
               activitytype: {
                 id: activityTypeId,

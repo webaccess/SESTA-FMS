@@ -375,6 +375,7 @@ class LoanEmiPage extends Component {
               editData={this.editData}
               rowsSelected={this.rowsSelect}
               columnsvalue={columnsvalue}
+              pagination
             />
           ) : (
               <h1>Loading...</h1>

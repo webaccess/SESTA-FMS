@@ -301,6 +301,7 @@ export class Activitytypes extends React.Component {
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 selectableRows
+                pagination
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (
