@@ -11,5 +11,8 @@ module.exports = {
     autoload: {
       enabled: true,
     },
+    activitytypes: {
+      enabled: true,
+    },
   },
 };

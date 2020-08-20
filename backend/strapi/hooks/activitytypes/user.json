@@ -1,0 +1,40 @@
+{
+  "user": [
+    {
+      "username": "WAfpoadmin",
+      "email": "WAfpoadmin@mail.com",
+      "password": "password",
+      "confirmed": true,
+      "blocked": false,
+      "first_name": "WA",
+      "last_name": "FPO Admin",
+      "role": 2,
+      "contact": {
+        "name": "WAfpoadmin",
+        "contact_type": "organization",
+        "organization": {
+          "name": "WAfpoadmin",
+          "sub_type": "FPO"
+        }
+      }
+    },
+    {
+      "username": "WAsuperadmin",
+      "email": "WAsuperadmin@mail.com",
+      "password": "password",
+      "confirmed": true,
+      "blocked": false,
+      "first_name": "WA",
+      "last_name": "Super Admin",
+      "role": 5,
+      "contact": {
+        "name": "WAsuperadmin",
+        "contact_type": "individual",
+        "individual": {
+          "first_name": "WA",
+          "last_name": "Super Admin"
+        }
+      }
+    }
+  ]
+}

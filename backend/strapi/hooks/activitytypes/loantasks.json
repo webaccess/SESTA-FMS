@@ -1,0 +1,28 @@
+{
+  "loantask": [
+    {
+      "activitytype": "land preparation",
+      "loan_model": "Horticulture"
+    },
+    {
+      "activitytype": "planting",
+      "loan_model": "Horticulture"
+    },
+    {
+      "activitytype": "new",
+      "loan_model": "Turmeric"
+    },
+    {
+      "activitytype": "planting",
+      "loan_model": "Turmeric"
+    },
+    {
+      "activitytype": "brand new",
+      "loan_model": "Turmeric"
+    },
+    {
+      "activitytype": "agriculture",
+      "loan_model": "Turmeric"
+    }
+  ]
+}
