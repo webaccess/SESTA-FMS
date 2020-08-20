@@ -15,7 +15,7 @@ const Piechart = (props) => (
           color: "white",
           font: {
             weight: "bold",
-            size: 16,
+            size: 10,
           },
         },
       },
@@ -24,8 +24,10 @@ const Piechart = (props) => (
       },
       legend: {
         labels: {
-          fontSize: 19,
+          fontSize : 12
         },
+        position: 'bottom',
+        align:'start'
       },
     }}
     responsive="true"

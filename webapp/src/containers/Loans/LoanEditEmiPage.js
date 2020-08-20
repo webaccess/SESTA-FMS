@@ -146,6 +146,7 @@ class LoanEditEmiPage extends Component {
                     updateActivityFlag = true;
                     fdata.start_datetime = this.state.values.actual_payment_date;
                     fdata.end_datetime = this.state.values.actual_payment_date;
+                    fdata.unit = 1;
                     delete fdata.contacts;
                     fdata.contact = {
                       id: auth.getUserInfo().contact.id
@@ -201,6 +202,7 @@ class LoanEditEmiPage extends Component {
             title: "Priniciple paid",
             start_datetime: this.state.values.actual_payment_date,
             end_datetime: this.state.values.actual_payment_date,
+            unit: 1,
             description: "",
             activitytype: {
               id: principalId,
@@ -213,6 +215,7 @@ class LoanEditEmiPage extends Component {
             title: "Interest paid",
             start_datetime: this.state.values.actual_payment_date,
             end_datetime: this.state.values.actual_payment_date,
+            unit: 1,
             description: "",
             activitytype: {
               id: interestId,

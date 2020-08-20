@@ -1,16 +1,17 @@
 import React from "react";
-import { Grid } from "@material-ui/core";
-import Layout from "../../hoc/Layout/Layout";
 import * as serviceProvider from "../../api/Axios";
 import Table from "../../components/Datatable/Datatable.js";
-import { withStyles } from "@material-ui/core/styles";
-import Autocomplete from "../../components/Autocomplete/Autocomplete.js";
-import style from "./Activity.module.css";
-import { Link } from "react-router-dom";
-import Input from "../../components/UI/Input/Input";
+import Layout from "../../hoc/Layout/Layout";
 import Button from "../../components/UI/Button/Button";
+import { withStyles } from "@material-ui/core/styles";
+import { Link } from "react-router-dom";
+import style from "./Users.module.css";
+import { Grid } from "@material-ui/core";
+import Input from "../../components/UI/Input/Input";
+import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import auth from "../../components/Auth/Auth";
+import Autocomplete from "../../components/Autocomplete/Autocomplete";
+import { map } from "lodash";
 
 const useStyles = (theme) => ({
   root: {},
@@ -20,8 +21,13 @@ const useStyles = (theme) => ({
     alignItems: "center",
     marginTop: theme.spacing(1),
   },
+  floatRow: {
+    height: "40px",
+    float: "right",
+  },
   buttonRow: {
     height: "42px",
+    float: "right",
     marginTop: theme.spacing(1),
   },
   spacer: {
@@ -37,7 +43,7 @@ const useStyles = (theme) => ({
   Districts: {
     marginRight: theme.spacing(1),
   },
-  States: {
+  Countries: {
     marginRight: theme.spacing(1),
   },
   Search: {
@@ -48,82 +54,75 @@ const useStyles = (theme) => ({
   },
 });
 
-export class Activity extends React.Component {
+export class Users extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      values: {},
       data: [],
-      getActivitytype: [],
+      values: {},
+      isCancel: false,
+      DeleteData: false,
+      dataCellId: [],
+      singleDelete: "",
+      multipleDelete: "",
+      getRoles: [],
+      loggedInUserRole: auth.getUserInfo().role.name,
     };
   }
 
   async componentDidMount() {
-    let filteredArray = [];
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/activities/"
-      )
-      .then((res) => {
-        res.data.map((e, i) => {
-          e.activityassignees.map((item) => {});
-          e.activityassignees
-            .filter((item) => item.contact === auth.getUserInfo().contact.id)
-            .map((filteredData) => {
-              filteredArray.push(e);
-            });
-        });
-        this.setState({ data: filteredArray });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activitytypes/?is_active=true"
-      )
-      .then((res) => {
-        this.setState({ getActivitytype: res.data });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
-
-  handleActivitytype = async (event, value) => {
-    if (value !== null) {
-      this.setState({ filterActivitytype: value.id });
-    } else {
-      this.setState({
-        filterActivitytype: "",
-      });
+    /** get all users */
+    let url = "users/?_sort=username:ASC";
+    if (
+      this.state.loggedInUserRole === "FPO Admin" ||
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      url += "&&contact.creator_id=" + auth.getUserInfo().contact.id;
     }
-  };
+    serviceProvider
+      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+      .then((res) => {
+        this.setState({ data: res.data });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
-  handleActiveChange(event, value, target) {
-    this.setState({
-      values: { ...this.state.values, [event.target.name]: event.target.value },
-    });
+    let roleArray = [];
+    if (
+      this.state.loggedInUserRole === "Sesta Admin" ||
+      this.state.loggedInUserRole === "Superadmin"
+    ) {
+      roleArray = [
+        { id: 1, name: "Sesta Admin" },
+        { id: 2, name: "FPO Admin" },
+        { id: 3, name: "CSP (Community Service Provider)" },
+      ];
+    }
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      roleArray = [
+        { id: 1, name: "FPO Admin" },
+        { id: 2, name: "CSP (Community Service Provider)" },
+      ];
+    }
+    this.setState({ getRoles: roleArray });
   }
 
   editData = (cellid) => {
-    this.props.history.push("/activities/edit/" + cellid);
+    this.props.history.push("/users/edit/" + cellid);
   };
 
-  DeleteData = (cellid, selectedId) => {
+  DeleteData = async (cellid, selectedId) => {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
+
       serviceProvider
         .serviceProviderForDeleteRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
+          process.env.REACT_APP_SERVER_URL + "users",
           cellid
         )
         .then((res) => {
-          this.setState({ singleDelete: res.data.name });
-          this.setState({ dataCellId: "" });
-          this.componentDidMount();
+          this.deleteContact(res.data.contact.id);
         })
         .catch((error) => {
           this.setState({ singleDelete: false });
@@ -132,18 +131,34 @@ export class Activity extends React.Component {
     }
   };
 
+  deleteContact = async (id) => {
+    serviceProvider
+      .serviceProviderForDeleteRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+        id
+      )
+      .then((res) => {
+        this.setState({ singleDelete: res.data.username, dataCellId: "" });
+        this.componentDidMount();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-      for (let id in selectedId) {
+
+      for (let i in selectedId) {
         serviceProvider
           .serviceProviderForDeleteRequest(
-            process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
-            selectedId[id]
+            process.env.REACT_APP_SERVER_URL + "users",
+            selectedId[i]
           )
           .then((res) => {
+            this.deleteContact(res.data.contact.id);
             this.setState({ multipleDelete: true });
-            this.componentDidMount();
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
@@ -153,121 +168,110 @@ export class Activity extends React.Component {
     }
   };
 
+  handleUserChange(event, value) {
+    this.setState({
+      values: { ...this.state.values, [event.target.name]: event.target.value },
+    });
+  }
+
+  handleRoleChange = async (event, value) => {
+    if (value !== null) {
+      this.setState({ roleStatus: value, isCancel: false });
+    } else {
+      this.setState({ roleStatus: "" });
+    }
+  };
+
   handleSearch() {
     let searchData = "";
-    if (this.state.values.FilterActivity) {
-      searchData += "title_contains=" + this.state.values.FilterActivity + "&&";
+    if (this.state.values.addUser) {
+      searchData += "username_contains=" + this.state.values.addUser;
     }
-    if (this.state.filterActivitytype) {
-      searchData += "activitytype.id=" + this.state.filterActivitytype;
+    if (this.state.roleStatus) {
+      searchData += searchData ? "&&" : "";
+      searchData += "role.name=" + this.state.roleStatus.name;
+    }
+    /** api call after search filter */
+    let url = "users/?_sort=username:ASC";
+    if (
+      this.state.loggedInUserRole === "FPO Admin" ||
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      url += "&&contact.creator_id=" + auth.getUserInfo().contact.id;
     }
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activities/?" +
-          searchData
+        process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
       )
       .then((res) => {
-        let filteredArray = [];
-        res.data.map((e, i) => {
-          e.activityassignees.map((item) => {});
-          e.activityassignees
-            .filter((item) => item.contact === auth.getUserInfo().contact.id)
-            .map((filteredData) => {
-              filteredArray.push(e);
-            });
-        });
-        this.setState({ data: filteredArray });
+        this.setState({ data: res.data });
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((error) => {
+        console.log(error);
       });
   }
 
   cancelForm = () => {
     this.setState({
-      filterActivitytype: null,
       values: {},
+      formSubmitted: "",
+      isCancel: true,
     });
     this.componentDidMount();
+    //routing code #route to users page
   };
 
   render() {
+    const { classes } = this.props;
     let data = this.state.data;
+    let roleFilter = this.state.getRoles;
+    let roleStatus = this.state.roleStatus;
+
     const Usercolumns = [
       {
-        name: "Activity",
-        selector: "title",
+        name: "Username",
+        selector: "username",
         sortable: true,
       },
       {
-        name: "Activity Type",
-        selector: "activitytype.name",
+        name: "Email",
+        selector: "email",
         sortable: true,
       },
       {
-        name: "Start Date/Time",
-        selector: "start_datetime",
-        format: (row) =>
-          `${
-            row.start_datetime != null
-              ? new Date(row.start_datetime).toLocaleString()
-              : ""
-          }`,
-        sortable: true,
-      },
-      {
-        name: "End Date/Time",
-        selector: "end_datetime",
-        format: (row) =>
-          `${
-            row.end_datetime != null
-              ? new Date(row.end_datetime).toLocaleString()
-              : ""
-          }`,
+        name: "Role",
+        selector: "role.name",
         sortable: true,
       },
     ];
-
     let selectors = [];
-    for (let keys in Usercolumns) {
-      selectors.push(Usercolumns[keys]["selector"]);
+    for (let i in Usercolumns) {
+      selectors.push(Usercolumns[i]["selector"]);
     }
-    const { classes } = this.props;
     let columnsvalue = selectors[0];
-    let ActivityTypeFilter = this.state.getActivitytype;
-    let filterActivitytype = this.state.filterActivitytype;
-    let filters = this.state.values;
+
     return (
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>Manage Activities</h1>
+            <h1 className={style.title}>Manage Users</h1>
             <div className={classes.row}>
               <div className={classes.buttonRow}>
-                <Button
-                  variant="contained"
-                  component={Link}
-                  to="/activities/add"
-                >
-                  Add Activity
+                <Button variant="contained" component={Link} to="/users/add">
+                  Add New User
                 </Button>
               </div>
             </div>
             {this.props.location.addData ? (
-              <Snackbar severity="success">
-                Activity added successfully.
-              </Snackbar>
+              <Snackbar severity="success">User added successfully.</Snackbar>
             ) : this.props.location.editData ? (
-              <Snackbar severity="success">
-                Activity edited successfully.
-              </Snackbar>
+              <Snackbar severity="success">User edited successfully.</Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
             this.state.singleDelete !== "" &&
             this.state.singleDelete ? (
               <Snackbar severity="success" Showbutton={false}>
-                Activity {this.state.singleDelete} deleted successfully!
+                User {this.state.singleDelete} deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.singleDelete === false ? (
@@ -277,7 +281,7 @@ export class Activity extends React.Component {
             ) : null}
             {this.state.multipleDelete === true ? (
               <Snackbar severity="success" Showbutton={false}>
-                Activities deleted successfully!
+                Users deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.multipleDelete === false ? (
@@ -292,13 +296,13 @@ export class Activity extends React.Component {
                   <Grid item md={12} xs={12}>
                     <Input
                       fullWidth
-                      label="Activity"
-                      name="FilterActivity"
+                      label="Username"
+                      name="addUser"
                       variant="outlined"
                       onChange={(event, value) => {
-                        this.handleActiveChange(event, value);
+                        this.handleUserChange(event, value);
                       }}
-                      value={this.state.values.FilterActivity || ""}
+                      value={this.state.values.addUser || ""}
                     />
                   </Grid>
                 </div>
@@ -308,31 +312,24 @@ export class Activity extends React.Component {
                   <Grid item md={12} xs={12}>
                     <Autocomplete
                       id="combo-box-demo"
-                      options={ActivityTypeFilter}
+                      options={roleFilter}
                       getOptionLabel={(option) => option.name}
                       onChange={(event, value) => {
-                        this.handleActivitytype(event, value);
+                        this.handleRoleChange(event, value);
                       }}
                       value={
-                        filterActivitytype
+                        roleStatus
                           ? this.state.isCancel === true
                             ? null
-                            : ActivityTypeFilter[
-                                ActivityTypeFilter.findIndex(function (
-                                  item,
-                                  i
-                                ) {
-                                  return item.id === filterActivitytype;
-                                })
-                              ] || null
+                            : roleStatus
                           : null
                       }
                       renderInput={(params) => (
                         <Input
                           {...params}
                           fullWidth
-                          label="Activity Type"
-                          name="addState"
+                          label="Select Role"
+                          name="selectRole"
                           variant="outlined"
                         />
                       )}
@@ -340,7 +337,6 @@ export class Activity extends React.Component {
                   </Grid>
                 </div>
               </div>
-              <div className={classes.searchInput}></div>
               <br></br>
               <Button onClick={this.handleSearch.bind(this)}>Search</Button>
               &nbsp;&nbsp;&nbsp;
@@ -350,15 +346,16 @@ export class Activity extends React.Component {
             </div>
             {data ? (
               <Table
-                title={"Activities"}
+                title={"Users"}
                 showSearch={false}
-                filters={filters}
+                filterData={true}
+                filterBy={["username", "email", "role.name"]}
+                selectableRows
                 data={data}
                 column={Usercolumns}
                 editData={this.editData}
                 DeleteData={this.DeleteData}
                 DeleteAll={this.DeleteAll}
-                rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 pagination
                 DeleteMessage={"Are you Sure you want to Delete"}
@@ -372,4 +369,4 @@ export class Activity extends React.Component {
     );
   }
 }
-export default withStyles(useStyles)(Activity);
+export default withStyles(useStyles)(Users);

@@ -36,7 +36,10 @@ import ActivitytypePage from "./containers/Activitytypes/ActivitytypePage";
 import Activitytypes from "./containers/Activitytypes/Activitytypes";
 import LoanEmiPage from "./containers/Loans/LoanEmiPage";
 import LoanEditEmiPage from "./containers/Loans/LoanEditEmiPage";
+import Users from "./containers/Users/Users";
+import UsersPage from "./containers/Users/UsersPage";
 import LoanEmiViewPage from "./containers/Loans/LoanEmiViewPage";
+import DashboardViewMoreDetails from "./containers/Dashboard/DashboardViewMoreDetails";
 
 function Routes() {
   return (
@@ -45,6 +48,7 @@ function Routes() {
         <div>
           <Switch>
             <PrivateRoute path="/" component={Dashboard} exact />
+            <PrivateRoute path="/view/more" component={DashboardViewMoreDetails} exact />
             <PrivateRoute path="/villages/add" component={VillagePage} exact />
             <PrivateRoute
               path="/villages/edit/:id"
@@ -159,6 +163,9 @@ function Routes() {
               component={LoanpurposePage}
               exact
             />
+            <PrivateRoute path="/users" component={Users} exact />
+            <PrivateRoute path="/users/add" component={UsersPage} exact />
+            <PrivateRoute path="/users/edit/:id" component={UsersPage} exact />
             <Route path="/404" component={NotFoundPage} />
             <AuthRoute path="/:authType/:id?" component={AuthPage} />
           </Switch>

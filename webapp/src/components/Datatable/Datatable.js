@@ -139,7 +139,7 @@ const Table = (props) => {
   const [isDeleteAllShowing, setisDeleteAllShowing] = React.useState(false);
   const [isActiveAllShowing, setisActiveAllShowing] = React.useState(false);
   let column = [];
-  if (valueForMemberPage !== "Loans" && valueForMemberPage !== "ViewLoanEMI") {
+  if (valueForMemberPage !== "Loans" && valueForMemberPage !== "ViewLoanEMI" && valueForMemberPage !== "EMI Due" && valueForMemberPage !== "Recent Activities") {
     column = [
       {
         cell: (cell) => (
@@ -442,7 +442,7 @@ const Table = (props) => {
             data={filteredData}
             title={props.title}
             columns={props.column}
-            pagination
+            pagination={props.pagination}
             selectableRowsComponent={Checkbox}
             contextActions={contextActions}
             actions={handleEditEvent}

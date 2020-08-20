@@ -198,8 +198,6 @@ export class Loanpurposes extends React.Component {
 
   render() {
     let data = this.state.data;
-    if (this.state.data.length > 0) {
-    }
     const Usercolumns = [
       {
         name: "Name of the Product",
@@ -329,6 +327,7 @@ export class Loanpurposes extends React.Component {
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 selectableRows
+                pagination
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (

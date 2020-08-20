@@ -39,8 +39,8 @@
       "via": "loan_model"
     },
     "loantasks": {
-      "via": "loan_model",
-      "collection": "loantask"
+      "collection": "loantask",
+      "via": "loan_model"
     },
     "fpo": {
       "plugin": "crm-plugin",

@@ -412,6 +412,7 @@ export class Countries extends React.Component {
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 selectableRows
+                pagination
                 DeleteMessage={"Are you Sure you want to Delete"}
                 ActiveMessage={
                   "Are you Sure you want to Deactivate selected Country"

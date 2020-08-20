@@ -10,8 +10,6 @@ import { Grid } from "@material-ui/core";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import Modal from "../../components/UI/Modal/Modal.js";
-import Switch from "../../components/UI/Switch/Switch";
 
 const useStyles = (theme) => ({
   root: {},
@@ -197,12 +195,6 @@ export class Activitytypes extends React.Component {
         sortable: true,
       },
       {
-        name: "FPO",
-        selector: "contact[0].name",
-        sortable: true,
-        cell: (row) => (row.contact[0] ? row.contact[0].name : "-"),
-      },
-      {
         name: "Remuneration",
         selector: "remuneration",
         sortable: true,
@@ -309,6 +301,7 @@ export class Activitytypes extends React.Component {
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 selectableRows
+                pagination
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (

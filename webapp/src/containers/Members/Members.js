@@ -10,8 +10,6 @@ import { Grid } from "@material-ui/core";
 import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import Modal from "../../components/UI/Modal/Modal.js";
-import Switch from "../../components/UI/Switch/Switch";
 import Autocomplete from "../../components/Autocomplete/Autocomplete";
 import { map } from "lodash";
 
@@ -75,47 +73,80 @@ export class Members extends React.Component {
       dataCellId: [],
       singleDelete: "",
       multipleDelete: "",
-      rolesList: [],
+      loggedInUserRole: auth.getUserInfo().role.name,
+      bankDetailsFound: true,
     };
   }
 
   async componentDidMount() {
-    // get all roles
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "users-permissions/roles"
-      )
-      .then((res) => {
-        this.setState({ rolesList: res.data.roles }, function () {
-          this.getMembers();
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    this.getMembers();
 
     // get all SHGs
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG"
-      )
-      .then((res) => {
-        this.setState({ getShg: res.data });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    let url =
+      "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC";
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      url += "&creator_id=" + auth.getUserInfo().contact.id;
+      serviceProvider
+        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .then((res) => {
+          this.setState({ getShg: res.data });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else if (
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/contact/?individual=" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((res) => {
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/contact/?id=" +
+                res.data[0].individual.vo
+            )
+            .then((response) => {
+              this.setState({ getShg: response.data[0].org_vos });
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      serviceProvider
+        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .then((res) => {
+          this.setState({ getShg: res.data });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }
 
   getMembers = () => {
+    let newDataArray = [];
+    let url = "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC";
+    if (
+      this.state.loggedInUserRole === "CSP (Community Service Provider)" ||
+      this.state.loggedInUserRole === "FPO Admin"
+    ) {
+      url += "&creator_id=" + auth.getUserInfo().contact.id;
+    }
     serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC"
-      )
+      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
-        this.updateRoleIdWithName(res.data);
+        res.data.map((e, i) => {
+          if (e.user === null) {
+            newDataArray.push(e); // add only those contacts having contact type=individual & users===null
+          }
+        });
+        this.setState({ data: newDataArray });
       })
       .catch((error) => {
         console.log(error);
@@ -132,26 +163,6 @@ export class Members extends React.Component {
       .catch((error) => {
         console.log(error);
       });
-  };
-
-  updateRoleIdWithName = (data, index) => {
-    data.forEach((element, index) => {
-      if (element.user) {
-        this.state.rolesList
-          .filter((role) => role.id === element.user.role)
-          .map((filteredRole) => {
-            Object.assign(data[index], {
-              userRole: filteredRole.name ? filteredRole.name : "",
-            });
-            this.setState({ data: data });
-          });
-      } else {
-        Object.assign(data[index], {
-          userRole: "",
-        });
-        this.setState({ data: data });
-      }
-    });
   };
 
   handleStateChange = async (event, value) => {
@@ -237,6 +248,7 @@ export class Members extends React.Component {
       filterState: "",
       filterDistrict: "",
       filterVillage: "",
+      filterShg: "",
       isCancel: true,
     });
 
@@ -245,7 +257,6 @@ export class Members extends React.Component {
 
   handleSearch() {
     let searchData = "";
-
     if (this.state.filterState) {
       searchData += searchData ? "&&" : "";
       searchData += "state=" + this.state.filterState.id;
@@ -260,22 +271,33 @@ export class Members extends React.Component {
     }
     if (this.state.filterShg) {
       searchData += searchData ? "&&" : "";
-      searchData += "individual.shg=" + this.state.filterShg.id;
+      if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
+        searchData += "individual.shg=" + this.state.filterShg.contact;
+      } else {
+        searchData += "individual.shg=" + this.state.filterShg.id;
+      }
     }
 
     //api call after search filter
+    let newDataArray = [];
+    let url = "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC";
+    if (
+      this.state.loggedInUserRole === "CSP (Community Service Provider)" ||
+      this.state.loggedInUserRole === "FPO Admin"
+    ) {
+      url += "&creator_id=" + auth.getUserInfo().contact.id;
+    }
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&" +
-          searchData
+        process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
       )
       .then((res) => {
-        if (res.data.length > 0) {
-          this.updateRoleIdWithName(res.data);
-        } else {
-          this.setState({ data: res.data });
-        }
+        res.data.map((e, i) => {
+          if (e.user === null) {
+            newDataArray.push(e);
+          }
+        });
+        this.setState({ data: newDataArray });
       })
       .catch((error) => {
         console.log(error);
@@ -298,9 +320,6 @@ export class Members extends React.Component {
         .then((res) => {
           if (res.data.shareinformation) {
             this.deleteShareInfo(res.data.shareinformation.id);
-          }
-          if (res.data.user) {
-            this.deleteUserInfo(res.data.user.id);
           }
           this.setState({ singleDelete: res.data.name });
           this.setState({ dataCellId: "" });
@@ -325,18 +344,6 @@ export class Members extends React.Component {
       });
   };
 
-  deleteUserInfo = async (id) => {
-    serviceProvider
-      .serviceProviderForDeleteRequest(
-        process.env.REACT_APP_SERVER_URL + "users",
-        id
-      )
-      .then((res) => {})
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
@@ -350,9 +357,6 @@ export class Members extends React.Component {
           .then((res) => {
             if (res.data.shareinformation) {
               this.deleteShareInfo(res.data.shareinformation.id);
-            }
-            if (res.data.user) {
-              this.deleteUserInfo(res.data.user.id);
             }
             this.setState({ multipleDelete: true });
             this.componentDidMount();
@@ -372,7 +376,36 @@ export class Members extends React.Component {
         memberData = memData;
       }
     });
-    this.props.history.push("/loans/apply/" + cellid, memberData);
+    /** check bandetails present for the SHG of the selected member
+     * if yes, allow member to apply for the loan
+     * else, display warning message
+     */
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/contact/?id=" +
+          memberData.individual.shg
+      )
+      .then((res) => {
+        serviceProvider
+          .serviceProviderForGetRequest(
+            process.env.REACT_APP_SERVER_URL +
+              "bankdetails/?organization=" +
+              res.data[0].organization.id
+          )
+          .then((res) => {
+            let bankData = res.data;
+            this.setState({ bankDetailsFound: true });
+            if (bankData.length > 0) {
+              this.props.history.push("/loans/apply/" + cellid, memberData);
+            } else {
+              this.setState({ bankDetailsFound: false });
+            }
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   render() {
@@ -420,11 +453,6 @@ export class Members extends React.Component {
         sortable: true,
       },
       {
-        name: "Role",
-        selector: "userRole",
-        sortable: true,
-      },
-      {
         name: "Village",
         selector: "villages[0].name",
         sortable: true,
@@ -459,6 +487,12 @@ export class Members extends React.Component {
                 </Button>
               </div>
             </div>
+            {!this.state.bankDetailsFound ? (
+              <Snackbar severity="info">
+                No bank details found for SHG of this member
+              </Snackbar>
+            ) : null}
+
             {this.props.location.addData ? (
               <Snackbar severity="success">Member added successfully.</Snackbar>
             ) : this.props.location.editData ? (
@@ -636,7 +670,6 @@ export class Members extends React.Component {
                 filterData={true}
                 filterBy={[
                   "name",
-                  "userRole",
                   "villages[0].name",
                   "district.name",
                   "phone",
@@ -650,6 +683,7 @@ export class Members extends React.Component {
                 DeleteAll={this.DeleteAll}
                 columnsvalue={columnsvalue}
                 selectableRows
+                pagination
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (

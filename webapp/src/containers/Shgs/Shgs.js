@@ -69,15 +69,21 @@ export class Shgs extends React.Component {
       isCancel: false,
       singleDelete: "",
       multipleDelete: "",
+      loggedInUserRole: auth.getUserInfo().role.name,
     };
   }
 
   async componentDidMount() {
+    let url =
+      "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG&&_sort=name:ASC";
+    if (
+      this.state.loggedInUserRole === "FPO Admin" ||
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      url += "&&creator_id=" + auth.getUserInfo().contact.id;
+    }
     serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC"
-      )
+      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
         this.setState({ data: res.data });
       });
@@ -277,11 +283,17 @@ export class Shgs extends React.Component {
     }
 
     //api call after search filter
+    let url =
+      "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG&&_sort=name:ASC";
+    if (
+      this.state.loggedInUserRole === "FPO Admin" ||
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      url += "&&creator_id=" + auth.getUserInfo().contact.id;
+    }
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC&&" +
-          searchData
+        process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
       )
       .then((res) => {
         this.setState({ data: res.data });
@@ -557,6 +569,7 @@ export class Shgs extends React.Component {
               modalHandle={this.modalHandle}
               columnsvalue={columnsvalue}
               selectableRows
+              pagination
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (

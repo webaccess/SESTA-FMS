@@ -238,6 +238,9 @@ class FpoPage extends Component {
           console.log(error);
         });
     } else {
+      Object.assign(postData, {
+        creator_id: auth.getUserInfo().contact.id,
+      });
       serviceProvider
         .serviceProviderForPostRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",

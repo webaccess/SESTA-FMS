@@ -39,14 +39,14 @@
       "type": "string"
     },
     "contact": {
-      "via": "loan_applications",
       "plugin": "crm-plugin",
-      "model": "contact"
+      "model": "contact",
+      "via": "loan_applications"
     },
     "approved_by": {
-      "via": "loan_app_approvedby",
       "plugin": "crm-plugin",
-      "model": "contact"
+      "model": "contact",
+      "via": "loan_app_approvedby"
     },
     "loan_model": {
       "via": "loan_applications",
@@ -64,12 +64,16 @@
       "required": false
     },
     "loan_application_tasks": {
-      "via": "loan_application",
-      "collection": "loan-application-tasks"
+      "collection": "loan-application-tasks",
+      "via": "loan_application"
     },
     "loan_app_installments": {
-      "via": "loan_application",
-      "collection": "loan-application-installments"
+      "collection": "loan-application-installments",
+      "via": "loan_application"
+    },
+    "creator_id": {
+      "plugin": "crm-plugin",
+      "model": "contact"
     }
   }
 }

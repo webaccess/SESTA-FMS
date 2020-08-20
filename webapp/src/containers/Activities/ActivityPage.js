@@ -180,8 +180,8 @@ class ActivityPage extends Component {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
-
     if (Object.keys(this.state.errors).length > 0) return;
+
     let activityTitle = this.state.values.addTitle;
     let activityType = this.state.values.addActivitytype;
     let activityDescription = this.state.values.addDescription;
@@ -217,6 +217,24 @@ class ActivityPage extends Component {
             postData
           )
           .then((res) => {
+            /** add logged in user's contact in activity assignee */
+            let assigneeData = {
+              contact: {
+                id: auth.getUserInfo().contact.id,
+              },
+              activity: {
+                id: res.data.id,
+              },
+            };
+            serviceProvider
+              .serviceProviderForPutRequest(
+                process.env.REACT_APP_SERVER_URL +
+                  "crm-plugin/activityassignees",
+                res.data.activityassignees[0].id,
+                assigneeData
+              )
+              .then((res) => {})
+              .catch((error) => {});
             this.setState({ formSubmitted: true });
             this.props.history.push({
               pathname: "/activities",
@@ -248,8 +266,25 @@ class ActivityPage extends Component {
             postData
           )
           .then((res) => {
+            /** add logged in user's contact in activity assignee */
+            let assigneeData = {
+              contact: {
+                id: auth.getUserInfo().contact.id,
+              },
+              activity: {
+                id: res.data.id,
+              },
+            };
+            serviceProvider
+              .serviceProviderForPutRequest(
+                process.env.REACT_APP_SERVER_URL +
+                  "crm-plugin/activityassignees",
+                res.data.activityassignees[0].id,
+                assigneeData
+              )
+              .then((res) => {})
+              .catch((error) => {});
             this.setState({ formSubmitted: true });
-
             this.props.history.push({ pathname: "/activities", addData: true });
           })
           .catch((error) => {
