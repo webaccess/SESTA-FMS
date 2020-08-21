@@ -511,7 +511,99 @@
       "specification": "Honda 5 hp",
       "loan_amount": 32000,
       "duration": 18,
-      "emi": 1951
+      "emi": 1951,
+      "emidetails": [
+        {
+          "loan_model": "Pumpset",
+          "principal": 1224,
+          "interest": 240
+        },
+        {
+          "loan_model": "Pumpset",
+          "principal": 1224,
+          "interest": 240
+        },
+        {
+          "loan_model": "Pumpset",
+          "principal": 1224,
+          "interest": 240
+        },
+        {
+          "loan_model": "Pumpset",
+          "principal": 1224,
+          "interest": 240
+        },
+        {
+          "loan_model": "Pumpset",
+          "principal": 1224,
+          "interest": 240
+        },
+        {
+          "loan_model": "Pumpset",
+          "principal": 1224,
+          "interest": 240
+        },
+        {
+          "loan_model": "Pumpset",
+          "principal": 1224,
+          "interest": 240
+        },
+        {
+          "loan_model": "Pumpset",
+          "principal": 1224,
+          "interest": 240
+        },
+        {
+          "loan_model": "Pumpset",
+          "principal": 1224,
+          "interest": 240
+        },
+        {
+          "loan_model": "Pumpset",
+          "principal": 1224,
+          "interest": 240
+        },
+        {
+          "loan_model": "Pumpset",
+          "principal": 1224,
+          "interest": 240
+        },
+        {
+          "loan_model": "Pumpset",
+          "principal": 1224,
+          "interest": 240
+        },
+        {
+          "loan_model": "Pumpset",
+          "principal": 1224,
+          "interest": 240
+        },
+        {
+          "loan_model": "Pumpset",
+          "principal": 1224,
+          "interest": 240
+        },
+        {
+          "loan_model": "Pumpset",
+          "principal": 1224,
+          "interest": 240
+        },
+        {
+          "loan_model": "Pumpset",
+          "principal": 1224,
+          "interest": 240
+        },
+        {
+          "loan_model": "Pumpset",
+          "principal": 1224,
+          "interest": 240
+        },
+        {
+          "loan_model": "Pumpset",
+          "principal": 1224,
+          "interest": 240
+        }
+      ]
     },
     {
       "product_name": "Motor pump",
