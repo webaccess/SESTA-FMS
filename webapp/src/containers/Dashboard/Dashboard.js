@@ -9,8 +9,10 @@ import { Grid } from "@material-ui/core";
 import Moment from "moment";
 import Tooltip from "@material-ui/core/Tooltip";
 import IconButton from "@material-ui/core/IconButton";
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
-import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet';
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import AccountBalanceWalletIcon from "@material-ui/icons/AccountBalanceWallet";
+import DashboardFPO from "./DashboardFPO";
+import DashboardSestaAdmin from "./DashboardSestaAdmin";
 
 const useStyles = (theme) => ({
   root: {},
@@ -26,15 +28,15 @@ const useStyles = (theme) => ({
   },
   pie: {
     width: "50px",
-    height: "50px"
+    height: "50px",
   },
   remun: {
     backgroundColor: "#000",
     padding: "15px",
     textAlign: "center",
-    color: "white"
+    color: "white",
   },
-})
+});
 
 class Dashboard extends Component {
   constructor(props) {
@@ -43,10 +45,9 @@ class Dashboard extends Component {
       loanData: [],
       activitiesData: [],
       activitytypeData: [],
-      remuneration: ""
-    }
+      remuneration: "",
+    };
   }
-
 
   async componentDidMount() {
     serviceProvider
@@ -55,16 +56,15 @@ class Dashboard extends Component {
       )
       .then((res) => {
         this.setState({ loanData: res.data });
-      })
+      });
 
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/activities?_sort=start_datetime:desc&&_limit=5",
-
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/activities?_sort=start_datetime:desc&&_limit=5"
       )
       .then((activityRes) => {
         this.setState({ activitiesData: activityRes.data });
-
       })
       .catch((error) => {
         console.log(error);
@@ -72,20 +72,24 @@ class Dashboard extends Component {
 
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
-
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes"
       )
       .then((typeRes) => {
         this.setState({ activitytypeData: typeRes.data });
-
-      })
+      });
   }
 
   handleLoanViewMore() {
-    this.props.history.push({ pathname: "/view/more", state: { loanData: this.state.loanData } });
+    this.props.history.push({
+      pathname: "/view/more",
+      state: { loanData: this.state.loanData },
+    });
   }
   handleActivityViewMore() {
-    this.props.history.push({ pathname: "/view/more", state: { activitiesData: this.state.activitiesData } });
+    this.props.history.push({
+      pathname: "/view/more",
+      state: { activitiesData: this.state.activitiesData },
+    });
   }
 
   render() {
@@ -93,38 +97,45 @@ class Dashboard extends Component {
     const userInfo = auth.getUserInfo();
 
     let loanData = [];
-    this.state.loanData.map(ldata => {
+    this.state.loanData.map((ldata) => {
       if (ldata.loan_app_installments.length > 0) {
         loanData.push(ldata);
       }
-    })
+    });
 
     let lastPaymentDate;
-    loanData.map(emi => {
-
+    loanData.map((emi) => {
       // sort loan application installments
-      emi.loan_app_installments.sort((a, b) => new Date(...a.payment_date.split('/').reverse()) - new Date(...b.payment_date.split('/').reverse()));
+      emi.loan_app_installments.sort(
+        (a, b) =>
+          new Date(...a.payment_date.split("/").reverse()) -
+          new Date(...b.payment_date.split("/").reverse())
+      );
 
       let paid = 0;
-      emi.loan_app_installments.map(emidata => {
-
+      emi.loan_app_installments.map((emidata) => {
         // get Pending Loan amount
         if (emidata.fine !== null || emidata.fine !== 0) {
-          emidata.totalPaid = (emidata.fine + emidata.actual_principal + emidata.actual_interest);
+          emidata.totalPaid =
+            emidata.fine + emidata.actual_principal + emidata.actual_interest;
         } else {
-          emidata.totalPaid = (emidata.actual_principal + emidata.actual_interest);
+          emidata.totalPaid =
+            emidata.actual_principal + emidata.actual_interest;
         }
         paid = paid + emidata.totalPaid;
 
         // get last payment date
-        if (emidata.actual_payment_date != null && emidata.actual_principal != null) {
-          return lastPaymentDate = emidata.id;
+        if (
+          emidata.actual_payment_date != null &&
+          emidata.actual_principal != null
+        ) {
+          return (lastPaymentDate = emidata.id);
         }
         // get EMI Due date if emi has been paid before
-        if (emidata.id == (lastPaymentDate + 1)) {
+        if (emidata.id == lastPaymentDate + 1) {
           emi.emiDueDate = emidata.payment_date;
         }
-      })
+      });
       // get Pending Loan amount
       let totalamount = emi.loan_model.loan_amount;
       let pendingLoanAmount = totalamount - paid;
@@ -137,37 +148,41 @@ class Dashboard extends Component {
       if (emi.loan_model.loan_amount === emi.pendingLoanAmount) {
         emi.emiDueDate = emi.loan_app_installments[0].payment_date;
       }
-    })
+    });
 
     let activitiesData = this.state.activitiesData;
     let remunaration = 0;
-    activitiesData.map(cspActivity => {
+    activitiesData.map((cspActivity) => {
       let remun = cspActivity.activitytype.remuneration;
       let unit = cspActivity.unit;
       let cal = remun * unit;
       remunaration = remunaration + cal;
-    })
+    });
 
     let activitytypeRes = this.state.activitytypeData;
     let activtiesArr = [];
-    activitytypeRes.map(type => {
-      let activityTypeName, activityTypeCount = 0;
-      activitiesData.map(activity => {
+    activitytypeRes.map((type) => {
+      let activityTypeName,
+        activityTypeCount = 0;
+      activitiesData.map((activity) => {
         if (activity.activitytype.name == type.name) {
           activityTypeName = activity.activitytype.name;
           activityTypeCount = activityTypeCount + 1;
         }
-      })
+      });
       if (activityTypeName) {
-        activtiesArr.push({ activityName: activityTypeName, activityCount: activityTypeCount });
+        activtiesArr.push({
+          activityName: activityTypeName,
+          activityCount: activityTypeCount,
+        });
       }
-    })
+    });
     let activityname = [];
     let activityvalue = [];
-    activtiesArr.map(act => {
+    activtiesArr.map((act) => {
       activityname.push(act.activityName);
       activityvalue.push(act.activityCount);
-    })
+    });
 
     const Usercolumns = [
       {
@@ -185,24 +200,21 @@ class Dashboard extends Component {
         selector: "pendingLoanAmount",
         sortable: true,
         cell: (row) =>
-          row.pendingLoanAmount ?
-            (row.pendingLoanAmount).toLocaleString() : null
+          row.pendingLoanAmount ? row.pendingLoanAmount.toLocaleString() : null,
       },
       {
         name: "Due date",
         selector: "emiDueDate",
         sortable: true,
         cell: (row) =>
-          row.emiDueDate ?
-            Moment(row.emiDueDate).format('DD MMM YYYY') : "-"
+          row.emiDueDate ? Moment(row.emiDueDate).format("DD MMM YYYY") : "-",
       },
       {
         name: "EMI",
         selector: "loan_model.emi",
         sortable: true,
         cell: (row) =>
-          row.loan_model.emi ?
-            (row.loan_model.emi).toLocaleString() : null
+          row.loan_model.emi ? row.loan_model.emi.toLocaleString() : null,
       },
     ];
     let selectors = [];
@@ -222,8 +234,9 @@ class Dashboard extends Component {
         selector: "start_datetime",
         sortable: true,
         cell: (row) =>
-          row.start_datetime ?
-            Moment(row.start_datetime).format('DD MMM YYYY') : null
+          row.start_datetime
+            ? Moment(row.start_datetime).format("DD MMM YYYY")
+            : null,
       },
       {
         name: "EMI",
@@ -238,97 +251,127 @@ class Dashboard extends Component {
     }
     let columnsvalue1 = selectors1[0];
     return (
-      
       <Layout>
         <h3>Welcome {userInfo.username}</h3>
         {userInfo.role.name == "CSP (Community Service Provider)" ? (
-        <Grid container style={{ border: "1px solid #ccc" }}>
-          <Grid item md={4} spacing={3} style={{ backgroundColor: "#e5e9e3" }}>
-            <div className={classes.remun}>
-              <AccountBalanceWalletIcon className={classes.Icon} />
-              <h3 style={{ color: "white", "marginBottom": "5px" }}>REMUNARATION </h3>
-              <p style={{ color: "white", "marginTop": "0px" }}>FOR AUGUST 2020 </p>
-              <h2 style={{ color: "green" }}>Rs. {remunaration}</h2>
-            </div>
-            <h3 align="center">ACTIVITIES</h3>
-            <Piechart
-              width={50}
-              height={50}
-              labels={activityname}
-              datasets={[
-                {
-                  data: activityvalue,
-                  backgroundColor: ["tomato", "green ", "blue", "yellow"],
-                },
-              ]}
-            />
-
-          </Grid>
-          <Grid item md={8} spacing={3}>
-            <div style={{ border: "1px solid #ccc", "backgroundColor": "#fff", "marginTop": "-1px" }}>
-              <h3 style={{ paddingLeft: "15px" }}>EMI DUE</h3>
-              {loanData ? (
-                <Table
-                  title={"EMI Due"}
-                  data={loanData}
-                  showSearch={false}
-                  filterData={false}
-                  filterBy={[
-                    "contact.name",
-                    "purpose",
-                    "pendingLoanAmount",
-                    "application_date",
-                    "loan_model.emi",
-                  ]}
-                  column={Usercolumns}
-                  editData={this.editData}
-                  rowsSelected={this.rowsSelect}
-                  columnsvalue={columnsvalue}
-                />
-              ) : (
+          <Grid container style={{ border: "1px solid #ccc" }}>
+            <Grid
+              item
+              md={4}
+              spacing={3}
+              style={{ backgroundColor: "#e5e9e3" }}
+            >
+              <div className={classes.remun}>
+                <AccountBalanceWalletIcon className={classes.Icon} />
+                <h3 style={{ color: "white", marginBottom: "5px" }}>
+                  REMUNARATION{" "}
+                </h3>
+                <p style={{ color: "white", marginTop: "0px" }}>
+                  FOR AUGUST 2020{" "}
+                </p>
+                <h2 style={{ color: "green" }}>Rs. {remunaration}</h2>
+              </div>
+              <h3 align="center">ACTIVITIES</h3>
+              <Piechart
+                width={50}
+                height={50}
+                labels={activityname}
+                datasets={[
+                  {
+                    data: activityvalue,
+                    backgroundColor: ["tomato", "green ", "blue", "yellow"],
+                  },
+                ]}
+              />
+            </Grid>
+            <Grid item md={8} spacing={3}>
+              <div
+                style={{
+                  border: "1px solid #ccc",
+                  backgroundColor: "#fff",
+                  marginTop: "-1px",
+                }}
+              >
+                <h3 style={{ paddingLeft: "15px" }}>EMI DUE</h3>
+                {loanData ? (
+                  <Table
+                    title={"EMI Due"}
+                    data={loanData}
+                    showSearch={false}
+                    filterData={false}
+                    filterBy={[
+                      "contact.name",
+                      "purpose",
+                      "pendingLoanAmount",
+                      "application_date",
+                      "loan_model.emi",
+                    ]}
+                    column={Usercolumns}
+                    editData={this.editData}
+                    rowsSelected={this.rowsSelect}
+                    columnsvalue={columnsvalue}
+                  />
+                ) : (
                   <h1>Loading...</h1>
                 )}
-              <div align="right">
-                <Tooltip title="View More">
-                  <IconButton onClick={this.handleLoanViewMore.bind(this)}>
-                    <MoreHorizIcon className={classes.MoreHorizIcon} />
-                  </IconButton>
-                </Tooltip>
+                <div align="right">
+                  <Tooltip title="View More">
+                    <IconButton onClick={this.handleLoanViewMore.bind(this)}>
+                      <MoreHorizIcon className={classes.MoreHorizIcon} />
+                    </IconButton>
+                  </Tooltip>
+                </div>
               </div>
-            </div>
-            <div style={{ border: "1px solid #ccc", "backgroundColor": "#fff", "marginTop": "-1px" }}>
-              <h3 style={{ paddingLeft: "15px" }}>RECENT ACTIVITIES</h3>
-              {activitiesData ? (
-                <Table
-                  title={"Recent Activities"}
-                  data={activitiesData}
-                  showSearch={false}
-                  filterData={false}
-                  filterBy={[
-                    "title",
-                    "start_datetime",
-                    "activitytype.remuneration"
-                  ]}
-                  column={Usercolumns1}
-                  editData={this.editData}
-                  rowsSelected={this.rowsSelect}
-                  columnsvalue={columnsvalue1}
-                />
-              ) : (
+              <div
+                style={{
+                  border: "1px solid #ccc",
+                  backgroundColor: "#fff",
+                  marginTop: "-1px",
+                }}
+              >
+                <h3 style={{ paddingLeft: "15px" }}>RECENT ACTIVITIES</h3>
+                {activitiesData ? (
+                  <Table
+                    title={"Recent Activities"}
+                    data={activitiesData}
+                    showSearch={false}
+                    filterData={false}
+                    filterBy={[
+                      "title",
+                      "start_datetime",
+                      "activitytype.remuneration",
+                    ]}
+                    column={Usercolumns1}
+                    editData={this.editData}
+                    rowsSelected={this.rowsSelect}
+                    columnsvalue={columnsvalue1}
+                  />
+                ) : (
                   <h1>Loading...</h1>
                 )}
 
-              <div align="right">
-                <Tooltip title="View More">
-                  <IconButton onClick={this.handleActivityViewMore.bind(this)}>
-                    <MoreHorizIcon className={classes.MoreHorizIcon} />
-                  </IconButton>
-                </Tooltip>
+                <div align="right">
+                  <Tooltip title="View More">
+                    <IconButton
+                      onClick={this.handleActivityViewMore.bind(this)}
+                    >
+                      <MoreHorizIcon className={classes.MoreHorizIcon} />
+                    </IconButton>
+                  </Tooltip>
+                </div>
               </div>
-            </div>
+            </Grid>
           </Grid>
-        </Grid>
-      ) : null}
+        ) : null}
+
+        {userInfo.role.name === "FPO Admin" ? (
+          <DashboardFPO></DashboardFPO>
+        ) : null}
+
+        {userInfo.role.name === "Sesta Admin" ||
+        userInfo.role.name === "Superdmin" ? (
+          <DashboardSestaAdmin></DashboardSestaAdmin>
+        ) : null}
       </Layout>
     );
   }
