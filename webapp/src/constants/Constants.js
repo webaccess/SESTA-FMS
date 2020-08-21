@@ -9,3 +9,7 @@ export const LOAN_TASK_STATUS = [
   { id: "Scheduled", name: "Scheduled" },
   { id: "Cancelled", name: "Cancelled" },
 ];
+export const REMUNERATION_NOTATION = [
+  { id: "Flat", name: "Flat" },
+  { id: "Percentage", name: "Percentage" },
+];

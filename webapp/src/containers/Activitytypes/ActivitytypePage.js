@@ -1,12 +1,14 @@
 import React, { Component } from "react";
 import Layout from "../../hoc/Layout/Layout";
 import * as serviceProvider from "../../api/Axios";
+import * as constants from "../../constants/Constants";
 
 import auth from "../../components/Auth/Auth";
 import Button from "../../components/UI/Button/Button";
 import Input from "../../components/UI/Input/Input";
 import Autotext from "../../components/Autotext/Autotext.js";
 import Checkbox from "@material-ui/core/Checkbox";
+import { MenuItem, TextField } from "@material-ui/core";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import {
   Card,
@@ -39,6 +41,7 @@ class ActivitytypePage extends Component {
       };
     }
     this.state = {
+      remNotation: constants.REMUNERATION_NOTATION,
       values: {},
       getFPO: [],
       addIsActive: false,
@@ -55,10 +58,17 @@ class ActivitytypePage extends Component {
             message: "Remuneration is required",
           },
         },
+        selectedNotation: {
+          required: {
+            value: "true",
+            message: "Notation is required",
+          },
+        },
         addFpo: validateFpo,
       },
       errors: {
         addFpo: [],
+        selectedNotation: [],
       },
       serverErrors: {},
       formSubmitted: "",
@@ -88,6 +98,7 @@ class ActivitytypePage extends Component {
               addRemuneration: res.data.remuneration,
             },
             addIsActive: res.data.is_active,
+            selectedNotation: res.data.notation,
           });
           if (res.data.contact[0]) {
             let tempValues = this.state.values;
@@ -153,6 +164,17 @@ class ActivitytypePage extends Component {
     }
   }
 
+  handleNotationChange = (event, value) => {
+    if (value.props !== null) {
+      this.setState({
+        selectedNotation: value.props.value,
+      });
+    } else {
+      this.setState({
+        selectedNotation: "",
+      });
+    }
+  };
   validate = () => {
     const values = this.state.values;
     const validations = this.state.validations;
@@ -185,11 +207,13 @@ class ActivitytypePage extends Component {
     let activitytypeName = this.state.values.addActivitytype;
     let IsActive = this.state.addIsActive;
     let remunerate = this.state.values.addRemuneration;
+    let notation = this.state.selectedNotation;
     let formData = {
       name: activitytypeName,
       remuneration: remunerate,
       is_active: IsActive,
       autocreated: false,
+      notation: notation,
     };
     /** save fpo selected from the drop down if roles are sesta admin & superadmin
      * save FPO belongs to logged in user if role is FPO admin
@@ -330,7 +354,7 @@ class ActivitytypePage extends Component {
                     </Snackbar>
                   ) : null}
                 </Grid>
-                <Grid item md={7} xs={12}>
+                <Grid item md={12} xs={12}>
                   <Input
                     fullWidth
                     label="Name*"
@@ -346,7 +370,8 @@ class ActivitytypePage extends Component {
                     variant="outlined"
                   />
                 </Grid>
-                <Grid item md={5} xs={12}>
+
+                <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
                     label="Remuneration*"
@@ -362,6 +387,32 @@ class ActivitytypePage extends Component {
                     onChange={this.handleChange}
                     variant="outlined"
                   />
+                </Grid>
+
+                <Grid item md={6} xs={12}>
+                  <TextField
+                    fullWidth
+                    id="outlined-select-currency"
+                    select
+                    label="Notation*"
+                    value={this.state.selectedNotation}
+                    onChange={this.handleNotationChange}
+                    helperText={
+                      this.hasError("selectedNotation")
+                        ? this.state.errors.selectedNotation[0]
+                        : this.state.selectedNotation === "Flat"
+                        ? "Amount stored in rupees"
+                        : null
+                    }
+                    error={this.hasError("selectedNotation")}
+                    variant="outlined"
+                  >
+                    {this.state.remNotation.map((option) => (
+                      <MenuItem key={option.id} value={option.name}>
+                        {option.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
                 </Grid>
                 {userInfo.role.name == "Sesta Admin" ||
                   (userInfo.role.name == "Superadmin" && (
