@@ -16,7 +16,7 @@ import AssignmentTurnedInIcon from "@material-ui/icons/AssignmentTurnedIn";
 import AssignmentIndIcon from "@material-ui/icons/AssignmentInd";
 import PrintIcon from "@material-ui/icons/Print";
 import auth from "../../components/Auth/Auth";
-import VisibilityIcon from '@material-ui/icons/Visibility';
+import VisibilityIcon from "@material-ui/icons/Visibility";
 
 const useStyles = makeStyles((theme) => ({
   editIcon: {
@@ -139,7 +139,13 @@ const Table = (props) => {
   const [isDeleteAllShowing, setisDeleteAllShowing] = React.useState(false);
   const [isActiveAllShowing, setisActiveAllShowing] = React.useState(false);
   let column = [];
-  if (valueForMemberPage !== "Loans" && valueForMemberPage !== "ViewLoanEMI" && valueForMemberPage !== "EMI Due" && valueForMemberPage !== "Recent Activities") {
+  if (
+    valueForMemberPage !== "FPO Loans" &&
+    valueForMemberPage !== "Loans" &&
+    valueForMemberPage !== "ViewLoanEMI" &&
+    valueForMemberPage !== "EMI Due" &&
+    valueForMemberPage !== "Recent Activities"
+  ) {
     column = [
       {
         cell: (cell) => (
@@ -263,9 +269,7 @@ const Table = (props) => {
                   aria-label="task"
                   disabled={cell.status === "Approved" ? false : true}
                 >
-                  <VisibilityIcon
-                    className={classes.VisibilityIcon}
-                  />
+                  <VisibilityIcon className={classes.VisibilityIcon} />
                 </IconButton>
               </Tooltip>
             </div>
