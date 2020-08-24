@@ -86,8 +86,8 @@ class LoanApprovalPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "loan-applications/" +
-          this.state.editPage[1]
+        "loan-applications/" +
+        this.state.editPage[1]
       )
       .then((res) => {
         this.getAllDetails(res.data);
@@ -114,8 +114,8 @@ class LoanApprovalPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/individuals/" +
-          data.contact.individual
+        "crm-plugin/individuals/" +
+        data.contact.individual
       )
       .then((res) => {
         let loaneeName = res.data.first_name + " " + res.data.last_name;
@@ -123,8 +123,8 @@ class LoanApprovalPage extends Component {
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/contact/?organization.id=" +
-              res.data.shg.organization
+            "crm-plugin/contact/?organization.id=" +
+            res.data.shg.organization
           )
           .then((response) => {
             let voName = response.data[0].organization.vos[0].name;
@@ -259,7 +259,7 @@ class LoanApprovalPage extends Component {
           });
         }
       })
-      .catch((error) => {});
+      .catch((error) => { });
   }
 
   saveLoanAppTasks = (data) => {
@@ -288,8 +288,13 @@ class LoanApprovalPage extends Component {
                   process.env.REACT_APP_SERVER_URL + "loan-application-tasks",
                   postLoanTaskData
                 )
-                .then((res) => {})
-                .catch((error) => {});
+                .then((res) => {
+                  this.props.history.push({
+                    pathname: "/loans",
+                    state: { loanApproved: true },
+                  });
+                })
+                .catch((error) => { });
             }
           });
         })
@@ -332,7 +337,7 @@ class LoanApprovalPage extends Component {
               serviceProvider
                 .serviceProviderForPostRequest(
                   process.env.REACT_APP_SERVER_URL +
-                    "loan-application-installments",
+                  "loan-application-installments",
                   postEmiData
                 )
                 .then((res) => {
@@ -350,12 +355,12 @@ class LoanApprovalPage extends Component {
                       });
                     });
                 })
-                .catch((error) => {});
+                .catch((error) => { });
             }
           });
         }
       })
-      .catch((error) => {});
+      .catch((error) => { });
   };
 
   render() {
@@ -507,10 +512,10 @@ class LoanApprovalPage extends Component {
                       Selected File: {this.state.fileName}
                     </label>
                   ) : (
-                    <label style={{ color: "red", fontSize: "11px" }}>
-                      No File Selected!
-                    </label>
-                  )}
+                      <label style={{ color: "red", fontSize: "11px" }}>
+                        No File Selected!
+                      </label>
+                    )}
                 </Grid>
                 <Grid item md={5} xs={12}>
                   <Autocomplete
@@ -524,13 +529,13 @@ class LoanApprovalPage extends Component {
                     value={
                       statusValue
                         ? this.state.loanStatusList[
-                            this.state.loanStatusList.findIndex(function (
-                              item,
-                              i
-                            ) {
-                              return item.id === statusValue;
-                            })
-                          ] || null
+                        this.state.loanStatusList.findIndex(function (
+                          item,
+                          i
+                        ) {
+                          return item.id === statusValue;
+                        })
+                        ] || null
                         : null
                     }
                     renderInput={(params) => (
