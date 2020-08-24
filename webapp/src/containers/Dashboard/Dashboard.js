@@ -2,12 +2,12 @@ import React, { Component } from "react";
 import Layout from "../../hoc/Layout/Layout";
 import auth from "../../components/Auth/Auth";
 import DashboardCSP from "./DashboardCSP.js";
+import DashboardFPO from "./DashboardFPO";
+import DashboardSestaAdmin from "./DashboardSestaAdmin";
 
 class Dashboard extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-    }
   }
 
   async componentDidMount() { }
@@ -19,23 +19,19 @@ class Dashboard extends Component {
     return (
       <Layout>
         <h3>Welcome {userInfo.username}</h3>
-        {userInfo.role.name === "Superadmin" ? (
-          <div>
-          </div>
-        ) : null}
-        {userInfo.role.name === "Sesta Admin" ? (
-          <div>
-          </div>
-        ) : null}
+      
         {userInfo.role.name === "FPO Admin" ? (
-          <div>
-          </div>
+          <DashboardFPO></DashboardFPO>
         ) : null}
+
+        {userInfo.role.name === "Sesta Admin" ||
+        userInfo.role.name === "Superdmin" ? (
+          <DashboardSestaAdmin></DashboardSestaAdmin>
+        ) : null}
+
         {userInfo.role.name === "CSP (Community Service Provider)" ? (
-          <div>
             <DashboardCSP></DashboardCSP>
-          </div>
-        ) : null}
+          ) : null}
       </Layout>
     );
   }
