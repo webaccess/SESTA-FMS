@@ -414,46 +414,47 @@ class ActivitytypePage extends Component {
                     ))}
                   </TextField>
                 </Grid>
-                {userInfo.role.name == "Sesta Admin" ||
-                  (userInfo.role.name == "Superadmin" && (
-                    <Grid item md={12} xs={12}>
-                      <Autotext
-                        id="combo-box-demo"
-                        options={fposFilter}
-                        variant="outlined"
-                        label="FPO"
-                        getOptionLabel={(option) => option.name}
-                        onChange={(event, value) => {
-                          this.handleFpoChange(event, value);
-                        }}
-                        value={
-                          addFpo
-                            ? this.state.isCancel === true
-                              ? null
-                              : fposFilter[
-                                  fposFilter.findIndex(function (item, i) {
-                                    return item.id === addFpo;
-                                  })
-                                ] || null
-                            : null
-                        }
-                        error={this.hasError("addFpo")}
-                        helperText={
-                          this.hasError("addFpo")
-                            ? this.state.errors.addFpo[0]
-                            : null
-                        }
-                        renderInput={(params) => (
-                          <Input
-                            fullWidth
-                            label="FPO*"
-                            name="addFpo"
-                            variant="outlined"
-                          />
-                        )}
-                      />
-                    </Grid>
-                  ))}
+            
+                {this.state.loggedInUserRole === "Sesta Admin" ||
+                this.state.loggedInUserRole === "Superadmin" ? (
+                  <Grid item md={12} xs={12}>
+                    <Autotext
+                      id="combo-box-demo"
+                      options={fposFilter}
+                      variant="outlined"
+                      label="FPO"
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handleFpoChange(event, value);
+                      }}
+                      value={
+                        addFpo
+                          ? this.state.isCancel === true
+                            ? null
+                            : fposFilter[
+                                fposFilter.findIndex(function (item, i) {
+                                  return item.id === addFpo;
+                                })
+                              ] || null
+                          : null
+                      }
+                      error={this.hasError("addFpo")}
+                      helperText={
+                        this.hasError("addFpo")
+                          ? this.state.errors.addFpo[0]
+                          : null
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          fullWidth
+                          label="FPO*"
+                          name="addFpo"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                ) : null}
 
                 <Grid item xs={12}>
                   <FormControlLabel

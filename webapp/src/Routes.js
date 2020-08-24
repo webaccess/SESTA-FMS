@@ -40,6 +40,7 @@ import Users from "./containers/Users/Users";
 import UsersPage from "./containers/Users/UsersPage";
 import LoanEmiViewPage from "./containers/Loans/LoanEmiViewPage";
 import DashboardViewMoreDetails from "./containers/Dashboard/DashboardViewMoreDetails";
+import DashboardFPOViewMoreDetails from "./containers/Dashboard/DashboardFPOViewMoreDetails";
 
 function Routes() {
   return (
@@ -48,7 +49,16 @@ function Routes() {
         <div>
           <Switch>
             <PrivateRoute path="/" component={Dashboard} exact />
-            <PrivateRoute path="/view/more" component={DashboardViewMoreDetails} exact />
+            <PrivateRoute
+              path="/view/more"
+              component={DashboardViewMoreDetails}
+              exact
+            />
+            <PrivateRoute
+              path="/fpo/loans/view/more"
+              component={DashboardFPOViewMoreDetails}
+              exact
+            />
             <PrivateRoute path="/villages/add" component={VillagePage} exact />
             <PrivateRoute
               path="/villages/edit/:id"
