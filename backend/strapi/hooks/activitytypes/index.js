@@ -6,6 +6,7 @@ const loanModelData = require("./loanmodel.json");
 const emiDetailsData = require("./emidetails.json");
 const loanTasksData = require("./loantasks.json");
 const userData = require("./user.json");
+const { serialize } = require("v8");
 
 async function asyncForEach(array, callback) {
   for (let index = 0; index < array.length; index++) {
@@ -263,7 +264,9 @@ module.exports = (strapi) => {
               .fetch();
             try {
               if (individualPresent) {
-                console.log(`Skipping individual ---`);
+                console.log(
+                  `Skipping individual ${user.contact.individual.first_name} ---`
+                );
               } else {
                 console.log(
                   "userData ind--",
@@ -278,7 +281,9 @@ module.exports = (strapi) => {
                   })
                   .save()
                   .then(() => {
-                    console.log(`Added individual ---`);
+                    console.log(
+                      `Added individual ${user.contact.individual.first_name} ---`
+                    );
                   });
               }
             } catch (error) {
@@ -300,7 +305,9 @@ module.exports = (strapi) => {
               .fetch();
             try {
               if (orgPresent) {
-                console.log(`Skipping organization ---`);
+                console.log(
+                  `Skipping organization ${user.contact.organization.name} ---`
+                );
               } else {
                 console.log(
                   "userData org--",
@@ -315,7 +322,9 @@ module.exports = (strapi) => {
                   })
                   .save()
                   .then(() => {
-                    console.log(`Added organization ---`);
+                    console.log(
+                      `Added organization ${user.contact.organization.name} ---`
+                    );
                   });
               }
             } catch (error) {
@@ -326,8 +335,8 @@ module.exports = (strapi) => {
       }
 
       async function addContact() {
-        let contactType;
         let contactTypePresent;
+        let fpoPresent;
         await asyncForEach(userData.user, async (user) => {
           if (user.contact.contact_type === "organization") {
             contactTypePresent = await bookshelf
@@ -345,6 +354,18 @@ module.exports = (strapi) => {
           }
           try {
             if (contactTypePresent) {
+              if (user.username === "fpouser") {
+                fpoPresent = await bookshelf
+                  .model("organization")
+                  .where({
+                    name: "WAfpoadmin",
+                    sub_type: "FPO",
+                  })
+                  .fetch();
+                const fpotId = fpoPresent.toJSON
+                  ? fpoPresent.toJSON()
+                  : fpoPresent;
+              }
               const contactPresent = await bookshelf
                 .model("contact")
                 .where({
@@ -360,7 +381,10 @@ module.exports = (strapi) => {
                   ? contactTypePresent.toJSON()
                   : contactTypePresent;
 
-                if (user.contact.contact_type == "individual") {
+                if (
+                  user.contact.contact_type == "individual" &&
+                  user.name !== "fpouser"
+                ) {
                   await bookshelf
                     .model("contact")
                     .forge({
@@ -372,13 +396,26 @@ module.exports = (strapi) => {
                     .then(() => {
                       console.log(`Added contact ${user.contact.name}`);
                     });
-                } else {
+                } else if (user.contact.contact_type == "organization") {
                   await bookshelf
                     .model("contact")
                     .forge({
                       name: user.contact.name,
                       contact_type: user.contact.contact_type,
                       organization: contactId.id,
+                    })
+                    .save()
+                    .then(() => {
+                      console.log(`Added contact ${user.contact.name}`);
+                    });
+                } else {
+                  await bookshelf
+                    .model("contact")
+                    .forge({
+                      name: user.contact.name,
+                      contact_type: user.contact.contact_type,
+                      individual: contactId.id,
+                      org_fpos: fpotId.id,
                     })
                     .save()
                     .then(() => {

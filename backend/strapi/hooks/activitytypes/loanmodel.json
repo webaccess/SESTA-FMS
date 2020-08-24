@@ -98,7 +98,7 @@
           "interest": 9
         }
       ],
-      "loantasks": ["land preparation", "planting"]
+      "loantasks": ["Grafts of crop 1", "Grafts of crop 2"]
     },
     {
       "product_name": "Turmeric",
@@ -167,8 +167,7 @@
           "principal": 878,
           "interest": 9
         }
-      ],
-      "loantasks": ["new", "planting", "brand new", "agriculture"]
+      ]
     },
     {
       "product_name": "Pig Sty",
@@ -515,93 +514,93 @@
       "emidetails": [
         {
           "loan_model": "Pumpset",
-          "principal": 1224,
-          "interest": 240
+          "principal": 1631,
+          "interest": 320
         },
         {
           "loan_model": "Pumpset",
-          "principal": 1224,
-          "interest": 240
+          "principal": 1647,
+          "interest": 304
         },
         {
           "loan_model": "Pumpset",
-          "principal": 1224,
-          "interest": 240
+          "principal": 1664,
+          "interest": 287
         },
         {
           "loan_model": "Pumpset",
-          "principal": 1224,
-          "interest": 240
+          "principal": 1680,
+          "interest": 271
         },
         {
           "loan_model": "Pumpset",
-          "principal": 1224,
-          "interest": 240
+          "principal": 1697,
+          "interest": 254
         },
         {
           "loan_model": "Pumpset",
-          "principal": 1224,
-          "interest": 240
+          "principal": 1714,
+          "interest": 237
         },
         {
           "loan_model": "Pumpset",
-          "principal": 1224,
-          "interest": 240
+          "principal": 1731,
+          "interest": 220
         },
         {
           "loan_model": "Pumpset",
-          "principal": 1224,
-          "interest": 240
+          "principal": 1749,
+          "interest": 202
         },
         {
           "loan_model": "Pumpset",
-          "principal": 1224,
-          "interest": 240
+          "principal": 1766,
+          "interest": 185
         },
         {
           "loan_model": "Pumpset",
-          "principal": 1224,
-          "interest": 240
+          "principal": 1784,
+          "interest": 167
         },
         {
           "loan_model": "Pumpset",
-          "principal": 1224,
-          "interest": 240
+          "principal": 1802,
+          "interest": 149
         },
         {
           "loan_model": "Pumpset",
-          "principal": 1224,
-          "interest": 240
+          "principal": 1820,
+          "interest": 131
         },
         {
           "loan_model": "Pumpset",
-          "principal": 1224,
-          "interest": 240
+          "principal": 1838,
+          "interest": 113
         },
         {
           "loan_model": "Pumpset",
-          "principal": 1224,
-          "interest": 240
+          "principal": 1856,
+          "interest": 95
         },
         {
           "loan_model": "Pumpset",
-          "principal": 1224,
-          "interest": 240
+          "principal": 1875,
+          "interest": 76
         },
         {
           "loan_model": "Pumpset",
-          "principal": 1224,
-          "interest": 240
+          "principal": 1894,
+          "interest": 57
         },
         {
           "loan_model": "Pumpset",
-          "principal": 1224,
-          "interest": 240
+          "principal": 1913,
+          "interest": 38
         },
         {
           "loan_model": "Pumpset",
-          "principal": 1224,
-          "interest": 240
+          "principal": 1932,
+          "interest": 19
         }
       ]
     },
@@ -610,21 +609,247 @@
       "specification": "1 hp Kiroslar pump",
       "loan_amount": 7000,
       "duration": 12,
-      "emi": 622
+      "emi": 622,
+      "emidetails": [
+        {
+          "loan_model": "Motor pump",
+          "principal": 552,
+          "interest": 70
+        },
+        {
+          "loan_model": "Motor pump",
+          "principal": 558,
+          "interest": 64
+        },
+        {
+          "loan_model": "Motor pump",
+          "principal": 563,
+          "interest": 59
+        },
+        {
+          "loan_model": "Motor pump",
+          "principal": 569,
+          "interest": 53
+        },
+        {
+          "loan_model": "Motor pump",
+          "principal": 574,
+          "interest": 48
+        },
+        {
+          "loan_model": "Motor pump",
+          "principal": 580,
+          "interest": 42
+        },
+        {
+          "loan_model": "Motor pump",
+          "principal": 587,
+          "interest": 35
+        },
+        {
+          "loan_model": "Motor pump",
+          "principal": 592,
+          "interest": 30
+        },
+        {
+          "loan_model": "Motor pump",
+          "principal": 598,
+          "interest": 24
+        },
+        {
+          "loan_model": "Motor pump",
+          "principal": 604,
+          "interest": 18
+        },
+        {
+          "loan_model": "Motor pump",
+          "principal": 610,
+          "interest": 12
+        },
+        {
+          "loan_model": "Motor pump",
+          "principal": 616,
+          "interest": 6
+        }
+      ]
     },
     {
       "product_name": "Maize",
       "specification": "half bigha",
       "loan_amount": 6000,
-      "duration": 8,
-      "emi": 1035
+      "duration": 6,
+      "emi": 1035,
+      "emidetails": [
+        {
+          "loan_model": "Maize",
+          "principal": 975,
+          "interest": 60
+        },
+        {
+          "loan_model": "Maize",
+          "principal": 985,
+          "interest": 50
+        },
+        {
+          "loan_model": "Maize",
+          "principal": 995,
+          "interest": 40
+        },
+        {
+          "loan_model": "Maize",
+          "principal": 1005,
+          "interest": 30
+        },
+        {
+          "loan_model": "Maize",
+          "principal": 1015,
+          "interest": 20
+        },
+        {
+          "loan_model": "Maize",
+          "principal": 1025,
+          "interest": 10
+        }
+      ]
     },
     {
       "product_name": "Goatery",
       "specification": "3 doe and shed",
       "loan_amount": 9000,
       "duration": 12,
-      "emi": 800
+      "emi": 800,
+      "emidetails": [
+        {
+          "loan_model": "Goatery",
+          "principal": 710,
+          "interest": 90
+        },
+        {
+          "loan_model": "Goatery",
+          "principal": 717,
+          "interest": 83
+        },
+        {
+          "loan_model": "Goatery",
+          "principal": 724,
+          "interest": 76
+        },
+        {
+          "loan_model": "Goatery",
+          "principal": 732,
+          "interest": 68
+        },
+        {
+          "loan_model": "Goatery",
+          "principal": 739,
+          "interest": 61
+        },
+        {
+          "loan_model": "Goatery",
+          "principal": 746,
+          "interest": 54
+        },
+        {
+          "loan_model": "Goatery",
+          "principal": 754,
+          "interest": 46
+        },
+        {
+          "loan_model": "Goatery",
+          "principal": 761,
+          "interest": 39
+        },
+        {
+          "loan_model": "Goatery",
+          "principal": 769,
+          "interest": 31
+        },
+        {
+          "loan_model": "Goatery",
+          "principal": 776,
+          "interest": 24
+        },
+        {
+          "loan_model": "Goatery",
+          "principal": 784,
+          "interest": 16
+        },
+        {
+          "loan_model": "Goatery",
+          "principal": 792,
+          "interest": 8
+        }
+      ],
+      "loantasks": ["Vet care support : Vaccination"]
+    },
+    {
+      "product_name": "Ginger",
+      "specification": "half bigha",
+      "loan_amount": 9000,
+      "duration": 12,
+      "emi": 800,
+      "emidetails": [
+        {
+          "loan_model": "Ginger",
+          "principal": 710,
+          "interest": 90
+        },
+        {
+          "loan_model": "Ginger",
+          "principal": 717,
+          "interest": 83
+        },
+        {
+          "loan_model": "Ginger",
+          "principal": 724,
+          "interest": 76
+        },
+        {
+          "loan_model": "Ginger",
+          "principal": 732,
+          "interest": 68
+        },
+        {
+          "loan_model": "Ginger",
+          "principal": 739,
+          "interest": 61
+        },
+        {
+          "loan_model": "Ginger",
+          "principal": 746,
+          "interest": 54
+        },
+        {
+          "loan_model": "Ginger",
+          "principal": 754,
+          "interest": 46
+        },
+        {
+          "loan_model": "Ginger",
+          "principal": 761,
+          "interest": 39
+        },
+        {
+          "loan_model": "Ginger",
+          "principal": 769,
+          "interest": 31
+        },
+        {
+          "loan_model": "Ginger",
+          "principal": 776,
+          "interest": 24
+        },
+        {
+          "loan_model": "Ginger",
+          "principal": 784,
+          "interest": 16
+        },
+        {
+          "loan_model": "Ginger",
+          "principal": 792,
+          "interest": 8
+        }
+      ]
     }
   ]
 }

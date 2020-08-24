@@ -4,163 +4,189 @@
       "name": "Loan application collection",
       "is_active": true,
       "remuneration": 10,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Indent form filled up & deposit at FPO",
       "is_active": true,
       "remuneration": 40,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Agriculture input generation",
       "is_active": true,
       "remuneration": 20,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Data collection of SRI method/meeting",
       "is_active": true,
       "remuneration": 5,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Training on SRI method : Seed sorting & seed treatment",
       "is_active": true,
       "remuneration": 5,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Nursery preparation",
       "is_active": true,
       "remuneration": 5,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Transplantation",
       "is_active": true,
       "remuneration": 10,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Weeding",
       "is_active": true,
       "remuneration": 5,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Nursery Training : Structure making",
       "is_active": true,
       "remuneration": 50,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Cutting/Grafting, Lyrering",
       "is_active": true,
       "remuneration": 10,
+      "notation": "Flat",
       "autocreated": true
     },
-
     {
       "name": "Seed procurement and Delivery at farmer",
       "is_active": true,
       "remuneration": 5,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Seedling procurement and Delivery at farmer",
       "is_active": true,
-      "remuneration": 50,
+      "remuneration": 0.5,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Agriculture Yield/production data collection",
       "is_active": true,
-      "remuneration": 10,
+      "remuneration": 0.1,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Vet care support : Vaccination",
       "is_active": true,
       "remuneration": 5,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Bird Vaccination",
       "is_active": true,
       "remuneration": 2,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Shed structure",
       "is_active": true,
       "remuneration": 10,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Deworming",
       "is_active": true,
       "remuneration": 5,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Disease Management",
       "is_active": true,
       "remuneration": 5,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Monthly review meeting",
       "is_active": true,
       "remuneration": 100,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Family based livelihhod planning",
       "is_active": true,
       "remuneration": 100,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Insurance for livestock",
       "is_active": true,
       "remuneration": 50,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Activity follow up (monthly)",
       "is_active": true,
       "remuneration": 20,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Nutrition Management",
       "is_active": true,
       "remuneration": 5,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Collection of principal amount",
       "is_active": true,
       "remuneration": 2,
+      "notation": "Percentage",
       "autocreated": true
     },
     {
       "name": "Body weight calculation ( 2 months)",
       "is_active": true,
       "remuneration": 2,
+      "notation": "Flat",
       "autocreated": true
     },
     {
       "name": "Interest collection",
       "is_active": true,
       "remuneration": 5,
+      "notation": "Percentage",
       "autocreated": true
     },
     {
       "name": "VO meeting",
       "is_active": true,
       "remuneration": 40,
+      "notation": "Flat",
       "autocreated": true
     }
   ]

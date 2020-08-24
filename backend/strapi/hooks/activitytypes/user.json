@@ -15,6 +15,10 @@
         "organization": {
           "name": "WAfpoadmin",
           "sub_type": "FPO"
+        },
+        "individual": {
+          "first_name": "WA",
+          "last_name": "FPO Admin"
         }
       }
     },
@@ -33,6 +37,24 @@
         "individual": {
           "first_name": "WA",
           "last_name": "Super Admin"
+        }
+      }
+    },
+    {
+      "username": "fpouser",
+      "email": "fpouser@mail.com",
+      "password": "password",
+      "confirmed": true,
+      "blocked": false,
+      "first_name": "WA",
+      "last_name": "FPO User",
+      "role": 2,
+      "contact": {
+        "name": "fpouser",
+        "contact_type": "individual",
+        "individual": {
+          "first_name": "WA",
+          "last_name": "FPO User"
         }
       }
     }

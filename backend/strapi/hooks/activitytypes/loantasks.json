@@ -1,28 +1,16 @@
 {
   "loantask": [
     {
-      "activitytype": "land preparation",
+      "activitytype": "Grafts of crop 1",
       "loan_model": "Horticulture"
     },
     {
-      "activitytype": "planting",
+      "activitytype": "Grafts of crop 1",
       "loan_model": "Horticulture"
     },
     {
-      "activitytype": "new",
-      "loan_model": "Turmeric"
-    },
-    {
-      "activitytype": "planting",
-      "loan_model": "Turmeric"
-    },
-    {
-      "activitytype": "brand new",
-      "loan_model": "Turmeric"
-    },
-    {
-      "activitytype": "agriculture",
-      "loan_model": "Turmeric"
+      "activitytype": "Vet care support : Vaccination",
+      "loan_model": "Goatery"
     }
   ]
 }
