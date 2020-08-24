@@ -20,22 +20,30 @@
       "default": true
     },
     "activities": {
-      "via": "activitytype",
       "plugin": "crm-plugin",
-      "collection": "activity"
+      "collection": "activity",
+      "via": "activitytype"
     },
     "remuneration": {
       "type": "decimal",
       "required": true
     },
     "contact": {
-      "via": "activitytypes",
       "plugin": "crm-plugin",
       "collection": "contact",
+      "via": "activitytypes",
       "dominant": true
     },
     "autocreated": {
       "type": "boolean"
+    },
+    "notation": {
+      "type": "enumeration",
+      "enum": [
+        "Flat",
+        "Percentage"
+      ],
+      "required": true
     }
   }
 }

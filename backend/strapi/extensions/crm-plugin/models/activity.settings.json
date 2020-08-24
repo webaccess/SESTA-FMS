@@ -24,9 +24,9 @@
       "type": "richtext"
     },
     "activitytype": {
+      "via": "activities",
       "plugin": "crm-plugin",
-      "model": "activitytype",
-      "via": "activities"
+      "model": "activitytype"
     },
     "activityassignees": {
       "plugin": "crm-plugin",
