@@ -160,8 +160,8 @@ class LoanEmiPage extends Component {
 
     // get Loan Ends On Date
     let sortedPaymentDate = loanAppData.loan_app_installments.sort((a, b) => new Date(...a.payment_date.split('/').reverse()) - new Date(...b.payment_date.split('/').reverse()));
-      let len = sortedPaymentDate.length -1;
-      data.loanEndsOn = Moment(sortedPaymentDate[len].payment_date).format('DD MMM YYYY');
+    let len = sortedPaymentDate.length - 1;
+    data.loanEndsOn = Moment(sortedPaymentDate[len].payment_date).format('DD MMM YYYY');
 
     const Usercolumns = [
       {
@@ -178,7 +178,7 @@ class LoanEmiPage extends Component {
         sortable: true,
         cell: (row) =>
           row.expected_principal ?
-            row.expected_principal.toLocaleString() : null
+            "₹" + row.expected_principal.toLocaleString() : null
       },
       {
         name: "Interest",
@@ -186,7 +186,7 @@ class LoanEmiPage extends Component {
         sortable: true,
         cell: (row) =>
           row.expected_interest ?
-            row.expected_interest.toLocaleString() : null
+            "₹" + row.expected_interest.toLocaleString() : null
       },
       {
         name: "Payment Date",
@@ -202,7 +202,7 @@ class LoanEmiPage extends Component {
         sortable: true,
         cell: (row) =>
           row.actual_principal ?
-            row.actual_principal.toLocaleString() : null
+            "₹" + row.actual_principal.toLocaleString() : null
       },
       {
         name: "Interest Paid",
@@ -210,12 +210,15 @@ class LoanEmiPage extends Component {
         sortable: true,
         cell: (row) =>
           row.actual_interest ?
-            row.actual_interest.toLocaleString() : null
+            "₹" + row.actual_interest.toLocaleString() : null
       },
       {
         name: "Fine",
         selector: "fine",
         sortable: true,
+        cell: (row) =>
+          row.fine ?
+            "₹" + row.fine.toLocaleString() : null
       },
       {
         name: "Total Paid",
@@ -223,7 +226,7 @@ class LoanEmiPage extends Component {
         sortable: true,
         cell: (row) =>
           row.totalPaid ?
-            row.totalPaid.toLocaleString() : null
+            "₹" + row.totalPaid.toLocaleString() : null
       },
       {
         name: "Outstanding",
@@ -231,7 +234,7 @@ class LoanEmiPage extends Component {
         sortable: true,
         cell: (row) =>
           row.outstanding ?
-            row.outstanding.toLocaleString() : null
+            "₹" + row.outstanding.toLocaleString() : null
       },
     ];
     let selectors = [];
