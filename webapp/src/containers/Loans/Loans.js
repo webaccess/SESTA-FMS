@@ -146,15 +146,15 @@ export class Loans extends React.Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/?individual=" +
-            auth.getUserInfo().contact.individual
+          "crm-plugin/contact/?individual=" +
+          auth.getUserInfo().contact.individual
         )
         .then((res) => {
           serviceProvider
             .serviceProviderForGetRequest(
               process.env.REACT_APP_SERVER_URL +
-                "crm-plugin/contact/?id=" +
-                res.data[0].individual.vo
+              "crm-plugin/contact/?id=" +
+              res.data[0].individual.vo
             )
             .then((response) => {
               this.setState({ getShg: response.data[0].org_vos });
@@ -184,8 +184,8 @@ export class Loans extends React.Component {
       );
       loandata.loan_model.loan_amount = loandata.loan_model.loan_amount.toLocaleString();
 
-       //sort installments date by id
-       loandata.loan_app_installments.sort((a, b) => new Date(...a.payment_date.split('/').reverse()) - new Date(...b.payment_date.split('/').reverse()));
+      //sort installments date by id
+      loandata.loan_app_installments.sort((a, b) => new Date(...a.payment_date.split('/').reverse()) - new Date(...b.payment_date.split('/').reverse()));
 
       if (
         loandata.loan_app_installments.length > 0 &&
@@ -248,8 +248,8 @@ export class Loans extends React.Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/individuals/?shg.id=" +
-            this.state.filterShg.id
+          "crm-plugin/individuals/?shg.id=" +
+          this.state.filterShg.id
         )
         .then((res) => {
           if (res.data.length > 0) {
@@ -418,6 +418,7 @@ export class Loans extends React.Component {
         name: "Amount",
         selector: "loan_model.loan_amount",
         sortable: true,
+        cell: (row) => "₹" + (row.loan_model.loan_amount)
       },
       {
         name: "Status",
@@ -428,13 +429,13 @@ export class Loans extends React.Component {
         name: "Outstanding amount",
         selector: "outstandingAmount",
         sortable: true,
-        cell: (row) => (row.outstandingAmount ? row.outstandingAmount : "-"),
+        cell: (row) => (row.outstandingAmount ? "₹" + row.outstandingAmount : "-"),
       },
       {
         name: "Amount Due",
         selector: "amount_due",
         sortable: true,
-        cell: (row) => (row.amount_due ? row.amount_due : "-"),
+        cell: (row) => (row.amount_due ? "₹" + row.amount_due : "-"),
       },
       {
         name: "Installment Date",
@@ -605,8 +606,8 @@ export class Loans extends React.Component {
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (
-            <h1>Loading...</h1>
-          )}
+              <h1>Loading...</h1>
+            )}
         </Grid>
       </Layout>
     );

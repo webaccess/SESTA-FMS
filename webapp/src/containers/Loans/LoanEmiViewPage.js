@@ -7,6 +7,8 @@ import MoneyIcon from "@material-ui/icons/Money";
 import Table from "../../components/Datatable/Datatable.js";
 import Moment from "moment";
 import { VIEW_LOAN_EMI_BREADCRUMBS } from "./config";
+import Button from "../../components/UI/Button/Button";
+import { Link } from "react-router-dom";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -159,8 +161,8 @@ class LoanEmiViewPage extends Component {
 
     // get Loan Ends On Date
     let sortedPaymentDate = loanAppData.loan_app_installments.sort((a, b) => new Date(...a.payment_date.split('/').reverse()) - new Date(...b.payment_date.split('/').reverse()));
-      let len = sortedPaymentDate.length -1;
-      data.loanEndsOn = Moment(sortedPaymentDate[len].payment_date).format('DD MMM YYYY');
+    let len = sortedPaymentDate.length - 1;
+    data.loanEndsOn = Moment(sortedPaymentDate[len].payment_date).format('DD MMM YYYY');
 
     const Usercolumns = [
       {
@@ -177,7 +179,7 @@ class LoanEmiViewPage extends Component {
         sortable: true,
         cell: (row) =>
           row.expected_principal ?
-            row.expected_principal.toLocaleString() : null
+            "₹" + row.expected_principal.toLocaleString() : null
       },
       {
         name: "Interest",
@@ -185,7 +187,7 @@ class LoanEmiViewPage extends Component {
         sortable: true,
         cell: (row) =>
           row.expected_interest ?
-            row.expected_interest.toLocaleString() : null
+            "₹" + row.expected_interest.toLocaleString() : null
       },
       {
         name: "Payment Date",
@@ -201,7 +203,7 @@ class LoanEmiViewPage extends Component {
         sortable: true,
         cell: (row) =>
           row.actual_principal ?
-            row.actual_principal.toLocaleString() : null
+            "₹" + row.actual_principal.toLocaleString() : null
       },
       {
         name: "Interest Paid",
@@ -209,12 +211,15 @@ class LoanEmiViewPage extends Component {
         sortable: true,
         cell: (row) =>
           row.actual_interest ?
-            row.actual_interest.toLocaleString() : null
+            "₹" + row.actual_interest.toLocaleString() : null
       },
       {
         name: "Fine",
         selector: "fine",
         sortable: true,
+        cell: (row) =>
+          row.fine ?
+            "₹" + row.fine.toLocaleString() : null
       },
       {
         name: "Total Paid",
@@ -222,7 +227,7 @@ class LoanEmiViewPage extends Component {
         sortable: true,
         cell: (row) =>
           row.totalPaid ?
-            row.totalPaid.toLocaleString() : null
+            "₹" + row.totalPaid.toLocaleString() : null
       },
       {
         name: "Outstanding",
@@ -230,7 +235,7 @@ class LoanEmiViewPage extends Component {
         sortable: true,
         cell: (row) =>
           row.outstanding ?
-            row.outstanding.toLocaleString() : null
+            "₹" + row.outstanding.toLocaleString() : null
       },
     ];
     let selectors = [];
@@ -357,15 +362,21 @@ class LoanEmiViewPage extends Component {
                 "totalPaid",
                 "outstanding",
               ]}
-              // filters={filters}
               column={Usercolumns}
-              // editData={this.editData}
               rowsSelected={this.rowsSelect}
               columnsvalue={columnsvalue}
             />
           ) : (
               <h1>Loading...</h1>
             )}
+          <br />
+          <Button
+            color="primary"
+            component={Link}
+            to="/loans"
+          >
+            Done
+            </Button>
         </Grid>
       </Layout>
     );

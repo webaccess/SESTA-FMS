@@ -20,7 +20,7 @@ const Piechart = (props) => (
         },
       },
       tooltips: {
-        enabled: false,
+        enabled: true,
       },
       legend: {
         labels: {
