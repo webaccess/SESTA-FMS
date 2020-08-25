@@ -233,13 +233,14 @@ class ActivityPage extends Component {
                 res.data.activityassignees[0].id,
                 assigneeData
               )
-              .then((res) => {})
+              .then((res) => {
+                this.setState({ formSubmitted: true });
+                this.props.history.push({
+                  pathname: "/activities",
+                  editData: true,
+                });
+              })
               .catch((error) => {});
-            this.setState({ formSubmitted: true });
-            this.props.history.push({
-              pathname: "/activities",
-              editData: true,
-            });
           })
           .catch((error) => {
             this.setState({ formSubmitted: false });
@@ -282,10 +283,14 @@ class ActivityPage extends Component {
                 res.data.activityassignees[0].id,
                 assigneeData
               )
-              .then((res) => {})
+              .then((res) => {
+                this.setState({ formSubmitted: true });
+                this.props.history.push({
+                  pathname: "/activities",
+                  addData: true,
+                });
+              })
               .catch((error) => {});
-            this.setState({ formSubmitted: true });
-            this.props.history.push({ pathname: "/activities", addData: true });
           })
           .catch((error) => {
             this.setState({ formSubmitted: false });

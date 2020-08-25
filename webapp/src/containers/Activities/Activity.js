@@ -63,11 +63,12 @@ export class Activity extends React.Component {
     let filteredArray = [];
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/activities/"
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/activities/?_sort=start_datetime:desc"
       )
       .then((res) => {
         res.data.map((e, i) => {
-          e.activityassignees.map((item) => { });
+          e.activityassignees.map((item) => {});
           e.activityassignees
             .filter((item) => item.contact === auth.getUserInfo().contact.id)
             .map((filteredData) => {
@@ -83,7 +84,7 @@ export class Activity extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/activitytypes/?is_active=true"
+          "crm-plugin/activitytypes/?is_active=true"
       )
       .then((res) => {
         this.setState({ getActivitytype: res.data });
@@ -165,13 +166,14 @@ export class Activity extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/activities/?" +
-        searchData
+          "crm-plugin/activities/?" +
+          searchData +
+          "&&_sort=start_datetime:desc"
       )
       .then((res) => {
         let filteredArray = [];
         res.data.map((e, i) => {
-          e.activityassignees.map((item) => { });
+          e.activityassignees.map((item) => {});
           e.activityassignees
             .filter((item) => item.contact === auth.getUserInfo().contact.id)
             .map((filteredData) => {
@@ -211,28 +213,30 @@ export class Activity extends React.Component {
         selector: "start_datetime",
         format: (row) =>
           `${
-          row.start_datetime != null
-            ? new Date(row.start_datetime).toLocaleString()
-            : ""
+            row.start_datetime != null
+              ? new Date(row.start_datetime).toLocaleString()
+              : ""
           }`,
         sortable: true,
         cell: (row) =>
-          row.start_datetime ?
-            Moment(row.start_datetime).format('DD MMM YYYY') : null
+          row.start_datetime
+            ? Moment(row.start_datetime).format("DD MMM YYYY")
+            : null,
       },
       {
         name: "End Date/Time",
         selector: "end_datetime",
         format: (row) =>
           `${
-          row.end_datetime != null
-            ? new Date(row.end_datetime).toLocaleString()
-            : ""
+            row.end_datetime != null
+              ? new Date(row.end_datetime).toLocaleString()
+              : ""
           }`,
         sortable: true,
         cell: (row) =>
-          row.end_datetime ?
-            Moment(row.end_datetime).format('DD MMM YYYY') : null
+          row.end_datetime
+            ? Moment(row.end_datetime).format("DD MMM YYYY")
+            : null,
       },
     ];
 
@@ -271,12 +275,12 @@ export class Activity extends React.Component {
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
-              this.state.singleDelete !== "" &&
-              this.state.singleDelete ? (
-                <Snackbar severity="success" Showbutton={false}>
-                  Activity {this.state.singleDelete} deleted successfully!
-                </Snackbar>
-              ) : null}
+            this.state.singleDelete !== "" &&
+            this.state.singleDelete ? (
+              <Snackbar severity="success" Showbutton={false}>
+                Activity {this.state.singleDelete} deleted successfully!
+              </Snackbar>
+            ) : null}
             {this.state.singleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
@@ -325,13 +329,13 @@ export class Activity extends React.Component {
                           ? this.state.isCancel === true
                             ? null
                             : ActivityTypeFilter[
-                            ActivityTypeFilter.findIndex(function (
-                              item,
-                              i
-                            ) {
-                              return item.id === filterActivitytype;
-                            })
-                            ] || null
+                                ActivityTypeFilter.findIndex(function (
+                                  item,
+                                  i
+                                ) {
+                                  return item.id === filterActivitytype;
+                                })
+                              ] || null
                           : null
                       }
                       renderInput={(params) => (
@@ -371,8 +375,8 @@ export class Activity extends React.Component {
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (
-                <h1>Loading...</h1>
-              )}
+              <h1>Loading...</h1>
+            )}
           </div>
         </Grid>
       </Layout>

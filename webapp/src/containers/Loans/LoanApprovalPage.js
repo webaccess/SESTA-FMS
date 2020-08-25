@@ -86,8 +86,8 @@ class LoanApprovalPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "loan-applications/" +
-        this.state.editPage[1]
+          "loan-applications/" +
+          this.state.editPage[1]
       )
       .then((res) => {
         this.getAllDetails(res.data);
@@ -101,7 +101,7 @@ class LoanApprovalPage extends Component {
     let document;
     let purpose = data.purpose;
     let applicationDate = Moment(data.application_date).format("DD MMM YYYY");
-    let loanAmnt = "Rs." + data.loan_model.loan_amount.toLocaleString();
+    let loanAmnt = "₹" + data.loan_model.loan_amount.toLocaleString();
     let duration = data.loan_model.duration + " Months";
     let status = data.status;
     let comment = data.review_comments;
@@ -114,8 +114,8 @@ class LoanApprovalPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/individuals/" +
-        data.contact.individual
+          "crm-plugin/individuals/" +
+          data.contact.individual
       )
       .then((res) => {
         let loaneeName = res.data.first_name + " " + res.data.last_name;
@@ -123,8 +123,8 @@ class LoanApprovalPage extends Component {
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/?organization.id=" +
-            res.data.shg.organization
+              "crm-plugin/contact/?organization.id=" +
+              res.data.shg.organization
           )
           .then((response) => {
             let voName = response.data[0].organization.vos[0].name;
@@ -253,13 +253,10 @@ class LoanApprovalPage extends Component {
           this.saveLoanAppTasks(loanAppRes.data);
           this.saveLoanAppInstallments(loanAppRes.data);
         } else {
-          this.props.history.push({
-            pathname: "/loans",
-            state: { loanApproved: true },
-          });
+          this.props.history.push({ pathname: "/loans", loanApproved: true });
         }
       })
-      .catch((error) => { });
+      .catch((error) => {});
   }
 
   saveLoanAppTasks = (data) => {
@@ -278,11 +275,10 @@ class LoanApprovalPage extends Component {
             let postLoanTaskData = {
               status: "Scheduled",
               loan_application: data.id,
-              // name: element.name,
               name: element.activitytype.name,
             };
 
-            if (!appTaskArray.includes(element.name)) {
+            if (!appTaskArray.includes(element.activitytype.name)) {
               serviceProvider
                 .serviceProviderForPostRequest(
                   process.env.REACT_APP_SERVER_URL + "loan-application-tasks",
@@ -291,10 +287,10 @@ class LoanApprovalPage extends Component {
                 .then((res) => {
                   this.props.history.push({
                     pathname: "/loans",
-                    state: { loanApproved: true },
+                    loanApproved: true,
                   });
                 })
-                .catch((error) => { });
+                .catch((error) => {});
             }
           });
         })
@@ -337,7 +333,7 @@ class LoanApprovalPage extends Component {
               serviceProvider
                 .serviceProviderForPostRequest(
                   process.env.REACT_APP_SERVER_URL +
-                  "loan-application-installments",
+                    "loan-application-installments",
                   postEmiData
                 )
                 .then((res) => {
@@ -348,19 +344,19 @@ class LoanApprovalPage extends Component {
                     .then((resp) => {
                       this.props.history.push({
                         pathname: "/loans",
+                        loanApproved: true,
                         state: {
-                          loanApproved: true,
                           loanAppResData: resp.data,
                         },
                       });
                     });
                 })
-                .catch((error) => { });
+                .catch((error) => {});
             }
           });
         }
       })
-      .catch((error) => { });
+      .catch((error) => {});
   };
 
   render() {
@@ -512,10 +508,10 @@ class LoanApprovalPage extends Component {
                       Selected File: {this.state.fileName}
                     </label>
                   ) : (
-                      <label style={{ color: "red", fontSize: "11px" }}>
-                        No File Selected!
-                      </label>
-                    )}
+                    <label style={{ color: "red", fontSize: "11px" }}>
+                      No File Selected!
+                    </label>
+                  )}
                 </Grid>
                 <Grid item md={5} xs={12}>
                   <Autocomplete
@@ -529,13 +525,13 @@ class LoanApprovalPage extends Component {
                     value={
                       statusValue
                         ? this.state.loanStatusList[
-                        this.state.loanStatusList.findIndex(function (
-                          item,
-                          i
-                        ) {
-                          return item.id === statusValue;
-                        })
-                        ] || null
+                            this.state.loanStatusList.findIndex(function (
+                              item,
+                              i
+                            ) {
+                              return item.id === statusValue;
+                            })
+                          ] || null
                         : null
                     }
                     renderInput={(params) => (
