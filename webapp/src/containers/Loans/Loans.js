@@ -146,15 +146,15 @@ export class Loans extends React.Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/?individual=" +
-            auth.getUserInfo().contact.individual
+          "crm-plugin/contact/?individual=" +
+          auth.getUserInfo().contact.individual
         )
         .then((res) => {
           serviceProvider
             .serviceProviderForGetRequest(
               process.env.REACT_APP_SERVER_URL +
-                "crm-plugin/contact/?id=" +
-                res.data[0].individual.vo
+              "crm-plugin/contact/?id=" +
+              res.data[0].individual.vo
             )
             .then((response) => {
               this.setState({ getShg: response.data[0].org_vos });
@@ -252,8 +252,8 @@ export class Loans extends React.Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/individuals/?shg.id=" +
-            this.state.filterShg.id
+          "crm-plugin/individuals/?shg.id=" +
+          this.state.filterShg.id
         )
         .then((res) => {
           if (res.data.length > 0) {
@@ -468,24 +468,24 @@ export class Loans extends React.Component {
             <h1 className={style.title}>Manage Loan Application</h1>
           </div>
 
-          {loanState.loanApplied ? (
+          {this.props.location.loanApplied ? (
             <Snackbar severity="success">
               You have successfully applied for the loan{" "}
               <b>{loanState.purpose}</b>
             </Snackbar>
           ) : null}
-          {loanState.loanAlreadyApplied ? (
+          {this.props.location.loanAlreadyApplied ? (
             <Snackbar severity="info">
               You have already applied loan for the Purpose{" "}
               <b>{loanState.purpose}</b>
             </Snackbar>
           ) : null}
-          {loanState.activeLoanPresent ? (
+          {this.props.location.activeLoanPresent ? (
             <Snackbar severity="info">
               You already have one active loan.
             </Snackbar>
           ) : null}
-          {loanState.loanNotApplied ? (
+          {this.props.location.loanNotApplied ? (
             <Snackbar severity="error">
               An error occured - Please try again later!
             </Snackbar>
@@ -613,8 +613,8 @@ export class Loans extends React.Component {
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (
-            <h1>Loading...</h1>
-          )}
+              <h1>Loading...</h1>
+            )}
         </Grid>
       </Layout>
     );

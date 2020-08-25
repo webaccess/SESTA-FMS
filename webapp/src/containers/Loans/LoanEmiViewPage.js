@@ -100,7 +100,7 @@ class LoanEmiViewPage extends Component {
                 purpose: purpose,
                 amount: amount,
                 duration: duration,
-                emi: "Rs." + emi.toLocaleString(),
+                emi: "₹" + emi.toLocaleString(),
                 pendingAmount: pendingAmount
                   ? pendingAmount
                   : "-",
@@ -156,7 +156,7 @@ class LoanEmiViewPage extends Component {
       if (pendingAmount < 0) {
         pendingAmount = 0;
       }
-      pendingAmount = "Rs. " + pendingAmount.toLocaleString();
+      pendingAmount = "₹" + pendingAmount.toLocaleString();
     }
 
     // get Loan Ends On Date
@@ -297,7 +297,7 @@ class LoanEmiViewPage extends Component {
                       <div className={classes.member}>
                         AMOUNT <br />
                         <span className={classes.fieldValues}>
-                          {data.amount}
+                          ₹{data.amount}
                         </span>
                       </div>
                     </b>
