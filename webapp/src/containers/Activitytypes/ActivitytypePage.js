@@ -96,10 +96,11 @@ class ActivitytypePage extends Component {
             values: {
               addActivitytype: res.data.name,
               addRemuneration: res.data.remuneration,
+              selectedNotation: res.data.notation,
             },
             addIsActive: res.data.is_active,
-            selectedNotation: res.data.notation,
           });
+
           if (res.data.contact[0]) {
             let tempValues = this.state.values;
             tempValues["addFpo"] = res.data.contact[0].id;
@@ -167,11 +168,14 @@ class ActivitytypePage extends Component {
   handleNotationChange = (event, value) => {
     if (value.props !== null) {
       this.setState({
-        selectedNotation: value.props.value,
+        values: { ...this.state.values, selectedNotation: value.props.value },
       });
     } else {
       this.setState({
-        selectedNotation: "",
+        values: {
+          ...this.state.values,
+          selectedNotation: "",
+        },
       });
     }
   };
@@ -207,7 +211,7 @@ class ActivitytypePage extends Component {
     let activitytypeName = this.state.values.addActivitytype;
     let IsActive = this.state.addIsActive;
     let remunerate = this.state.values.addRemuneration;
-    let notation = this.state.selectedNotation;
+    let notation = this.state.values.selectedNotation;
     let formData = {
       name: activitytypeName,
       remuneration: remunerate,
@@ -314,6 +318,7 @@ class ActivitytypePage extends Component {
   render() {
     let fposFilter = this.state.getFPO;
     let addFpo = this.state.values.addFpo;
+    let selectedNotation = this.state.values.selectedNotation;
     const userInfo = auth.getUserInfo();
     let isCancel = this.state.isCancel;
     let checked = this.state.checkedB;
@@ -395,18 +400,21 @@ class ActivitytypePage extends Component {
                     id="outlined-select-currency"
                     select
                     label="Notation*"
-                    value={this.state.selectedNotation}
-                    onChange={this.handleNotationChange}
+                    error={this.hasError("selectedNotation")}
                     helperText={
                       this.hasError("selectedNotation")
                         ? this.state.errors.selectedNotation[0]
-                        : this.state.selectedNotation === "Flat"
+                        : selectedNotation === "Flat"
                         ? "Amount stored in rupees"
                         : null
                     }
-                    error={this.hasError("selectedNotation")}
+                    value={selectedNotation || ""}
+                    onChange={(event, value) => {
+                      this.handleNotationChange(event, value);
+                    }}
                     variant="outlined"
                   >
+                    3
                     {this.state.remNotation.map((option) => (
                       <MenuItem key={option.id} value={option.name}>
                         {option.name}
@@ -414,7 +422,7 @@ class ActivitytypePage extends Component {
                     ))}
                   </TextField>
                 </Grid>
-            
+
                 {this.state.loggedInUserRole === "Sesta Admin" ||
                 this.state.loggedInUserRole === "Superadmin" ? (
                   <Grid item md={12} xs={12}>

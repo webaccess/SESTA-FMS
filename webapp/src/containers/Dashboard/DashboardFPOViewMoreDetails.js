@@ -193,15 +193,14 @@ class DashboardFPOViewMoreDetails extends Component {
         <Grid>
           <Grid>
             <div>
-              <h3>Loans</h3>
-              <Button
-                style={{ align: "right" }}
-                color="primary"
-                component={Link}
-                to="/"
-              >
-                Back
-              </Button>
+              <h3>
+                Loans
+                <div align="right">
+                  <Button color="primary" component={Link} to="/">
+                    Back
+                  </Button>
+                </div>
+              </h3>
             </div>
             <div className={classes.row}>
               <div className={classes.searchInput}>
