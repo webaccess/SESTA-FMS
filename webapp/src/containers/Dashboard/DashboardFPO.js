@@ -52,10 +52,6 @@ const useStyles = (theme) => ({
     fontWeight: "bold",
     lineHeight: "1.5",
   },
-  loanTable: {
-    height: "calc(100% - 115px)",
-    overflow: "auto",
-  },
 });
 
 class DashboardForFPO extends Component {
@@ -373,7 +369,7 @@ class DashboardForFPO extends Component {
               }}
             >
               <h3 align="center">LOANS</h3>
-              <div style={{ height: "calc(100% - 115px)" }}>
+              <div style={{ height: "calc(100% - 115px)", overflow: "auto" }}>
                 {loanData ? (
                   <Table
                     title={"FPO Loans"}
