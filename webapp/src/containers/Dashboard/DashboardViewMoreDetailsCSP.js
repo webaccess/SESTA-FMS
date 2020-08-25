@@ -75,8 +75,11 @@ class DashboardViewMoreDetailsCSP extends Component {
 
       )
       .then((activityRes) => {
-        this.setState({ activitiesData: activityRes.data });
+        this.getCspActivties(activityRes);
       })
+      .catch((error) => {
+        console.log(error);
+      });
 
     serviceProvider
       .serviceProviderForGetRequest(
@@ -97,6 +100,19 @@ class DashboardViewMoreDetailsCSP extends Component {
       .catch((error) => {
         console.log(error);
       });
+  }
+
+  getCspActivties(activityRes) {
+    let filteredArray = [];
+    activityRes.data.map((e, i) => {
+      e.activityassignees.map((item) => { });
+      e.activityassignees
+        .filter((item) => item.contact === auth.getUserInfo().contact.id)
+        .map((filteredData) => {
+          filteredArray.push(e);
+        });
+    })
+    this.setState({ activitiesData: filteredArray });
   }
 
   handleNameChange(event, value) {
@@ -162,7 +178,7 @@ class DashboardViewMoreDetailsCSP extends Component {
         "crm-plugin/activities/?" + searchData
       )
       .then((res) => {
-        this.setState({ activitiesData: res.data });
+        this.getCspActivties(res);
       })
   }
 
@@ -226,20 +242,22 @@ class DashboardViewMoreDetailsCSP extends Component {
 
   manageLoanEMIData(loanInstallmentData) {
     this.state.loanInstallmentData.map(ldata => {
-      if (ldata.actual_principal === null && ldata.actual_interest === null) {
-        this.state.loanData.map(ld => {
+      if (ldata.loan_application.creator_id == auth.getUserInfo().contact.id) {
+        if (ldata.actual_principal === null && ldata.actual_interest === null) {
+          this.state.loanData.map(ld => {
 
-          // calculate pending loan amount
-          let pendingAmount = ldata.expected_principal + ldata.expected_interest;
-          ldata.pendingAmount = pendingAmount;
+            // calculate pending loan amount
+            let pendingAmount = ldata.expected_principal + ldata.expected_interest;
+            ldata.pendingAmount = pendingAmount;
 
-          // get Member name and EMI
-          if (ld.id == ldata.loan_application.id) {
-            ldata.loan_application.memName = ld.contact.name;
-            ldata.emi = ld.loan_model.emi;
-          }
-        })
-        loanInstallmentData.push(ldata);
+            // get Member name and EMI
+            if (ld.id == ldata.loan_application.id) {
+              ldata.loan_application.memName = ld.contact.name;
+              ldata.emi = ld.loan_model.emi;
+            }
+          })
+          loanInstallmentData.push(ldata);
+        }
       }
     })
     // sort loan application installments by payment date

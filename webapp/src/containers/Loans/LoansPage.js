@@ -216,8 +216,8 @@ class LoansPage extends Component {
             loanApplied = false;
             this.props.history.push({
               pathname: "/loans",
+              loanAlreadyApplied: true,
               state: {
-                loanAlreadyApplied: true,
                 purpose: assignLoanAppValues.product_name,
               },
             });
@@ -227,7 +227,7 @@ class LoansPage extends Component {
             loanApplied = false;
             this.props.history.push({
               pathname: "/loans",
-              state: { activeLoanPresent: true },
+              activeLoanPresent: true
             });
           }
         } else if (
@@ -281,8 +281,8 @@ class LoansPage extends Component {
 
         this.props.history.push({
           pathname: "/loans",
+          loanApplied: true,
           state: {
-            loanApplied: true,
             purpose: assignLoanAppValues.product_name,
             memberData: res.data,
           },
@@ -291,7 +291,7 @@ class LoansPage extends Component {
       .catch((error) => {
         this.props.history.push({
           pathname: "/loans",
-          state: { loanNotApplied: true },
+          loanNotApplied: true
         });
       });
   }

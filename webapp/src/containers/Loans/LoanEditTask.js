@@ -195,9 +195,8 @@ class LoanEditTask extends Component {
         activityTypeResp.data.map(type => {
           if (type.name == loanTaskData.name) {
             let activityTypeId = type.id;
-
             let activitiyData = {
-              title: loanTaskData.name,
+              title: this.props.location.state.loanAppData.contact.name + ": " + loanTaskData.name,
               start_datetime: this.state.values.editDate,
               end_datetime: this.state.values.editDate,
               unit: 1,
@@ -232,7 +231,7 @@ class LoanEditTask extends Component {
                     process.env.REACT_APP_SERVER_URL + "crm-plugin/activityassignees",
                     activityassignee
                   )
-                  .then((assigneeResp) => {})
+                  .then((assigneeResp) => { })
               })
           }
         })

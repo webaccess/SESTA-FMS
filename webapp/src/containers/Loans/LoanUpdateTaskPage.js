@@ -95,10 +95,10 @@ class LoanUpdateTaskPage extends Component {
                 shg: shgName,
                 village: villageName,
                 purpose: purpose,
-                amount: "Rs." + (amount).toLocaleString(),
+                amount: "₹" + (amount).toLocaleString(),
                 duration: duration,
-                emi: "Rs." + (emi).toLocaleString(),
-                pendingAmount: pendingAmount ? "Rs." + (pendingAmount).toLocaleString() : "-",
+                emi: "₹" + (emi).toLocaleString(),
+                pendingAmount: pendingAmount ? "₹" + (pendingAmount).toLocaleString() : "-",
                 loanEndsOn: loanEndsOn ? Moment(loanEndsOn).format("DD MMM YYYY") : "-"
               }
             })
@@ -145,7 +145,7 @@ class LoanUpdateTaskPage extends Component {
     if (pendingAmount < 0) {
       pendingAmount = 0;
     }
-    pendingAmount = "Rs. " + pendingAmount.toLocaleString();
+    pendingAmount = "₹" + pendingAmount.toLocaleString();
 
     // get Loan Ends On Date
     if (loanAppData.loan_app_installments.length > 0) {
