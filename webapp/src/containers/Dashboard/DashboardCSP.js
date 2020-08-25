@@ -64,6 +64,7 @@ class DashboardCSP extends Component {
   }
 
   async componentDidMount() {
+    let filteredArray = [];
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL + "loan-application-installments?_sort=id:asc"
@@ -85,7 +86,15 @@ class DashboardCSP extends Component {
         process.env.REACT_APP_SERVER_URL + "crm-plugin/activities?_sort=end_datetime:desc",
       )
       .then((activityRes) => {
-        this.setState({ activitiesData: activityRes.data });
+        activityRes.data.map((e, i) => {
+          e.activityassignees.map((item) => { });
+          e.activityassignees
+            .filter((item) => item.contact === auth.getUserInfo().contact.id)
+            .map((filteredData) => {
+              filteredArray.push(e);
+            });
+          this.setState({ activitiesData: filteredArray });
+        })
       })
       .catch((error) => {
         console.log(error);
@@ -102,20 +111,24 @@ class DashboardCSP extends Component {
 
   manageLoanEMIData(loanInstallmentData) {
     this.state.loanInstallmentData.map(ldata => {
-      if (ldata.actual_principal === null && ldata.actual_interest === null) {
-        this.state.loanData.map(ld => {
+      if (ldata.loan_application.creator_id == auth.getUserInfo().contact.id) {
+        if (ldata.actual_principal === null && ldata.actual_interest === null) {
+          this.state.loanData.map(ld => {
 
-          // calculate pending loan amount
-          let pendingAmount = ldata.expected_principal + ldata.expected_interest;
-          ldata.pendingAmount = pendingAmount;
+            // calculate pending loan amount
+            let pendingAmount = ldata.expected_principal + ldata.expected_interest;
+            ldata.pendingAmount = pendingAmount;
 
-          // get Member name and EMI
-          if (ld.id == ldata.loan_application.id) {
-            ldata.loan_application.memName = ld.contact.name;
-            ldata.emi = ld.loan_model.emi;
-          }
-        })
-        loanInstallmentData.push(ldata);
+            // get Member name and EMI
+            if (ld.id == ldata.loan_application.id) {
+              if (ld.contact) {
+                ldata.loan_application.memName = ld.contact.name;
+                ldata.emi = ld.loan_model.emi;
+              }
+            }
+          })
+          loanInstallmentData.push(ldata);
+        }
       }
     })
     // sort loan application installments by payment date
@@ -193,7 +206,6 @@ class DashboardCSP extends Component {
         activitycolor.push(color);
       }
     })
-    console.log('activitycolor-- ', activitycolor);
 
     let loanEmiRedirect = { pathname: "/view/more", state: { loanEMIData: loanInstallmentData } };
     let activityRedirect = { pathname: "/view/more", state: { activitiesData: this.state.activitiesData } };
@@ -201,7 +213,6 @@ class DashboardCSP extends Component {
     // Top 5 records of Loan EMI Data and Activties
     loanInstallmentData = loanInstallmentData.length > 5 ? loanInstallmentData.slice(1, 6) : loanInstallmentData;
     activitiesData = activitiesData.length > 5 ? activitiesData.slice(1, 6) : activitiesData;
-
     const Usercolumns = [
       {
         name: "Name",
@@ -270,7 +281,6 @@ class DashboardCSP extends Component {
       selectors1.push(Usercolumns1[i]["selector"]);
     }
     let columnsvalue1 = selectors1[0];
-
     return (
       <div>
         <Grid container style={{ border: "1px solid #ccc" }}>
@@ -282,18 +292,19 @@ class DashboardCSP extends Component {
               <h2 style={{ color: "green" }}>₹ {remunaration}</h2>
             </div>
             <h3 align="center">ACTIVITIES</h3>
-            <Piechart
-              width={5}
-              height={5}
-              labels={activityname}
-              datasets={[
-                {
-                  data: activityvalue,
-                  backgroundColor: ["#A52A2A", "#9ACD32", "#6495ED", "#ff6361", "#3CB371", "#FFD700", "#bc5090", "#D2691E", "#696969", "#00008B", "#C0C0C0", "#488f31", "#FFDEAD", "#EE82EE", "#4682B4"],
-                  // backgroundColor: activitycolor,
-                },
-              ]}
-            />
+            {activityname.length > 0 && activityvalue.length > 0 ? (
+              <Piechart
+                width={5}
+                height={5}
+                labels={activityname}
+                datasets={[
+                  {
+                    data: activityvalue,
+                    backgroundColor: ["#A52A2A", "#9ACD32", "#6495ED", "#ff6361", "#3CB371", "#FFD700", "#bc5090", "#D2691E", "#696969", "#00008B", "#C0C0C0", "#488f31", "#FFDEAD", "#EE82EE", "#4682B4"],
+                    // backgroundColor: activitycolor,
+                  },
+                ]}
+              />) : <h3 align="center">No records present for this month</h3>}
 
           </Grid>
           <Grid item md={8} spacing={3}>
