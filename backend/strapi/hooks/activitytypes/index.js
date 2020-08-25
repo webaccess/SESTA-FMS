@@ -7,12 +7,29 @@ const emiDetailsData = require("./emidetails.json");
 const loanTasksData = require("./loantasks.json");
 const userData = require("./user.json");
 const { serialize } = require("v8");
+const bcrypt = require("bcryptjs");
+const request = require("request");
+var Promise = require("bluebird");
 
 async function asyncForEach(array, callback) {
   for (let index = 0; index < array.length; index++) {
     await callback(array[index], index, array);
   }
 }
+
+function hashPassword(user = {}) {
+  return new Promise((resolve) => {
+    bcrypt.hash(`${user.password}`, 10, (err, hash) => {
+      console.log("passed pass, hash", user.password, hash);
+      resolve(hash);
+    });
+  });
+}
+let values = { password: "password" };
+if (values.password) {
+  values.password = hashPassword(values);
+}
+console.log("After hashPassword", values.password, values);
 
 module.exports = (strapi) => {
   const hook = {
@@ -29,27 +46,70 @@ module.exports = (strapi) => {
 
     async initialize() {
       (async () => {
+        //addIndividual();
+        //console.log("--After Individual\n");
+        //addOrganization();
+        //console.log("--After Organization\n");
+        //addContact();
+        //console.log("--After Contact\n");
+        //addUser();
+        //console.log("--After User\n");
         addActivitytypes();
         console.log("--After activitytypes\n");
-        addLoanModel();
-        console.log("--After loanmodels\n");
-        addEmiDetails();
-        console.log("--After emidetails\n");
-        addLoanTasks();
-        console.log("--After loantasks\n");
-        addIndividual();
-        console.log("--After Individual\n");
-        addOrganization();
-        console.log("--After Organization\n");
-        addContact();
-        console.log("--After Contact\n");
-        addUser();
-        console.log("--After User\n");
+        //addLoanModel();
+        //console.log("--After loanmodels\n");
+        //addEmiDetails();
+        //console.log("--After emidetails\n");
+        //addLoanTasks();
+        //console.log("--After loantasks\n");
       })();
 
+      //await bookshelf
+      //  .model("user")
+      //  .forge({
+      //    username: "passtest",
+      //    provider: "local",
+      //    email: "ank@gmail.com",
+      //    password:
+      //      "$2a$10$Pg24BdHmzcje1fM/yRL6ceAxBlP5UX5Gf.Grw3Ki2r19rNB23fqeS",
+      //    confirmed: true,
+      //    blocked: false,
+      //    role: 2,
+      //    //contact: contactModel.id,
+      //  })
+      //  .save();
+
+      let values = { password: "password" };
+      let valuesP = "password";
+      //values.password = await strapi.plugins[
+      //  "users-permissions"
+      //].services.user.hashPassword(values.password);
+
+      values.password = bcrypt.hash(`${values.password}`, 10, (err, hash) => {
+        return hash;
+      });
+
+      console.log("values,newPass4", values.password);
+
+      valuesP = bcrypt.hash(values, 10, (err, hash) => {
+        // Now we can store the password hash in db.
+        return hash;
+      });
+      console.log("valuesP2", valuesP);
+
       async function addActivitytypes() {
+        //let fpoUserPresent;
+        //fpoUserPresent = await bookshelf
+        //  .model("user")
+        //  .where({ username: "fpouser" })
+        //  .fetch();
+        //const fpoUserId = fpoUserPresent.toJSON
+        //  ? fpoUserPresent.toJSON()
+        //  : fpoUserPresent;
+        //console.log("fpoUserId", fpoUserId);
         await asyncForEach(
           activitytypeData.activitytypes,
+          //org_fpo
           async (activitytype) => {
             const activitytypePresent = await bookshelf
               .model("activitytype")
@@ -60,13 +120,16 @@ module.exports = (strapi) => {
               if (activitytypePresent) {
                 console.log(`Skipping activitytype ${activitytype.name}...`);
               } else {
+                //console.log("fpoUserId inside loop 3", fpoUserId);
                 await bookshelf
                   .model("activitytype")
                   .forge({
                     name: activitytype.name,
                     is_active: activitytype.is_active,
                     remuneration: activitytype.remuneration,
+                    notation: activitytype.notation,
                     autocreated: activitytype.autocreated,
+                    //contact: fpoUserId.id,
                   })
                   .save()
                   .then(() => {
@@ -337,6 +400,7 @@ module.exports = (strapi) => {
       async function addContact() {
         let contactTypePresent;
         let fpoPresent;
+        let fpotId;
         await asyncForEach(userData.user, async (user) => {
           if (user.contact.contact_type === "organization") {
             contactTypePresent = await bookshelf
@@ -353,8 +417,10 @@ module.exports = (strapi) => {
               .fetch();
           }
           try {
+            console.log("contactTypePresent 3", contactTypePresent);
             if (contactTypePresent) {
               if (user.username === "fpouser") {
+                console.log("In fpouser 3");
                 fpoPresent = await bookshelf
                   .model("organization")
                   .where({
@@ -362,10 +428,10 @@ module.exports = (strapi) => {
                     sub_type: "FPO",
                   })
                   .fetch();
-                const fpotId = fpoPresent.toJSON
-                  ? fpoPresent.toJSON()
-                  : fpoPresent;
+                fpotId = fpoPresent.toJSON ? fpoPresent.toJSON() : fpoPresent;
+                console.log("fpotId 3", fpotId);
               }
+
               const contactPresent = await bookshelf
                 .model("contact")
                 .where({
@@ -373,7 +439,7 @@ module.exports = (strapi) => {
                   contact_type: user.contact.contact_type,
                 })
                 .fetch();
-
+              console.log("contactPresent", contactPresent);
               if (contactPresent) {
                 console.log(`Skipping ${user.contact.name}...`);
               } else {
@@ -383,8 +449,9 @@ module.exports = (strapi) => {
 
                 if (
                   user.contact.contact_type == "individual" &&
-                  user.name !== "fpouser"
+                  user.username !== "fpouser"
                 ) {
+                  console.log("-In superadmin loop 1");
                   await bookshelf
                     .model("contact")
                     .forge({
@@ -397,6 +464,7 @@ module.exports = (strapi) => {
                       console.log(`Added contact ${user.contact.name}`);
                     });
                 } else if (user.contact.contact_type == "organization") {
+                  console.log("-In fpo admin loop 1");
                   await bookshelf
                     .model("contact")
                     .forge({
@@ -409,13 +477,20 @@ module.exports = (strapi) => {
                       console.log(`Added contact ${user.contact.name}`);
                     });
                 } else {
+                  console.log("-In fpo user 2nd loop new");
+                  console.log(
+                    "fpotId.id 3",
+                    fpoPresent,
+                    fpotId.id,
+                    contactId.id
+                  );
                   await bookshelf
                     .model("contact")
                     .forge({
                       name: user.contact.name,
                       contact_type: user.contact.contact_type,
                       individual: contactId.id,
-                      org_fpos: fpotId.id,
+                      org_fpo: fpotId.id,
                     })
                     .save()
                     .then(() => {
@@ -424,6 +499,16 @@ module.exports = (strapi) => {
                 }
               }
               //});
+              //    const fpoAdminPresent = await bookshelf
+              //.model("contact")
+              //.where({
+              //  name: "WAfpoadmin",
+              //  contact_type: "organization",
+              //})
+              //if (fpoAdminPresent){
+              //  fpotId = fpoAdminPresent.toJSON ? fpoAdminPresent.toJSON() : fpoAdminPresent;
+
+              //}
             }
           } catch (error) {
             console.log(error);
@@ -448,7 +533,7 @@ module.exports = (strapi) => {
                 .where({ username: user.username })
                 .fetch();
               if (userPresent) {
-                console.log(`Skipping user ...`);
+                console.log(`Skipping user ${user.username}...`);
               } else {
                 const contactModel = contactPresent.toJSON
                   ? contactPresent.toJSON()
@@ -468,7 +553,7 @@ module.exports = (strapi) => {
                   })
                   .save()
                   .then(() => {
-                    console.log(`Added user ..`);
+                    console.log(`Added user ${user.username}..`);
                   });
               }
             }
