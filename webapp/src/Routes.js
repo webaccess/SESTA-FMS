@@ -42,6 +42,9 @@ import LoanEmiViewPage from "./containers/Loans/LoanEmiViewPage";
 import DashboardViewMoreDetailsCSP from "./containers/Dashboard/DashboardViewMoreDetailsCSP";
 import DashboardCSP from "./containers/Dashboard/DashboardCSP";
 import DashboardFPOViewMoreDetails from "./containers/Dashboard/DashboardFPOViewMoreDetails";
+import Reports from "./containers/Reports/Reports";
+import CSPSummaryReport from "./containers/Reports/CSPSummaryReport";
+import CSPActivityReport from "./containers/Reports/CSPActivityReport.js";
 
 function Routes() {
   return (
@@ -51,7 +54,11 @@ function Routes() {
           <Switch>
             <PrivateRoute path="/" component={Dashboard} exact />
             <PrivateRoute path="/" component={DashboardCSP} exact />
-            <PrivateRoute path="/view/more" component={DashboardViewMoreDetailsCSP} exact />
+            <PrivateRoute
+              path="/view/more"
+              component={DashboardViewMoreDetailsCSP}
+              exact
+            />
             <PrivateRoute
               path="/fpo/loans/view/more"
               component={DashboardFPOViewMoreDetails}
@@ -174,6 +181,17 @@ function Routes() {
             <PrivateRoute path="/users" component={Users} exact />
             <PrivateRoute path="/users/add" component={UsersPage} exact />
             <PrivateRoute path="/users/edit/:id" component={UsersPage} exact />
+            <PrivateRoute path="/reports" component={Reports} exact />
+            <PrivateRoute
+              path="/summary-report"
+              component={CSPSummaryReport}
+              exact
+            />
+            <PrivateRoute
+              path="/activity-report"
+              component={CSPActivityReport}
+              exact
+            />
             <Route path="/404" component={NotFoundPage} />
             <AuthRoute path="/:authType/:id?" component={AuthPage} />
           </Switch>
