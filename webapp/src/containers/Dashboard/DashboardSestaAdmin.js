@@ -5,7 +5,7 @@ import * as serviceProvider from "../../api/Axios";
 import { Grid } from "@material-ui/core";
 import PersonIcon from "@material-ui/icons/Person";
 import PeopleIcon from "@material-ui/icons/People";
-import HomeWorkIcon from "@material-ui/icons/HomeWork";
+import NaturePeopleIcon from "@material-ui/icons/NaturePeople";
 import MoneyIcon from "@material-ui/icons/Money";
 
 const useStyles = (theme) => ({
@@ -136,7 +136,7 @@ class DashboardForFPO extends Component {
               </h2>
             </div>
             <div className={classes.evenBlock}>
-              <HomeWorkIcon className={classes.Icon} />
+              <NaturePeopleIcon className={classes.Icon} />
               <h3 style={{ color: "white", marginBottom: "5px" }}>
                 {" "}
                 VILLAGE ORGANIZATIONS{" "}

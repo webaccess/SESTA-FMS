@@ -10,7 +10,7 @@ import IconButton from "@material-ui/core/IconButton";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import PersonIcon from "@material-ui/icons/Person";
 import PeopleIcon from "@material-ui/icons/People";
-import HomeWorkIcon from "@material-ui/icons/HomeWork";
+import NaturePeopleIcon from "@material-ui/icons/NaturePeople";
 import MoneyIcon from "@material-ui/icons/Money";
 import Moment from "moment";
 import { Link } from "react-router-dom";
@@ -293,7 +293,7 @@ class DashboardForFPO extends Component {
 
           <Grid item md={3} spacing={3}>
             <div className={classes.oddBlock}>
-              <HomeWorkIcon className={classes.Icon} />
+              <NaturePeopleIcon className={classes.Icon} />
               <h3 style={{ color: "white", marginBottom: "5px" }}>
                 {" "}
                 VILLAGE ORGANIZATIONS{" "}
@@ -369,7 +369,7 @@ class DashboardForFPO extends Component {
               }}
             >
               <h3 align="center">LOANS</h3>
-              <div style={{ height: "calc(100% - 115px)", overflow: "auto" }}>
+              <div style={{ height: "calc(100% - 115px)" }}>
                 {loanData ? (
                   <Table
                     title={"FPO Loans"}
