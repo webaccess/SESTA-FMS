@@ -757,6 +757,36 @@ const modules = {
     order: 26,
     roles: ["FPO Admin", "Sesta Admin", "Superadmin"],
   },
+  Reports: {
+    is_active: true,
+    icon_class: "listAlt",
+    url: "/reports",
+    slug: "list_reports",
+    displayNavigation: true,
+    module: "", //slug
+    order: 27,
+    roles: ["FPO Admin"],
+  },
+  "CSP Summary Report": {
+    is_active: true,
+    icon_class: "",
+    url: "/reports/summary-report",
+    slug: "summary_report",
+    displayNavigation: false,
+    module: "", //slug
+    order: 28,
+    roles: ["FPO Admin"],
+  },
+  "CSP Activity Report": {
+    is_active: true,
+    icon_class: "",
+    url: "/reports/activity-report",
+    slug: "activity_report",
+    displayNavigation: false,
+    module: "", //slug
+    order: 28,
+    roles: ["FPO Admin"],
+  },
 };
 
 module.exports = Object.freeze({
