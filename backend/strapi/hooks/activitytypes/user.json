@@ -2,8 +2,9 @@
   "user": [
     {
       "username": "WAfpoadmin",
+      "provider": "local",
       "email": "WAfpoadmin@mail.com",
-      "password": "password",
+      "password": "$2a$10$Pg24BdHmzcje1fM/yRL6ceAxBlP5UX5Gf.Grw3Ki2r19rNB23fqeS",
       "confirmed": true,
       "blocked": false,
       "first_name": "WA",
@@ -20,8 +21,9 @@
     },
     {
       "username": "WAsuperadmin",
+      "provider": "local",
       "email": "WAsuperadmin@mail.com",
-      "password": "password",
+      "password": "$2a$10$Pg24BdHmzcje1fM/yRL6ceAxBlP5UX5Gf.Grw3Ki2r19rNB23fqeS",
       "confirmed": true,
       "blocked": false,
       "first_name": "WA",
@@ -38,8 +40,9 @@
     },
     {
       "username": "fpouser",
+      "provider": "local",
       "email": "fpouser@mail.com",
-      "password": "password",
+      "password": "$2a$10$Pg24BdHmzcje1fM/yRL6ceAxBlP5UX5Gf.Grw3Ki2r19rNB23fqeS",
       "confirmed": true,
       "blocked": false,
       "first_name": "WA",

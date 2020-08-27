@@ -16,19 +16,30 @@ async function asyncForEach(array, callback) {
     await callback(array[index], index, array);
   }
 }
-
-function hashPassword(user = {}) {
-  return new Promise((resolve) => {
-    bcrypt.hash(`${user.password}`, 10, (err, hash) => {
-      console.log("passed pass, hash", user.password, hash);
-      resolve(hash);
-    });
+let user = { password: "password" };
+let test;
+async function hashPassword(user) {
+  //return new Promise((resolve) => {
+  bcrypt.hash(`${user.password}`, 10, (err, hash) => {
+    console.log("passed pass, hash10", user.password, hash);
+    //resolve(hash);
+    test = hash;
+    return hash;
   });
+  user.password = await bcrypt.hash(`${user.password}`, 10);
+  // let new = await bcrypt.hash(user.password, 10);
+  //});
 }
+
+console.log("user.password", user.password);
 let values = { password: "password" };
+
+let testP = hashPassword(values);
+console.log("testP", testP);
 if (values.password) {
-  values.password = hashPassword(values);
+  //console.log("ePass9", ePass);
 }
+
 console.log("After hashPassword", values.password, values);
 
 module.exports = (strapi) => {
@@ -46,14 +57,14 @@ module.exports = (strapi) => {
 
     async initialize() {
       (async () => {
-        //addIndividual();
-        //console.log("--After Individual\n");
-        //addOrganization();
-        //console.log("--After Organization\n");
-        //addContact();
-        //console.log("--After Contact\n");
-        //addUser();
-        //console.log("--After User\n");
+        addIndividual();
+        console.log("--After Individual\n");
+        addOrganization();
+        console.log("--After Organization\n");
+        addContact();
+        console.log("--After Contact\n");
+        addUser();
+        console.log("--After User\n");
         addActivitytypes();
         console.log("--After activitytypes\n");
         //addLoanModel();
@@ -98,6 +109,8 @@ module.exports = (strapi) => {
       console.log("valuesP2", valuesP);
 
       async function addActivitytypes() {
+        console.log("user.password in activity type10", test);
+        console.log("testP in activity type10", testP);
         //let fpoUserPresent;
         //fpoUserPresent = await bookshelf
         //  .model("user")
@@ -473,8 +486,11 @@ module.exports = (strapi) => {
                       organization: contactId.id,
                     })
                     .save()
-                    .then(() => {
+                    .then((res) => {
+                      res.toJSON();
+                      console.log("res in fpo admin", res, res.id);
                       console.log(`Added contact ${user.contact.name}`);
+                      linkFpo(res);
                     });
                 } else {
                   console.log("-In fpo user 2nd loop new");
@@ -498,22 +514,24 @@ module.exports = (strapi) => {
                     });
                 }
               }
-              //});
-              //    const fpoAdminPresent = await bookshelf
-              //.model("contact")
-              //.where({
-              //  name: "WAfpoadmin",
-              //  contact_type: "organization",
-              //})
-              //if (fpoAdminPresent){
-              //  fpotId = fpoAdminPresent.toJSON ? fpoAdminPresent.toJSON() : fpoAdminPresent;
-
-              //}
             }
           } catch (error) {
             console.log(error);
           }
         });
+      }
+
+      async function linkFpo(obj) {
+        await bookshelf
+          .model("individual")
+          .where({
+            first_name: "WA",
+            last_name: "FPO User",
+          })
+          .save({ fpo: obj.id }, { patch: true })
+          .then(() => {
+            console.log("Linked FPO admin to FPO user...");
+          });
       }
 
       async function addUser() {
@@ -542,6 +560,7 @@ module.exports = (strapi) => {
                   .model("user")
                   .forge({
                     username: user.username,
+                    provider: user.provider,
                     email: user.email,
                     password: user.password,
                     confirmed: user.confirmed,
