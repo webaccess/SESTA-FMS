@@ -15,7 +15,7 @@
     "login": [
       {
         "customBootstrapClass": "col-md-12",
-        "label": "Username",
+        "label": "Contact Number",
         "name": "identifier",
         "type": "text",
         "placeholder": "johndoe@gmail.com",
