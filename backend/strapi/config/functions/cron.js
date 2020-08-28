@@ -19,7 +19,16 @@ module.exports = {
   //
   // }
 
-  "*/1 * * * *": () => {
+  "*/1 * * * *": async () => {
     console.log("1 minute later");
+    const application = await strapi.services["loan-application"].find({});
+    console.log("application", application);
+    application.map((item) => {
+      if (item.loan_app_installments) {
+        item.loan_app_installments.map((inst) => {
+          console.log("inst", inst);
+        });
+      }
+    });
   },
 };
