@@ -9,6 +9,9 @@ import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 import Button from "../../components/UI/Button/Button";
 import Autocomplete from "../../components/Autocomplete/Autocomplete";
 import { CSP_ACTIVITY_REPORT_BREADCRUMBS } from "./config";
+import Moment from "moment";
+import Table from "../../components/Datatable/Datatable.js";
+import { CSVLink, CSVDownload } from "react-csv";
 
 const useStyles = (theme) => ({
   row: {
@@ -24,6 +27,10 @@ const useStyles = (theme) => ({
     marginRight: theme.spacing(1),
     width: "230px",
   },
+  csvData: {
+    color: "white",
+    textDecoration: "none"
+  },
 });
 
 export class CSPSummaryReport extends React.Component {
@@ -35,6 +42,8 @@ export class CSPSummaryReport extends React.Component {
       filterCspName: "",
       isCancel: false,
       cspList: [],
+      activitiesData: [],
+      filename: [],
     };
   }
 
@@ -43,12 +52,32 @@ export class CSPSummaryReport extends React.Component {
     let url =
       "users/?contact.creator_id=" +
       auth.getUserInfo().contact.id +
-      "&&_sort=username:ASC";
+      "&&role.name=CSP (Community Service Provider)&&_sort=username:ASC";
     serviceProvider
       .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
-        console.log("--res--", res.data);
-        this.setState({ cspList: res.data });
+        let cspContact = [];
+        res.data.map(e => {
+          e.name = e.contact.name
+          this.setState({ cspList: res.data });
+        })
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    let activityArr = [];
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activities/?_sort=end_datetime:desc",
+      )
+      .then((activityRes) => {
+        activityRes.data.map(activity => {
+          if (activity.contacts[0].creator_id.id == auth.getUserInfo().contact.id) {
+            activityArr.push(activity);
+          }
+        })
+        this.setState({ activitiesData: activityArr });
       })
       .catch((error) => {
         console.log(error);
@@ -85,10 +114,58 @@ export class CSPSummaryReport extends React.Component {
     }
   }
 
-  handleSearch() {}
+  handleSearch() {
+    let searchData = "";
+    if (this.state.filterCspName) {
+      searchData += searchData ? "&&" : "";
+      searchData += "activityassignees.contact=" + this.state.filterCspName.contact.id;
+    }
+    if (this.state.filterStartDate) {
+      searchData += searchData ? "&&" : "";
+      searchData +=
+        "start_datetime_gte=" + this.state.filterStartDate.toISOString();
+    }
+    if (this.state.filterEndDate) {
+      searchData += searchData ? "&&" : "";
+      searchData +=
+        "start_datetime_lte=" + this.state.filterEndDate.toISOString();
+    }
+    let activityArr = [];
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activities?" + searchData + "&&_sort=end_datetime:desc",
+      )
+      .then((activityRes) => {
+        activityRes.data.map(activity => {
+          if (activity.contacts[0].creator_id.id == auth.getUserInfo().contact.id) {
+            activityArr.push(activity);
+          }
+        })
+        this.setState({ activitiesData: activityArr });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  formatCSVFilename(csvActivityData) {
+    let filename = "";
+    if (this.state.filterCspName) {
+      filename += "_of_" + this.state.filterCspName.username;
+    }
+    if (this.state.filterStartDate) {
+      filename += "_from_" + Moment(this.state.filterStartDate).format('DDMMMYYYY');
+    }
+    if (this.state.filterEndDate) {
+      filename += "_to_" + Moment(this.state.filterEndDate).format('DDMMMYYYY');
+    }
+    filename = "csp_activitiy_report" + filename + ".csv";
+    this.setState({ filename: filename });
+  }
 
   cancelForm = () => {
     this.setState({
+      filterCspName: "",
       filterStartDate: "",
       filterEndDate: "",
       isCancel: true,
@@ -98,6 +175,76 @@ export class CSPSummaryReport extends React.Component {
 
   render() {
     const { classes } = this.props;
+    let activitiesData = this.state.activitiesData;
+    let date, activityType, description, memberName, filename;
+    let csvActivityData = [];
+    activitiesData.map(activity => {
+      let splitTitle = (activity.title).split(":") ? (activity.title).split(":") : activity.title;
+      activity.memberName = splitTitle[0];
+      date = Moment(activity.start_datetime).format('DD MMM YYYY');
+      activityType = activity.activitytype.name;
+      description = activity.title;
+      memberName = activity.memberName;
+      csvActivityData.push({ "Date": date, "Activity Type": activityType, "Description": description, "Member Name": memberName });
+    })
+    if (csvActivityData.length <= 0) {
+      csvActivityData = "There are no records to display";
+    }
+
+    let reportFilterName = "";
+    let filterCsp = "All";
+    if (this.state.filterCspName) {
+      filterCsp = this.state.filterCspName.name;
+    }
+    let filterStDate = this.state.filterStartDate ? Moment(this.state.filterStartDate).format('DD MMM YYYY') : null;
+    let filterEnDate = this.state.filterEndDate ? Moment(this.state.filterEndDate).format('DD MMM YYYY') : null;
+
+    if (filterCsp === 'All') {
+      reportFilterName += 'Report of ' + filterCsp + ' CSPs';
+    } else {
+      reportFilterName += 'Report for CSP: ' + filterCsp;
+    }
+
+    if (this.state.filterStartDate) {
+      reportFilterName += ' for the duration: ' + filterStDate;
+    }
+    if (this.state.filterEndDate) {
+      reportFilterName += ' - ' + filterEnDate;
+    }
+
+    const Usercolumns = [
+      {
+        name: "Date",
+        selector: "start_datetime",
+        sortable: true,
+        cell: (row) =>
+          row.start_datetime ?
+            Moment(row.start_datetime).format('DD MMM YYYY') : null
+      },
+      {
+        name: "Activity Type",
+        selector: "activitytype.name",
+        sortable: true,
+      },
+
+      {
+        name: "Description",
+        selector: "title",
+        sortable: true,
+      },
+      {
+        name: "Member Name",
+        selector: "memberName",
+        sortable: true,
+        cell: (row) => row.memberName ? row.memberName : "-"
+      },
+    ];
+
+    let selectors = [];
+    for (let i in Usercolumns) {
+      selectors.push(Usercolumns[i]["selector"]);
+    }
+    let columnsvalue = selectors[0];
     return (
       <Layout breadcrumbs={CSP_ACTIVITY_REPORT_BREADCRUMBS}>
         <Grid>
@@ -112,7 +259,7 @@ export class CSPSummaryReport extends React.Component {
                     <Autocomplete
                       id="combo-box-demo"
                       options={this.state.cspList}
-                      getOptionLabel={(option) => option.username}
+                      getOptionLabel={(option) => option.name}
                       onChange={(event, value) => {
                         this.handleCSPChange(event, value);
                       }}
@@ -166,12 +313,48 @@ export class CSPSummaryReport extends React.Component {
                   </Grid>
                 </div>
               </div>
+
               <Button onClick={this.handleSearch.bind(this)}>Search</Button>
               &nbsp;&nbsp;&nbsp;
               <Button color="secondary" clicked={this.cancelForm}>
                 reset
               </Button>
             </div>
+            <p>{reportFilterName}</p>
+            <div className={classes.emiDue}>
+              {activitiesData ? (
+                <Table
+                  title={"CSP Report"}
+                  data={activitiesData}
+                  showSearch={false}
+                  filterData={false}
+                  filterBy={[
+                    "start_datetime",
+                    "activitytype.name",
+                    "title",
+                    "memberName",
+                  ]}
+                  column={Usercolumns}
+                  editData={this.editData}
+                  rowsSelected={this.rowsSelect}
+                  columnsvalue={columnsvalue}
+                />
+              ) : (
+                  <h1>Loading...</h1>
+                )}
+            </div>
+            <br />
+            <Button>
+              <CSVLink
+                data={csvActivityData}
+                onClick={() => {
+                  this.formatCSVFilename(csvActivityData);
+                }}
+                filename={this.state.filename}
+                className={classes.csvData}>
+                Download
+                </CSVLink>
+            </Button>
           </Grid>
         </Grid>
       </Layout>

@@ -72,8 +72,8 @@ class ActivityPage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/activities/?id=" +
-            this.state.editPage[1]
+          "crm-plugin/activities/?id=" +
+          this.state.editPage[1]
         )
         .then((res) => {
           this.setState({
@@ -95,7 +95,7 @@ class ActivityPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activitytypes/?is_active=true"
+        "crm-plugin/activitytypes/?is_active=true"
       )
       .then((res) => {
         this.setState({ getActivitytype: res.data });
@@ -202,6 +202,7 @@ class ActivityPage extends Component {
       description: activityDescription,
       activitytype: activityType,
       contacts: [activityContact],
+      unit: 1
     };
     if (new Date(startDate).getTime() > new Date(endDate).getTime()) {
       this.setState({ DateTimepickerError: true });
@@ -229,7 +230,7 @@ class ActivityPage extends Component {
             serviceProvider
               .serviceProviderForPutRequest(
                 process.env.REACT_APP_SERVER_URL +
-                  "crm-plugin/activityassignees",
+                "crm-plugin/activityassignees",
                 res.data.activityassignees[0].id,
                 assigneeData
               )
@@ -240,7 +241,7 @@ class ActivityPage extends Component {
                   editData: true,
                 });
               })
-              .catch((error) => {});
+              .catch((error) => { });
           })
           .catch((error) => {
             this.setState({ formSubmitted: false });
@@ -279,7 +280,7 @@ class ActivityPage extends Component {
             serviceProvider
               .serviceProviderForPutRequest(
                 process.env.REACT_APP_SERVER_URL +
-                  "crm-plugin/activityassignees",
+                "crm-plugin/activityassignees",
                 res.data.activityassignees[0].id,
                 assigneeData
               )
@@ -290,7 +291,7 @@ class ActivityPage extends Component {
                   addData: true,
                 });
               })
-              .catch((error) => {});
+              .catch((error) => { });
           })
           .catch((error) => {
             this.setState({ formSubmitted: false });
@@ -379,10 +380,10 @@ class ActivityPage extends Component {
                     value={
                       addActivitytype
                         ? activitytypeFilter[
-                            activitytypeFilter.findIndex(function (item, i) {
-                              return item.id === addActivitytype;
-                            })
-                          ] || null
+                        activitytypeFilter.findIndex(function (item, i) {
+                          return item.id === addActivitytype;
+                        })
+                        ] || null
                         : null
                     }
                     error={this.hasError("addActivitytype")}
@@ -462,10 +463,10 @@ class ActivityPage extends Component {
                       value={
                         addcontact
                           ? contactFilter[
-                              contactFilter.findIndex(function (item, i) {
-                                return item.id === addcontact;
-                              })
-                            ] || null
+                          contactFilter.findIndex(function (item, i) {
+                            return item.id === addcontact;
+                          })
+                          ] || null
                           : null
                       }
                       renderInput={(params) => (

@@ -199,7 +199,7 @@ class LoanEditEmiPage extends Component {
         // add activity records while updating loan emi for the first time by csp
         let activities = [
           {
-            title: this.props.location.state.loanAppData.contact.name + ": Priniciple paid",
+            title: this.props.location.state.loanAppData.contact.name + ": Prinicipal paid",
             start_datetime: this.state.values.actual_payment_date,
             end_datetime: this.state.values.actual_payment_date,
             unit: 1,

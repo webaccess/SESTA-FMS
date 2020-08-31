@@ -93,8 +93,8 @@ class DashboardCSP extends Component {
             .map((filteredData) => {
               filteredArray.push(e);
             });
-          this.setState({ activitiesData: filteredArray });
         })
+        this.setState({ activitiesData: filteredArray });
       })
       .catch((error) => {
         console.log(error);
@@ -174,7 +174,7 @@ class DashboardCSP extends Component {
     // Calculate Remuneration for current month
     let remunaration = 0;
     activitiesData.map(cspActivity => {
-      let stdate = new Date(cspActivity.end_datetime);
+      let stdate = new Date(cspActivity.start_datetime);
       stdate = stdate.getFullYear() + '-' + (stdate.getMonth() + 1);
       if (stdate == today) {
         let remun = cspActivity.activitytype.remuneration;
@@ -259,20 +259,21 @@ class DashboardCSP extends Component {
       {
         name: "Activity Name",
         selector: "title",
-        sortable: true, // width:20%
+        sortable: true,
       },
       {
         name: "Date",
-        selector: "end_datetime",
+        selector: "start_datetime",
         sortable: true,
         cell: (row) =>
-          row.end_datetime ?
-            Moment(row.end_datetime).format('DD MMM YYYY') : null
+          row.start_datetime ?
+            Moment(row.start_datetime).format('DD MMM YYYY') : null
       },
       {
         name: "Remuneration",
         selector: "activitytype.remuneration",
         sortable: true,
+        cell: (row) => "₹" + (row.activitytype.remuneration).toLocaleString()
       },
     ];
 
