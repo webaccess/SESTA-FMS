@@ -5,7 +5,7 @@ import * as serviceProvider from "../../api/Axios";
 import Layout from "../../hoc/Layout/Layout";
 import { Grid } from "@material-ui/core";
 import Input from "../../components/UI/Input/Input";
-import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
+import DateTimepicker from "../../components/UI/DateTimepicker/DateTimepicker.js";
 import Button from "../../components/UI/Button/Button";
 import Autocomplete from "../../components/Autocomplete/Autocomplete";
 import { CSP_ACTIVITY_REPORT_BREADCRUMBS } from "./config";
@@ -70,7 +70,7 @@ export class CSPSummaryReport extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activities/?_sort=start_datetime:desc"
+        "crm-plugin/activities/?_sort=start_datetime:desc"
       )
       .then((activityRes) => {
         activityRes.data.map((activity) => {
@@ -138,9 +138,9 @@ export class CSPSummaryReport extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activities?" +
-          searchData +
-          "&&_sort=end_datetime:desc"
+        "crm-plugin/activities?" +
+        searchData +
+        "&&_sort=start_datetime:desc"
       )
       .then((activityRes) => {
         activityRes.data.map((activity) => {
@@ -188,11 +188,18 @@ export class CSPSummaryReport extends React.Component {
     let activitiesData = this.state.activitiesData;
     let date, activityType, description, memberName, filename;
     let csvActivityData = [];
-    activitiesData.map((activity) => {
-      let splitTitle = activity.title.split(":")
-        ? activity.title.split(":")
-        : activity.title;
-      activity.memberName = splitTitle[0];
+    let splitTitle;
+
+    activitiesData.map(activity => {
+
+      // Get Member name from activity only related to loans
+      if (activity.activitytype.name == "Loan application collection" || activity.activitytype.name == "Collection of principal amount" || activity.activitytype.name == "Interest collection" || activity.loan_application_task != null) {
+        splitTitle = ~activity.title.indexOf(":") ? activity.title.split(":") : "-";
+        activity.memberName = splitTitle[0];
+      } else {
+        activity.memberName = "-";
+      }
+
       date = Moment(activity.start_datetime).format("DD MMM YYYY");
       activityType = activity.activitytype.name;
       description = activity.title;
@@ -308,11 +315,11 @@ export class CSPSummaryReport extends React.Component {
               <div className={classes.searchInput}>
                 <div className={classes.Districts}>
                   <Grid item md={12} xs={12}>
-                    <Datepicker
+                    <DateTimepicker
                       label="Start Date"
                       name="startDate"
                       value={this.state.filterStartDate || ""}
-                      format={"dd MMM yyyy"}
+                      // format={"dd MMM yyyy"}
                       onChange={(event, value) =>
                         this.handleStartDateChange(event, value)
                       }
@@ -323,11 +330,11 @@ export class CSPSummaryReport extends React.Component {
               <div className={classes.searchInput}>
                 <div className={classes.Districts}>
                   <Grid item md={12} xs={12}>
-                    <Datepicker
+                    <DateTimepicker
                       label="End Date"
                       name="endDate"
                       value={this.state.filterEndDate || ""}
-                      format={"dd MMM yyyy"}
+                      // format={"dd MMM yyyy"}
                       onChange={(event, value) =>
                         this.handleEndDateChange(event, value)
                       }
@@ -362,8 +369,8 @@ export class CSPSummaryReport extends React.Component {
                   pagination
                 />
               ) : (
-                <h1>Loading...</h1>
-              )}
+                  <h1>Loading...</h1>
+                )}
             </div>
             <br />
             <Button>
