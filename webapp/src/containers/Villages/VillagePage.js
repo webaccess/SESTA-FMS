@@ -61,8 +61,8 @@ class VillagePage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/villages/?id=" +
-            this.state.editPage[1]
+          "crm-plugin/villages/?id=" +
+          this.state.editPage[1]
         )
         .then((res) => {
           this.setState({
@@ -84,8 +84,8 @@ class VillagePage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/?is_active=true&&state.id=" +
-            this.state.values.addState
+          "crm-plugin/districts/?is_active=true&&state.id=" +
+          this.state.values.addState
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
@@ -133,8 +133,8 @@ class VillagePage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId
+          "crm-plugin/districts/?is_active=true&&state.id=" +
+          stateId
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
@@ -150,6 +150,7 @@ class VillagePage extends Component {
           addState: "",
           addDistrict: "",
         },
+        getDistrict: []
       });
       this.setState({ stateSelected: false });
     }
@@ -387,10 +388,10 @@ class VillagePage extends Component {
                     value={
                       addState
                         ? stateFilter[
-                            stateFilter.findIndex(function (item, i) {
-                              return item.id === addState;
-                            })
-                          ] || null
+                        stateFilter.findIndex(function (item, i) {
+                          return item.id === addState;
+                        })
+                        ] || null
                         : null
                     }
                     error={this.hasError("addState")}
@@ -424,10 +425,10 @@ class VillagePage extends Component {
                     value={
                       addDistrict
                         ? districtFilter[
-                            districtFilter.findIndex(function (item, i) {
-                              return item.id === addDistrict;
-                            })
-                          ] || null
+                        districtFilter.findIndex(function (item, i) {
+                          return item.id === addDistrict;
+                        })
+                        ] || null
                         : null
                     }
                     error={this.hasError("addDistrict")}
@@ -435,8 +436,8 @@ class VillagePage extends Component {
                       this.hasError("addDistrict")
                         ? this.state.errors.addDistrict[0]
                         : this.state.stateSelected
-                        ? null
-                        : "Please select the state first"
+                          ? null
+                          : "Please select the state first"
                     }
                     renderInput={(params) => (
                       <Input
