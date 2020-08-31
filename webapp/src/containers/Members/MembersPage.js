@@ -117,8 +117,8 @@ class ActivityPage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/" +
-            this.state.editPage[1]
+          "crm-plugin/contact/" +
+          this.state.editPage[1]
         )
         .then((res) => {
           this.handleStateChange(res.data.state);
@@ -196,15 +196,15 @@ class ActivityPage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/?individual=" +
-            auth.getUserInfo().contact.individual
+          "crm-plugin/contact/?individual=" +
+          auth.getUserInfo().contact.individual
         )
         .then((res) => {
           serviceProvider
             .serviceProviderForGetRequest(
               process.env.REACT_APP_SERVER_URL +
-                "crm-plugin/contact/?id=" +
-                res.data[0].individual.vo
+              "crm-plugin/contact/?id=" +
+              res.data[0].individual.vo
             )
             .then((response) => {
               this.setState({ getShgs: response.data[0].org_vos });
@@ -277,8 +277,8 @@ class ActivityPage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId
+          "crm-plugin/districts/?is_active=true&&state.id=" +
+          stateId
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
@@ -293,7 +293,10 @@ class ActivityPage extends Component {
           ...this.state.values,
           addState: "",
           addDistrict: "",
+          addVillage: ""
         },
+        getDistrict: [],
+        getVillage: []
       });
       this.setState({ stateSelected: false });
     }
@@ -308,8 +311,8 @@ class ActivityPage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/villages/?is_active=true&&district.id=" +
-            districtId
+          "crm-plugin/villages/?is_active=true&&district.id=" +
+          districtId
         )
         .then((res) => {
           this.setState({ getVillage: res.data });
@@ -325,6 +328,7 @@ class ActivityPage extends Component {
           addDistrict: "",
           addVillage: "",
         },
+        getVillage: []
       });
       this.setState({ districtSelected: false });
     }
@@ -520,7 +524,7 @@ class ActivityPage extends Component {
             this.state.shareInfoId,
             postShareData
           )
-          .then((res) => {})
+          .then((res) => { })
           .catch((error) => {
             console.log(error);
           });
@@ -531,7 +535,7 @@ class ActivityPage extends Component {
               process.env.REACT_APP_SERVER_URL + "shareinformations",
               this.state.shareInfoId
             )
-            .then((res) => {})
+            .then((res) => { })
             .catch((error) => {
               console.log(error);
             });
@@ -544,7 +548,7 @@ class ActivityPage extends Component {
           process.env.REACT_APP_SERVER_URL + "shareinformations/",
           postShareData
         )
-        .then((res) => {})
+        .then((res) => { })
         .catch((error) => {
           console.log(error);
         });
@@ -680,10 +684,10 @@ class ActivityPage extends Component {
                     value={
                       addState
                         ? stateFilter[
-                            stateFilter.findIndex(function (item, i) {
-                              return item.id === addState;
-                            })
-                          ] || null
+                        stateFilter.findIndex(function (item, i) {
+                          return item.id === addState;
+                        })
+                        ] || null
                         : null
                     }
                     error={this.hasError("addState")}
@@ -717,10 +721,10 @@ class ActivityPage extends Component {
                     value={
                       addDistrict
                         ? districtFilter[
-                            districtFilter.findIndex(function (item, i) {
-                              return item.id === addDistrict;
-                            })
-                          ] || null
+                        districtFilter.findIndex(function (item, i) {
+                          return item.id === addDistrict;
+                        })
+                        ] || null
                         : null
                     }
                     error={this.hasError("addDistrict")}
@@ -728,8 +732,8 @@ class ActivityPage extends Component {
                       this.hasError("addDistrict")
                         ? this.state.errors.addDistrict[0]
                         : this.state.stateSelected
-                        ? null
-                        : "Please select the state first"
+                          ? null
+                          : "Please select the state first"
                     }
                     renderInput={(params) => (
                       <Input
@@ -787,10 +791,10 @@ class ActivityPage extends Component {
                     value={
                       addVillage
                         ? villageFilter[
-                            villageFilter.findIndex(function (item, i) {
-                              return item.id === addVillage;
-                            })
-                          ] || null
+                        villageFilter.findIndex(function (item, i) {
+                          return item.id === addVillage;
+                        })
+                        ] || null
                         : null
                     }
                     error={this.hasError("addVillage")}
@@ -798,8 +802,8 @@ class ActivityPage extends Component {
                       this.hasError("addVillage")
                         ? this.state.errors.addVillage[0]
                         : this.state.districtSelected
-                        ? null
-                        : "Please select the district first"
+                          ? null
+                          : "Please select the district first"
                     }
                     renderInput={(params) => (
                       <Input
@@ -855,8 +859,8 @@ class ActivityPage extends Component {
                     helperText={
                       this.hasError("addEmail")
                         ? this.state.errors["addEmail"].map((error) => {
-                            return error + " ";
-                          })
+                          return error + " ";
+                        })
                         : null
                     }
                     value={this.state.values.addEmail || ""}
@@ -876,25 +880,25 @@ class ActivityPage extends Component {
                     }}
                     value={
                       this.state.loggedInUserRole ===
-                      "CSP (Community Service Provider)"
+                        "CSP (Community Service Provider)"
                         ? addShg
                           ? this.state.isCancel === true
                             ? null
                             : shgFilters[
-                                shgFilters.findIndex(function (item, i) {
-                                  return item.contact === addShg;
-                                })
-                              ] || null
+                            shgFilters.findIndex(function (item, i) {
+                              return item.contact === addShg;
+                            })
+                            ] || null
                           : null
                         : addShg
-                        ? this.state.isCancel === true
-                          ? null
-                          : shgFilters[
-                              shgFilters.findIndex(function (item, i) {
-                                return item.id === addShg;
-                              })
+                          ? this.state.isCancel === true
+                            ? null
+                            : shgFilters[
+                            shgFilters.findIndex(function (item, i) {
+                              return item.id === addShg;
+                            })
                             ] || null
-                        : null
+                          : null
                     }
                     error={this.hasError("addShg")}
                     helperText={
