@@ -51,26 +51,30 @@ export class Reports extends React.Component {
             <div>
               <h3>Reports</h3>
             </div>
-            <Card className={classes.root}>
-              <CardActionArea
-                component={Link}
-                to={{
-                  pathname: "/summary-report",
-                }}
-              >
-                <CardContent>CSP Summary Report</CardContent>
-              </CardActionArea>
-            </Card>
-            <Card className={classes.root}>
-              <CardActionArea
-                component={Link}
-                to={{
-                  pathname: "/activity-report",
-                }}
-              >
-                <CardContent>CSP Activity Report</CardContent>
-              </CardActionArea>
-            </Card>
+            <div>
+              <Card className={classes.root}>
+                <CardActionArea
+                  component={Link}
+                  to={{
+                    pathname: "/summary-report",
+                  }}
+                >
+                  <CardContent>CSP Summary Report</CardContent>
+                </CardActionArea>
+              </Card>
+            </div>
+            <div>
+              <Card className={classes.root}>
+                <CardActionArea
+                  component={Link}
+                  to={{
+                    pathname: "/activity-report",
+                  }}
+                >
+                  <CardContent>CSP Activity Report</CardContent>
+                </CardActionArea>
+              </Card>
+            </div>
           </Grid>
         </Grid>
       </Layout>
