@@ -200,7 +200,7 @@ export class CSPSummaryReport extends React.Component {
     let filterEnDate = this.state.filterEndDate ? Moment(this.state.filterEndDate).format('DD MMM YYYY') : null;
 
     if (filterCsp === 'All') {
-      reportFilterName += 'Report of "' + filterCsp + '" CSPs';
+      reportFilterName += 'Report of ' + filterCsp + ' CSPs';
     } else {
       reportFilterName += 'Report for CSP: ' + filterCsp;
     }
