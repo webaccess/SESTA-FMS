@@ -20,12 +20,8 @@ import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autotext from "../../components/Autotext/Autotext";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import DateFnsUtils from "@date-io/date-fns";
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker,
-} from "@material-ui/pickers";
 import { constants } from "buffer";
+import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 
 class ActivityPage extends Component {
   constructor(props) {
@@ -102,6 +98,12 @@ class ActivityPage extends Component {
         },
         nominee: {
           required: { value: "true", message: "Nominee is required" },
+        },
+        selectedDate: {
+          required: {
+            value: "true",
+            message: "Date is required",
+          },
         },
       },
       errors: {},
@@ -250,7 +252,7 @@ class ActivityPage extends Component {
       delete allValiations["nominee"];
       delete allValiations["shareAmt"];
       delete allValiations["noOfShares"];
-      delete allValiations["certificateNo"];
+      delete allValiations["selectedDate"];
     }
     map(allValiations, (validation, key) => {
       let value = values[key] ? values[key] : "";
@@ -501,7 +503,6 @@ class ActivityPage extends Component {
     let shareCertiNo = this.state.values.certificateNo;
     let shareNominee = this.state.values.nominee;
     let shareDate = this.state.values.selectedDate;
-
     let postShareData = {
       contact: data.id,
       nominee_name: shareNominee,
@@ -510,7 +511,7 @@ class ActivityPage extends Component {
       certificate_no: shareCertiNo,
       date: shareDate,
     };
-
+    if (Object.keys(this.state.errors).length > 0) return;
     if (data.shareinformation) {
       // update share info in shareinformation table
       if (this.state.isShareholder) {
@@ -978,28 +979,26 @@ class ActivityPage extends Component {
                       />
                     </Grid>
                     <Grid item md={6} xs={12}>
-                      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                        <KeyboardDatePicker
-                          autoOk
-                          inputVariant="outlined"
-                          margin="normal"
-                          id="date-picker-dialog"
-                          label="Date"
-                          format="MM/dd/yyyy"
-                          value={this.state.values.selectedDate}
-                          onChange={(value) =>
-                            this.setState({
-                              values: {
-                                ...this.state.values,
-                                selectedDate: value,
-                              },
-                            })
-                          }
-                          KeyboardButtonProps={{
-                            "aria-label": "change date",
-                          }}
-                        />
-                      </MuiPickersUtilsProvider>
+                      <Datepicker
+                        label="Date*"
+                        name="selectedDate"
+                        value={this.state.values.selectedDate || ""}
+                        format={"dd MMM yyyy"}
+                        error={this.hasError("selectedDate")}
+                        helperText={
+                          this.hasError("selectedDate")
+                            ? this.state.errors.selectedDate[0]
+                            : null
+                        }
+                        onChange={(value) =>
+                          this.setState({
+                            values: {
+                              ...this.state.values,
+                              selectedDate: value,
+                            },
+                          })
+                        }
+                      />
                     </Grid>
                     <Grid item md={6} xs={12}>
                       <Input
