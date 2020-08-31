@@ -56,7 +56,11 @@ export class CSPSummaryReport extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
-        this.setState({ cspList: res.data });
+        let cspContact = [];
+        res.data.map(e => {
+          e.name = e.contact.name
+          this.setState({ cspList: res.data });
+        })
       })
       .catch((error) => {
         console.log(error);
@@ -161,6 +165,7 @@ export class CSPSummaryReport extends React.Component {
 
   cancelForm = () => {
     this.setState({
+      filterCspName: "",
       filterStartDate: "",
       filterEndDate: "",
       isCancel: true,
@@ -185,6 +190,28 @@ export class CSPSummaryReport extends React.Component {
     if (csvActivityData.length <= 0) {
       csvActivityData = "There are no records to display";
     }
+
+    let reportFilterName = "";
+    let filterCsp = "All";
+    if (this.state.filterCspName) {
+      filterCsp = this.state.filterCspName.name;
+    }
+    let filterStDate = this.state.filterStartDate ? Moment(this.state.filterStartDate).format('DD MMM YYYY') : null;
+    let filterEnDate = this.state.filterEndDate ? Moment(this.state.filterEndDate).format('DD MMM YYYY') : null;
+
+    if (filterCsp === 'All') {
+      reportFilterName += 'Report of "' + filterCsp + '" CSPs';
+    } else {
+      reportFilterName += 'Report for CSP: ' + filterCsp;
+    }
+
+    if (this.state.filterStartDate) {
+      reportFilterName += ' for the duration: ' + filterStDate;
+    }
+    if (this.state.filterEndDate) {
+      reportFilterName += ' - ' + filterEnDate;
+    }
+
     const Usercolumns = [
       {
         name: "Date",
@@ -232,7 +259,7 @@ export class CSPSummaryReport extends React.Component {
                     <Autocomplete
                       id="combo-box-demo"
                       options={this.state.cspList}
-                      getOptionLabel={(option) => option.username}
+                      getOptionLabel={(option) => option.name}
                       onChange={(event, value) => {
                         this.handleCSPChange(event, value);
                       }}
@@ -293,6 +320,7 @@ export class CSPSummaryReport extends React.Component {
                 reset
               </Button>
             </div>
+            <p>{reportFilterName}</p>
             <div className={classes.emiDue}>
               {activitiesData ? (
                 <Table
