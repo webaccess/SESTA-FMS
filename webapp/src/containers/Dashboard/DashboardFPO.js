@@ -267,7 +267,7 @@ class DashboardForFPO extends Component {
     }
 
     return (
-      <div className="App">
+      <div className="App" style={{ paddingTop: "15px" }}>
         <Grid container style={{ border: "1px solid #ccc" }}>
           <Grid item md={3} spacing={3}>
             <div className={classes.oddBlock}>

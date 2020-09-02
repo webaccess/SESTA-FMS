@@ -8,6 +8,7 @@ import Table from "../../components/Datatable/Datatable.js";
 import Moment from "moment";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import { LOAN_TASK_BREADCRUMBS } from "./config";
+import style from "./Loans.module.css";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -29,14 +30,14 @@ const useStyles = (theme) => ({
   },
   loanee: {
     display: "flex",
-    paddingLeft: "75px"
+    paddingLeft: "75px",
   },
   fieldValues: {
     fontSize: "13px !important",
   },
   dataRow: {
     display: "flex",
-    paddingLeft: "75px"
+    paddingLeft: "75px",
   },
 });
 
@@ -45,8 +46,8 @@ class LoanUpdateTaskPage extends Component {
     super(props);
     this.state = {
       data: [],
-      loantasks: []
-    }
+      loantasks: [],
+    };
   }
 
   async componentDidMount() {
@@ -56,11 +57,13 @@ class LoanUpdateTaskPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "loan-application-tasks/?loan_application.id=" + memberData.id + "&&_sort=id:ASC"
+          "loan-application-tasks/?loan_application.id=" +
+          memberData.id +
+          "&&_sort=id:ASC"
       )
       .then((res) => {
         this.setState({ loantasks: res.data });
-      })
+      });
   }
 
   getAllDetails = (memberData) => {
@@ -75,8 +78,8 @@ class LoanUpdateTaskPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/individuals/" +
-        memberData.contact.individual
+          "crm-plugin/individuals/" +
+          memberData.contact.individual
       )
       .then((res) => {
         let shgName = res.data.shg.name;
@@ -84,8 +87,8 @@ class LoanUpdateTaskPage extends Component {
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/?organization.id=" +
-            res.data.shg.organization
+              "crm-plugin/contact/?organization.id=" +
+              res.data.shg.organization
           )
           .then((response) => {
             let villageName = response.data[0].villages[0].name;
@@ -95,29 +98,34 @@ class LoanUpdateTaskPage extends Component {
                 shg: shgName,
                 village: villageName,
                 purpose: purpose,
-                amount: "₹" + (amount).toLocaleString(),
+                amount: "₹" + amount.toLocaleString(),
                 duration: duration,
-                emi: "₹" + (emi).toLocaleString(),
-                pendingAmount: pendingAmount ? "₹" + (pendingAmount).toLocaleString() : "-",
-                loanEndsOn: loanEndsOn ? Moment(loanEndsOn).format("DD MMM YYYY") : "-"
-              }
-            })
-          })
-      })
-  }
+                emi: "₹" + emi.toLocaleString(),
+                pendingAmount: pendingAmount
+                  ? "₹" + pendingAmount.toLocaleString()
+                  : "-",
+                loanEndsOn: loanEndsOn
+                  ? Moment(loanEndsOn).format("DD MMM YYYY")
+                  : "-",
+              },
+            });
+          });
+      });
+  };
 
   editData = (cellid) => {
     let loantask;
-    this.state.loantasks.map(data => {
+    this.state.loantasks.map((data) => {
       if (data.id === cellid) {
         loantask = data;
       }
     });
 
     this.props.history.push("/loan/task/edit/" + cellid, {
-      loantask: loantask, loanAppData: this.props.location.state.loanAppData
+      loantask: loantask,
+      loanAppData: this.props.location.state.loanAppData,
     });
-  }
+  };
 
   render() {
     const { classes } = this.props;
@@ -126,21 +134,24 @@ class LoanUpdateTaskPage extends Component {
     let loanAppData = this.props.location.state.loanAppData;
 
     let paid = 0;
-    loanAppData.loan_app_installments.map(emidata => {
+    loanAppData.loan_app_installments.map((emidata) => {
       if (emidata.actual_principal) {
         if (emidata.fine !== null || emidata.fine !== 0) {
-          emidata.totalPaid = (emidata.fine + emidata.actual_principal + emidata.actual_interest);
+          emidata.totalPaid =
+            emidata.fine + emidata.actual_principal + emidata.actual_interest;
         } else {
-          emidata.totalPaid = (emidata.actual_principal + emidata.actual_interest);
+          emidata.totalPaid =
+            emidata.actual_principal + emidata.actual_interest;
         }
         paid = paid + emidata.totalPaid;
       }
-
-    })
+    });
 
     // Pending Amount = Actual amount + Fine - Total installment paid
     let pendingAmount;
-    let loanAmount = parseInt(loanAppData.loan_model.loan_amount.replace(/,/g, ''));
+    let loanAmount = parseInt(
+      loanAppData.loan_model.loan_amount.replace(/,/g, "")
+    );
     pendingAmount = loanAmount - paid;
     if (pendingAmount < 0) {
       pendingAmount = 0;
@@ -149,14 +160,20 @@ class LoanUpdateTaskPage extends Component {
 
     // get Loan Ends On Date
     if (loanAppData.loan_app_installments.length > 0) {
-      let sortedPaymentDate = loanAppData.loan_app_installments.sort((a, b) => new Date(...a.payment_date.split('/').reverse()) - new Date(...b.payment_date.split('/').reverse()));
+      let sortedPaymentDate = loanAppData.loan_app_installments.sort(
+        (a, b) =>
+          new Date(...a.payment_date.split("/").reverse()) -
+          new Date(...b.payment_date.split("/").reverse())
+      );
       let len = sortedPaymentDate.length - 1;
-      data.loanEndsOn = Moment(sortedPaymentDate[len].payment_date).format('DD MMM YYYY');
+      data.loanEndsOn = Moment(sortedPaymentDate[len].payment_date).format(
+        "DD MMM YYYY"
+      );
     }
 
-    loantasks.map(task => {
+    loantasks.map((task) => {
       if (task.date != null) {
-        task.date = Moment(task.date).format('DD MMM YYYY');
+        task.date = Moment(task.date).format("DD MMM YYYY");
       }
     });
 
@@ -189,33 +206,42 @@ class LoanUpdateTaskPage extends Component {
     let columnsvalue = selectors[0];
 
     let taskEditPage = false;
-    if (this.props.location.state && this.props.location.state.loanEditTaskPage) {
+    if (
+      this.props.location.state &&
+      this.props.location.state.loanEditTaskPage
+    ) {
       taskEditPage = true;
     }
-    if (this.props.history.action === 'POP') {
+    if (this.props.history.action === "POP") {
       taskEditPage = false;
     }
 
     return (
-      <Layout
-        breadcrumbs={
-          LOAN_TASK_BREADCRUMBS
-        }
-      >
+      <Layout breadcrumbs={LOAN_TASK_BREADCRUMBS}>
         <Grid>
           <div className="App">
-            <h5>LOAN</h5>
+            <h5 className={style.loan}>LOANS</h5>
 
             <div style={{ display: "flex" }}>
               <h2 style={{ margin: "13px" }}>{data.loanee}</h2>
-              <div className={classes.dataRow}><p>SHG GROUP <b>{data.shg}</b></p></div>
+              <div className={classes.dataRow}>
+                <p>
+                  SHG GROUP <b>{data.shg}</b>
+                </p>
+              </div>
 
-              <div className={classes.dataRow}><p>VILLAGE <b>{data.village}</b> </p></div>
+              <div className={classes.dataRow}>
+                <p>
+                  VILLAGE <b>{data.village}</b>{" "}
+                </p>
+              </div>
             </div>
           </div>
           <Grid item md={12} xs={12}>
             {taskEditPage === true ? (
-              <Snackbar severity="success">Loan Task Updated successfully.</Snackbar>
+              <Snackbar severity="success">
+                Loan Task Updated successfully.
+              </Snackbar>
             ) : null}
           </Grid>
           <Card className={classes.mainContent}>
@@ -233,7 +259,7 @@ class LoanUpdateTaskPage extends Component {
                     <b>
                       <div className={classes.member}>
                         PURPOSE
-                          <br />
+                        <br />
                         <span className={classes.fieldValues}>
                           {data.purpose}
                         </span>
@@ -254,9 +280,13 @@ class LoanUpdateTaskPage extends Component {
                     <b>
                       <div className={classes.member}>
                         PENDING AMOUNT <br />
-                        {loantasks.length > 0 ? (<span className={classes.fieldValues}>
-                          {pendingAmount}
-                        </span>) : "-"}
+                        {loantasks.length > 0 ? (
+                          <span className={classes.fieldValues}>
+                            {pendingAmount}
+                          </span>
+                        ) : (
+                          "-"
+                        )}
                       </div>
                     </b>
                   </Grid>
@@ -264,9 +294,7 @@ class LoanUpdateTaskPage extends Component {
                     <b>
                       <div className={classes.member}>
                         EMI <br />
-                        <span className={classes.fieldValues}>
-                          {data.emi}
-                        </span>
+                        <span className={classes.fieldValues}>{data.emi}</span>
                       </div>
                     </b>
                   </Grid>
@@ -284,9 +312,13 @@ class LoanUpdateTaskPage extends Component {
                     <b>
                       <div className={classes.member}>
                         LOAN ENDS ON <br />
-                        {loantasks.length > 0 ? (<span className={classes.fieldValues}>
-                          {data.loanEndsOn}
-                        </span>) : "-"}
+                        {loantasks.length > 0 ? (
+                          <span className={classes.fieldValues}>
+                            {data.loanEndsOn}
+                          </span>
+                        ) : (
+                          "-"
+                        )}
                       </div>
                     </b>
                   </Grid>
@@ -310,11 +342,11 @@ class LoanUpdateTaskPage extends Component {
               pagination
             />
           ) : (
-              <h1>Loading...</h1>
-            )}
+            <h1>Loading...</h1>
+          )}
         </Grid>
       </Layout>
-    )
+    );
   }
 }
 

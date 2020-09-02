@@ -51,6 +51,10 @@ const useStyles = (theme) => ({
   Cancel: {
     marginRight: theme.spacing(1),
   },
+  menuName: {
+    position: "relative",
+    top: "20px",
+  },
 });
 
 export class Villages extends React.Component {
@@ -315,7 +319,8 @@ export class Villages extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>
+            <h5 className={classes.menuName}>MASTERS</h5>
+            <h2 className={style.title}>
               Manage Villages
               <div className={classes.floatRow}>
                 <div className={classes.buttonRow}>
@@ -328,7 +333,7 @@ export class Villages extends React.Component {
                   </Button>
                 </div>
               </div>
-            </h1>
+            </h2>
             {this.props.location.addData ? (
               <Snackbar severity="success">
                 Village added successfully.

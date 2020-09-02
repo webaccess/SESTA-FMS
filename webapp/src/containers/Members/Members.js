@@ -479,20 +479,26 @@ export class Members extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>Manage Members</h1>
-            <div className={classes.row}>
-              <div className={classes.buttonRow}>
-                <Button variant="contained" component={Link} to="/members/add">
-                  Add New Member
-                </Button>
+            <h5 className={style.menuName}>MEMBERS</h5>
+            <h2 className={style.title}>
+              Manage Members
+              <div className={classes.floatRow}>
+                <div className={classes.buttonRow}>
+                  <Button
+                    variant="contained"
+                    component={Link}
+                    to="/members/add"
+                  >
+                    Add New Member
+                  </Button>
+                </div>
               </div>
-            </div>
+            </h2>
             {!this.state.bankDetailsFound ? (
               <Snackbar severity="info">
                 No bank details found for SHG of this member
               </Snackbar>
             ) : null}
-
             {this.props.location.addData ? (
               <Snackbar severity="success">Member added successfully.</Snackbar>
             ) : this.props.location.editData ? (

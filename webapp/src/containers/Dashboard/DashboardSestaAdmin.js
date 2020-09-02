@@ -125,7 +125,7 @@ class DashboardForFPO extends Component {
     const userInfo = auth.getUserInfo();
 
     return (
-      <div className="App">
+      <div className="App" style={{ paddingTop: "15px" }}>
         <Grid container>
           <Grid item md={3} spacing={3} style={{ backgroundColor: "#e5e9e3" }}>
             <div className={classes.oddBlock}>

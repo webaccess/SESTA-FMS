@@ -369,7 +369,7 @@ class LoanApprovalPage extends Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h5 className={style.loan}>LOAN</h5>
+            <h5 className={style.loan}>LOANS</h5>
             <h2 className={style.title}>Loan Approval</h2>
 
             <Card className={classes.mainContent}>
