@@ -58,9 +58,9 @@ class LoanEmiViewPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "loan-application-installments/?loan_application.id=" +
-          memberData.id +
-          "&&_sort=payment_date:ASC"
+        "loan-application-installments/?loan_application.id=" +
+        memberData.id +
+        "&&_sort=payment_date:ASC"
       )
       .then((res) => {
         this.setState({ loanEmiData: res.data });
@@ -79,8 +79,8 @@ class LoanEmiViewPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/individuals/" +
-          memberData.contact.individual
+        "crm-plugin/individuals/" +
+        memberData.contact.individual
       )
       .then((res) => {
         let shgName = res.data.shg.name;
@@ -88,8 +88,8 @@ class LoanEmiViewPage extends Component {
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/contact/?organization.id=" +
-              res.data.shg.organization
+            "crm-plugin/contact/?organization.id=" +
+            res.data.shg.organization
           )
           .then((response) => {
             let villageName = response.data[0].villages[0].name;
@@ -188,7 +188,7 @@ class LoanEmiViewPage extends Component {
             : null,
       },
       {
-        name: "Principle",
+        name: "Principal",
         selector: "expected_principal",
         sortable: true,
         cell: (row) =>
@@ -215,7 +215,7 @@ class LoanEmiViewPage extends Component {
             : null,
       },
       {
-        name: "Priniciple Paid",
+        name: "Prinicipal Paid",
         selector: "actual_principal",
         sortable: true,
         cell: (row) =>
@@ -377,8 +377,8 @@ class LoanEmiViewPage extends Component {
               columnsvalue={columnsvalue}
             />
           ) : (
-            <h1>Loading...</h1>
-          )}
+              <h1>Loading...</h1>
+            )}
           <br />
           <Button color="primary" component={Link} to="/loans">
             Done

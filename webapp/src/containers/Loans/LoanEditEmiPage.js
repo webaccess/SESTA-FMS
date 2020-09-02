@@ -292,7 +292,7 @@ class LoanEditEmiPage extends Component {
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
-                    label="Principle Paid*"
+                    label="Principal Paid*"
                     name="actual_principal"
                     value={this.state.values.actual_principal ? this.state.values.actual_principal : this.state.values.expected_principal || ""}
                     error={this.hasError("actual_principal")}
