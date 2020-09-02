@@ -80,6 +80,9 @@ function Toolbar(props) {
         <ToolbarItem>
           <Logo />
           <div className={classes.flexGrow} />
+          <h4 style={{ color: "#000", paddingRight: "2%" }}>
+            Welcome {auth.getUserInfo().contact.name}
+          </h4>
           <Hidden mdDown>
             <IconButton
               className={classes.accntBtn}
