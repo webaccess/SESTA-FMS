@@ -9,9 +9,9 @@ import { Grid } from "@material-ui/core";
 import Moment from "moment";
 import Tooltip from "@material-ui/core/Tooltip";
 import IconButton from "@material-ui/core/IconButton";
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
-import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet';
-import { withRouter } from 'react-router';
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import AccountBalanceWalletIcon from "@material-ui/icons/AccountBalanceWallet";
+import { withRouter } from "react-router";
 import { Link } from "react-router-dom";
 
 const useStyles = (theme) => ({
@@ -28,28 +28,28 @@ const useStyles = (theme) => ({
   },
   pie: {
     width: "50px",
-    height: "50px"
+    height: "50px",
   },
   remun: {
     backgroundColor: "#000",
     padding: "15px",
     textAlign: "center",
-    color: "white"
+    color: "white",
   },
   remunText: {
     color: "white",
-    marginBottom: "5px"
+    marginBottom: "5px",
   },
   remunDate: {
     color: "white",
-    marginTop: "0px"
+    marginTop: "0px",
   },
   emiDue: {
     border: "1px solid #ccc",
     backgroundColor: "#fff",
-    marginTop: "-1px"
-  }
-})
+    marginTop: "-1px",
+  },
+});
 
 class DashboardCSP extends Component {
   constructor(props) {
@@ -59,19 +59,20 @@ class DashboardCSP extends Component {
       loanInstallmentData: [],
       activitiesData: [],
       activitytypeData: [],
-      remuneration: ""
-    }
+      remuneration: "",
+    };
   }
 
   async componentDidMount() {
     let filteredArray = [];
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "loan-application-installments?_sort=id:asc"
+        process.env.REACT_APP_SERVER_URL +
+          "loan-application-installments?_sort=id:asc"
       )
       .then((res) => {
         this.setState({ loanInstallmentData: res.data });
-      })
+      });
 
     serviceProvider
       .serviceProviderForGetRequest(
@@ -79,21 +80,22 @@ class DashboardCSP extends Component {
       )
       .then((res) => {
         this.setState({ loanData: res.data });
-      })
+      });
 
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/activities?_sort=end_datetime:desc",
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/activities?_sort=end_datetime:desc"
       )
       .then((activityRes) => {
         activityRes.data.map((e, i) => {
-          e.activityassignees.map((item) => { });
+          e.activityassignees.map((item) => {});
           e.activityassignees
             .filter((item) => item.contact === auth.getUserInfo().contact.id)
             .map((filteredData) => {
               filteredArray.push(e);
             });
-        })
+        });
         this.setState({ activitiesData: filteredArray });
       })
       .catch((error) => {
@@ -102,21 +104,21 @@ class DashboardCSP extends Component {
 
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes"
       )
       .then((typeRes) => {
         this.setState({ activitytypeData: typeRes.data });
-      })
+      });
   }
 
   manageLoanEMIData(loanInstallmentData) {
-    this.state.loanInstallmentData.map(ldata => {
+    this.state.loanInstallmentData.map((ldata) => {
       if (ldata.loan_application.creator_id == auth.getUserInfo().contact.id) {
         if (ldata.actual_principal === null && ldata.actual_interest === null) {
-          this.state.loanData.map(ld => {
-
+          this.state.loanData.map((ld) => {
             // calculate pending loan amount
-            let pendingAmount = ldata.expected_principal + ldata.expected_interest;
+            let pendingAmount =
+              ldata.expected_principal + ldata.expected_interest;
             ldata.pendingAmount = pendingAmount;
 
             // get Member name and EMI
@@ -126,33 +128,41 @@ class DashboardCSP extends Component {
                 ldata.emi = ld.loan_model.emi;
               }
             }
-          })
+          });
           loanInstallmentData.push(ldata);
         }
       }
-    })
+    });
     // sort loan application installments by payment date
-    loanInstallmentData.sort((a, b) => new Date(...a.payment_date.split('/').reverse()) - new Date(...b.payment_date.split('/').reverse()));
+    loanInstallmentData.sort(
+      (a, b) =>
+        new Date(...a.payment_date.split("/").reverse()) -
+        new Date(...b.payment_date.split("/").reverse())
+    );
   }
 
   manageActivityData(activitytypeRes, activitiesData, today, activtiesArr) {
-    activitytypeRes.map(type => {
-      let activityTypeName, activityTypeCount = 0;
-      activitiesData.map(activity => {
+    activitytypeRes.map((type) => {
+      let activityTypeName,
+        activityTypeCount = 0;
+      activitiesData.map((activity) => {
         // Pie chart calculation for current month
         let stdate = new Date(activity.end_datetime);
-        stdate = stdate.getFullYear() + '-' + (stdate.getMonth() + 1);
+        stdate = stdate.getFullYear() + "-" + (stdate.getMonth() + 1);
         if (stdate == today) {
           if (activity.activitytype.name == type.name) {
             activityTypeName = activity.activitytype.name;
             activityTypeCount = activityTypeCount + 1;
           }
         }
-      })
+      });
       if (activityTypeName) {
-        activtiesArr.push({ activityName: activityTypeName, activityCount: activityTypeCount });
+        activtiesArr.push({
+          activityName: activityTypeName,
+          activityCount: activityTypeCount,
+        });
       }
-    })
+    });
   }
 
   render() {
@@ -166,33 +176,38 @@ class DashboardCSP extends Component {
 
     // Today's date
     let today = new Date();
-    today = today.getFullYear() + '-' + (today.getMonth() + 1);
+    today = today.getFullYear() + "-" + (today.getMonth() + 1);
 
     // Date format for Remuneration
-    let remun_date = Moment(today).format('MMMM YYYY').toUpperCase();
+    let remun_date = Moment(today).format("MMMM YYYY").toUpperCase();
 
     // Calculate Remuneration for current month
     let remunaration = 0;
-    activitiesData.map(cspActivity => {
+    activitiesData.map((cspActivity) => {
       let stdate = new Date(cspActivity.start_datetime);
-      stdate = stdate.getFullYear() + '-' + (stdate.getMonth() + 1);
+      stdate = stdate.getFullYear() + "-" + (stdate.getMonth() + 1);
       if (stdate == today) {
         let remun = cspActivity.activitytype.remuneration;
         let unit = cspActivity.unit;
         let cal = remun * unit;
         remunaration = remunaration + cal;
       }
-    })
+    });
 
     let activitytypeRes = this.state.activitytypeData;
     let activtiesArr = [];
-    this.manageActivityData(activitytypeRes, activitiesData, today, activtiesArr);
+    this.manageActivityData(
+      activitytypeRes,
+      activitiesData,
+      today,
+      activtiesArr
+    );
 
     // Pie chart array for label, values and colors to display
     let activityname = [];
     let activityvalue = [];
     let activitycolor = [];
-    activtiesArr.map(act => {
+    activtiesArr.map((act) => {
       activityname.push(act.activityName);
       activityvalue.push(act.activityCount);
 
@@ -202,17 +217,27 @@ class DashboardCSP extends Component {
         let r = Math.floor(Math.random() * 200);
         let g = Math.floor(Math.random() * 200);
         let b = Math.floor(Math.random() * 200);
-        color = 'rgb(' + r + ', ' + g + ', ' + b + ')';
+        color = "rgb(" + r + ", " + g + ", " + b + ")";
         activitycolor.push(color);
       }
-    })
+    });
 
-    let loanEmiRedirect = { pathname: "/view/more", state: { loanEMIData: loanInstallmentData } };
-    let activityRedirect = { pathname: "/view/more", state: { activitiesData: this.state.activitiesData } };
+    let loanEmiRedirect = {
+      pathname: "/view/more",
+      state: { loanEMIData: loanInstallmentData },
+    };
+    let activityRedirect = {
+      pathname: "/view/more",
+      state: { activitiesData: this.state.activitiesData },
+    };
 
     // Top 5 records of Loan EMI Data and Activties
-    loanInstallmentData = loanInstallmentData.length > 5 ? loanInstallmentData.slice(1, 6) : loanInstallmentData;
-    activitiesData = activitiesData.length > 5 ? activitiesData.slice(1, 6) : activitiesData;
+    loanInstallmentData =
+      loanInstallmentData.length > 5
+        ? loanInstallmentData.slice(1, 6)
+        : loanInstallmentData;
+    activitiesData =
+      activitiesData.length > 5 ? activitiesData.slice(1, 6) : activitiesData;
     const Usercolumns = [
       {
         name: "Name",
@@ -229,24 +254,22 @@ class DashboardCSP extends Component {
         selector: "pendingAmount",
         sortable: true,
         cell: (row) =>
-          row.pendingAmount ?
-            "₹" + (row.pendingAmount).toLocaleString() : null
+          row.pendingAmount ? "₹" + row.pendingAmount.toLocaleString() : null,
       },
       {
         name: "Due date",
         selector: "payment_date",
         sortable: true,
         cell: (row) =>
-          row.payment_date ?
-            Moment(row.payment_date).format('DD MMM YYYY') : null
+          row.payment_date
+            ? Moment(row.payment_date).format("DD MMM YYYY")
+            : null,
       },
       {
         name: "EMI Amount",
         selector: "emi",
         sortable: true,
-        cell: (row) =>
-          row.emi ?
-            "₹" + (row.emi).toLocaleString() : null
+        cell: (row) => (row.emi ? "₹" + row.emi.toLocaleString() : null),
       },
     ];
     let selectors = [];
@@ -266,14 +289,15 @@ class DashboardCSP extends Component {
         selector: "start_datetime",
         sortable: true,
         cell: (row) =>
-          row.start_datetime ?
-            Moment(row.start_datetime).format('DD MMM YYYY') : null
+          row.start_datetime
+            ? Moment(row.start_datetime).format("DD MMM YYYY")
+            : null,
       },
       {
         name: "Remuneration",
         selector: "activitytype.remuneration",
         sortable: true,
-        cell: (row) => "₹" + (row.activitytype.remuneration).toLocaleString()
+        cell: (row) => "₹" + row.activitytype.remuneration.toLocaleString(),
       },
     ];
 
@@ -283,7 +307,7 @@ class DashboardCSP extends Component {
     }
     let columnsvalue1 = selectors1[0];
     return (
-      <div>
+      <div className="App" style={{ paddingTop: "15px" }}>
         <Grid container style={{ border: "1px solid #ccc" }}>
           <Grid item md={4} spacing={3} style={{ backgroundColor: "#e5e9e3" }}>
             <div className={classes.remun}>
@@ -301,12 +325,30 @@ class DashboardCSP extends Component {
                 datasets={[
                   {
                     data: activityvalue,
-                    backgroundColor: ["#A52A2A", "#9ACD32", "#6495ED", "#ff6361", "#3CB371", "#FFD700", "#bc5090", "#D2691E", "#696969", "#00008B", "#C0C0C0", "#488f31", "#FFDEAD", "#EE82EE", "#4682B4"],
+                    backgroundColor: [
+                      "#A52A2A",
+                      "#9ACD32",
+                      "#6495ED",
+                      "#ff6361",
+                      "#3CB371",
+                      "#FFD700",
+                      "#bc5090",
+                      "#D2691E",
+                      "#696969",
+                      "#00008B",
+                      "#C0C0C0",
+                      "#488f31",
+                      "#FFDEAD",
+                      "#EE82EE",
+                      "#4682B4",
+                    ],
                     // backgroundColor: activitycolor,
                   },
                 ]}
-              />) : <h3 align="center">No records present for this month</h3>}
-
+              />
+            ) : (
+              <h3 align="center">No records present for this month</h3>
+            )}
           </Grid>
           <Grid item md={8} spacing={3}>
             <div className={classes.emiDue}>
@@ -330,13 +372,11 @@ class DashboardCSP extends Component {
                   columnsvalue={columnsvalue}
                 />
               ) : (
-                  <h1>Loading...</h1>
-                )}
+                <h1>Loading...</h1>
+              )}
               <div align="right">
                 <Tooltip title="View More">
-                  <IconButton
-                    component={Link}
-                    to={loanEmiRedirect}>
+                  <IconButton component={Link} to={loanEmiRedirect}>
                     <MoreHorizIcon className={classes.MoreHorizIcon} />
                   </IconButton>
                 </Tooltip>
@@ -353,7 +393,7 @@ class DashboardCSP extends Component {
                   filterBy={[
                     "title",
                     "end_datetime",
-                    "activitytype.remuneration"
+                    "activitytype.remuneration",
                   ]}
                   column={Usercolumns1}
                   editData={this.editData}
@@ -361,14 +401,12 @@ class DashboardCSP extends Component {
                   columnsvalue={columnsvalue1}
                 />
               ) : (
-                  <h1>Loading...</h1>
-                )}
+                <h1>Loading...</h1>
+              )}
 
               <div align="right">
                 <Tooltip title="View More">
-                  <IconButton
-                    component={Link}
-                    to={activityRedirect}>
+                  <IconButton component={Link} to={activityRedirect}>
                     <MoreHorizIcon className={classes.MoreHorizIcon} />
                   </IconButton>
                 </Tooltip>

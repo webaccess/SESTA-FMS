@@ -18,7 +18,7 @@ class Dashboard extends Component {
 
     return (
       <Layout>
-        {/* <h3>Welcome {userInfo.username}</h3> */}
+        <h3 style={{ position: "relative", top: "20px" }}>DASHBOARD</h3>
 
         {userInfo.role.name === "FPO Admin" ? (
           <DashboardFPO></DashboardFPO>
