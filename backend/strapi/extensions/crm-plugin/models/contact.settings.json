@@ -26,16 +26,7 @@
     "email_other": {
       "type": "email"
     },
-    "address_1": {
-      "type": "text"
-    },
-    "address_2": {
-      "type": "text"
-    },
     "city": {
-      "type": "string"
-    },
-    "pincode": {
       "type": "string"
     },
     "contact_type": {
@@ -56,10 +47,6 @@
       "plugin": "crm-plugin",
       "model": "state"
     },
-    "district": {
-      "plugin": "crm-plugin",
-      "model": "district"
-    },
     "individual": {
       "plugin": "crm-plugin",
       "model": "individual",
@@ -76,15 +63,9 @@
       "via": "contact"
     },
     "activitytypes": {
-      "via": "contact",
       "plugin": "crm-plugin",
-      "collection": "activitytype"
-    },
-    "block": {
-      "type": "string"
-    },
-    "gp": {
-      "type": "string"
+      "collection": "activitytype",
+      "via": "contact"
     },
     "shareinformation": {
       "model": "shareinformation",
@@ -96,8 +77,8 @@
       "via": "contact"
     },
     "loan_app_approvedby": {
-      "via": "approved_by",
-      "model": "loan-application"
+      "model": "loan-application",
+      "via": "approved_by"
     },
     "organization": {
       "plugin": "crm-plugin",
@@ -115,12 +96,17 @@
       "via": "fpo"
     },
     "loan_applications": {
-      "via": "contact",
-      "collection": "loan-application"
+      "collection": "loan-application",
+      "via": "contact"
     },
     "creator_id": {
       "plugin": "crm-plugin",
       "model": "contact"
+    },
+    "addresses": {
+      "plugin": "crm-plugin",
+      "collection": "address",
+      "via": "contact"
     }
   }
 }

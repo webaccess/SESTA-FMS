@@ -207,10 +207,11 @@ export class Fpos extends React.Component {
   handleSearch() {
     let searchData = "";
     if (this.state.filterState) {
-      searchData += "state.id=" + this.state.filterState.id + "&&";
+      searchData += "addresses.state.id=" + this.state.filterState.id + "&&";
     }
     if (this.state.filterDistrict) {
-      searchData += "district.id=" + this.state.filterDistrict.id + "&&";
+      searchData +=
+        "addresses.district.id=" + this.state.filterDistrict.id + "&&";
     }
     if (this.state.filterFpo) {
       searchData += "name_contains=" + this.state.filterFpo;

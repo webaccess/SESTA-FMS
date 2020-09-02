@@ -273,13 +273,14 @@ export class Shgs extends React.Component {
         "organization.vos[0].name_contains=" + this.state.filterVo + "&&";
     }
     if (this.state.filterState) {
-      searchData += "state.id=" + this.state.filterState.id + "&&";
+      searchData += "addresses.state.id=" + this.state.filterState.id + "&&";
     }
     if (this.state.filterDistrict) {
-      searchData += "district.id=" + this.state.filterDistrict.id + "&&";
+      searchData +=
+        "addresses.district.id=" + this.state.filterDistrict.id + "&&";
     }
     if (this.state.filterVillage) {
-      searchData += "villages.id=" + this.state.filterVillage.id;
+      searchData += "addresses.village.id=" + this.state.filterVillage.id;
     }
 
     //api call after search filter
@@ -316,21 +317,21 @@ export class Shgs extends React.Component {
         selector: "organization.vos[0].name",
         sortable: true,
       },
-      {
-        name: "Village",
-        selector: "villages[0].name",
-        sortable: true,
-      },
-      {
-        name: "District",
-        selector: "district.name",
-        sortable: true,
-      },
-      {
-        name: "State",
-        selector: "state.name",
-        sortable: true,
-      },
+      //{
+      //  name: "Village",
+      //  selector: "villages[0].name",
+      //  sortable: true,
+      //},
+      //{
+      //  name: "District",
+      //  selector: "district.name",
+      //  sortable: true,
+      //},
+      //{
+      //  name: "State",
+      //  selector: "state.name",
+      //  sortable: true,
+      //},
     ];
 
     let selectors = [];

@@ -61,10 +61,11 @@ class VoPage extends Component {
           this.setState({
             values: {
               addVo: res.data.organization.name,
-              addVoAddress: res.data.address_1,
+              addId: res.data.addresses[0].id,
+              addVoAddress: res.data.addresses[0].address_line_1,
               addPerson: res.data.organization.person_incharge,
-              addBlock: res.data.block,
-              addGp: res.data.gp,
+              addBlock: res.data.addresses[0].block,
+              addGp: res.data.addresses[0].gp,
             },
           });
         })
@@ -110,24 +111,33 @@ class VoPage extends Component {
     this.setState({ formSubmitted: "" });
     if (Object.keys(this.state.errors).length > 0) return;
     let voName = this.state.values.addVo;
+    let addressId = this.state.values.addId;
     let voAddress = this.state.values.addVoAddress;
     let person = this.state.values.addPerson;
     let block = this.state.values.addBlock;
     let gp = this.state.values.addGp;
+    let postAddressData = {
+      address_line_1: voAddress,
+      block: block,
+      gp: gp,
+    };
     let postData = {
       name: voName,
       sub_type: "VO",
-      address: voAddress,
+      //address: voAddress,
+      addresses: [postAddressData],
       person_incharge: person,
       contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
         "Organization"
       ][0],
-      address_1: voAddress,
-      block: block,
-      gp: gp,
     };
     if (this.state.editPage[0]) {
       // for edit Vo page
+
+      Object.assign(postAddressData, {
+        id: addressId,
+      });
+
       serviceProvider
         .serviceProviderForPutRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",

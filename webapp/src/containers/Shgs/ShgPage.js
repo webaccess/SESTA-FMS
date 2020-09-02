@@ -94,21 +94,23 @@ class ShgPage extends Component {
             this.state.editPage[1]
         )
         .then((res) => {
-          this.handleStateChange(res.data.state);
-          this.handleDistrictChange(res.data.district);
+          this.handleStateChange(res.data.addresses[0].state);
+          this.handleDistrictChange(res.data.addresses[0].district);
           this.handleVoChange("", res.data.organization.vos[0]);
 
           this.setState({
             values: {
               addShg: res.data.name,
-              addAddress: res.data.address_1,
+              addAddress: res.data.addresses[0].address_line_1,
               addPointOfContact: res.data.organization.person_incharge,
-              addDistrict: res.data.district.id,
-              addState: res.data.state.id,
-              addVillage: res.data.villages[0].id,
+              addId: res.data.addresses[0].id,
+              addDistrict: res.data.addresses[0].district,
+              addState: res.data.addresses[0].state,
+              addVillage: res.data.addresses[0].village,
               addVo: res.data.organization.vos[0].id,
             },
           });
+          console.log("values", this.state.values);
 
           // if "add bankdetails" is checked
           if (res.data.organization.bankdetail) {
@@ -182,15 +184,18 @@ class ShgPage extends Component {
 
   handleStateChange(value) {
     if (value !== null) {
+      let newVal = value;
+      if (typeof value === "object") {
+        newVal = value.id;
+      }
       this.setState({
-        values: { ...this.state.values, addState: value.id },
+        values: { ...this.state.values, addState: newVal },
       });
-      let stateId = value.id;
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId
+            newVal
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
@@ -213,15 +218,18 @@ class ShgPage extends Component {
 
   handleDistrictChange(value) {
     if (value !== null) {
+      let newVal = value;
+      if (typeof value === "object") {
+        newVal = value.id;
+      }
       this.setState({
-        values: { ...this.state.values, addDistrict: value.id },
+        values: { ...this.state.values, addDistrict: newVal },
       });
-      let districtId = value.id;
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/villages/?is_active=true&&district.id=" +
-            districtId
+            newVal
         )
         .then((res) => {
           this.setState({ getVillage: res.data });
@@ -244,8 +252,14 @@ class ShgPage extends Component {
 
   handleVillageChange(event, value) {
     if (value !== null) {
+      let newVal = value;
+      console.log("value--", value);
+      if (typeof value === "object") {
+        newVal = value.id;
+      }
+      console.log("newVal", newVal);
       this.setState({
-        values: { ...this.state.values, addVillage: value.id },
+        values: { ...this.state.values, addVillage: newVal },
       });
     } else {
       this.setState({
@@ -318,6 +332,7 @@ class ShgPage extends Component {
     this.setState({ formSubmitted: "" });
     if (Object.keys(this.state.errors).length > 0) return;
     let shgName = this.state.values.addShg;
+    let addressId = this.state.values.addId;
     let shgAddress = this.state.values.addAddress;
     let shgPersonInCharge = this.state.values.addPointOfContact;
     let shgVillage = this.state.values.addVillage;
@@ -325,26 +340,33 @@ class ShgPage extends Component {
     let stateId = this.state.values.addState;
     let districtId = this.state.values.addDistrict;
 
-    let postShgData = {
-      name: shgName,
-      sub_type: "SHG",
-      address_1: shgAddress,
-      person_incharge: shgPersonInCharge,
-      contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
-        "Organization"
-      ][0],
+    let postAddressData = {
+      address_line_1: shgAddress,
       district: {
         id: districtId,
       },
       state: {
         id: stateId,
       },
-      villages: {
+      village: {
         id: shgVillage,
       },
+    };
+    console.log("postAddressData", postAddressData);
+    let postShgData = {
+      name: shgName,
+      sub_type: "SHG",
+      person_incharge: shgPersonInCharge,
+      contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
+        "Organization"
+      ][0],
+      addresses: [postAddressData],
       vos: shgVo,
     };
     if (this.state.editPage[0]) {
+      Object.assign(postAddressData, {
+        id: addressId,
+      });
       // edit SHG data
       serviceProvider
         .serviceProviderForPutRequest(

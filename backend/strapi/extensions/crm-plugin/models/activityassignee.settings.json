@@ -16,9 +16,9 @@
       "model": "activity"
     },
     "contact": {
+      "via": "activityassignees",
       "plugin": "crm-plugin",
-      "model": "contact",
-      "via": "activityassignees"
+      "model": "contact"
     }
   }
 }

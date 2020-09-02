@@ -12,7 +12,7 @@ import {
   Divider,
   Grid,
 } from "@material-ui/core";
-import { map } from "lodash";
+import { map, values } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
 import { ADD_MEMBERS_BREADCRUMBS, EDIT_MEMBERS_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
@@ -121,27 +121,47 @@ class ActivityPage extends Component {
             this.state.editPage[1]
         )
         .then((res) => {
-          this.handleStateChange(res.data.state);
-          this.handleDistrictChange(res.data.district);
+          this.handleStateChange(res.data.addresses[0].state);
+          this.handleDistrictChange(res.data.addresses[0].district);
           this.handleShgChange("", res.data.individual.shg);
-
+          //getdistid();
+          //async function getdistid() {
+          //  console.log("res in", res.data.addresses[0].district);
+          //  await serviceProvider
+          //    .serviceProviderForGetRequest(
+          //      process.env.REACT_APP_SERVER_URL +
+          //        "crm-plugin/districts/" +
+          //        res.data.addresses[0].district
+          //    )
+          //    .then((res) => {
+          //      this.setState({ values: { addDistrict: res.data } });
+          //      console.log("distData", res.data.id);
+          //      console.log("addDistrict", this.state.values.addDistrict);
+          //    })
+          //    .catch((error) => {
+          //      console.log(error);
+          //    });
+          //}
           this.setState({
             values: {
               firstName: res.data.individual.first_name,
               lastName: res.data.individual.last_name,
               husbandName: res.data.individual.partner_name,
-              address: res.data.address_1,
-              addDistrict: res.data.district.id,
-              addState: res.data.state.id,
-              addBlock: res.data.block,
-              addGp: res.data.gp,
-              addVillage: res.data.villages[0].id,
-              addPincode: res.data.pincode,
+              addId: res.data.addresses[0].id,
+              address: res.data.addresses[0].address_line_1,
+              addDistrict: res.data.addresses[0].district,
+              addState: res.data.addresses[0].state,
+              addBlock: res.data.addresses[0].block,
+              addGp: res.data.addresses[0].gp,
+              addVillage: res.data.addresses[0].village,
+              addPincode: res.data.addresses[0].pincode,
               addPhone: res.data.phone,
               addEmail: res.data.email,
               addShg: res.data.individual.shg,
             },
           });
+          //getDistName(res.data.addresses[0].district);
+          console.log("values", this.state.values);
 
           // if isShareholder is checked
           if (res.data.shareinformation) {
@@ -175,6 +195,16 @@ class ActivityPage extends Component {
       .catch((error) => {
         console.log(error);
       });
+    console.log(
+      "addDistrict before,addState",
+      this.state.values.firstName,
+      this.state.addState
+    );
+
+    //async function getDistName(id) {
+    //  console.log("id", id);
+
+    //}
 
     // get all shgs
     let url =
@@ -270,18 +300,22 @@ class ActivityPage extends Component {
 
   handleStateChange(value) {
     if (value !== null) {
+      let newVal = value;
+      if (typeof value === "object") {
+        newVal = value.id;
+      }
       this.setState({
-        values: { ...this.state.values, addState: value.id },
+        values: { ...this.state.values, addState: newVal },
       });
-      let stateId = value.id;
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId
+            newVal
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
+          console.log("res in state ", res.data, this.state.getDistrict);
         })
         .catch((error) => {
           console.log(error);
@@ -300,16 +334,22 @@ class ActivityPage extends Component {
   }
 
   handleDistrictChange(value) {
+    console.log("value", value);
     if (value !== null) {
+      let newVal = value;
+      if (typeof value === "object") {
+        newVal = value.id;
+      }
       this.setState({
-        values: { ...this.state.values, addDistrict: value.id },
+        values: { ...this.state.values, addDistrict: newVal },
       });
       let districtId = value.id;
+      console.log("value", newVal);
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/villages/?is_active=true&&district.id=" +
-            districtId
+            newVal
         )
         .then((res) => {
           this.setState({ getVillage: res.data });
@@ -332,8 +372,12 @@ class ActivityPage extends Component {
 
   handleVillageChange(event, value) {
     if (value !== null) {
+      let newVal = value;
+      if (typeof value === "object") {
+        newVal = value.id;
+      }
       this.setState({
-        values: { ...this.state.values, addVillage: value.id },
+        values: { ...this.state.values, addVillage: newVal },
       });
     } else {
       this.setState({
@@ -349,14 +393,6 @@ class ActivityPage extends Component {
     this.setState({
       isShareholder: !this.state.isShareholder,
     });
-  };
-
-  handleClickShowPassword = () => {
-    this.setState({ showPassword: !this.state.showPassword });
-  };
-
-  handleMouseDownPassword = (event) => {
-    event.preventDefault();
   };
 
   handleShgChange(event, value) {
@@ -389,44 +425,59 @@ class ActivityPage extends Component {
     let fName = this.state.values.firstName;
     let lName = this.state.values.lastName;
     let hName = this.state.values.husbandName;
+    let phoneNo = this.state.values.addPhone;
+    let emailAdd = this.state.values.addEmail;
+    let shgId = this.state.values.addShg;
+    let block = this.state.values.addBlock;
+    let gp = this.state.values.addGp;
+    let pincodeNo = this.state.values.addPincode;
+    let addressId = this.state.values.addId;
     let address = this.state.values.address;
     let stateId = this.state.values.addState;
     let districtId = this.state.values.addDistrict;
-    let block = this.state.values.addBlock;
-    let gp = this.state.values.addGp;
-    let phoneNo = this.state.values.addPhone;
-    let emailAdd = this.state.values.addEmail;
-    let pincodeNo = this.state.values.addPincode;
     let villageId = this.state.values.addVillage;
-    let shgId = this.state.values.addShg;
 
+    console.log("villageId", villageId);
+    let postAddressData = {
+      block: block,
+      gp: gp,
+      pincode: pincodeNo,
+      address_line_1: address,
+      district:
+        //districtId,
+        {
+          id: districtId,
+        },
+      state: {
+        id: stateId,
+      },
+      //stateId,
+      village:
+        //villageId,
+        {
+          id: villageId,
+        },
+    };
     let postData = {
       name: fName + " " + lName,
       phone: phoneNo,
       email: emailAdd,
-      address_1: address,
-      pincode: pincodeNo,
       contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
         "Individual"
       ][0],
-      district: {
-        id: districtId,
-      },
-      state: {
-        id: stateId,
-      },
-      villages: {
-        id: villageId,
-      },
-      block: block,
-      gp: gp,
+      addresses: [postAddressData],
       first_name: fName,
       last_name: lName,
       partner_name: hName,
       shg: shgId,
     };
+
     if (this.state.editPage[0]) {
       // edit present member (update API)
+      Object.assign(postAddressData, {
+        id: addressId,
+      });
+
       serviceProvider
         .serviceProviderForPutRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
@@ -468,6 +519,9 @@ class ActivityPage extends Component {
           if (this.state.isShareholder) {
             this.saveShareInfo(res.data);
           }
+          //if (this.state.values.address) {
+          //  this.saveaddressInfo(res.data);
+          //}
           this.setState({
             formSubmitted: true,
           });
@@ -549,6 +603,45 @@ class ActivityPage extends Component {
           console.log(error);
         });
     }
+  };
+
+  saveaddressInfo = async (data) => {
+    let block = this.state.values.addBlock;
+    let gp = this.state.values.addGp;
+    let pincodeNo = this.state.values.addPincode;
+    let address = this.state.values.address;
+    let stateId = this.state.values.addState;
+    let districtId = this.state.values.addDistrict;
+    let villageId = this.state.values.addVillage;
+
+    let postAddressData = {
+      contact: data.id,
+      block: block,
+      gp: gp,
+      pincode: pincodeNo,
+      address_1: address,
+      district: {
+        id: districtId,
+      },
+      state: {
+        id: stateId,
+      },
+      villages: {
+        id: villageId,
+      },
+    };
+
+    serviceProvider
+      .serviceProviderForPostRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/address/",
+        postAddressData
+      )
+      .then((res) => {
+        console.log("res", res);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   cancelForm = () => {

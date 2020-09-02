@@ -80,11 +80,12 @@ class FpoPage extends Component {
           this.setState({
             values: {
               addFpo: res.data.organization.name,
-              addAddress: res.data.address_1,
+              addId: res.data.addresses[0].id,
+              addAddress: res.data.addresses[0].address_line_1,
               addPointOfContact: res.data.organization.person_incharge,
-              addDistrict: res.data.district.id,
-              addState: res.data.state.id,
-              addBlock: res.data.block,
+              addDistrict: res.data.addresses[0].district,
+              addState: res.data.addresses[0].state,
+              addBlock: res.data.addresses[0].block,
               addEmail: res.data.email,
               addPhone: res.data.phone,
             },
@@ -189,11 +190,18 @@ class FpoPage extends Component {
     let fpoName = this.state.values.addFpo;
     let fpoState = this.state.values.addState;
     let fpoDistrict = this.state.values.addDistrict;
+    let addressId = this.state.values.addId;
     let fpoAddress = this.state.values.addAddress;
     let fpoBlock = this.state.values.addBlock;
     let fpoPersonInCharge = this.state.values.addPointOfContact;
     let fpoEmail = this.state.values.addEmail;
     let fpoPhone = this.state.values.addPhone;
+    let postAddressData = {
+      address_line_1: fpoAddress,
+      state: fpoState,
+      district: fpoDistrict,
+      block: fpoBlock,
+    };
     let postData = {
       name: fpoName,
       sub_type: "FPO",
@@ -201,15 +209,16 @@ class FpoPage extends Component {
       contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
         "Organization"
       ][0],
-      address_1: fpoAddress,
-      state: fpoState,
-      district: fpoDistrict,
-      block: fpoBlock,
+      addresses: [postAddressData],
       email: fpoEmail,
       phone: fpoPhone,
     };
     if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
+      Object.assign(postAddressData, {
+        id: addressId,
+      });
+
       serviceProvider
         .serviceProviderForPutRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",

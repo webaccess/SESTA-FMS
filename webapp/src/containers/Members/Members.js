@@ -62,7 +62,7 @@ export class Members extends React.Component {
       data: [],
       getState: [],
       getDistrict: [],
-      getVillage: [],
+      ge: [],
       getShg: [],
       filterState: "",
       filterDistrict: "",
@@ -146,7 +146,8 @@ export class Members extends React.Component {
             newDataArray.push(e); // add only those contacts having contact type=individual & users===null
           }
         });
-        this.setState({ data: newDataArray });
+        this.getDistrictData(newDataArray);
+        this.getVillageData(newDataArray);
       })
       .catch((error) => {
         console.log(error);
@@ -164,6 +165,35 @@ export class Members extends React.Component {
         console.log(error);
       });
   };
+
+  async getDistrictData(data) {
+    for (let i in data) {
+      await serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/districts/" +
+            data[i].addresses[0].district
+        )
+        .then((res) => {
+          data[i].addresses.push({ district: res.data }); // add corresponding district to record
+        });
+    }
+  }
+
+  async getVillageData(data) {
+    for (let i in data) {
+      await serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/villages/" +
+            data[i].addresses[0].village
+        )
+        .then((res) => {
+          data[i].addresses.push({ village: res.data }); // add corresponding village to record
+        });
+    }
+    this.setState({ data: data });
+  }
 
   handleStateChange = async (event, value) => {
     if (value !== null) {
@@ -259,15 +289,15 @@ export class Members extends React.Component {
     let searchData = "";
     if (this.state.filterState) {
       searchData += searchData ? "&&" : "";
-      searchData += "state=" + this.state.filterState.id;
+      searchData += "addresses.state=" + this.state.filterState.id;
     }
     if (this.state.filterDistrict) {
       searchData += searchData ? "&&" : "";
-      searchData += "district=" + this.state.filterDistrict.id;
+      searchData += "addresses.district=" + this.state.filterDistrict.id;
     }
     if (this.state.filterVillage) {
       searchData += searchData ? "&&" : "";
-      searchData += "villages=" + this.state.filterVillage.id;
+      searchData += "addresses.village=" + this.state.filterVillage.id;
     }
     if (this.state.filterShg) {
       searchData += searchData ? "&&" : "";
@@ -297,7 +327,8 @@ export class Members extends React.Component {
             newDataArray.push(e);
           }
         });
-        this.setState({ data: newDataArray });
+        this.getDistrictData(newDataArray);
+        this.getVillageData(newDataArray);
       })
       .catch((error) => {
         console.log(error);
@@ -454,12 +485,12 @@ export class Members extends React.Component {
       },
       {
         name: "Village",
-        selector: "villages[0].name",
+        selector: "addresses[2].village.name",
         sortable: true,
       },
       {
         name: "District",
-        selector: "district.name",
+        selector: "addresses[1].district.name",
         sortable: true,
       },
       {
