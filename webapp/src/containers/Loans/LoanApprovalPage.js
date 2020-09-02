@@ -16,6 +16,7 @@ import * as constants from "../../constants/Constants";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
+import { APPROVE_LOAN_BREADCRUMBS } from "./config";
 
 const useStyles = (theme) => ({
   root: {
@@ -366,7 +367,7 @@ class LoanApprovalPage extends Component {
     let statusValue = this.state.values.selectedStatus;
 
     return (
-      <Layout>
+      <Layout breadcrumbs={APPROVE_LOAN_BREADCRUMBS}>
         <Grid>
           <div className="App">
             <h5 className={style.loan}>LOANS</h5>
