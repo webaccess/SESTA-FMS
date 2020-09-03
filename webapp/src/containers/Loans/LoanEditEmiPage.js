@@ -332,7 +332,7 @@ class LoanEditEmiPage extends Component {
                         : null
                     }
                     value={this.state.values.actual_payment_date || ""}
-                    // format={"dd MMM yyyy"}
+                    format={"dd MMM yyyy"}
                     onChange={(value) =>
                       this.setState({
                         values: { ...this.state.values, actual_payment_date: value }
