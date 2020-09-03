@@ -15,15 +15,15 @@ import auth from "../../components/Auth/Auth";
 const authRoute = ({ component: Component, ...rest }) => (
   <Route
     {...rest}
-    render={props =>
-      ["login", "reset-password", "forgot-password"].indexOf(
+    render={(props) =>
+      ["login", "reset-password", "forgot-password", "verify-otp"].indexOf(
         props.match.params.authType
       ) > -1 ? (
         auth.getToken() !== null ? (
           <Redirect
             to={{
               pathname: "/",
-              state: { from: props.location }
+              state: { from: props.location },
             }}
           />
         ) : (

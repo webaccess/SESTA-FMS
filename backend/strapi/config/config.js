@@ -51,4 +51,62 @@ bookshelf.model("roleModule", {
   tableName: "modules_roles__roles_modules",
 });
 
+bookshelf.model("activitytype", {
+  tableName: "activitytypes",
+  requireFetch: false,
+});
+
+bookshelf.model("loan_model", {
+  requireFetch: false,
+  tableName: "loan_models",
+  emidetail() {
+    return this.hasMany("emidetail", "loan_model", "id");
+  },
+  loantask() {
+    return this.hasMany("loantask", "loan_model", "id");
+  },
+});
+
+bookshelf.model("emidetail", {
+  tableName: "emidetails",
+  requireFetch: false,
+  loan_model() {
+    return this.belongsTo("loan_model", "loan_model", "id");
+  },
+});
+
+bookshelf.model("loantask", {
+  tableName: "loantasks",
+  requireFetch: false,
+  activitytype() {
+    return this.hasOne("activitytype", "loantask", "id");
+  },
+  loan_model() {
+    return this.belongsTo("loan_model", "loan_model", "id");
+  },
+});
+
+bookshelf.model("individual", {
+  tableName: "individuals",
+  requireFetch: false,
+});
+
+bookshelf.model("organization", {
+  tableName: "organizations",
+  requireFetch: false,
+});
+
+bookshelf.model("contact", {
+  tableName: "contacts",
+  requireFetch: false,
+  individual() {
+    return this.hasOne("individual", "contact", "id");
+  },
+});
+
+bookshelf.model("user", {
+  tableName: "users-permissions_user",
+  requireFetch: false,
+});
+
 module.exports = bookshelf;
