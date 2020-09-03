@@ -20,12 +20,8 @@ import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autotext from "../../components/Autotext/Autotext";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import DateFnsUtils from "@date-io/date-fns";
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker,
-} from "@material-ui/pickers";
 import { constants } from "buffer";
+import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 
 class ActivityPage extends Component {
   constructor(props) {
@@ -103,6 +99,12 @@ class ActivityPage extends Component {
         nominee: {
           required: { value: "true", message: "Nominee is required" },
         },
+        selectedDate: {
+          required: {
+            value: "true",
+            message: "Date is required",
+          },
+        },
       },
       errors: {},
       editPage: [
@@ -117,8 +119,8 @@ class ActivityPage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/" +
-            this.state.editPage[1]
+          "crm-plugin/contact/" +
+          this.state.editPage[1]
         )
         .then((res) => {
           this.handleStateChange(res.data.state);
@@ -131,17 +133,29 @@ class ActivityPage extends Component {
               lastName: res.data.individual.last_name,
               husbandName: res.data.individual.partner_name,
               address: res.data.address_1,
-              addDistrict: res.data.district.id,
-              addState: res.data.state.id,
               addBlock: res.data.block,
               addGp: res.data.gp,
-              addVillage: res.data.villages[0].id,
               addPincode: res.data.pincode,
               addPhone: res.data.phone,
               addEmail: res.data.email,
               addShg: res.data.individual.shg,
             },
           });
+
+          if (this.state.getState.length > 0) {
+            this.state.getState.map(state => {
+              if (state.id === res.data.state.id) {
+                this.setState({
+                  values: {
+                    ...this.state.values,
+                    addState: res.data.state.id,
+                    addDistrict: res.data.district.id,
+                    addVillage: res.data.villages[0].id,
+                  },
+                });
+              }
+            })
+          }
 
           // if isShareholder is checked
           if (res.data.shareinformation) {
@@ -196,15 +210,15 @@ class ActivityPage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/?individual=" +
-            auth.getUserInfo().contact.individual
+          "crm-plugin/contact/?individual=" +
+          auth.getUserInfo().contact.individual
         )
         .then((res) => {
           serviceProvider
             .serviceProviderForGetRequest(
               process.env.REACT_APP_SERVER_URL +
-                "crm-plugin/contact/?id=" +
-                res.data[0].individual.vo
+              "crm-plugin/contact/?id=" +
+              res.data[0].individual.vo
             )
             .then((response) => {
               this.setState({ getShgs: response.data[0].org_vos });
@@ -250,7 +264,7 @@ class ActivityPage extends Component {
       delete allValiations["nominee"];
       delete allValiations["shareAmt"];
       delete allValiations["noOfShares"];
-      delete allValiations["certificateNo"];
+      delete allValiations["selectedDate"];
     }
     map(allValiations, (validation, key) => {
       let value = values[key] ? values[key] : "";
@@ -273,27 +287,32 @@ class ActivityPage extends Component {
       this.setState({
         values: { ...this.state.values, addState: value.id },
       });
-      let stateId = value.id;
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
+      if (value.is_active == true) {
+        let stateId = value.id;
+        serviceProvider
+          .serviceProviderForGetRequest(
+            process.env.REACT_APP_SERVER_URL +
             "crm-plugin/districts/?is_active=true&&state.id=" +
             stateId
-        )
-        .then((res) => {
-          this.setState({ getDistrict: res.data });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      this.setState({ stateSelected: true });
+          )
+          .then((res) => {
+            this.setState({ getDistrict: res.data });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        this.setState({ stateSelected: true });
+      }
     } else {
       this.setState({
         values: {
           ...this.state.values,
           addState: "",
           addDistrict: "",
+          addVillage: ""
         },
+        getDistrict: [],
+        getVillage: []
       });
       this.setState({ stateSelected: false });
     }
@@ -308,8 +327,8 @@ class ActivityPage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/villages/?is_active=true&&district.id=" +
-            districtId
+          "crm-plugin/villages/?is_active=true&&district.id=" +
+          districtId
         )
         .then((res) => {
           this.setState({ getVillage: res.data });
@@ -325,6 +344,7 @@ class ActivityPage extends Component {
           addDistrict: "",
           addVillage: "",
         },
+        getVillage: []
       });
       this.setState({ districtSelected: false });
     }
@@ -501,7 +521,6 @@ class ActivityPage extends Component {
     let shareCertiNo = this.state.values.certificateNo;
     let shareNominee = this.state.values.nominee;
     let shareDate = this.state.values.selectedDate;
-
     let postShareData = {
       contact: data.id,
       nominee_name: shareNominee,
@@ -510,7 +529,7 @@ class ActivityPage extends Component {
       certificate_no: shareCertiNo,
       date: shareDate,
     };
-
+    if (Object.keys(this.state.errors).length > 0) return;
     if (data.shareinformation) {
       // update share info in shareinformation table
       if (this.state.isShareholder) {
@@ -520,7 +539,7 @@ class ActivityPage extends Component {
             this.state.shareInfoId,
             postShareData
           )
-          .then((res) => {})
+          .then((res) => { })
           .catch((error) => {
             console.log(error);
           });
@@ -531,7 +550,7 @@ class ActivityPage extends Component {
               process.env.REACT_APP_SERVER_URL + "shareinformations",
               this.state.shareInfoId
             )
-            .then((res) => {})
+            .then((res) => { })
             .catch((error) => {
               console.log(error);
             });
@@ -544,7 +563,7 @@ class ActivityPage extends Component {
           process.env.REACT_APP_SERVER_URL + "shareinformations/",
           postShareData
         )
-        .then((res) => {})
+        .then((res) => { })
         .catch((error) => {
           console.log(error);
         });
@@ -680,10 +699,10 @@ class ActivityPage extends Component {
                     value={
                       addState
                         ? stateFilter[
-                            stateFilter.findIndex(function (item, i) {
-                              return item.id === addState;
-                            })
-                          ] || null
+                        stateFilter.findIndex(function (item, i) {
+                          return item.id === addState;
+                        })
+                        ] || null
                         : null
                     }
                     error={this.hasError("addState")}
@@ -717,10 +736,10 @@ class ActivityPage extends Component {
                     value={
                       addDistrict
                         ? districtFilter[
-                            districtFilter.findIndex(function (item, i) {
-                              return item.id === addDistrict;
-                            })
-                          ] || null
+                        districtFilter.findIndex(function (item, i) {
+                          return item.id === addDistrict;
+                        })
+                        ] || null
                         : null
                     }
                     error={this.hasError("addDistrict")}
@@ -728,8 +747,8 @@ class ActivityPage extends Component {
                       this.hasError("addDistrict")
                         ? this.state.errors.addDistrict[0]
                         : this.state.stateSelected
-                        ? null
-                        : "Please select the state first"
+                          ? null
+                          : "Please select the state first"
                     }
                     renderInput={(params) => (
                       <Input
@@ -787,10 +806,10 @@ class ActivityPage extends Component {
                     value={
                       addVillage
                         ? villageFilter[
-                            villageFilter.findIndex(function (item, i) {
-                              return item.id === addVillage;
-                            })
-                          ] || null
+                        villageFilter.findIndex(function (item, i) {
+                          return item.id === addVillage;
+                        })
+                        ] || null
                         : null
                     }
                     error={this.hasError("addVillage")}
@@ -798,8 +817,8 @@ class ActivityPage extends Component {
                       this.hasError("addVillage")
                         ? this.state.errors.addVillage[0]
                         : this.state.districtSelected
-                        ? null
-                        : "Please select the district first"
+                          ? null
+                          : "Please select the district first"
                     }
                     renderInput={(params) => (
                       <Input
@@ -855,8 +874,8 @@ class ActivityPage extends Component {
                     helperText={
                       this.hasError("addEmail")
                         ? this.state.errors["addEmail"].map((error) => {
-                            return error + " ";
-                          })
+                          return error + " ";
+                        })
                         : null
                     }
                     value={this.state.values.addEmail || ""}
@@ -876,25 +895,25 @@ class ActivityPage extends Component {
                     }}
                     value={
                       this.state.loggedInUserRole ===
-                      "CSP (Community Service Provider)"
+                        "CSP (Community Service Provider)"
                         ? addShg
                           ? this.state.isCancel === true
                             ? null
                             : shgFilters[
-                                shgFilters.findIndex(function (item, i) {
-                                  return item.contact === addShg;
-                                })
-                              ] || null
+                            shgFilters.findIndex(function (item, i) {
+                              return item.contact === addShg;
+                            })
+                            ] || null
                           : null
                         : addShg
-                        ? this.state.isCancel === true
-                          ? null
-                          : shgFilters[
-                              shgFilters.findIndex(function (item, i) {
-                                return item.id === addShg;
-                              })
+                          ? this.state.isCancel === true
+                            ? null
+                            : shgFilters[
+                            shgFilters.findIndex(function (item, i) {
+                              return item.id === addShg;
+                            })
                             ] || null
-                        : null
+                          : null
                     }
                     error={this.hasError("addShg")}
                     helperText={
@@ -978,28 +997,26 @@ class ActivityPage extends Component {
                       />
                     </Grid>
                     <Grid item md={6} xs={12}>
-                      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                        <KeyboardDatePicker
-                          autoOk
-                          inputVariant="outlined"
-                          margin="normal"
-                          id="date-picker-dialog"
-                          label="Date"
-                          format="MM/dd/yyyy"
-                          value={this.state.values.selectedDate}
-                          onChange={(value) =>
-                            this.setState({
-                              values: {
-                                ...this.state.values,
-                                selectedDate: value,
-                              },
-                            })
-                          }
-                          KeyboardButtonProps={{
-                            "aria-label": "change date",
-                          }}
-                        />
-                      </MuiPickersUtilsProvider>
+                      <Datepicker
+                        label="Date*"
+                        name="selectedDate"
+                        value={this.state.values.selectedDate || ""}
+                        format={"dd MMM yyyy"}
+                        error={this.hasError("selectedDate")}
+                        helperText={
+                          this.hasError("selectedDate")
+                            ? this.state.errors.selectedDate[0]
+                            : null
+                        }
+                        onChange={(value) =>
+                          this.setState({
+                            values: {
+                              ...this.state.values,
+                              selectedDate: value,
+                            },
+                          })
+                        }
+                      />
                     </Grid>
                     <Grid item md={6} xs={12}>
                       <Input

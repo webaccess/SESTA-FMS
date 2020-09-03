@@ -12,9 +12,13 @@ const SMS_PASSWORD = process.env.SMS_PASSWORD;
 const SMS_FROM = process.env.SMS_FROM;
 module.exports = {
   sendOTP: async (mobileNo, OTP) => {
+    let content =
+      "Your OTP for forgot password is " +
+      OTP +
+      ". This is valid for 15 minutes.";
     let config = {
       method: "post",
-      url: `${URL}?username=${SMS_USERNAME}&password=${SMS_PASSWORD}&to=${mobileNo}&from=${SMS_FROM}&text=${OTP}&dlr-mask=19&dlr-url`,
+      url: `${URL}?username=${SMS_USERNAME}&password=${SMS_PASSWORD}&to=${mobileNo}&from=${SMS_FROM}&text=${content}&dlr-mask=19&dlr-url`,
     };
 
     axios(config)

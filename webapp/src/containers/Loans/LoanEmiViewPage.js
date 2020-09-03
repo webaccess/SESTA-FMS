@@ -9,6 +9,7 @@ import Moment from "moment";
 import { VIEW_LOAN_EMI_BREADCRUMBS } from "./config";
 import Button from "../../components/UI/Button/Button";
 import { Link } from "react-router-dom";
+import style from "./Loans.module.css";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -101,9 +102,7 @@ class LoanEmiViewPage extends Component {
                 amount: amount,
                 duration: duration,
                 emi: "₹" + emi.toLocaleString(),
-                pendingAmount: pendingAmount
-                  ? pendingAmount
-                  : "-",
+                pendingAmount: pendingAmount ? pendingAmount : "-",
                 loanEndsOn: loanEndsOn
                   ? Moment(loanEndsOn).format("DD MMM YYYY")
                   : "-",
@@ -135,23 +134,31 @@ class LoanEmiViewPage extends Component {
     let paid = 0;
     loanEmiData.map((emidata) => {
       if (emidata.fine !== null || emidata.fine !== 0) {
-        emidata.totalPaid = (emidata.fine + emidata.actual_principal + emidata.actual_interest).toLocaleString();
+        emidata.totalPaid = (
+          emidata.fine +
+          emidata.actual_principal +
+          emidata.actual_interest
+        ).toLocaleString();
       } else {
-        emidata.totalPaid = (emidata.actual_principal + emidata.actual_interest).toLocaleString();
+        emidata.totalPaid = (
+          emidata.actual_principal + emidata.actual_interest
+        ).toLocaleString();
       }
       let totalLoanAmnt =
         emidata.expected_principal + emidata.expected_interest;
-      emidata.outstanding =
-        (totalLoanAmnt - (emidata.actual_principal + emidata.actual_interest)).toLocaleString();
+      emidata.outstanding = (
+        totalLoanAmnt -
+        (emidata.actual_principal + emidata.actual_interest)
+      ).toLocaleString();
 
-      emidata.totalPaid = parseInt(emidata.totalPaid.replace(/,/g, ''));
+      emidata.totalPaid = parseInt(emidata.totalPaid.replace(/,/g, ""));
       paid = paid + emidata.totalPaid;
     });
 
     // Pending Amount = Actual amount + Fine - Total installment paid
     let pendingAmount;
     if (data.amount) {
-      let totalamount = parseInt(data.amount.replace(/,/g, ''));
+      let totalamount = parseInt(data.amount.replace(/,/g, ""));
       pendingAmount = totalamount - paid;
       if (pendingAmount < 0) {
         pendingAmount = 0;
@@ -160,9 +167,15 @@ class LoanEmiViewPage extends Component {
     }
 
     // get Loan Ends On Date
-    let sortedPaymentDate = loanAppData.loan_app_installments.sort((a, b) => new Date(...a.payment_date.split('/').reverse()) - new Date(...b.payment_date.split('/').reverse()));
+    let sortedPaymentDate = loanAppData.loan_app_installments.sort(
+      (a, b) =>
+        new Date(...a.payment_date.split("/").reverse()) -
+        new Date(...b.payment_date.split("/").reverse())
+    );
     let len = sortedPaymentDate.length - 1;
-    data.loanEndsOn = Moment(sortedPaymentDate[len].payment_date).format('DD MMM YYYY');
+    data.loanEndsOn = Moment(sortedPaymentDate[len].payment_date).format(
+      "DD MMM YYYY"
+    );
 
     const Usercolumns = [
       {
@@ -170,72 +183,74 @@ class LoanEmiViewPage extends Component {
         selector: "payment_date",
         sortable: true,
         cell: (row) =>
-          row.payment_date ?
-            Moment(row.payment_date).format('DD MMM YYYY') : null
+          row.payment_date
+            ? Moment(row.payment_date).format("DD MMM YYYY")
+            : null,
       },
       {
-        name: "Principle",
+        name: "Principal",
         selector: "expected_principal",
         sortable: true,
         cell: (row) =>
-          row.expected_principal ?
-            "₹" + row.expected_principal.toLocaleString() : null
+          row.expected_principal
+            ? "₹" + row.expected_principal.toLocaleString()
+            : null,
       },
       {
         name: "Interest",
         selector: "expected_interest",
         sortable: true,
         cell: (row) =>
-          row.expected_interest ?
-            "₹" + row.expected_interest.toLocaleString() : null
+          row.expected_interest
+            ? "₹" + row.expected_interest.toLocaleString()
+            : null,
       },
       {
         name: "Payment Date",
         selector: "actual_payment_date",
         sortable: true,
         cell: (row) =>
-          row.actual_payment_date ?
-            Moment(row.actual_payment_date).format('DD MMM YYYY') : null
+          row.actual_payment_date
+            ? Moment(row.actual_payment_date).format("DD MMM YYYY")
+            : null,
       },
       {
-        name: "Priniciple Paid",
+        name: "Prinicipal Paid",
         selector: "actual_principal",
         sortable: true,
         cell: (row) =>
-          row.actual_principal ?
-            "₹" + row.actual_principal.toLocaleString() : null
+          row.actual_principal
+            ? "₹" + row.actual_principal.toLocaleString()
+            : null,
       },
       {
         name: "Interest Paid",
         selector: "actual_interest",
         sortable: true,
         cell: (row) =>
-          row.actual_interest ?
-            "₹" + row.actual_interest.toLocaleString() : null
+          row.actual_interest
+            ? "₹" + row.actual_interest.toLocaleString()
+            : null,
       },
       {
         name: "Fine",
         selector: "fine",
         sortable: true,
-        cell: (row) =>
-          row.fine ?
-            "₹" + row.fine.toLocaleString() : null
+        cell: (row) => (row.fine ? "₹" + row.fine.toLocaleString() : null),
       },
       {
         name: "Total Paid",
         selector: "totalPaid",
         sortable: true,
         cell: (row) =>
-          row.totalPaid ?
-            "₹" + row.totalPaid.toLocaleString() : null
+          row.totalPaid ? "₹" + row.totalPaid.toLocaleString() : null,
       },
       {
         name: "Outstanding",
         selector: "outstanding",
         sortable: true,
         cell: (row) =>
-          row.outstanding ?
-            "₹" + row.outstanding.toLocaleString() : null
+          row.outstanding ? "₹" + row.outstanding.toLocaleString() : null,
       },
     ];
     let selectors = [];
@@ -245,15 +260,10 @@ class LoanEmiViewPage extends Component {
     let columnsvalue = selectors[0];
 
     return (
-      <Layout
-        breadcrumbs={
-          VIEW_LOAN_EMI_BREADCRUMBS
-        }
-      >
+      <Layout breadcrumbs={VIEW_LOAN_EMI_BREADCRUMBS}>
         <Grid>
           <div className="App">
-            <h5>LOAN</h5>
-
+            <h5 className={style.loan}>LOANS</h5>
             <div style={{ display: "flex" }}>
               <h2 style={{ margin: "13px" }}>{data.loanee}</h2>
               <div className={classes.dataRow}>
@@ -370,13 +380,9 @@ class LoanEmiViewPage extends Component {
               <h1>Loading...</h1>
             )}
           <br />
-          <Button
-            color="primary"
-            component={Link}
-            to="/loans"
-          >
+          <Button color="primary" component={Link} to="/loans">
             Done
-            </Button>
+          </Button>
         </Grid>
       </Layout>
     );

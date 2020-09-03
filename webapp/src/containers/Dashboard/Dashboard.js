@@ -10,7 +10,7 @@ class Dashboard extends Component {
     super(props);
   }
 
-  async componentDidMount() { }
+  async componentDidMount() {}
 
   render() {
     const { classes } = this.props;
@@ -18,8 +18,8 @@ class Dashboard extends Component {
 
     return (
       <Layout>
-        <h3>Welcome {userInfo.username}</h3>
-      
+        <h3 style={{ position: "relative", top: "20px" }}>DASHBOARD</h3>
+
         {userInfo.role.name === "FPO Admin" ? (
           <DashboardFPO></DashboardFPO>
         ) : null}
@@ -30,8 +30,8 @@ class Dashboard extends Component {
         ) : null}
 
         {userInfo.role.name === "CSP (Community Service Provider)" ? (
-            <DashboardCSP></DashboardCSP>
-          ) : null}
+          <DashboardCSP></DashboardCSP>
+        ) : null}
       </Layout>
     );
   }

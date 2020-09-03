@@ -11,6 +11,7 @@ import Autocomplete from "../../components/Autocomplete/Autocomplete";
 import DateTimepicker from "../../components/UI/DateTimepicker/DateTimepicker.js";
 import Button from "../../components/UI/Button/Button";
 import { Link } from "react-router-dom";
+import { CSVLink, CSVDownload } from "react-csv";
 
 const useStyles = (theme) => ({
   root: {},
@@ -31,6 +32,10 @@ const useStyles = (theme) => ({
     marginRight: theme.spacing(1),
     width: "230px",
   },
+  csvData: {
+    color: "white",
+    textDecoration: "none"
+  },
 });
 class DashboardViewMoreDetailsCSP extends Component {
   constructor(props) {
@@ -48,6 +53,7 @@ class DashboardViewMoreDetailsCSP extends Component {
       filterEndDate: "",
       remuneration: "",
       isCancel: false,
+      filename: [],
     };
   }
 
@@ -55,7 +61,7 @@ class DashboardViewMoreDetailsCSP extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "loan-application-installments?_sort=id:asc"
+        "loan-application-installments?_sort=id:asc"
       )
       .then((res) => {
         this.setState({ loanInstallmentData: res.data });
@@ -72,7 +78,7 @@ class DashboardViewMoreDetailsCSP extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activities?_sort=end_datetime:asc"
+        "crm-plugin/activities?_sort=start_datetime:desc"
       )
       .then((activityRes) => {
         this.getCspActivties(activityRes);
@@ -104,7 +110,7 @@ class DashboardViewMoreDetailsCSP extends Component {
   getCspActivties(activityRes) {
     let filteredArray = [];
     activityRes.data.map((e, i) => {
-      e.activityassignees.map((item) => {});
+      e.activityassignees.map((item) => { });
       e.activityassignees
         .filter((item) => item.contact === auth.getUserInfo().contact.id)
         .map((filteredData) => {
@@ -176,8 +182,8 @@ class DashboardViewMoreDetailsCSP extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activities/?" +
-          searchData
+        "crm-plugin/activities/?" +
+        searchData
       )
       .then((res) => {
         this.getCspActivties(res);
@@ -228,8 +234,8 @@ class DashboardViewMoreDetailsCSP extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "loan-application-installments?" +
-          searchData
+        "loan-application-installments?" +
+        searchData
       )
       .then((res) => {
         this.setState({ loanInstallmentData: res.data });
@@ -274,6 +280,21 @@ class DashboardViewMoreDetailsCSP extends Component {
     );
   }
 
+  formatCSVFilename() {
+    let filename = "";
+    if (this.state.filterActType) {
+      filename += "_of_" + this.state.filterActType.name;
+    }
+    if (this.state.filterStartDate) {
+      filename += "_from_" + Moment(this.state.filterStartDate).format('DDMMMYYYY');
+    }
+    if (this.state.filterEndDate) {
+      filename += "_to_" + Moment(this.state.filterEndDate).format('DDMMMYYYY');
+    }
+    filename = "csp_activities" + filename + ".csv";
+    this.setState({ filename: filename });
+  }
+
   render() {
     const { classes } = this.props;
     let activitytypeData = this.state.activitytypeData;
@@ -293,6 +314,20 @@ class DashboardViewMoreDetailsCSP extends Component {
     this.manageLoanEMIData(loanInstallmentData);
 
     let activitiesData = this.state.activitiesData;
+    let activityName, date, remuneration;
+    let csvActivityData = [];
+    let remunTotal = 0;
+    activitiesData.map(activity => {
+      remunTotal = remunTotal + activity.activitytype.remuneration;
+      activityName = activity.title;
+      date = Moment(activity.start_datetime).format('DD MMM YYYY');
+      remuneration = activity.activitytype.remuneration;
+      csvActivityData.push({ "Activity Name": activityName, "Date": date, "Remuneration": remuneration })
+    })
+    remunTotal = "₹" + (remunTotal).toLocaleString();
+    if (csvActivityData.length <= 0) {
+      csvActivityData = "There are no records to display";
+    }
 
     const Usercolumns = [
       {
@@ -353,6 +388,7 @@ class DashboardViewMoreDetailsCSP extends Component {
         name: "Remuneration",
         selector: "activitytype.remuneration",
         sortable: true,
+        cell: (row) => "₹" + (row.activitytype.remuneration).toLocaleString()
       },
     ];
 
@@ -361,6 +397,7 @@ class DashboardViewMoreDetailsCSP extends Component {
       selectors1.push(Usercolumns1[i]["selector"]);
     }
     let columnsvalue1 = selectors1[0];
+
     return (
       <Layout>
         <Grid>
@@ -458,6 +495,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                 </Button>
               </div>
             ) : null}
+
             {dbLoanData ? (
               <Table
                 title={"EMI Due"}
@@ -553,6 +591,9 @@ class DashboardViewMoreDetailsCSP extends Component {
               </div>
             ) : null}
             {dbActivitiesData ? (
+              <h5>TOTAL REMUNERATION : {remunTotal}</h5>
+            ) : null}
+            {dbActivitiesData ? (
               <Table
                 title={"Recent Activities"}
                 data={activitiesData}
@@ -571,6 +612,20 @@ class DashboardViewMoreDetailsCSP extends Component {
               />
             ) : null}
           </Grid>
+          <br />
+          {dbActivitiesData ? (
+            <Button>
+              <CSVLink
+                data={csvActivityData}
+                onClick={() => {
+                  this.formatCSVFilename(csvActivityData);
+                }}
+                filename={this.state.filename}
+                className={classes.csvData}>
+                Download
+              </CSVLink>
+            </Button>
+          ) : null}
         </Grid>
       </Layout>
     );

@@ -51,6 +51,10 @@ const useStyles = (theme) => ({
   Cancel: {
     marginRight: theme.spacing(1),
   },
+  menuName: {
+    position: "relative",
+    top: "20px",
+  },
 });
 
 export class States extends React.Component {
@@ -337,14 +341,17 @@ export class States extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>Manage States</h1>
-            <div className={classes.row}>
-              <div className={classes.buttonRow}>
-                <Button variant="contained" component={Link} to="/states/add">
-                  Add State
-                </Button>
+            <h5 className={classes.menuName}>MASTERS</h5>
+            <h2 className={style.title}>
+              Manage States
+              <div className={classes.floatRow}>
+                <div className={classes.buttonRow}>
+                  <Button variant="contained" component={Link} to="/states/add">
+                    Add State
+                  </Button>
+                </div>
               </div>
-            </div>
+            </h2>
             {this.props.location.addData ? (
               <Snackbar severity="success">State added successfully.</Snackbar>
             ) : null}

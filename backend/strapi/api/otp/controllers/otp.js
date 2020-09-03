@@ -43,15 +43,10 @@ module.exports = {
       .fetch()
       .then((model) => model);
 
-    console.log("loh", otpModel);
-
     const result = otpModel.toJSON ? otpModel.toJSON() : otpModel;
     let createdAt = new Date(result.created_at);
-    console.log("creat", createdAt);
-    console.log("today", today);
     const diff = (today.getTime() - createdAt.getTime()) / 60000;
-    console.log("diff", diff);
-    if (diff > 60.0) {
+    if (diff > 15.0) {
       return ctx.response.badRequest("OTP has expired");
     } else {
       await bookshelf
@@ -60,19 +55,17 @@ module.exports = {
             { is_verified: true },
             { patch: true, transacting: t }
           );
-          console.log("cclog");
+
           const resetPasswordToken = crypto.randomBytes(64).toString("hex");
-          console.log("cclog2");
+
           const contact = await strapi
             .query("contact", "crm-plugin")
             .findOne({ phone: contact_number });
 
-          console.log("cc", contact);
-
           if (!contact) {
             return Promise.reject("Contact does not exist");
           }
-          console.log("cclog3");
+
           await strapi
             .query("user", "users-permissions")
             .model.where({ id: contact.user.id })
@@ -80,7 +73,7 @@ module.exports = {
               { resetPasswordToken: resetPasswordToken },
               { patch: true, transacting: t }
             );
-          console.log("cclog4");
+
           return new Promise((resolve) => resolve(resetPasswordToken));
         })
         .then((success) => {

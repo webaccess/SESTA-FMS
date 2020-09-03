@@ -17,7 +17,7 @@
       {
         "customBootstrapClass": "col-md-12",
         "subheading": "",
-        "label": "Username",
+        "label": "Contact Number",
         "name": "identifier",
         "type": "text",
         "placeholder": "Mobile Number",

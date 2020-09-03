@@ -146,15 +146,15 @@ export class Loans extends React.Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?individual=" +
-          auth.getUserInfo().contact.individual
+            "crm-plugin/contact/?individual=" +
+            auth.getUserInfo().contact.individual
         )
         .then((res) => {
           serviceProvider
             .serviceProviderForGetRequest(
               process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/contact/?id=" +
-              res.data[0].individual.vo
+                "crm-plugin/contact/?id=" +
+                res.data[0].individual.vo
             )
             .then((response) => {
               this.setState({ getShg: response.data[0].org_vos });
@@ -252,8 +252,8 @@ export class Loans extends React.Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/individuals/?shg.id=" +
-          this.state.filterShg.id
+            "crm-plugin/individuals/?shg.id=" +
+            this.state.filterShg.id
         )
         .then((res) => {
           if (res.data.length > 0) {
@@ -464,8 +464,8 @@ export class Loans extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            LOAN
-            <h1 className={style.title}>Manage Loan Application</h1>
+            <h5 className={style.loan}>LOANS</h5>
+            <h2 className={style.title}>Manage Loan Application</h2>
           </div>
 
           {this.props.location.loanApplied ? (
@@ -613,8 +613,8 @@ export class Loans extends React.Component {
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (
-              <h1>Loading...</h1>
-            )}
+            <h1>Loading...</h1>
+          )}
         </Grid>
       </Layout>
     );
