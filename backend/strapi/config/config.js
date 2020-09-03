@@ -89,17 +89,11 @@ bookshelf.model("loantask", {
 bookshelf.model("individual", {
   tableName: "individuals",
   requireFetch: false,
-  //individual() {
-  //  return this.hasOne("individual", "contact", "id");
-  //},
 });
 
 bookshelf.model("organization", {
   tableName: "organizations",
   requireFetch: false,
-  //individual() {
-  //  return this.hasOne("individual", "contact", "id");
-  //},
 });
 
 bookshelf.model("contact", {

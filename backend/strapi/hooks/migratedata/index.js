@@ -1,46 +1,16 @@
-const fs = require("fs");
-const path = require("path");
 const bookshelf = require("../../config/config.js");
 const activitytypeData = require("./activitytypes.json");
 const loanModelData = require("./loanmodel.json");
 const emiDetailsData = require("./emidetails.json");
 const loanTasksData = require("./loantasks.json");
 const userData = require("./user.json");
-const { serialize } = require("v8");
-const bcrypt = require("bcryptjs");
-const request = require("request");
-var Promise = require("bluebird");
 
+// genreric method to iterate over data
 async function asyncForEach(array, callback) {
   for (let index = 0; index < array.length; index++) {
     await callback(array[index], index, array);
   }
 }
-let user = { password: "password" };
-let test;
-async function hashPassword(user) {
-  //return new Promise((resolve) => {
-  bcrypt.hash(`${user.password}`, 10, (err, hash) => {
-    console.log("passed pass, hash10", user.password, hash);
-    //resolve(hash);
-    test = hash;
-    return hash;
-  });
-  user.password = await bcrypt.hash(`${user.password}`, 10);
-  // let new = await bcrypt.hash(user.password, 10);
-  //});
-}
-
-console.log("user.password", user.password);
-let values = { password: "password" };
-
-let testP = hashPassword(values);
-console.log("testP", testP);
-if (values.password) {
-  //console.log("ePass9", ePass);
-}
-
-console.log("After hashPassword", values.password, values);
 
 module.exports = (strapi) => {
   const hook = {
@@ -56,6 +26,7 @@ module.exports = (strapi) => {
      */
 
     async initialize() {
+      // calls to all functions to store data
       (async () => {
         addIndividual();
         console.log("--After Individual\n");
@@ -67,73 +38,27 @@ module.exports = (strapi) => {
         console.log("--After User\n");
         addActivitytypes();
         console.log("--After activitytypes\n");
-        //addLoanModel();
-        //console.log("--After loanmodels\n");
-        //addEmiDetails();
-        //console.log("--After emidetails\n");
-        //addLoanTasks();
-        //console.log("--After loantasks\n");
+        addLoanModel();
+        console.log("--After loanmodels\n");
+        addEmiDetails();
+        console.log("--After emidetails\n");
+        addLoanTasks();
+        console.log("--After loantasks\n");
       })();
 
-      //await bookshelf
-      //  .model("user")
-      //  .forge({
-      //    username: "passtest",
-      //    provider: "local",
-      //    email: "ank@gmail.com",
-      //    password:
-      //      "$2a$10$Pg24BdHmzcje1fM/yRL6ceAxBlP5UX5Gf.Grw3Ki2r19rNB23fqeS",
-      //    confirmed: true,
-      //    blocked: false,
-      //    role: 2,
-      //    //contact: contactModel.id,
-      //  })
-      //  .save();
-
-      let values = { password: "password" };
-      let valuesP = "password";
-      //values.password = await strapi.plugins[
-      //  "users-permissions"
-      //].services.user.hashPassword(values.password);
-
-      values.password = bcrypt.hash(`${values.password}`, 10, (err, hash) => {
-        return hash;
-      });
-
-      console.log("values,newPass4", values.password);
-
-      valuesP = bcrypt.hash(values, 10, (err, hash) => {
-        // Now we can store the password hash in db.
-        return hash;
-      });
-      console.log("valuesP2", valuesP);
-
+      // add activity types
       async function addActivitytypes() {
-        console.log("user.password in activity type10", test);
-        console.log("testP in activity type10", testP);
-        //let fpoUserPresent;
-        //fpoUserPresent = await bookshelf
-        //  .model("user")
-        //  .where({ username: "fpouser" })
-        //  .fetch();
-        //const fpoUserId = fpoUserPresent.toJSON
-        //  ? fpoUserPresent.toJSON()
-        //  : fpoUserPresent;
-        //console.log("fpoUserId", fpoUserId);
         await asyncForEach(
           activitytypeData.activitytypes,
-          //org_fpo
           async (activitytype) => {
             const activitytypePresent = await bookshelf
               .model("activitytype")
               .where({ name: activitytype.name })
               .fetch();
-            // save countries
             try {
               if (activitytypePresent) {
                 console.log(`Skipping activitytype ${activitytype.name}...`);
               } else {
-                //console.log("fpoUserId inside loop 3", fpoUserId);
                 await bookshelf
                   .model("activitytype")
                   .forge({
@@ -142,7 +67,6 @@ module.exports = (strapi) => {
                     remuneration: activitytype.remuneration,
                     notation: activitytype.notation,
                     autocreated: activitytype.autocreated,
-                    //contact: fpoUserId.id,
                   })
                   .save()
                   .then(() => {
@@ -156,6 +80,7 @@ module.exports = (strapi) => {
         );
       }
 
+      // add loan models
       async function addLoanModel() {
         const fpoPresent = await bookshelf
           .model("contact")
@@ -199,6 +124,7 @@ module.exports = (strapi) => {
         }
       }
 
+      //add emi details
       async function addEmiDetails() {
         await asyncForEach(loanModelData.loan_model, async (loanmodel) => {
           const { emidetails } = loanmodel;
@@ -213,7 +139,6 @@ module.exports = (strapi) => {
                 const emiPresent = await bookshelf
                   .model("emidetail")
                   .where({
-                    //loan_model: emidetail.id,
                     principal: emidetail.principal,
                     interest: emidetail.interest,
                   })
@@ -258,6 +183,7 @@ module.exports = (strapi) => {
         });
       }
 
+      // add loan tasks
       async function addLoanTasks() {
         await asyncForEach(loanModelData.loan_model, async (loanmodel) => {
           const { loantasks } = loanmodel;
@@ -328,6 +254,7 @@ module.exports = (strapi) => {
         });
       }
 
+      // add individuals
       async function addIndividual() {
         await asyncForEach(userData.user, async (user) => {
           if (user.contact.contact_type === "individual") {
@@ -369,6 +296,7 @@ module.exports = (strapi) => {
         });
       }
 
+      // add organizations
       async function addOrganization() {
         await asyncForEach(userData.user, async (user) => {
           if (user.contact.contact_type === "organization") {
@@ -385,11 +313,6 @@ module.exports = (strapi) => {
                   `Skipping organization ${user.contact.organization.name} ---`
                 );
               } else {
-                console.log(
-                  "userData org--",
-                  user.contact.organization,
-                  user.contact.organization.name
-                );
                 await bookshelf
                   .model("organization")
                   .forge({
@@ -410,6 +333,7 @@ module.exports = (strapi) => {
         });
       }
 
+      // add contacts
       async function addContact() {
         let contactTypePresent;
         let fpoPresent;
@@ -430,10 +354,8 @@ module.exports = (strapi) => {
               .fetch();
           }
           try {
-            console.log("contactTypePresent 3", contactTypePresent);
             if (contactTypePresent) {
               if (user.username === "fpouser") {
-                console.log("In fpouser 3");
                 fpoPresent = await bookshelf
                   .model("organization")
                   .where({
@@ -442,7 +364,6 @@ module.exports = (strapi) => {
                   })
                   .fetch();
                 fpotId = fpoPresent.toJSON ? fpoPresent.toJSON() : fpoPresent;
-                console.log("fpotId 3", fpotId);
               }
 
               const contactPresent = await bookshelf
@@ -452,7 +373,6 @@ module.exports = (strapi) => {
                   contact_type: user.contact.contact_type,
                 })
                 .fetch();
-              console.log("contactPresent", contactPresent);
               if (contactPresent) {
                 console.log(`Skipping ${user.contact.name}...`);
               } else {
@@ -464,7 +384,6 @@ module.exports = (strapi) => {
                   user.contact.contact_type == "individual" &&
                   user.username !== "fpouser"
                 ) {
-                  console.log("-In superadmin loop 1");
                   await bookshelf
                     .model("contact")
                     .forge({
@@ -477,7 +396,6 @@ module.exports = (strapi) => {
                       console.log(`Added contact ${user.contact.name}`);
                     });
                 } else if (user.contact.contact_type == "organization") {
-                  console.log("-In fpo admin loop 1");
                   await bookshelf
                     .model("contact")
                     .forge({
@@ -488,18 +406,10 @@ module.exports = (strapi) => {
                     .save()
                     .then((res) => {
                       res.toJSON();
-                      console.log("res in fpo admin", res, res.id);
                       console.log(`Added contact ${user.contact.name}`);
                       linkFpo(res);
                     });
                 } else {
-                  console.log("-In fpo user 2nd loop new");
-                  console.log(
-                    "fpotId.id 3",
-                    fpoPresent,
-                    fpotId.id,
-                    contactId.id
-                  );
                   await bookshelf
                     .model("contact")
                     .forge({
@@ -521,6 +431,7 @@ module.exports = (strapi) => {
         });
       }
 
+      // links FPO to individual to create FPO user
       async function linkFpo(obj) {
         await bookshelf
           .model("individual")
@@ -534,6 +445,7 @@ module.exports = (strapi) => {
           });
       }
 
+      // add users
       async function addUser() {
         await asyncForEach(userData.user, async (user) => {
           const contactPresent = await bookshelf

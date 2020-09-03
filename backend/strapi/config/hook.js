@@ -11,7 +11,7 @@ module.exports = {
     autoload: {
       enabled: true,
     },
-    activitytypes: {
+    migratedata: {
       enabled: true,
     },
   },
