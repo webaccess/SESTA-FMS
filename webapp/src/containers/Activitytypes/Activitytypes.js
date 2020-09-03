@@ -8,8 +8,9 @@ import { Link } from "react-router-dom";
 import style from "./Activitytypes.module.css";
 import { Grid } from "@material-ui/core";
 import Input from "../../components/UI/Input/Input";
-import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
+import Modal from "../../components/UI/Modal/Modal.js";
+import Switch from "../../components/UI/Switch/Switch";
 
 const useStyles = (theme) => ({
   root: {},
@@ -65,6 +66,9 @@ export class Activitytypes extends React.Component {
       data: [],
       selectedid: 0,
       open: false,
+      isSetActive: false,
+      isSetInActive: false,
+      isActiveAllShowing: false,
       columnsvalue: [],
       DeleteData: false,
       properties: props,
@@ -72,6 +76,8 @@ export class Activitytypes extends React.Component {
       dataCellId: [],
       singleDelete: "",
       multipleDelete: "",
+      active: {},
+      allIsActive: [],
     };
   }
 
@@ -109,6 +115,10 @@ export class Activitytypes extends React.Component {
 
     return result;
   }
+
+  AllModalHandler = (event) => {
+    this.setState({ isActiveAllShowing: false });
+  };
 
   handleSearch() {
     let searchData = "";
@@ -186,8 +196,115 @@ export class Activitytypes extends React.Component {
     }
   };
 
-  handleClose = () => {
+  ActiveAll = (selectedId, selected) => {
+    if (selectedId.length !== 0) {
+      let numberOfIsActive = [];
+      for (let i in selected) {
+        numberOfIsActive.push(selected[i]["is_active"]);
+      }
+      this.setState({ allIsActive: numberOfIsActive });
+      let IsActive = "";
+      numberOfIsActive.forEach((element, index) => {
+        if (numberOfIsActive[index] === true) {
+          IsActive = false;
+        } else {
+          IsActive = true;
+        }
+
+        let setActiveId = selectedId[index];
+        serviceProvider
+          .serviceProviderForPutRequest(
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
+            setActiveId,
+            {
+              is_active: IsActive,
+            }
+          )
+          .then((res) => {
+            this.setState({ formSubmitted: true });
+            this.componentDidMount({ updateData: true });
+            this.props.history.push({
+              pathname: "/activitytypes",
+              updateData: true,
+            });
+            this.clearSelected(selected);
+          })
+          .catch((error) => {
+            this.setState({ formSubmitted: false });
+            if (error.response !== undefined) {
+              this.setState({
+                errorCode:
+                  error.response.data.statusCode +
+                  " Error- " +
+                  error.response.data.error +
+                  " Message- " +
+                  error.response.data.message +
+                  " Please try again!",
+              });
+            } else {
+              this.setState({
+                errorCode: "Network Error - Please try again!",
+              });
+            }
+            console.log(error);
+          });
+      });
+    }
+  };
+
+  clearSelected = (selected) => {
+    let clearselected = "";
+  };
+
+  confirmActive = (event) => {
+    this.setState({ isActiveAllShowing: true });
+    this.setState({ setActiveId: event.target.id });
+    this.setState({ IsActive: event.target.checked });
+  };
+
+  handle = () => {
     this.setState({ open: false });
+  };
+
+  handleActive = (event) => {
+    this.setState({ isActiveAllShowing: false });
+    let setActiveId = this.state.setActiveId;
+    let IsActive = this.state.IsActive;
+    serviceProvider
+      .serviceProviderForPutRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
+        setActiveId,
+        {
+          is_active: IsActive,
+        }
+      )
+      .then((res) => {
+        this.setState({ formSubmitted: true });
+        this.setState({ open: true });
+        this.componentDidMount({ editData: true });
+        this.props.history.push({ pathname: "/activitytypes", editData: true });
+      })
+      .catch((error) => {
+        this.setState({ formSubmitted: false });
+        if (error.response !== undefined) {
+          this.setState({
+            errorCode:
+              error.response.data.statusCode +
+              " Error- " +
+              error.response.data.error +
+              " Message- " +
+              error.response.data.message +
+              " Please try again!",
+          });
+        } else {
+          this.setState({ errorCode: "Network Error - Please try again!" });
+        }
+        console.log(error);
+      });
+  };
+
+  closeActiveAllModalHandler = (event) => {
+    this.setState({ isActiveAllShowing: false });
   };
 
   handleCheckBox = (event) => {
@@ -206,6 +323,21 @@ export class Activitytypes extends React.Component {
         name: "Remuneration",
         selector: "remuneration",
         sortable: true,
+      },
+      {
+        name: "Active",
+        cell: (cell) => (
+          <Switch
+            id={cell.id}
+            onChange={(e) => {
+              this.confirmActive(e);
+            }}
+            defaultChecked={cell.is_active}
+            Small={true}
+          />
+        ),
+        sortable: true,
+        button: true,
       },
     ];
 
@@ -243,6 +375,16 @@ export class Activitytypes extends React.Component {
             ) : null}
             {this.props.location.editData ? (
               <Snackbar severity="success">
+                Activity type edited successfully.
+              </Snackbar>
+            ) : null}
+            {this.props.location.updateData ? (
+              <Snackbar
+                ref={this.snackbar}
+                open={true}
+                autoHideDuration={4000}
+                severity="success"
+              >
                 Activity type edited successfully.
               </Snackbar>
             ) : null}
@@ -297,9 +439,11 @@ export class Activitytypes extends React.Component {
             <br></br>
             {data ? (
               <Table
+                showSetAllActive={true}
                 title={"Activitytypes"}
                 showSearch={false}
                 filterData={true}
+                allIsActive={this.state.allIsActive}
                 Searchplaceholder={"Search by Activity Type Name"}
                 filterBy={["name"]}
                 filters={filters}
@@ -309,6 +453,8 @@ export class Activitytypes extends React.Component {
                 DeleteData={this.DeleteData}
                 clearSelected={this.clearSelected}
                 DeleteAll={this.DeleteAll}
+                handleActive={this.handleActive}
+                ActiveAll={this.ActiveAll}
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 selectableRows
@@ -318,6 +464,24 @@ export class Activitytypes extends React.Component {
             ) : (
               <h1>Loading...</h1>
             )}
+            <Modal
+              className="modal"
+              show={this.state.isActiveAllShowing}
+              close={this.closeActiveAllModalHandler}
+              displayCross={{ display: "none" }}
+              handleEventChange={true}
+              event={this.handleActive}
+              footer={{
+                footerSaveName: "OKAY",
+                footerCloseName: "CLOSE",
+                displayClose: { display: "true" },
+                displaySave: { display: "true" },
+              }}
+            >
+              {this.state.IsActive
+                ? " Do you want to activate selected activity type ?"
+                : " Do you want to deactivate selected activity type ?"}
+            </Modal>
           </div>
         </Grid>
       </Layout>

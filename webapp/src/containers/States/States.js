@@ -250,10 +250,6 @@ export class States extends React.Component {
     this.setState({ open: false });
   };
 
-  handleClose = () => {
-    this.setState({ open: false });
-  };
-
   handleActive = (event) => {
     this.setState({ isActiveAllShowing: false });
     let setActiveId = this.state.setActiveId;
