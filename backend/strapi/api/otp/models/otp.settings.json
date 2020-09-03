@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "otps",
+  "info": {
+    "name": "otp"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "contact_number": {
+      "type": "string",
+      "required": true,
+      "maxLength": 10,
+      "minLength": 10
+    },
+    "is_verified": {
+      "type": "boolean",
+      "default": false
+    },
+    "otp": {
+      "type": "integer"
+    }
+  }
+}
