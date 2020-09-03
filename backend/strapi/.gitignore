@@ -111,3 +111,4 @@ exports
 .cache
 build
 plugins/crm-plugin/
+.env
