@@ -144,7 +144,8 @@ const Table = (props) => {
     valueForMemberPage !== "Loans" &&
     valueForMemberPage !== "ViewLoanEMI" &&
     valueForMemberPage !== "EMI Due" &&
-    valueForMemberPage !== "Recent Activities"
+    valueForMemberPage !== "Recent Activities" &&
+    valueForMemberPage !== "CSP Report"
   ) {
     column = [
       {
@@ -333,8 +334,8 @@ const Table = (props) => {
                   </IconButton>
                 </Tooltip>
               ) : (
-                ""
-              )}
+                  ""
+                )}
             </div>
           </div>
         ),
@@ -439,8 +440,8 @@ const Table = (props) => {
             />
           </div>
         ) : (
-          <p></p>
-        )}
+            <p></p>
+          )}
         <Card>
           <DataTable
             data={filteredData}
@@ -461,10 +462,10 @@ const Table = (props) => {
               props.noDataComponent ? (
                 props.noDataComponent
               ) : (
-                <p>
-                  There are no records to display in <b>{props.title}</b>
-                </p>
-              )
+                  <p>
+                    There are no records to display in <b>{props.title}</b>
+                  </p>
+                )
             }
             noHeader={selected.length === 0 || selected.length < 2}
             conditionalRowStyles={props.conditionalRowStyles}
@@ -491,11 +492,11 @@ const Table = (props) => {
               Do you want to delete selected <b>{props.title}</b>
             </p>
           ) : (
-            <p>
-              {" "}
-              {props.DeleteMessage} <b>{dataName}</b> ?
-            </p>
-          )}
+              <p>
+                {" "}
+                {props.DeleteMessage} <b>{dataName}</b> ?
+              </p>
+            )}
         </Modal>
         <Modal
           className="modal"

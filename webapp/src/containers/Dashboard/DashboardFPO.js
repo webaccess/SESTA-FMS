@@ -10,22 +10,12 @@ import IconButton from "@material-ui/core/IconButton";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import PersonIcon from "@material-ui/icons/Person";
 import PeopleIcon from "@material-ui/icons/People";
-import HomeWorkIcon from "@material-ui/icons/HomeWork";
+import NaturePeopleIcon from "@material-ui/icons/NaturePeople";
 import MoneyIcon from "@material-ui/icons/Money";
 import Moment from "moment";
 import { Link } from "react-router-dom";
 
 const useStyles = (theme) => ({
-  member: {
-    color: "black",
-    fontSize: "10px",
-  },
-  mainContent: {
-    padding: "20px",
-  },
-  fieldValues: {
-    fontSize: "20px !important",
-  },
   Icon: {
     fontSize: "40px",
     color: "#008000",
@@ -43,10 +33,24 @@ const useStyles = (theme) => ({
     color: "white",
   },
   evenBlock: {
-    backgroundColor: "#00643C",
+    backgroundColor: "#112e23",
     padding: "15px",
     textAlign: "center",
     color: "white",
+  },
+  labelValues: {
+    color: "#028941",
+    fontSize: "46px",
+    fontWeight: "bold",
+    marginBottom: "0px",
+    marginTop: "0px",
+    lineHeight: "1.5",
+  },
+  fieldValues: {
+    color: "#028941",
+    fontSize: "32px",
+    fontWeight: "bold",
+    lineHeight: "1.5",
   },
 });
 
@@ -60,7 +64,7 @@ class DashboardForFPO extends Component {
       approvedLoans: 0,
       pendingLoans: 0,
       loanDistributedAmounts: [],
-      totalLoanDistributed: "",
+      totalLoanDistributed: 0,
       loansTableData: [],
       loansAllDetails: [],
       purposesValues: [],
@@ -263,83 +267,125 @@ class DashboardForFPO extends Component {
     }
 
     return (
-      <div className="App">
+      <div className="App" style={{ paddingTop: "15px" }}>
         <Grid container style={{ border: "1px solid #ccc" }}>
-          <Grid item md={3} spacing={3} style={{ backgroundColor: "#e5e9e3" }}>
+          <Grid item md={3} spacing={3}>
             <div className={classes.oddBlock}>
               <PersonIcon className={classes.Icon} />
               <h3 style={{ color: "white", marginBottom: "5px" }}>MEMBERS </h3>
-              <h2 style={{ color: "green" }}>
+              <h2 className={classes.labelValues}>
                 {this.state.memberData.toLocaleString()}
               </h2>
             </div>
+          </Grid>
+
+          <Grid item md={3} spacing={3}>
+            <div className={classes.evenBlock}>
+              <PeopleIcon className={classes.Icon} />
+              <h3 style={{ color: "white", marginBottom: "5px" }}>
+                SELF HELP GROUPS{" "}
+              </h3>
+              <h2 className={classes.labelValues}>
+                {this.state.shgData.toLocaleString()}
+              </h2>
+            </div>
+          </Grid>
+
+          <Grid item md={3} spacing={3}>
+            <div className={classes.oddBlock}>
+              <NaturePeopleIcon className={classes.Icon} />
+              <h3 style={{ color: "white", marginBottom: "5px" }}>
+                {" "}
+                VILLAGE ORGANIZATIONS{" "}
+              </h3>
+              <h2 className={classes.labelValues}>
+                {this.state.voData.toLocaleString()}
+              </h2>
+            </div>
+          </Grid>
+
+          <Grid item md={3} spacing={3}>
+            <div className={classes.evenBlock}>
+              <MoneyIcon className={classes.Icon} />
+              <h3 style={{ color: "white", marginBottom: "5px" }}>
+                LOAN APPLICATIONS{" "}
+              </h3>
+              <div style={{ display: "inline-flex" }}>
+                <div
+                  style={{ borderRight: "1px solid #fff", padding: "0px 15px" }}
+                >
+                  <h5 style={{ display: "block", margin: "0px" }}>APPROVED</h5>
+                  <span className={classes.fieldValues}>
+                    {this.state.approvedLoans}
+                  </span>
+                </div>
+                <div style={{ padding: "0px 15px" }}>
+                  <h5 style={{ display: "block", margin: "0px" }}>PENDING</h5>
+                  <span className={classes.fieldValues}>
+                    {this.state.pendingLoans}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Grid>
+        </Grid>
+
+        <Grid container style={{ border: "1px solid #ccc" }}>
+          <Grid
+            item
+            md={3}
+            spacing={3}
+            style={{ padding: "15px", backgroundColor: "#fff" }}
+          >
             <h3 align="center">LOAN AMOUNT DISTRIBUTED</h3>
-            <h2 align="center" style={{ color: "green" }}>
+            <h2 align="center" className={classes.fieldValues}>
               ₹ {this.state.totalLoanDistributed.toLocaleString()}
             </h2>
-            <Piechart
-              width={50}
-              height={50}
-              labels={["DISTRIBUTED", "RECEIVED"]}
-              datasets={[
-                {
-                  data: this.state.loanDistributedAmounts,
-                  backgroundColor: ["#2E8B57", "#2F4F2F "],
-                },
-              ]}
-            />
+            {this.state.loanDistributedAmounts &&
+            this.state.loanDistributedAmounts.length > 0 ? (
+              <Piechart
+                width={50}
+                height={50}
+                labels={["DISTRIBUTED", "RECEIVED"]}
+                datasets={[
+                  {
+                    data: this.state.loanDistributedAmounts,
+                    backgroundColor: ["#2E8B57", "#2F4F2F "],
+                  },
+                ]}
+              />
+            ) : (
+              <h3 align="center"> No Data to display </h3>
+            )}
           </Grid>
-          <Grid item md={6} spacing={3} style={{ backgroundColor: "#e5e9e3" }}>
-            <Grid
-              item
-              xs={6}
-              spacing={3}
-              style={{ backgroundColor: "#e5e9e3" }}
-            >
-              <div className={classes.evenBlock}>
-                <PeopleIcon className={classes.Icon} />
-                <h3 style={{ color: "white", marginBottom: "5px" }}>
-                  SELF HELP GROUPS{" "}
-                </h3>
-                <h2 style={{ color: "green" }}>
-                  {this.state.shgData.toLocaleString()}
-                </h2>
-              </div>
 
-              <div className={classes.oddBlock}>
-                <HomeWorkIcon className={classes.Icon} />
-                <h3 style={{ color: "white", marginBottom: "5px" }}>
-                  {" "}
-                  VILLAGE ORGANIZATIONS{" "}
-                </h3>
-                <h2 style={{ color: "green" }}>
-                  {this.state.voData.toLocaleString()}
-                </h2>
-              </div>
-            </Grid>
+          <Grid item md={6} spacing={3}>
             <div
               style={{
                 border: "1px solid #ccc",
                 backgroundColor: "#fff",
                 marginTop: "-1px",
+                height: "100%",
               }}
             >
               <h3 align="center">LOANS</h3>
-              {loanData ? (
-                <Table
-                  title={"FPO Loans"}
-                  data={loanData}
-                  showSearch={false}
-                  filterData={false}
-                  filterBy={["memberName", "loanAmount", "loanDate"]}
-                  column={Usercolumns}
-                  // editData={this.editData}
-                  rowsSelected={this.rowsSelect}
-                  columnsvalue={columnsvalue}
-                />
-              ) : (
-                <h1>Loading...</h1>
-              )}
+              <div style={{ height: "calc(100% - 115px)" }}>
+                {loanData ? (
+                  <Table
+                    title={"FPO Loans"}
+                    data={loanData}
+                    showSearch={false}
+                    filterData={false}
+                    filterBy={["memberName", "loanAmount", "loanDate"]}
+                    column={Usercolumns}
+                    // editData={this.editData}
+                    rowsSelected={this.rowsSelect}
+                    columnsvalue={columnsvalue}
+                  />
+                ) : (
+                  <h1>Loading...</h1>
+                )}
+              </div>
               <div align="right">
                 <Tooltip title="View More">
                   <IconButton
@@ -356,39 +402,52 @@ class DashboardForFPO extends Component {
               </div>
             </div>
           </Grid>
-          <Grid item md={3} spacing={3} style={{ backgroundColor: "#e5e9e3" }}>
-            <div className={classes.evenBlock}>
-              <MoneyIcon className={classes.Icon} />
-              <h3 style={{ color: "white", marginBottom: "5px" }}>
-                LOAN APPLICATIONS{" "}
-              </h3>
-              <div style={{ display: "inline-flex" }}>
-                <div style={{ borderRight: "2px solid #fff" }}>
-                  <h5 style={{ display: "block" }}>APPROVED</h5>
-                  <span className={classes.fieldValues}>
-                    {this.state.approvedLoans}
-                  </span>
-                </div>
-                <div>
-                  <h5 style={{ display: "block" }}>PENDING</h5>
-                  <span className={classes.fieldValues}>
-                    {this.state.pendingLoans}
-                  </span>
-                </div>
-              </div>
-            </div>
+
+          <Grid
+            item
+            md={3}
+            spacing={3}
+            style={{ padding: "15px", backgroundColor: "#fff" }}
+          >
             <h3 align="center">LOAN BY PURPOSE</h3>
-            <Piechart
-              width={50}
-              height={50}
-              labels={this.state.purposes}
-              datasets={[
-                {
-                  data: this.state.purposesValues,
-                  backgroundColor: newColor,
-                },
-              ]}
-            />
+            {this.state.purposes && this.state.purposes.length > 0 ? (
+              <Piechart
+                width={50}
+                height={50}
+                labels={this.state.purposes}
+                datasets={[
+                  {
+                    data: this.state.purposesValues,
+                    // backgroundColor: newColor,
+                    backgroundColor: [
+                      "#2dc190",
+                      "#28a8b5",
+                      "#bc7e9d",
+                      "#028941",
+                      "#ff6361",
+                      "#3CB371",
+                      "#5a3da3",
+                      "#bfa05c",
+                      "#6495ED",
+                      "#A52A2A",
+                      "#9ACD32",
+                      "#FFD700",
+                      "#bc5090",
+                      "#D2691E",
+                      "#696969",
+                      "#00008B",
+                      "#C0C0C0",
+                      "#488f31",
+                      "#FFDEAD",
+                      "#EE82EE",
+                      "#4682B4",
+                    ],
+                  },
+                ]}
+              />
+            ) : (
+              <h3 align="center"> No Data to display </h3>
+            )}
           </Grid>
         </Grid>
       </div>

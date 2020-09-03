@@ -20,6 +20,10 @@ const useStyles = (theme) => ({
     alignItems: "center",
     marginTop: theme.spacing(1),
   },
+  floatRow: {
+    height: "40px",
+    float: "right",
+  },
   buttonRow: {
     height: "42px",
     marginTop: theme.spacing(1),
@@ -45,6 +49,10 @@ const useStyles = (theme) => ({
   },
   Cancel: {
     marginRight: theme.spacing(1),
+  },
+  menuName: {
+    position: "relative",
+    top: "20px",
   },
 });
 
@@ -320,18 +328,21 @@ export class Countries extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>Manage Countries</h1>
-            <div className={classes.row}>
-              <div className={classes.buttonRow}>
-                <Button
-                  variant="contained"
-                  component={Link}
-                  to="/countries/add"
-                >
-                  Add Country
-                </Button>
+            <h5 className={classes.menuName}>MASTERS</h5>
+            <h2 className={style.title}>
+              Manage Countries
+              <div className={classes.floatRow}>
+                <div className={classes.buttonRow}>
+                  <Button
+                    variant="contained"
+                    component={Link}
+                    to="/countries/add"
+                  >
+                    Add Country
+                  </Button>
+                </div>
               </div>
-            </div>
+            </h2>
             {this.props.location.addData ? (
               <Snackbar severity="success">
                 Country added successfully.

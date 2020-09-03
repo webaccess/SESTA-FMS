@@ -43,6 +43,10 @@ const useStyles = (theme) => ({
   searchInput: {
     marginRight: theme.spacing(1),
   },
+  menuName: {
+    position: "relative",
+    top: "20px",
+  },
 });
 
 export class Shgs extends React.Component {
@@ -374,7 +378,8 @@ export class Shgs extends React.Component {
     return (
       <Layout>
         <div className="App">
-          <h1 className={style.title}>
+          <h5 className={classes.menuName}>MASTERS</h5>
+          <h2 className={style.title}>
             Manage Self Help Group
             <div className={classes.floatRow}>
               <div className={style.addButton}>
@@ -388,7 +393,7 @@ export class Shgs extends React.Component {
                 </Button>
               </div>
             </div>
-          </h1>
+          </h2>
           {this.props.location.addData ? (
             <Snackbar severity="success">SHG added successfully.</Snackbar>
           ) : this.props.location.editData ? (

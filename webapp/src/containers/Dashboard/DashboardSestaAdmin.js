@@ -5,20 +5,10 @@ import * as serviceProvider from "../../api/Axios";
 import { Grid } from "@material-ui/core";
 import PersonIcon from "@material-ui/icons/Person";
 import PeopleIcon from "@material-ui/icons/People";
-import HomeWorkIcon from "@material-ui/icons/HomeWork";
+import NaturePeopleIcon from "@material-ui/icons/NaturePeople";
 import MoneyIcon from "@material-ui/icons/Money";
 
 const useStyles = (theme) => ({
-  member: {
-    color: "black",
-    fontSize: "10px",
-  },
-  mainContent: {
-    padding: "20px",
-  },
-  fieldValues: {
-    fontSize: "20px !important",
-  },
   Icon: {
     fontSize: "40px",
     color: "#008000",
@@ -36,10 +26,24 @@ const useStyles = (theme) => ({
     color: "white",
   },
   evenBlock: {
-    backgroundColor: "#00643C",
+    backgroundColor: "#112e23",
     padding: "15px",
     textAlign: "center",
     color: "white",
+  },
+  labelValues: {
+    color: "#028941",
+    fontSize: "46px",
+    fontWeight: "bold",
+    marginBottom: "0px",
+    marginTop: "0px",
+    lineHeight: "1.5",
+  },
+  fieldValues: {
+    color: "#028941",
+    fontSize: "32px",
+    fontWeight: "bold",
+    lineHeight: "1.5",
   },
 });
 
@@ -121,23 +125,23 @@ class DashboardForFPO extends Component {
     const userInfo = auth.getUserInfo();
 
     return (
-      <div className="App">
+      <div className="App" style={{ paddingTop: "15px" }}>
         <Grid container>
           <Grid item md={3} spacing={3} style={{ backgroundColor: "#e5e9e3" }}>
             <div className={classes.oddBlock}>
               <PersonIcon className={classes.Icon} />
               <h3 style={{ color: "white", marginBottom: "5px" }}>MEMBERS </h3>
-              <h2 style={{ color: "green" }}>
+              <h2 className={classes.labelValues}>
                 {this.state.memberData.toLocaleString()}
               </h2>
             </div>
             <div className={classes.evenBlock}>
-              <HomeWorkIcon className={classes.Icon} />
+              <NaturePeopleIcon className={classes.Icon} />
               <h3 style={{ color: "white", marginBottom: "5px" }}>
                 {" "}
                 VILLAGE ORGANIZATIONS{" "}
               </h3>
-              <h2 style={{ color: "green" }}>
+              <h2 className={classes.labelValues}>
                 {this.state.voData.toLocaleString()}
               </h2>
             </div>
@@ -148,7 +152,7 @@ class DashboardForFPO extends Component {
               <h3 style={{ color: "white", marginBottom: "5px" }}>
                 SELF HELP GROUPS{" "}
               </h3>
-              <h2 style={{ color: "green" }}>
+              <h2 className={classes.labelValues}>
                 {this.state.shgData.toLocaleString()}
               </h2>
             </div>
@@ -158,14 +162,16 @@ class DashboardForFPO extends Component {
                 LOAN APPLICATIONS{" "}
               </h3>
               <div style={{ display: "inline-flex" }}>
-                <div style={{ borderRight: "2px solid #fff" }}>
-                  <h5 style={{ display: "block" }}>APPROVED</h5>
+                <div
+                  style={{ borderRight: "1px solid #fff", padding: "0px 15px" }}
+                >
+                  <h5 style={{ display: "block", margin: "0px" }}>APPROVED</h5>
                   <span className={classes.fieldValues}>
                     {this.state.approvedLoans}
                   </span>
                 </div>
-                <div>
-                  <h5 style={{ display: "block" }}>PENDING</h5>
+                <div style={{ padding: "0px 15px" }}>
+                  <h5 style={{ display: "block", margin: "0px" }}>PENDING</h5>
                   <span className={classes.fieldValues}>
                     {this.state.pendingLoans}
                   </span>
