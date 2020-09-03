@@ -485,7 +485,6 @@ class ActivityPage extends Component {
                     id="outlined-multiline-static"
                     fullWidth
                     label="Status / Comments"
-                    multiline
                     rows={10}
                     name="addDescription"
                     value={this.state.values.addDescription || ""}

@@ -130,8 +130,8 @@ class LoansPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&id=" +
-          shgid
+        "crm-plugin/contact/?contact_type=organization&id=" +
+        shgid
       )
       .then((res) => {
         // get VO assigned to selected SHG member
@@ -277,7 +277,7 @@ class LoansPage extends Component {
             res.data.id,
             updateAppNo
           )
-          .then((loanapp_res) => {});
+          .then((loanapp_res) => { });
 
         this.props.history.push({
           pathname: "/loans",
@@ -346,10 +346,10 @@ class LoansPage extends Component {
             serviceProvider
               .serviceProviderForPostRequest(
                 process.env.REACT_APP_SERVER_URL +
-                  "crm-plugin/activityassignees",
+                "crm-plugin/activityassignees",
                 activityassignee
               )
-              .then((assigneeResp) => {});
+              .then((assigneeResp) => { });
           });
       });
   }
@@ -490,10 +490,10 @@ class LoansPage extends Component {
                     value={
                       handlePurposeChange
                         ? loan_model[
-                            loan_model.findIndex(function (item, i) {
-                              return item.id == handlePurposeChange.id;
-                            })
-                          ]
+                        loan_model.findIndex(function (item, i) {
+                          return item.id == handlePurposeChange.id;
+                        })
+                        ]
                         : loan_model[0]
                     }
                     renderInput={(params) => (
@@ -553,17 +553,17 @@ class LoansPage extends Component {
                           </tr>
                           <tr style={{ backgroundColor: "#dddddd" }}>
                             <th>Due Date</th>
-                            <th>Principle</th>
+                            <th>Principal</th>
                             <th>Interest</th>
                           </tr>
                           {this.state.loan_installments
                             ? this.state.loan_installments.map((row) => (
-                                <tr>
-                                  <td>{row.due_date}</td>
-                                  <td>{row.principal}</td>
-                                  <td>{row.interest}</td>
-                                </tr>
-                              ))
+                              <tr>
+                                <td>{row.due_date}</td>
+                                <td>{row.principal}</td>
+                                <td>{row.interest}</td>
+                              </tr>
+                            ))
                             : null}
                         </table>
                       </b>

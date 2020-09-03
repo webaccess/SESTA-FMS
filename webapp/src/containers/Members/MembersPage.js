@@ -133,17 +133,29 @@ class ActivityPage extends Component {
               lastName: res.data.individual.last_name,
               husbandName: res.data.individual.partner_name,
               address: res.data.address_1,
-              addDistrict: res.data.district.id,
-              addState: res.data.state.id,
               addBlock: res.data.block,
               addGp: res.data.gp,
-              addVillage: res.data.villages[0].id,
               addPincode: res.data.pincode,
               addPhone: res.data.phone,
               addEmail: res.data.email,
               addShg: res.data.individual.shg,
             },
           });
+
+          if (this.state.getState.length > 0) {
+            this.state.getState.map(state => {
+              if (state.id === res.data.state.id) {
+                this.setState({
+                  values: {
+                    ...this.state.values,
+                    addState: res.data.state.id,
+                    addDistrict: res.data.district.id,
+                    addVillage: res.data.villages[0].id,
+                  },
+                });
+              }
+            })
+          }
 
           // if isShareholder is checked
           if (res.data.shareinformation) {
@@ -275,20 +287,22 @@ class ActivityPage extends Component {
       this.setState({
         values: { ...this.state.values, addState: value.id },
       });
-      let stateId = value.id;
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/districts/?is_active=true&&state.id=" +
-          stateId
-        )
-        .then((res) => {
-          this.setState({ getDistrict: res.data });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      this.setState({ stateSelected: true });
+      if (value.is_active == true) {
+        let stateId = value.id;
+        serviceProvider
+          .serviceProviderForGetRequest(
+            process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/districts/?is_active=true&&state.id=" +
+            stateId
+          )
+          .then((res) => {
+            this.setState({ getDistrict: res.data });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        this.setState({ stateSelected: true });
+      }
     } else {
       this.setState({
         values: {
