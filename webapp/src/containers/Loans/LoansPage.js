@@ -20,7 +20,7 @@ import PersonIcon from "@material-ui/icons/Person";
 import PeopleIcon from "@material-ui/icons/People";
 import HomeIcon from "@material-ui/icons/Home";
 import MoneyIcon from "@material-ui/icons/Money";
-import HomeWorkIcon from "@material-ui/icons/HomeWork";
+import NaturePeopleIcon from "@material-ui/icons/NaturePeople";
 import TextField from "@material-ui/core/TextField";
 import Button from "../../components/UI/Button/Button";
 import Moment from "moment";
@@ -466,7 +466,7 @@ class LoansPage extends Component {
                 </IconButton>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <IconButton aria-label="view">
-                  <HomeWorkIcon className={classes.Icon} />
+                  <NaturePeopleIcon className={classes.Icon} />
                   <b>
                     <div className={classes.member}>
                       VILLAGE ORGANIZATION <br />
@@ -553,7 +553,7 @@ class LoansPage extends Component {
                           </tr>
                           <tr style={{ backgroundColor: "#dddddd" }}>
                             <th>Due Date</th>
-                            <th>Principle</th>
+                            <th>Principal</th>
                             <th>Interest</th>
                           </tr>
                           {this.state.loan_installments

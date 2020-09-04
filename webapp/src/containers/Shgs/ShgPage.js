@@ -112,6 +112,20 @@ class ShgPage extends Component {
           });
           console.log("values", this.state.values);
 
+          if (this.state.getState.length > 0) {
+            this.state.getState.map((state) => {
+              if (state.id === res.data.state.id) {
+                this.setState({
+                  values: {
+                    ...this.state.values,
+                    addState: res.data.state.id,
+                    addDistrict: res.data.district.id,
+                    addVillage: res.data.villages[0].id,
+                  },
+                });
+              }
+            });
+          }
           // if "add bankdetails" is checked
           if (res.data.organization.bankdetail) {
             this.setState({ bankInfoId: res.data.organization.bankdetail });
@@ -191,6 +205,7 @@ class ShgPage extends Component {
       this.setState({
         values: { ...this.state.values, addState: newVal },
       });
+      //if (value.is_active == true) {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
@@ -204,13 +219,17 @@ class ShgPage extends Component {
           console.log(error);
         });
       this.setState({ stateSelected: true });
+      //}
     } else {
       this.setState({
         values: {
           ...this.state.values,
           addState: "",
           addDistrict: "",
+          addVillage: "",
         },
+        getDistrict: [],
+        getVillage: [],
       });
       this.setState({ stateSelected: false });
     }
@@ -245,6 +264,7 @@ class ShgPage extends Component {
           addDistrict: "",
           addVillage: "",
         },
+        getVillage: [],
       });
       this.setState({ districtSelected: false });
     }

@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import { get, map, replace, set } from "lodash";
-import { Link } from "react-router-dom";
+import { Link } from "@material-ui/core";
 import form from "./forms.json";
 import styles from "./AuthPage.module.css";
 // Utils
@@ -10,12 +10,16 @@ import { Container } from "@material-ui/core";
 import Button from "../../components/UI/Button/Button";
 import Input from "../../components/UI/Input/Input";
 import axios from "axios";
+import Visibility from "@material-ui/icons/Visibility";
+import VisibilityOff from "@material-ui/icons/VisibilityOff";
+import IconButton from "@material-ui/core/IconButton";
+import InputAdornment from "@material-ui/core/InputAdornment";
 
 class AuthPage extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      value: {},
+      value: { showPassword: false },
       errors: {},
       fieldErrors: {},
       formErrors: {},
@@ -27,7 +31,7 @@ class AuthPage extends PureComponent {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      value: {},
+      value: { showPassword: false },
       errors: {},
       fieldErrors: {},
       formErrors: [],
@@ -71,12 +75,16 @@ class AuthPage extends PureComponent {
       case "login":
         requestURL = process.env.REACT_APP_SERVER_URL + "auth/local";
         break;
+      case "verify-otp":
+        requestURL = process.env.REACT_APP_SERVER_URL + "otps/validateotp";
+        break;
+      case "forgot-password":
+        requestURL = process.env.REACT_APP_SERVER_URL + "otps/requestotp";
+        break;
       case "reset-password":
         requestURL = process.env.REACT_APP_SERVER_URL + "auth/reset-password";
         break;
-      case "forgot-password":
-        requestURL = process.env.REACT_APP_SERVER_URL + "auth/forgot-password";
-        break;
+
       default:
     }
 
@@ -107,6 +115,69 @@ class AuthPage extends PureComponent {
     });
   };
 
+  getOTP = (resend) => {
+    console.log("getOTP==", resend);
+    const requestURL = process.env.REACT_APP_SERVER_URL + "otps/requestotp";
+    const body = this.state.value;
+    if (resend)
+      body["contact_number"] = this.props.location.state.contact_number;
+    axios({
+      method: "post",
+      url: requestURL,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: this.state.value,
+      // withCredentials: true,
+      responseType: "json",
+    })
+      .then((response) => {
+        this.setState({ buttonView: false });
+        if (resend == false)
+          this.props.history.push({
+            pathname: "/verify-otp",
+            state: {
+              contact_number: this.state.value.contact_number,
+            },
+          });
+        else this.setState({ showSuccessMsg: true });
+      })
+      .catch((error) => {
+        this.setState({ buttonView: false });
+      });
+  };
+
+  validateOTP = () => {
+    const requestURL = this.getRequestURL();
+    const contact_number = this.props.location.state.contact_number;
+    console.log("cc", contact_number);
+    const body = this.state.value;
+    body.contact_number = contact_number;
+    axios({
+      method: "post",
+      url: requestURL,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: this.state.value,
+      // withCredentials: true,
+      responseType: "json",
+    })
+      .then((response) => {
+        console.log("response", response);
+        this.setState({ buttonView: false });
+        this.props.history.push("/reset-password?code=" + response.data.result);
+      })
+      .catch((error) => {
+        this.setState({ buttonView: false });
+        this.setState({ formErrors: { otp: ["Error verifying otp."] } });
+      });
+  };
+
+  resendOTP = () => {
+    return this.getOTP(true);
+  };
+
   handleSubmit = (e) => {
     e.preventDefault();
     const body = this.state.value;
@@ -118,7 +189,16 @@ class AuthPage extends PureComponent {
     this.setState({ formErrors: [] });
     // This line is required for the callback url to redirect your user to app
     if (this.props.match.params.authType === "forgot-password") {
-      set(body, "url", process.env.REACT_APP_CLIENT_URL + "reset-password");
+      // set(body, "url", process.env.REACT_APP_CLIENT_URL + "reset-password");
+      console.log("enters this1");
+      return this.getOTP(false);
+    }
+    if (this.props.match.params.authType === "verify-otp") {
+      console.log("enters this2");
+      return this.validateOTP();
+    }
+    if (this.props.match.params.authType === "reset-password") {
+      body.passwordConfirmation = body.password;
     }
 
     if (Object.keys(this.state.errors).length > 0) {
@@ -141,6 +221,7 @@ class AuthPage extends PureComponent {
           auth.setToken(response.data.jwt);
           auth.setUserInfo(response.data.user);
         }
+        console.log("in here= 11===");
         this.setState({ buttonView: false });
         this.redirectUser();
       })
@@ -185,7 +266,9 @@ class AuthPage extends PureComponent {
     if (this.props.match.params.authType === "login")
       this.props.history.push("/");
     else {
+      console.log("in here====");
       this.setState({ showSuccessMsg: true });
+      this.setState({ value: {} });
     }
   };
 
@@ -197,14 +280,14 @@ class AuthPage extends PureComponent {
     if (this.props.match.params.authType === "login") {
       return (
         <div>
-          <Link to="/forgot-password">Forgot Password</Link>
+          <Link href="/forgot-password">Forgot Password</Link>
         </div>
       );
     }
 
     return (
       <div>
-        <Link to="/login">Ready to signin</Link>
+        <Link href="/login">Ready to signin</Link>
       </div>
     );
   };
@@ -238,8 +321,23 @@ class AuthPage extends PureComponent {
       message = "Reset password link is sent to your mail.";
     else if (this.props.match.params.authType === "reset-password")
       message = "Password reset successfully.";
+    else if (this.props.match.params.authType === "verify-otp")
+      message = "OTP sent successfully.";
 
     return <div style={{ color: "green" }}>{message}</div>;
+  };
+
+  handleClickShowPassword = () => {
+    this.setState({
+      value: {
+        ...this.state.value,
+        showPassword: !this.state.value.showPassword,
+      },
+    });
+  };
+
+  handleMouseDownPassword = (event) => {
+    event.preventDefault();
   };
 
   render() {
@@ -272,6 +370,11 @@ class AuthPage extends PureComponent {
                     );
                     return (
                       <div key={"field" + key} style={{ margin: "8px" }}>
+                        {get(input, "subheading") ? (
+                          <h4>{get(input, "subheading")}</h4>
+                        ) : (
+                          ""
+                        )}
                         <Input
                           autoFocus={key === 0}
                           className={`${
@@ -303,14 +406,56 @@ class AuthPage extends PureComponent {
                               : false
                           }
                           placeholder={get(input, "placeholder")}
-                          type={get(input, "type")}
+                          type={
+                            get(input, "type") == "password"
+                              ? this.state.value.showPassword
+                                ? "text"
+                                : "password"
+                              : get(input, "type")
+                          }
                           helperText={fieldErrorVal}
                           inputProps={{
                             validations: `${JSON.stringify(
                               get(input, "validations")
                             )}`,
                           }}
+                          InputProps={
+                            get(input, "type") == "password"
+                              ? {
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={this.handleClickShowPassword}
+                                        onMouseDown={
+                                          this.handleMouseDownPassword
+                                        }
+                                      >
+                                        {this.state.value.showPassword ? (
+                                          <Visibility />
+                                        ) : (
+                                          <VisibilityOff />
+                                        )}
+                                      </IconButton>
+                                    </InputAdornment>
+                                  ),
+                                }
+                              : ""
+                          }
                         />
+                        {get(input, "name") == "otp" ? (
+                          <div>
+                            <br />
+                            <Link
+                              href="javascript:void(0)"
+                              onClick={this.resendOTP}
+                            >
+                              Resend OTP
+                            </Link>
+                          </div>
+                        ) : (
+                          ""
+                        )}
                       </div>
                     );
                   })}
@@ -319,6 +464,7 @@ class AuthPage extends PureComponent {
                       this.state.formErrors,
                       (error, keyval) => {
                         let nameval = get(input, "name");
+
                         if (nameval === keyval && error.length > 0) {
                           return (
                             <div

@@ -50,14 +50,18 @@ class UsersPage extends Component {
           },
         },
         addPhone: {
+          required: {
+            value: "true",
+            message: "Phone number is required",
+          },
           phone: {
             value: "true",
             message: "Please enter valid phone number",
           },
         },
-        username: {
-          required: { value: "true", message: "Username is required" },
-        },
+        // username: {
+        //   required: { value: "true", message: "Username is required" },
+        // },
         password: {
           required: { value: "true", message: "Password is required" },
         },
@@ -368,7 +372,7 @@ class UsersPage extends Component {
 
   saveUser = async (data) => {
     let emailAdd = this.state.values.addEmail;
-    let username = this.state.values.username;
+    let username = this.state.values.addPhone;
     let password = this.state.values.password;
     let roleId = this.state.values.role;
     let selectFieldId = this.state.values.selectField;
@@ -604,7 +608,7 @@ class UsersPage extends Component {
                     variant="outlined"
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
+                {/* <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
                     label="Username*"
@@ -619,7 +623,7 @@ class UsersPage extends Component {
                     onChange={this.handleChange}
                     variant="outlined"
                   />
-                </Grid>
+                </Grid> */}
                 <Grid item md={6} xs={12}>
                   <Input
                     variant="outlined"

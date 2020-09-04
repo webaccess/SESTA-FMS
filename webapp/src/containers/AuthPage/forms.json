@@ -3,10 +3,11 @@
     "forgot-password": [
       {
         "customBootstrapClass": "col-md-12",
-        "label": "Enter your email",
-        "name": "email",
-        "type": "email",
-        "placeholder": "johndoe@gmail.com",
+        "subheading": "Enter the mobile number associated with your account and we'll send you an OTP",
+        "label": "Enter your Mobile Number",
+        "name": "contact_number",
+        "type": "tel",
+        "placeholder": "Mobile Number",
         "validations": {
           "required": { "value": "true", "message": "Email field required" }
         }
@@ -15,16 +16,18 @@
     "login": [
       {
         "customBootstrapClass": "col-md-12",
-        "label": "Username",
+        "subheading": "",
+        "label": "Contact Number",
         "name": "identifier",
         "type": "text",
-        "placeholder": "johndoe@gmail.com",
+        "placeholder": "Mobile Number",
         "validations": {
           "required": { "value": "true", "message": "Username field required" }
         }
       },
       {
         "customBootstrapClass": "col-md-12",
+        "subheading": "",
         "label": "Password",
         "name": "password",
         "type": "password",
@@ -33,30 +36,27 @@
         }
       }
     ],
+    "verify-otp": [
+      {
+        "customBootstrapClass": "col-md-12",
+        "subheading": "Please enter the OTP",
+        "name": "otp",
+        "type": "number",
+        "label": "OTP",
+        "validations": {
+          "required": { "value": "true", "message": "Password field required" }
+        }
+      }
+    ],
     "reset-password": [
       {
         "customBootstrapClass": "col-md-12",
+        "subheading": "",
+        "label": "Password",
         "name": "password",
         "type": "password",
-        "label": "Password",
         "validations": {
-          "validatePasswordRegex": {
-            "value": "true",
-            "message": "Use 8 or more characters with a mix of letters & numbers"
-          },
           "required": { "value": "true", "message": "Password field required" }
-        }
-      },
-      {
-        "customBootstrapClass": "col-md-12",
-        "name": "passwordConfirmation",
-        "type": "password",
-        "label": "Confirm Password",
-        "validations": {
-          "required": {
-            "value": "true",
-            "message": "Confirm password field required"
-          }
         }
       }
     ]

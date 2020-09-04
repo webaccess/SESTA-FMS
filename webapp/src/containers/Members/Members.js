@@ -477,6 +477,7 @@ export class Members extends React.Component {
     });
 
     let data = this.state.data;
+    //console.log("name", name);
     const Usercolumns = [
       {
         name: "Name",
@@ -502,28 +503,36 @@ export class Members extends React.Component {
 
     let selectors = [];
     for (let i in Usercolumns) {
+      console.log("i", Usercolumns[i]["selector"]);
       selectors.push(Usercolumns[i]["selector"]);
     }
     let columnsvalue = selectors[0];
+    console.log("columnsvalue", columnsvalue);
 
     return (
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>Manage Members</h1>
-            <div className={classes.row}>
-              <div className={classes.buttonRow}>
-                <Button variant="contained" component={Link} to="/members/add">
-                  Add New Member
-                </Button>
+            <h5 className={style.menuName}>MEMBERS</h5>
+            <h2 className={style.title}>
+              Manage Members
+              <div className={classes.floatRow}>
+                <div className={classes.buttonRow}>
+                  <Button
+                    variant="contained"
+                    component={Link}
+                    to="/members/add"
+                  >
+                    Add New Member
+                  </Button>
+                </div>
               </div>
-            </div>
+            </h2>
             {!this.state.bankDetailsFound ? (
               <Snackbar severity="info">
                 No bank details found for SHG of this member
               </Snackbar>
             ) : null}
-
             {this.props.location.addData ? (
               <Snackbar severity="success">Member added successfully.</Snackbar>
             ) : this.props.location.editData ? (
@@ -694,8 +703,9 @@ export class Members extends React.Component {
                 Reset
               </Button>
             </div>
-            {data ? (
+            {data && data.name !== "fpouser" ? (
               <Table
+                {...data.name}
                 title={"Members"}
                 showSearch={false}
                 filterData={true}

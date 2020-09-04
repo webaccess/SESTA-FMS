@@ -43,6 +43,10 @@ const useStyles = (theme) => ({
   searchInput: {
     marginRight: theme.spacing(1),
   },
+  menuName: {
+    position: "relative",
+    top: "20px",
+  },
 });
 
 export class Shgs extends React.Component {
@@ -85,7 +89,11 @@ export class Shgs extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
-        this.setState({ data: res.data });
+        console.log("res.data", res.data);
+        this.setState({ TestData: res.data });
+        this.getStateData(this.state.TestData);
+        this.getDistrictData(this.state.TestData);
+        this.getVillageData(this.state.TestData);
       });
 
     //api call for states filter
@@ -111,6 +119,50 @@ export class Shgs extends React.Component {
       .catch((error) => {
         console.log(error);
       });
+  }
+
+  async getStateData(data) {
+    for (let i in data) {
+      await serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/states/" +
+            data[i].addresses[0].state
+        )
+        .then((res) => {
+          data[i].addresses.push({ state: res.data }); // add corresponding district to record
+        });
+    }
+  }
+
+  async getDistrictData(data) {
+    for (let i in data) {
+      await serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/districts/" +
+            data[i].addresses[0].district
+        )
+        .then((res) => {
+          data[i].addresses.push({ district: res.data }); // add corresponding district to record
+        });
+    }
+  }
+
+  async getVillageData(data) {
+    for (let i in data) {
+      await serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/villages/" +
+            data[i].addresses[0].village
+        )
+        .then((res) => {
+          data[i].addresses.push({ village: res.data }); // add corresponding village to record
+        });
+    }
+    this.setState({ data: data });
+    console.log("data in ", data);
   }
 
   handleStateChange = async (event, value) => {
@@ -297,7 +349,11 @@ export class Shgs extends React.Component {
         process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
       )
       .then((res) => {
-        this.setState({ data: res.data });
+        //this.setState({ testData: res.data });
+        this.setState({ TestData: res.data });
+        this.getStateData(this.state.TestData);
+        this.getDistrictData(this.state.TestData);
+        this.getVillageData(this.state.TestData);
       })
       .catch((err) => {
         console.log(err);
@@ -317,21 +373,21 @@ export class Shgs extends React.Component {
         selector: "organization.vos[0].name",
         sortable: true,
       },
-      //{
-      //  name: "Village",
-      //  selector: "villages[0].name",
-      //  sortable: true,
-      //},
-      //{
-      //  name: "District",
-      //  selector: "district.name",
-      //  sortable: true,
-      //},
-      //{
-      //  name: "State",
-      //  selector: "state.name",
-      //  sortable: true,
-      //},
+      {
+        name: "Village",
+        selector: "addresses[3].village.name",
+        sortable: true,
+      },
+      {
+        name: "District",
+        selector: "addresses[2].district.name",
+        sortable: true,
+      },
+      {
+        name: "State",
+        selector: "addresses[1].state.name",
+        sortable: true,
+      },
     ];
 
     let selectors = [];
@@ -375,7 +431,8 @@ export class Shgs extends React.Component {
     return (
       <Layout>
         <div className="App">
-          <h1 className={style.title}>
+          <h5 className={classes.menuName}>MASTERS</h5>
+          <h2 className={style.title}>
             Manage Self Help Group
             <div className={classes.floatRow}>
               <div className={style.addButton}>
@@ -389,7 +446,7 @@ export class Shgs extends React.Component {
                 </Button>
               </div>
             </div>
-          </h1>
+          </h2>
           {this.props.location.addData ? (
             <Snackbar severity="success">SHG added successfully.</Snackbar>
           ) : this.props.location.editData ? (

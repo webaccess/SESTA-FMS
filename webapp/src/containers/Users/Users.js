@@ -254,14 +254,17 @@ export class Users extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>Manage Users</h1>
-            <div className={classes.row}>
-              <div className={classes.buttonRow}>
-                <Button variant="contained" component={Link} to="/users/add">
-                  Add New User
-                </Button>
+            <h5 className={style.menuName}>USERS</h5>
+            <h2 className={style.title}>
+              Manage Users
+              <div className={classes.floatRow}>
+                <div className={classes.buttonRow}>
+                  <Button variant="contained" component={Link} to="/users/add">
+                    Add New User
+                  </Button>
+                </div>
               </div>
-            </div>
+            </h2>
             {this.props.location.addData ? (
               <Snackbar severity="success">User added successfully.</Snackbar>
             ) : this.props.location.editData ? (
