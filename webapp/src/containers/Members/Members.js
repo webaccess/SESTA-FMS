@@ -100,15 +100,15 @@ export class Members extends React.Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/?individual=" +
-            auth.getUserInfo().contact.individual
+          "crm-plugin/contact/?individual=" +
+          auth.getUserInfo().contact.individual
         )
         .then((res) => {
           serviceProvider
             .serviceProviderForGetRequest(
               process.env.REACT_APP_SERVER_URL +
-                "crm-plugin/contact/?id=" +
-                res.data[0].individual.vo
+              "crm-plugin/contact/?id=" +
+              res.data[0].individual.vo
             )
             .then((response) => {
               this.setState({ getShg: response.data[0].org_vos });
@@ -177,8 +177,8 @@ export class Members extends React.Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId
+          "crm-plugin/districts/?is_active=true&&state.id=" +
+          stateId
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
@@ -206,8 +206,8 @@ export class Members extends React.Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/villages/?is_active=true&&district.id=" +
-            distId
+          "crm-plugin/villages/?is_active=true&&district.id=" +
+          distId
         )
         .then((res) => {
           this.setState({ getVillage: res.data });
@@ -338,7 +338,7 @@ export class Members extends React.Component {
         process.env.REACT_APP_SERVER_URL + "shareinformations",
         id
       )
-      .then((res) => {})
+      .then((res) => { })
       .catch((error) => {
         console.log(error);
       });
@@ -383,15 +383,15 @@ export class Members extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?id=" +
-          memberData.individual.shg
+        "crm-plugin/contact/?id=" +
+        memberData.individual.shg
       )
       .then((res) => {
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
-              "bankdetails/?organization=" +
-              res.data[0].organization.id
+            "bankdetails/?organization=" +
+            res.data[0].organization.id
           )
           .then((res) => {
             let bankData = res.data;
@@ -446,6 +446,19 @@ export class Members extends React.Component {
     });
 
     let data = this.state.data;
+    data.map(memdata => {
+      this.state.getShg.map(shg => {
+        if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
+          if (memdata.individual.shg === shg.contact) {
+            memdata.shgName = shg.name;
+          }
+        } else {
+          if (memdata.individual.shg === shg.id) {
+            memdata.shgName = shg.name;
+          }
+        }
+      })
+    })
     const Usercolumns = [
       {
         name: "Name",
@@ -463,9 +476,16 @@ export class Members extends React.Component {
         sortable: true,
       },
       {
+        name: "SHG Name",
+        selector: "shgName",
+        sortable: true,
+      },
+      {
         name: "Phone",
         selector: "phone",
         sortable: true,
+        cell: (row) =>
+          row.phone ? row.phone : "-"
       },
     ];
 
@@ -479,20 +499,26 @@ export class Members extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>Manage Members</h1>
-            <div className={classes.row}>
-              <div className={classes.buttonRow}>
-                <Button variant="contained" component={Link} to="/members/add">
-                  Add New Member
-                </Button>
+            <h5 className={style.menuName}>MEMBERS</h5>
+            <h2 className={style.title}>
+              Manage Members
+              <div className={classes.floatRow}>
+                <div className={classes.buttonRow}>
+                  <Button
+                    variant="contained"
+                    component={Link}
+                    to="/members/add"
+                  >
+                    Add New Member
+                  </Button>
+                </div>
               </div>
-            </div>
+            </h2>
             {!this.state.bankDetailsFound ? (
               <Snackbar severity="info">
                 No bank details found for SHG of this member
               </Snackbar>
             ) : null}
-
             {this.props.location.addData ? (
               <Snackbar severity="success">Member added successfully.</Snackbar>
             ) : this.props.location.editData ? (
@@ -501,12 +527,12 @@ export class Members extends React.Component {
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
-            this.state.singleDelete !== "" &&
-            this.state.singleDelete ? (
-              <Snackbar severity="success" Showbutton={false}>
-                Member {this.state.singleDelete} deleted successfully!
-              </Snackbar>
-            ) : null}
+              this.state.singleDelete !== "" &&
+              this.state.singleDelete ? (
+                <Snackbar severity="success" Showbutton={false}>
+                  Member {this.state.singleDelete} deleted successfully!
+                </Snackbar>
+              ) : null}
             {this.state.singleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
@@ -672,6 +698,7 @@ export class Members extends React.Component {
                   "name",
                   "villages[0].name",
                   "district.name",
+                  "shgName",
                   "phone",
                 ]}
                 filters={filters}
@@ -687,8 +714,8 @@ export class Members extends React.Component {
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (
-              <h1>Loading...</h1>
-            )}
+                <h1>Loading...</h1>
+              )}
           </div>
         </Grid>
       </Layout>

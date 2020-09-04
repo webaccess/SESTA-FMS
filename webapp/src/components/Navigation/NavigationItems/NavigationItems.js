@@ -132,6 +132,10 @@ function NavigationItems(props) {
       !props.location.pathname.includes("/members") ||
       !props.location.pathname.includes("/activities") ||
       !props.location.pathname.includes("/loans") ||
+      !props.location.pathname.includes("/users") ||
+      !props.location.pathname.includes("/reports") ||
+      !props.location.pathname.includes("/summary-report") ||
+      !props.location.pathname.includes("/activity-report") ||
       props.location.pathname !== "/"
     ) {
       if (openMenu !== true) {
@@ -144,6 +148,10 @@ function NavigationItems(props) {
       props.location.pathname.includes("/members") ||
       props.location.pathname.includes("/activities") ||
       props.location.pathname.includes("/loans") ||
+      props.location.pathname.includes("/users") ||
+      props.location.pathname.includes("/reports") ||
+      props.location.pathname.includes("/summary-report") ||
+      props.location.pathname.includes("/activity-report") ||
       props.location.pathname === "/"
     ) {
       if (openMenu == true) {

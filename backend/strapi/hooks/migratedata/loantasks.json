@@ -1,0 +1,16 @@
+{
+  "loantask": [
+    {
+      "activitytype": "Grafts of crop 1",
+      "loan_model": "Horticulture"
+    },
+    {
+      "activitytype": "Grafts of crop 1",
+      "loan_model": "Horticulture"
+    },
+    {
+      "activitytype": "Vet care support : Vaccination",
+      "loan_model": "Goatery"
+    }
+  ]
+}

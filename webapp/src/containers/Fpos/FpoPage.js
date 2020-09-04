@@ -72,8 +72,8 @@ class FpoPage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/" +
-            this.state.editPage[1]
+          "crm-plugin/contact/" +
+          this.state.editPage[1]
         )
         .then((res) => {
           this.handleStateChange("", res.data.state);
@@ -82,13 +82,24 @@ class FpoPage extends Component {
               addFpo: res.data.organization.name,
               addAddress: res.data.address_1,
               addPointOfContact: res.data.organization.person_incharge,
-              addDistrict: res.data.district.id,
-              addState: res.data.state.id,
               addBlock: res.data.block,
               addEmail: res.data.email,
               addPhone: res.data.phone,
             },
           });
+          if (this.state.getState.length > 0) {
+            this.state.getState.map(state => {
+              if (state.id === res.data.state.id) {
+                this.setState({
+                  values: {
+                    ...this.state.values,
+                    addState: res.data.state.id,
+                    addDistrict: res.data.district.id
+                  },
+                });
+              }
+            })
+          }
         })
         .catch((error) => {
           console.log(error);
@@ -119,20 +130,24 @@ class FpoPage extends Component {
       this.setState({
         values: { ...this.state.values, addState: value.id },
       });
-      let stateId = value.id;
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
+
+      if (value.is_active == true) {
+        let stateId = value.id;
+        serviceProvider
+          .serviceProviderForGetRequest(
+            process.env.REACT_APP_SERVER_URL +
             "crm-plugin/districts/?is_active=true&&state.id=" +
             stateId
-        )
-        .then((res) => {
-          this.setState({ getDistrict: res.data });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      this.setState({ stateSelected: true });
+          )
+          .then((res) => {
+            this.setState({ getDistrict: res.data });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        this.setState({ stateSelected: true });
+      }
+
     } else {
       this.setState({
         values: {
@@ -344,10 +359,10 @@ class FpoPage extends Component {
                     value={
                       addState
                         ? stateFilter[
-                            stateFilter.findIndex(function (item, i) {
-                              return item.id === addState;
-                            })
-                          ] || null
+                        stateFilter.findIndex(function (item, i) {
+                          return item.id === addState;
+                        })
+                        ] || null
                         : null
                     }
                     error={this.hasError("addState")}
@@ -381,10 +396,10 @@ class FpoPage extends Component {
                     value={
                       addDistrict
                         ? districtFilter[
-                            districtFilter.findIndex(function (item, i) {
-                              return item.id === addDistrict;
-                            })
-                          ] || null
+                        districtFilter.findIndex(function (item, i) {
+                          return item.id === addDistrict;
+                        })
+                        ] || null
                         : null
                     }
                     error={this.hasError("addDistrict")}
@@ -392,8 +407,8 @@ class FpoPage extends Component {
                       this.hasError("addDistrict")
                         ? this.state.errors.addDistrict[0]
                         : this.state.stateSelected
-                        ? null
-                        : "Please select the state first"
+                          ? null
+                          : "Please select the state first"
                     }
                     renderInput={(params) => (
                       <Input

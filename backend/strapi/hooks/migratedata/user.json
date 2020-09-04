@@ -1,0 +1,61 @@
+{
+  "user": [
+    {
+      "username": "WAfpoadmin",
+      "provider": "local",
+      "email": "WAfpoadmin@mail.com",
+      "password": "$2a$10$Pg24BdHmzcje1fM/yRL6ceAxBlP5UX5Gf.Grw3Ki2r19rNB23fqeS",
+      "confirmed": true,
+      "blocked": false,
+      "first_name": "WA",
+      "last_name": "FPO Admin",
+      "role": 2,
+      "contact": {
+        "name": "WAfpoadmin",
+        "contact_type": "organization",
+        "organization": {
+          "name": "WAfpoadmin",
+          "sub_type": "FPO"
+        }
+      }
+    },
+    {
+      "username": "WAsuperadmin",
+      "provider": "local",
+      "email": "WAsuperadmin@mail.com",
+      "password": "$2a$10$Pg24BdHmzcje1fM/yRL6ceAxBlP5UX5Gf.Grw3Ki2r19rNB23fqeS",
+      "confirmed": true,
+      "blocked": false,
+      "first_name": "WA",
+      "last_name": "Super Admin",
+      "role": 5,
+      "contact": {
+        "name": "WAsuperadmin",
+        "contact_type": "individual",
+        "individual": {
+          "first_name": "WA",
+          "last_name": "Super Admin"
+        }
+      }
+    },
+    {
+      "username": "fpouser",
+      "provider": "local",
+      "email": "fpouser@mail.com",
+      "password": "$2a$10$Pg24BdHmzcje1fM/yRL6ceAxBlP5UX5Gf.Grw3Ki2r19rNB23fqeS",
+      "confirmed": true,
+      "blocked": false,
+      "first_name": "WA",
+      "last_name": "FPO User",
+      "role": 2,
+      "contact": {
+        "name": "fpouser",
+        "contact_type": "individual",
+        "individual": {
+          "first_name": "WA",
+          "last_name": "FPO User"
+        }
+      }
+    }
+  ]
+}
