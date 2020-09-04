@@ -409,7 +409,7 @@ class DashboardViewMoreDetailsCSP extends Component {
             </div>
             {dbLoanData ? <h3>EMI Due</h3> : null}
             {dbLoanData ? (
-              <div className={classes.row}>
+              <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
                 <div className={classes.searchInput}>
                   <div className={classes.Districts}>
                     <Grid item md={12} xs={12}>

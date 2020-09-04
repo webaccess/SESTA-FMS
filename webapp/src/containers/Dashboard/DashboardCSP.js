@@ -309,7 +309,7 @@ class DashboardCSP extends Component {
     return (
       <div className="App" style={{ paddingTop: "15px" }}>
         <Grid container style={{ border: "1px solid #ccc" }}>
-          <Grid item md={4} spacing={3} style={{ backgroundColor: "#e5e9e3" }}>
+          <Grid item md={4} xs={12} spacing={3} style={{ backgroundColor: "#e5e9e3" }}>
             <div className={classes.remun}>
               <AccountBalanceWalletIcon className={classes.Icon} />
               <h3 className={classes.remunText}>REMUNERATION </h3>
@@ -350,7 +350,7 @@ class DashboardCSP extends Component {
               <h3 align="center">No records present for this month</h3>
             )}
           </Grid>
-          <Grid item md={8} spacing={3}>
+          <Grid item md={8} xs={12} spacing={3}>
             <div className={classes.emiDue}>
               <h3 style={{ paddingLeft: "15px" }}>EMI DUE</h3>
               {loanInstallmentData ? (

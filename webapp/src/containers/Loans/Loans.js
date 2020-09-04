@@ -40,6 +40,7 @@ const useStyles = (theme) => ({
   },
   searchInput: {
     marginRight: theme.spacing(1),
+    marginBottom: "8px",
   },
   Districts: {
     marginRight: theme.spacing(1),
@@ -494,8 +495,7 @@ export class Loans extends React.Component {
             <Snackbar severity="success">Changes saved successfully</Snackbar>
           ) : null}
 
-          <br></br>
-          <div className={classes.row}>
+          <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
             <div className={classes.searchInput}>
               <div className={style.Districts}>
                 <Grid item md={12} xs={12}>
@@ -572,10 +572,10 @@ export class Loans extends React.Component {
                 </Grid>
               </div>
             </div>
-            <br></br>
-            <Button onClick={this.handleSearch.bind(this)}>Search</Button>
-            &nbsp;&nbsp;&nbsp;
-            <Button color="secondary" clicked={this.cancelForm}>
+            <Button onClick={this.handleSearch.bind(this)} 
+              style={{ marginRight: "5px", marginBottom: "8px", }}>Search</Button>
+            <Button color="secondary" clicked={this.cancelForm}
+              style={{ marginBottom: "8px", }}>
               reset
             </Button>
           </div>

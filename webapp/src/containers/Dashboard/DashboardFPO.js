@@ -26,17 +26,29 @@ const useStyles = (theme) => ({
       color: "#008000",
     },
   },
+  fpoInlineGrid: {
+    display: "inline-flex",
+    flexWrap: "wrap",
+  },
   oddBlock: {
     backgroundColor: "#000",
     padding: "15px",
     textAlign: "center",
     color: "white",
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
   },
   evenBlock: {
     backgroundColor: "#112e23",
     padding: "15px",
     textAlign: "center",
     color: "white",
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
   },
   labelValues: {
     color: "#028941",
@@ -45,6 +57,7 @@ const useStyles = (theme) => ({
     marginBottom: "0px",
     marginTop: "0px",
     lineHeight: "1.5",
+    flex: "auto",
   },
   fieldValues: {
     color: "#028941",
@@ -52,6 +65,11 @@ const useStyles = (theme) => ({
     fontWeight: "bold",
     lineHeight: "1.5",
   },
+  fpoHead3: {
+    color: "white",
+    marginBottom: "5px",
+    flex: "auto",
+  }
 });
 
 class DashboardForFPO extends Component {
@@ -269,20 +287,20 @@ class DashboardForFPO extends Component {
     return (
       <div className="App" style={{ paddingTop: "15px" }}>
         <Grid container style={{ border: "1px solid #ccc" }}>
-          <Grid item md={3} spacing={3}>
+          <Grid className={classes.fpoInlineGrid} item md={3} spacing={3}>
             <div className={classes.oddBlock}>
               <PersonIcon className={classes.Icon} />
-              <h3 style={{ color: "white", marginBottom: "5px" }}>MEMBERS </h3>
+              <h3 className={classes.fpoHead3}>MEMBERS </h3>
               <h2 className={classes.labelValues}>
                 {this.state.memberData.toLocaleString()}
               </h2>
             </div>
           </Grid>
 
-          <Grid item md={3} spacing={3}>
+          <Grid className={classes.fpoInlineGrid} item md={3} spacing={3}>
             <div className={classes.evenBlock}>
               <PeopleIcon className={classes.Icon} />
-              <h3 style={{ color: "white", marginBottom: "5px" }}>
+              <h3 className={classes.fpoHead3}>
                 SELF HELP GROUPS{" "}
               </h3>
               <h2 className={classes.labelValues}>
@@ -291,10 +309,10 @@ class DashboardForFPO extends Component {
             </div>
           </Grid>
 
-          <Grid item md={3} spacing={3}>
+          <Grid className={classes.fpoInlineGrid} item md={3} spacing={3}>
             <div className={classes.oddBlock}>
               <NaturePeopleIcon className={classes.Icon} />
-              <h3 style={{ color: "white", marginBottom: "5px" }}>
+              <h3 className={classes.fpoHead3}>
                 {" "}
                 VILLAGE ORGANIZATIONS{" "}
               </h3>
@@ -304,10 +322,10 @@ class DashboardForFPO extends Component {
             </div>
           </Grid>
 
-          <Grid item md={3} spacing={3}>
+          <Grid className={classes.fpoInlineGrid} item md={3} spacing={3}>
             <div className={classes.evenBlock}>
               <MoneyIcon className={classes.Icon} />
-              <h3 style={{ color: "white", marginBottom: "5px" }}>
+              <h3 className={classes.fpoHead3}>
                 LOAN APPLICATIONS{" "}
               </h3>
               <div style={{ display: "inline-flex" }}>

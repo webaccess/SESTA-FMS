@@ -35,6 +35,7 @@ const useStyles = (theme) => ({
   },
   searchInput: {
     marginRight: theme.spacing(1),
+    marginBottom: "8px",
   },
   Districts: {
     marginRight: theme.spacing(1),
@@ -49,8 +50,8 @@ const useStyles = (theme) => ({
     marginRight: theme.spacing(1),
   },
   menuName: {
-    position: "relative",
-    top: "20px",
+    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+    margin: "0px",
   },
 });
 
@@ -237,21 +238,21 @@ export class Loanpurposes extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h5 className={classes.menuName}>MASTERS</h5>
-            <h2 className={style.title}>
-              Manage Loan Purpose
-              <div className={classes.floatRow}>
-                <div className={classes.buttonRow}>
-                  <Button
-                    variant="contained"
-                    component={Link}
-                    to="/Loanpurpose/add"
-                  >
-                    Add Loan Purpose
-                  </Button>
-                </div>
+          <h5 className={classes.menuName}>MASTER</h5>
+            <div className={style.headerWrap}>
+              <h2 className={style.title}>
+                Manage Loan Purpose
+              </h2>
+              <div className={classes.buttonRow}>
+                <Button
+                  variant="contained"
+                  component={Link}
+                  to="/Loanpurpose/add"
+                >
+                  Add Loan Purpose
+                </Button>
               </div>
-            </h2>
+            </div>
             {this.props.location.addData ? (
               <Snackbar severity="success">
                 Loan Purpose added successfully.
@@ -283,7 +284,7 @@ export class Loanpurposes extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            <div className={classes.row}>
+            <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -299,15 +300,15 @@ export class Loanpurposes extends React.Component {
                   </Grid>
                 </div>
               </div>
-              <br></br>
               <Button
+                style={{ marginRight: "5px", marginBottom: "8px", }}
                 variant="contained"
                 onClick={this.handleSearch.bind(this)}
               >
                 Search
               </Button>
-              &nbsp;&nbsp;&nbsp;
               <Button
+                style={{ marginBottom: "8px", }}
                 color="secondary"
                 variant="contained"
                 onClick={this.cancelForm.bind(this)}

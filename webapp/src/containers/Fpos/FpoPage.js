@@ -304,7 +304,7 @@ class FpoPage extends Component {
           this.state.editPage[0] ? EDIT_FPO_BREADCRUMBS : ADD_FPO_BREADCRUMBS
         }
       >
-        <Card>
+        <Card style={{ maxWidth: '45rem' }}>
           <form
             autoComplete="off"
             noValidate
@@ -507,7 +507,7 @@ class FpoPage extends Component {
               </Grid>
             </CardContent>
             <Divider />
-            <CardActions>
+            <CardActions style={{padding: "15px",}}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"

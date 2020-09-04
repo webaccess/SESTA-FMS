@@ -95,6 +95,10 @@ const useStyles = makeStyles((theme) => ({
     verticalAlign: "middle",
     marginBottom: "0px !important",
   },
+  subMenuList: {
+    padding: "0px !important",
+    margin: "0px !important",
+  }
 }));
 
 const StyledMenuItem = withStyles((theme) => ({
@@ -199,7 +203,7 @@ function NavigationItems(props) {
         if (moduleArray.includes(module.name)) {
           masterMenu.push(
             <Collapse in={openMenu} timeout="auto" unmountOnExit>
-              <ListItem>
+              <ListItem className={clsx(classes.subMenuList, className)} >
                 <NavigationItem link={module.url} text={module.name} />
               </ListItem>
             </Collapse>

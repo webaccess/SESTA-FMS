@@ -34,6 +34,7 @@ const useStyles = (theme) => ({
   },
   searchInput: {
     marginRight: theme.spacing(1),
+    marginBottom: "8px",
   },
   Districts: {
     marginRight: theme.spacing(1),
@@ -253,8 +254,8 @@ export class Activity extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-            <h1 className={style.title}>Manage Activities</h1>
-            <div className={classes.row}>
+            <div className={style.headerWrap}>
+              <h1 className={style.title}>Manage Activities</h1>
               <div className={classes.buttonRow}>
                 <Button
                   variant="contained"
@@ -296,8 +297,7 @@ export class Activity extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            <br></br>
-            <div className={classes.row}>
+            <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -351,11 +351,12 @@ export class Activity extends React.Component {
                   </Grid>
                 </div>
               </div>
-              <div className={classes.searchInput}></div>
-              <br></br>
-              <Button onClick={this.handleSearch.bind(this)}>Search</Button>
-              &nbsp;&nbsp;&nbsp;
-              <Button color="secondary" clicked={this.cancelForm}>
+              <Button
+				style={{ marginRight: "5px", marginBottom: "8px", }}
+				onClick={this.handleSearch.bind(this)}>Search</Button>
+              <Button
+				style={{ marginBottom: "8px", }}
+				color="secondary" clicked={this.cancelForm}>
                 reset
               </Button>
             </div>
