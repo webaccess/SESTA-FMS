@@ -250,10 +250,6 @@ export class States extends React.Component {
     this.setState({ open: false });
   };
 
-  handleClose = () => {
-    this.setState({ open: false });
-  };
-
   handleActive = (event) => {
     this.setState({ isActiveAllShowing: false });
     let setActiveId = this.state.setActiveId;
@@ -419,7 +415,6 @@ export class States extends React.Component {
             <br></br>
             {data ? (
               <Table
-                showSetAllActive={true}
                 title={"States"}
                 showSearch={false}
                 filterData={true}
