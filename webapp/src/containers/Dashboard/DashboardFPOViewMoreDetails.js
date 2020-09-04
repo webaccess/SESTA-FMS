@@ -24,6 +24,7 @@ const useStyles = (theme) => ({
   },
   searchInput: {
     marginRight: theme.spacing(1),
+    marginBottom: "8px",
   },
   Districts: {
     marginRight: theme.spacing(1),
@@ -202,7 +203,7 @@ class DashboardFPOViewMoreDetails extends Component {
                 </div>
               </h3>
             </div>
-            <div className={classes.row}>
+            <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
               <div className={classes.searchInput}>
                 <div className={classes.Districts}>
                   <Grid item md={12} xs={12}>
@@ -249,9 +250,12 @@ class DashboardFPOViewMoreDetails extends Component {
                   </Grid>
                 </div>
               </div>
-              <Button onClick={this.handleSearch.bind(this)}>Search</Button>
-              &nbsp;&nbsp;&nbsp;
-              <Button color="secondary" clicked={this.cancelForm}>
+              <Button
+                style={{ marginRight: "5px", marginBottom: "8px", }}
+                onClick={this.handleSearch.bind(this)}>Search</Button>
+              <Button
+                style={{ marginRight: "5px", marginBottom: "8px", }}
+                color="secondary" clicked={this.cancelForm}>
                 reset
               </Button>
             </div>

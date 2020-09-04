@@ -83,6 +83,8 @@ const useStyles = (theme) => ({
   member: {
     color: "black",
     fontSize: "11px",
+    textAlign: "left",
+    marginLeft: "7px",
   },
   memberData: {
     fontSize: "20px",
@@ -98,11 +100,17 @@ const useStyles = (theme) => ({
     textAlign: "left",
   },
   mainContent: {
-    padding: "25px",
+    padding: "0px",
   },
   purposeCard: {
     padding: "20px",
   },
+  fieldValues: {
+    fontSize: "13px",
+    marginTop: "10px",
+    display: "flex",
+    flexWrap: "wrap",
+  }
 });
 
 class LoansPage extends Component {
@@ -428,57 +436,78 @@ class LoansPage extends Component {
         <Grid>
           <div className="App">
             <h5 className={style.loan}>LOAN</h5>
-            <h2 className={style.title}>Apply for Loan</h2>
-
+            <div className={style.headerWrap}>
+              <h2 className={style.title}>Apply for Loan</h2>
+            </div>
             {/* <h4 align="right">Birangana Women Producers Company Pvt. Ltd</h4> */}
 
             <Card className={classes.mainContent}>
-              <Grid>
-                <IconButton aria-label="view">
+              <Grid className={classes.purposeCard}>
+                <IconButton
+                  className={style.loanIconBtn}
+                  disableRipple
+                  aria-label="view">
                   <PersonIcon className={classes.Icon} />
                   <b>
                     <div className={classes.member}>
                       LOANEE
                       <br />
-                      {data.name}
+                      <span className={classes.fieldValues}>
+                        {data.name}
+                      </span>
                     </div>
                   </b>
                 </IconButton>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <IconButton aria-label="view">
+                <IconButton
+                  className={style.loanIconBtn}
+                  disableRipple
+                  aria-label="view">
                   <PeopleIcon className={classes.Icon} />
                   <b>
                     <div className={classes.member}>
-                      SHG GROUP <br />
+                      SHG GROUP
+                      <br />
+                      <span className={classes.fieldValues}>
                       {shgName}
+                      </span>
                     </div>
                   </b>
                 </IconButton>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <IconButton aria-label="view">
+                <IconButton
+                  className={style.loanIconBtn}
+                  disableRipple
+                  aria-label="view">
                   <HomeIcon className={classes.Icon} />
                   <b>
                     <div className={classes.member}>
-                      VILLAGE <br />
-                      {data.villages[0].name}
+                      VILLAGE
+                      <br />
+                      <span className={classes.fieldValues}>
+                        {data.villages[0].name}
+                      </span>
                     </div>
                   </b>
                 </IconButton>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <IconButton aria-label="view">
+                <IconButton
+                  className={style.loanIconBtn}
+                  disableRipple
+                  aria-label="view">
                   <NaturePeopleIcon className={classes.Icon} />
                   <b>
                     <div className={classes.member}>
-                      VILLAGE ORGANIZATION <br />
-                      {shgUnderVo}
+                      VILLAGE ORGANIZATION
+                      <br />
+                      <span className={classes.fieldValues}>
+                        {shgUnderVo}
+                      </span>
                     </div>
                   </b>
                 </IconButton>
               </Grid>
 
               <Divider />
-              <Grid className={classes.purposeCard}>
-                <Grid item xs={12} style={{ width: "74%" }}>
+              <Grid className={classes.purposeCard} style={{maxWidth: "660px",}}>
+                <Grid item xs={12}>
                   <Autocomplete
                     id="combo-box-demo"
                     disabled={false}
@@ -511,72 +540,63 @@ class LoansPage extends Component {
 
               <Divider />
 
-              <Grid className={classes.purposeCard}>
-                <table style={{ padding: "20px" }}>
-                  <tr>
-                    <td style={{ paddingBottom: "179px" }}>
-                      <table>
-                        <tr>
-                          <td>
-                            <b>Product Details</b>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <b>
-                              Loan Amount <br /> Rs. {loan_amnt}{" "}
-                            </b>
-                            <br />
-                            <br />
-                            <b>
-                              Duration <br /> {duration} Months{" "}
-                            </b>
-                            <br />
-                            <br />
-                            <b>
-                              Area/Size/Specifications <br /> {specification}{" "}
-                            </b>
-                            <br />
-                            <br />
-                          </td>
-                        </tr>
-                      </table>
-                    </td>
-
-                    <td style={{ paddingBottom: "50px" }}>
-                      <b>
-                        <table style={{ width: "100%", height: "100%" }}>
-                          <tr>
-                            <td>EMI Installment</td>
-                            <td></td>
-                            <td>Amount in rupees</td>
-                          </tr>
-                          <tr style={{ backgroundColor: "#dddddd" }}>
-                            <th>Due Date</th>
-                            <th>Principal</th>
-                            <th>Interest</th>
-                          </tr>
-                          {this.state.loan_installments
-                            ? this.state.loan_installments.map((row) => (
-                              <tr>
-                                <td>{row.due_date}</td>
-                                <td>{row.principal}</td>
-                                <td>{row.interest}</td>
-                              </tr>
-                            ))
-                            : null}
-                        </table>
-                      </b>
-                    </td>
-                  </tr>
-                </table>
+              <Grid container className={classes.purposeCard} style={{maxWidth: "700px",}}>
+              <Grid item md={6} xs={12} spacing={2} className={style.productLeftPanel}>
+                <div className={style.panelWrap}>
+                  <div className={style.panelHeader}>
+                    <span className={style.panelHeaderTitle}>Product Details</span>
+                  </div>
+                  <div className={style.panelContent} style={{padding: "15px"}}>
+                    <div className={style.normalProductValue}>
+                      Loan Amount
+                      <br />
+                      <span className={style.boldProductValue}> Rs. {loan_amnt} </span>
+                    </div>
+                    <div className={style.normalProductValue}>
+                      Duration
+                      <br />
+                      <span className={style.boldProductValue}> {duration} Months </span>
+                    </div>
+                    <div className={style.normalProductValue}>
+                      Area/Size/Specifications
+                      <br />
+                      <span className={style.boldProductValue}> {specification}</span>
+                    </div>
+                  </div>
+                </div>
+              </Grid>
+              <Grid item md={6} xs={12} spacing={2} className={style.productRightPanel}>
+                <div className={style.panelWrap}>
+                  <div className={style.panelHeader}>
+                  <span className={style.panelHeaderTitle}>EMI Installment </span>
+                  <span className={style.panelSubHeaderTitle}>Amount in rupees</span>
+                  </div>
+                  <div className={style.panelContent}>
+                    <table className={style.productAmoutTable}>
+                      <tr style={{ backgroundColor: "#dddddd" }}>
+                        <th className={style.boldProductCell}>Due Date</th>
+                        <th className={style.boldProductCell}>Principle</th>
+                        <th className={style.boldProductCell}>Interest</th>
+                      </tr>
+                      {this.state.loan_installments
+                        ? this.state.loan_installments.map((row) => (
+                            <tr>
+                              <td className={style.normalProductCell}>{row.due_date}</td>
+                              <td className={style.normalProductCell}>{row.principal}</td>
+                              <td className={style.normalProductCell}>{row.interest}</td>
+                            </tr>
+                          ))
+                        : null}
+                    </table>
+                  </div>
+                </div>
+              </Grid>
               </Grid>
               <Divider />
-
-              <br />
-              <Grid>
-                <Button onClick={this.SaveData.bind(this)}>Save</Button>
-                &nbsp;&nbsp;&nbsp;
+              <Grid style={{padding:"15px"}}>
+                <Button
+                  style={{marginRight:"8px"}}
+                  onClick={this.SaveData.bind(this)}>Save</Button>
                 <Button
                   color="secondary"
                   clicked={this.cancelForm}

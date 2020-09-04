@@ -15,14 +15,17 @@ const useStyles = makeStyles((theme) => ({
   root: {
     boxShadow: "none",
   },
-  flexGrow: {
-    flexGrow: 1,
-  },
+  inlineFlex: {
+    display: "inline-flex",
+    alignItems: "center",
+    },
   signOutButton: {
     marginLeft: theme.spacing(1),
   },
   accntBtn: {
     backgroundColor: "#028941",
+    height: "48px",
+    width: "48px",
     "&:hover": {
       backgroundColor: "#026430",
     },
@@ -77,16 +80,15 @@ function Toolbar(props) {
   return (
     <div>
       <AppBar className={classes.root}>
-        <ToolbarItem>
+        <ToolbarItem style={{justifyContent: "space-between", flexWrap: "wrap",}}>
           <Logo />
-          <div className={classes.flexGrow} />
-          <h4 style={{ color: "#000", paddingRight: "2%" }}>
+          <div className={classes.inlineFlex}>
+          <h4 style={{ color: "#000", paddingRight: "1rem", whiteSpace: "nowrap", }}>
             Welcome {auth.getUserInfo().contact.name}
           </h4>
           <Hidden mdDown>
             <IconButton
               className={classes.accntBtn}
-              edge="end"
               aria-label="account of current user"
               aria-controls={menuId}
               aria-haspopup="true"
@@ -99,6 +101,7 @@ function Toolbar(props) {
           <Hidden lgUp>
             <DrawerToggle clicked={props.drawerToggleClicked} />
           </Hidden>
+          </div>
         </ToolbarItem>
       </AppBar>
       {renderMenu}

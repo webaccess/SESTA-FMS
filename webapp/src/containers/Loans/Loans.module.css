@@ -30,8 +30,7 @@ table, th, td {
   /* text-align: center; */
 }
 .loan {
-  position: relative;
-  top: 20px;
+  margin:0px;
 }
 td {
   font-size:11px;
@@ -46,4 +45,106 @@ tr {
   border: 1px solid lightgray;
   border-collapse: collapse;
   background-color:"#dddddd";
+}
+.manageTable p{
+  margin: 0px;
+}
+.loanPurposeGrid{
+  widows: 100%;
+  margin:0px;
+}
+.loanEmiTable{
+  margin-top: 25px;
+  background-color: rgb(250 250 250);
+  border:1px solid rgba(0,0,0,.12);
+}
+:global(.MuiPaper-root) {
+  margin: 0px;
+}
+.loanEmiTable p{
+  margin: 0px;
+}
+.loanIconBtn{
+  padding-left: 0px !important;
+  padding-right: 3rem !important;
+  background-color: transparent !important;
+}
+.productLeftPanel{
+  max-width: calc(50% - 10px) !important;
+  margin-right: 10px !important;
+  border: 1px solid #c1c1c1 !important;
+}
+.productRightPanel{
+  max-width: calc(50% - 10px) !important;
+  margin-left: 10px !important;
+  border: 1px solid #c1c1c1 !important;
+}
+.panelHeader{
+  padding: 15px;
+  border-bottom: 1px solid #c1c1c1;
+  align-items: flex-end;
+  display: flex;
+  justify-content: space-between;
+}
+.panelHeaderTitle{
+  font-size: 14px;
+  font-weight: 700;
+  display: inline-flex;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+}
+.panelSubHeaderTitle{
+  font-size: 12px;
+  display: inline-flex;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+}
+.normalProductValue{
+  font-size: 13px;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  margin-bottom: 15px;
+}
+.boldProductValue{
+  font-size: 14px;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  display: flex;
+  margin-top: 10px;
+  font-weight: 700;
+}
+.boldProductCell{
+  font-size: 14px;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 700;
+  padding: 15px;
+}
+.normalProductCell{
+  font-size: 13px;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 400;
+  padding: 15px;
+}
+.productAmoutTable{
+  width:100%;
+}
+.productAmoutTable{
+  border:0px
+}
+.productAmoutTable tr{
+  border-left: 0px;
+  border-right: 0px;
+}
+.productAmoutTable tr:last-child{
+  border-bottom: 0px;
+}
+.productAmoutTable tr td, .productAmoutTable tr th{
+  border-radius: 0px !important;
+}
+
+@media (max-width: 576px) {
+  .productLeftPanel {
+    max-width: 100% !important;
+    margin: 0px 0px 20px 0px !important;
+  }
+   .productRightPanel {
+    max-width: 100% !important;
+    margin: 0px !important;
+  }
 }

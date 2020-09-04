@@ -1,0 +1,7 @@
+:global(.MuiInputLabel-formControl ) {
+  z-index:1;
+}
+
+:global(.MuiInput-formControl) {
+  min-height: 30px;
+}

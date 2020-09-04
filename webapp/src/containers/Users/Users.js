@@ -39,6 +39,7 @@ const useStyles = (theme) => ({
   },
   searchInput: {
     marginRight: theme.spacing(1),
+    marginBottom: "8px",
   },
   Districts: {
     marginRight: theme.spacing(1),
@@ -255,16 +256,15 @@ export class Users extends React.Component {
         <Grid>
           <div className="App">
             <h5 className={style.menuName}>USERS</h5>
-            <h2 className={style.title}>
-              Manage Users
-              <div className={classes.floatRow}>
-                <div className={classes.buttonRow}>
-                  <Button variant="contained" component={Link} to="/users/add">
-                    Add New User
-                  </Button>
-                </div>
+            <div className={style.headerWrap}>
+              <h2 className={style.title}>
+                Manage Users</h2>
+              <div className={classes.buttonRow}>
+                <Button variant="contained" component={Link} to="/users/add">
+                  Add New User
+                </Button>
               </div>
-            </h2>
+            </div>
             {this.props.location.addData ? (
               <Snackbar severity="success">User added successfully.</Snackbar>
             ) : this.props.location.editData ? (
@@ -292,7 +292,6 @@ export class Users extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            <br></br>
             <div className={classes.row}>
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
@@ -340,10 +339,10 @@ export class Users extends React.Component {
                   </Grid>
                 </div>
               </div>
-              <br></br>
-              <Button onClick={this.handleSearch.bind(this)}>Search</Button>
-              &nbsp;&nbsp;&nbsp;
-              <Button color="secondary" clicked={this.cancelForm}>
+              <Button onClick={this.handleSearch.bind(this)}
+                style={{ marginRight: "5px", marginBottom: "8px", }}>Search</Button>
+              <Button color="secondary" clicked={this.cancelForm}
+                style={{ marginBottom: "8px", }}>
                 reset
               </Button>
             </div>

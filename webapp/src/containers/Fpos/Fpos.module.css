@@ -1,6 +1,12 @@
 .title {
   color: #263238;
 }
+.headerWrap{
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
 .addButton {
   float: right;
   /* padding-bottom: px; */

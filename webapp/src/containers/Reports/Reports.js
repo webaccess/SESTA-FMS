@@ -25,8 +25,7 @@ const useStyles = (theme) => ({
     width: "230px",
   },
   menuName: {
-    position: "relative",
-    top: "20px",
+    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
   },
 });
 
@@ -42,11 +41,11 @@ export class Reports extends React.Component {
     const { classes } = this.props;
     return (
       <Layout>
-        <Grid>
-          <Grid>
-            <div>
-              <h5 className={classes.menuName}>REPORTS</h5>
-            </div>
+        <div>
+          <h5 className={classes.menuName}>REPORTS</h5>
+        </div>
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={6} md={4}>
             <div>
               <Card className={classes.root}>
                 <CardActionArea
@@ -59,6 +58,8 @@ export class Reports extends React.Component {
                 </CardActionArea>
               </Card>
             </div>
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
             <div>
               <Card className={classes.root}>
                 <CardActionArea
