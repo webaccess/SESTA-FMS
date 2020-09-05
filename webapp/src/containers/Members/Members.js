@@ -477,7 +477,21 @@ export class Members extends React.Component {
     });
 
     let data = this.state.data;
-    //console.log("name", name);
+    data.map((memdata) => {
+      this.state.getShg.map((shg) => {
+        if (
+          this.state.loggedInUserRole === "CSP (Community Service Provider)"
+        ) {
+          if (memdata.individual.shg === shg.contact) {
+            memdata.shgName = shg.name;
+          }
+        } else {
+          if (memdata.individual.shg === shg.id) {
+            memdata.shgName = shg.name;
+          }
+        }
+      });
+    });
     const Usercolumns = [
       {
         name: "Name",
@@ -495,9 +509,15 @@ export class Members extends React.Component {
         sortable: true,
       },
       {
+        name: "SHG Name",
+        selector: "shgName",
+        sortable: true,
+      },
+      {
         name: "Phone",
         selector: "phone",
         sortable: true,
+        cell: (row) => (row.phone ? row.phone : "-"),
       },
     ];
 
@@ -713,6 +733,7 @@ export class Members extends React.Component {
                   "name",
                   "villages[0].name",
                   "district.name",
+                  "shgName",
                   "phone",
                 ]}
                 filters={filters}

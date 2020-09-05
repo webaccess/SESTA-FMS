@@ -154,6 +154,7 @@ class LoanEditTask extends Component {
                     fdata.contact = {
                       id: auth.getUserInfo().contact.id
                     }
+                    fdata.end_datetime = this.state.values.editDate;
                     fdata.description = loanTaskData.comments;
                     serviceProvider
                       .serviceProviderForPutRequest(
@@ -326,7 +327,7 @@ class LoanEditTask extends Component {
                         : null
                     }
                     value={this.state.values.editDate || ""}
-                    // format={"dd MMM yyyy"}
+                    format={"dd MMM yyyy"}
                     onChange={(value) =>
                       this.setState({
                         values: { ...this.state.values, editDate: value }

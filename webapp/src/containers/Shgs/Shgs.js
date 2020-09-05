@@ -375,18 +375,21 @@ export class Shgs extends React.Component {
       },
       {
         name: "Village",
-        selector: "addresses[3].village.name",
+        cell: (row) => (row.addresses[3] ? addresses[3].village.name : "-"),
+        //selector: "addresses[3].village.name",
         sortable: true,
       },
       {
         name: "District",
-        selector: "addresses[2].district.name",
+        //selector: "addresses[2].district.name",
         sortable: true,
+        cell: (row) => (row.addresses[2] ? addresses[2].district.name : "-"),
       },
       {
         name: "State",
-        selector: "addresses[1].state.name",
+        //selector: "addresses[1].state.name",
         sortable: true,
+        cell: (row) => (row.addresses[1] ? addresses[1].state.name : "-"),
       },
     ];
 

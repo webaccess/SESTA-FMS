@@ -61,10 +61,12 @@ class VillagePage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/villages/?id=" +
-          this.state.editPage[1]
+            "crm-plugin/villages/?id=" +
+            this.state.editPage[1]
         )
         .then((res) => {
+          this.handleStateChange(res.data[0].state);
+
           this.setState({
             values: {
               addVillage: res.data[0].name,
@@ -75,24 +77,25 @@ class VillagePage extends Component {
               addState: res.data[0].state.id,
             },
           });
+          console.log("this.state.values", this.state.values);
         })
         .catch((error) => {
           console.log(error);
         });
       this.stateIds = this.state.values.addState;
 
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/districts/?is_active=true&&state.id=" +
-          this.state.values.addState
-        )
-        .then((res) => {
-          this.setState({ getDistrict: res.data });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      //serviceProvider
+      //  .serviceProviderForGetRequest(
+      //    process.env.REACT_APP_SERVER_URL +
+      //      "crm-plugin/districts/?is_active=true&&state.id=" +
+      //      this.state.values.addState
+      //  )
+      //  .then((res) => {
+      //    this.setState({ getDistrict: res.data });
+      //  })
+      //  .catch((error) => {
+      //    console.log(error);
+      //  });
     }
     serviceProvider
       .serviceProviderForGetRequest(
@@ -115,6 +118,47 @@ class VillagePage extends Component {
     });
   };
 
+  handleStateChange(value) {
+    console.log("value", value);
+
+    if (value !== null) {
+      console.log("value", value);
+      let newVal = value;
+      if (typeof value === "object") {
+        newVal = value.id;
+      }
+      this.setState({
+        values: { ...this.state.values, addState: newVal },
+      });
+      //if (value.is_active == true) {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/districts/?is_active=true&&state.id=" +
+            newVal
+        )
+        .then((res) => {
+          this.setState({ getDistrict: res.data });
+          console.log("res in state ", res.data, this.state.getDistrict);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      this.setState({ stateSelected: true });
+      //}
+    } else {
+      this.setState({
+        values: {
+          ...this.state.values,
+          addState: "",
+          addDistrict: "",
+        },
+        getDistrict: [],
+      });
+      this.setState({ stateSelected: false });
+    }
+  }
+
   handleCheckBox = (event) => {
     this.setState({
       values: {
@@ -123,38 +167,6 @@ class VillagePage extends Component {
       },
     });
   };
-
-  handleStateChange(event, value) {
-    if (value !== null) {
-      this.setState({
-        values: { ...this.state.values, addState: value.id },
-      });
-      let stateId = value.id;
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/districts/?is_active=true&&state.id=" +
-          stateId
-        )
-        .then((res) => {
-          this.setState({ getDistrict: res.data });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      this.setState({ stateSelected: true });
-    } else {
-      this.setState({
-        values: {
-          ...this.state.values,
-          addState: "",
-          addDistrict: "",
-        },
-        getDistrict: []
-      });
-      this.setState({ stateSelected: false });
-    }
-  }
 
   handleDistrictChange(event, value) {
     if (value !== null) {
@@ -382,16 +394,16 @@ class VillagePage extends Component {
                     label="Select State*"
                     getOptionLabel={(option) => option.name}
                     onChange={(event, value) => {
-                      this.handleStateChange(event, value);
+                      this.handleStateChange(value);
                     }}
                     defaultValue={[]}
                     value={
                       addState
                         ? stateFilter[
-                        stateFilter.findIndex(function (item, i) {
-                          return item.id === addState;
-                        })
-                        ] || null
+                            stateFilter.findIndex(function (item, i) {
+                              return item.id === addState;
+                            })
+                          ] || null
                         : null
                     }
                     error={this.hasError("addState")}
@@ -425,10 +437,10 @@ class VillagePage extends Component {
                     value={
                       addDistrict
                         ? districtFilter[
-                        districtFilter.findIndex(function (item, i) {
-                          return item.id === addDistrict;
-                        })
-                        ] || null
+                            districtFilter.findIndex(function (item, i) {
+                              return item.id === addDistrict;
+                            })
+                          ] || null
                         : null
                     }
                     error={this.hasError("addDistrict")}
@@ -436,8 +448,8 @@ class VillagePage extends Component {
                       this.hasError("addDistrict")
                         ? this.state.errors.addDistrict[0]
                         : this.state.stateSelected
-                          ? null
-                          : "Please select the state first"
+                        ? null
+                        : "Please select the state first"
                     }
                     renderInput={(params) => (
                       <Input
