@@ -463,7 +463,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                         label="Start Date"
                         name="startDate"
                         value={this.state.filterStartDate || ""}
-                        // format={"dd MMM yyyy"}
+                        format={"dd MMM yyyy"}
                         onChange={(event, value) =>
                           this.handleStartDateChange(event, value)
                         }
@@ -478,7 +478,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                         label="End Date"
                         name="endDate"
                         value={this.state.filterEndDate || ""}
-                        // format={"dd MMM yyyy"}
+                        format={"dd MMM yyyy"}
                         onChange={(event, value) =>
                           this.handleEndDateChange(event, value)
                         }
@@ -558,7 +558,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                         label="Start Date"
                         name="startDate"
                         value={this.state.filterStartDate || ""}
-                        // format={"dd MMM yyyy"}
+                        format={"dd MMM yyyy"}
                         onChange={(event, value) =>
                           this.handleStartDateChange(event, value)
                         }
@@ -573,7 +573,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                         label="End Date"
                         name="endDate"
                         value={this.state.filterEndDate || ""}
-                        // format={"dd MMM yyyy"}
+                        format={"dd MMM yyyy"}
                         onChange={(event, value) =>
                           this.handleEndDateChange(event, value)
                         }
