@@ -372,6 +372,9 @@ class UsersPage extends Component {
     let password = this.state.values.password;
     let roleId = this.state.values.role;
     let selectFieldId = this.state.values.selectField;
+    if (emailAdd == "" || emailAdd == undefined) {
+      emailAdd = username + "@sesta.com";
+    }
     let postUserData = {
       username: username,
       password: password,
@@ -380,7 +383,7 @@ class UsersPage extends Component {
       contact: data.id,
       email: emailAdd,
     };
-
+    console.log("postUserData", postUserData);
     let postIndividualData = {};
     if (roleId) {
       if (roleId.name === "CSP (Community Service Provider)") {
@@ -474,10 +477,22 @@ class UsersPage extends Component {
               });
             })
             .catch((error) => {
-              console.log(error);
+              // this.state.errors.addPhone
             });
         })
-        .catch((error) => {});
+        .catch((error) => {
+          if (
+            error.response.data.message[0]["messages"][0]["id"] ===
+            "Auth.form.error.username.taken"
+          ) {
+            this.state.errors.addPhone = [];
+            this.state.errors.addPhone.push("Duplicate phone number!!");
+            this.setState({ errorCode: "Duplicate phone number!!" });
+          }
+
+          console.log("errorr");
+          console.log("err", error);
+        });
     }
   };
 
