@@ -9,6 +9,7 @@ import Input from "../../components/UI/Input/Input";
 import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 import Button from "../../components/UI/Button/Button";
 import { Link } from "react-router-dom";
+import style from "./Dashboard.module.css";
 
 const useStyles = (theme) => ({
   root: {},
@@ -27,8 +28,11 @@ const useStyles = (theme) => ({
     marginBottom: "8px",
   },
   Districts: {
-    marginRight: theme.spacing(1),
     width: "230px",
+  },
+  buttonRow: {
+    height: "42px",
+    marginTop: theme.spacing(1),
   },
 });
 
@@ -193,15 +197,15 @@ class DashboardFPOViewMoreDetails extends Component {
       <Layout>
         <Grid>
           <Grid>
-            <div>
-              <h3>
+            <div className={style.headerWrap}>
+              <h2 className={style.title}>
                 Loans
-                <div align="right">
-                  <Button color="primary" component={Link} to="/">
-                    Back
-                  </Button>
-                </div>
-              </h3>
+              </h2>
+              <div className={classes.buttonRow}>
+                <Button color="primary" component={Link} to="/">
+                  Back
+                </Button>
+              </div>
             </div>
             <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
               <div className={classes.searchInput}>
@@ -221,7 +225,7 @@ class DashboardFPOViewMoreDetails extends Component {
                 </div>
               </div>
               <div className={classes.searchInput}>
-                <div className={classes.Districts}>
+                <div>
                   <Grid item md={12} xs={12}>
                     <Datepicker
                       label="Start Date"
@@ -236,7 +240,7 @@ class DashboardFPOViewMoreDetails extends Component {
                 </div>
               </div>
               <div className={classes.searchInput}>
-                <div className={classes.Districts}>
+                <div>
                   <Grid item md={12} xs={12}>
                     <Datepicker
                       label="End Date"

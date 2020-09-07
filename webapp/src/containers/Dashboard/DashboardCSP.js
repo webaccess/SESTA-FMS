@@ -13,6 +13,7 @@ import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import AccountBalanceWalletIcon from "@material-ui/icons/AccountBalanceWallet";
 import { withRouter } from "react-router";
 import { Link } from "react-router-dom";
+import style from "./Dashboard.module.css";
 
 const useStyles = (theme) => ({
   root: {},
@@ -45,7 +46,9 @@ const useStyles = (theme) => ({
     marginTop: "0px",
   },
   emiDue: {
-    border: "1px solid #ccc",
+    borderWidth: "1px 0px",
+    borderStyle: "solid",
+    borderColor : "#ccc",
     backgroundColor: "#fff",
     marginTop: "-1px",
   },
@@ -352,7 +355,7 @@ class DashboardCSP extends Component {
           </Grid>
           <Grid item md={8} xs={12} spacing={3}>
             <div className={classes.emiDue}>
-              <h3 style={{ paddingLeft: "15px" }}>EMI DUE</h3>
+              <h3 className={style.emiDueHead}>EMI DUE</h3>
               {loanInstallmentData ? (
                 <Table
                   title={"EMI Due"}
@@ -383,7 +386,7 @@ class DashboardCSP extends Component {
               </div>
             </div>
             <div className={classes.emiDue}>
-              <h3 style={{ paddingLeft: "15px" }}>RECENT ACTIVITIES</h3>
+              <h3 className={style.emiDueHead}>RECENT ACTIVITIES</h3>
               {activitiesData ? (
                 <Table
                   title={"Recent Activities"}

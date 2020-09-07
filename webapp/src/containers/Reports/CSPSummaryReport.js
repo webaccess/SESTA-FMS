@@ -31,6 +31,7 @@ const useStyles = (theme) => ({
   },
   searchInput: {
     marginRight: theme.spacing(1),
+    marginBottom: "8px",
   },
   Districts: {
     marginRight: theme.spacing(1),
@@ -401,38 +402,38 @@ export class CSPSummaryReport extends React.Component {
                   </div>
                 </div>
                 <div className={classes.searchInput}>
-                  <div className={classes.Districts}>
-                    <Grid item md={12} xs={12}>
-                      <DateTimepicker
-                        label="Start Date"
-                        name="startDate"
-                        value={this.state.filterStartDate || ""}
-                        format={"dd MMM yyyy"}
-                        onChange={(event, value) =>
-                          this.handleStartDateChange(event, value)
-                        }
-                      />
-                    </Grid>
-                  </div>
+                  <Grid item md={12} xs={12}>
+                    <DateTimepicker
+                      label="Start Date"
+                      name="startDate"
+                      value={this.state.filterStartDate || ""}
+                      format={"dd MMM yyyy"}
+                      onChange={(event, value) =>
+                        this.handleStartDateChange(event, value)
+                      }
+                    />
+                  </Grid>
                 </div>
                 <div className={classes.searchInput}>
-                  <div className={classes.Districts}>
-                    <Grid item md={12} xs={12}>
-                      <DateTimepicker
-                        label="End Date"
-                        name="endDate"
-                        value={this.state.filterEndDate || ""}
-                        format={"dd MMM yyyy"}
-                        onChange={(event, value) =>
-                          this.handleEndDateChange(event, value)
-                        }
-                      />
-                    </Grid>
-                  </div>
+                  <Grid item md={12} xs={12}>
+                    <DateTimepicker
+                      label="End Date"
+                      name="endDate"
+                      value={this.state.filterEndDate || ""}
+                      format={"dd MMM yyyy"}
+                      onChange={(event, value) =>
+                        this.handleEndDateChange(event, value)
+                      }
+                    />
+                  </Grid>
                 </div>
-                <Button onClick={this.handleSearch.bind(this)}>Search</Button>
+                <Button
+                  style={{ marginRight: "5px", marginBottom: "8px", }}
+                  onClick={this.handleSearch.bind(this)}>Search</Button>
                 &nbsp;&nbsp;&nbsp;
-                <Button color="secondary" clicked={this.cancelForm}>
+                <Button
+                  style={{ marginBottom: "8px", }}
+                  color="secondary" clicked={this.cancelForm}>
                   reset
                 </Button>
               </div>

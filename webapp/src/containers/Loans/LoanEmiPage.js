@@ -24,6 +24,8 @@ const useStyles = (theme) => ({
   member: {
     color: "black",
     fontSize: "10px",
+    padding: "5px 0px",
+    margin: "5px 0px",
   },
   mainContent: {
     padding: "25px",
@@ -34,10 +36,21 @@ const useStyles = (theme) => ({
   },
   fieldValues: {
     fontSize: "13px !important",
+    marginTop: "10px !important",
+    display: "flex",
   },
   dataRow: {
     display: "flex",
   },
+  emiViewWrap: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+  },
+  loaneeName: {
+    margin: "10px 0",
+    display: "inline-flex",
+  }
 });
 
 class LoanEmiPage extends Component {
@@ -273,8 +286,8 @@ class LoanEmiPage extends Component {
         <Grid>
           <div className="App">
             <h5 className={style.loan}>LOANS</h5>
-            <div style={{ display: "flex" }}>
-              <h2 style={{ margin: "13px" }} style={{paddingRight: "4rem",}}>{data.loanee}</h2>
+            <div className={classes.emiViewWrap}>
+              <h2 className={classes.loaneeName} style={{paddingRight: "4rem",}}>{data.loanee}</h2>
               <div className={classes.dataRow} style={{paddingRight: "4rem",}}>
                 <p>
                   SHG GROUP <b>{data.shg}</b>
@@ -319,7 +332,8 @@ class LoanEmiPage extends Component {
                   </Grid>
                   <Grid spacing={2} xs={2}>
                     <b>
-                      <div className={classes.member}>
+                      <div className={classes.member}
+                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
                         AMOUNT <br />
                         <span className={classes.fieldValues}>
                           ₹{data.amount}
@@ -329,7 +343,8 @@ class LoanEmiPage extends Component {
                   </Grid>
                   <Grid spacing={2} xs={2}>
                     <b>
-                      <div className={classes.member}>
+                      <div className={classes.member}
+                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
                         PENDING AMOUNT <br />
                         <span className={classes.fieldValues}>
                           {pendingAmount}
@@ -339,7 +354,8 @@ class LoanEmiPage extends Component {
                   </Grid>
                   <Grid spacing={2} xs={2}>
                     <b>
-                      <div className={classes.member}>
+                      <div className={classes.member}
+                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
                         EMI <br />
                         <span className={classes.fieldValues}>{data.emi}</span>
                       </div>
@@ -347,7 +363,8 @@ class LoanEmiPage extends Component {
                   </Grid>
                   <Grid spacing={2} xs={2}>
                     <b>
-                      <div className={classes.member}>
+                      <div className={classes.member}
+                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
                         DURATION <br />
                         <span className={classes.fieldValues}>
                           {data.duration}
@@ -357,7 +374,8 @@ class LoanEmiPage extends Component {
                   </Grid>
                   <Grid spacing={2} xs={2}>
                     <b>
-                      <div className={classes.member}>
+                      <div className={classes.member}
+                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
                         LOAN ENDS ON <br />
                         <span className={classes.fieldValues}>
                           {data.loanEndsOn}

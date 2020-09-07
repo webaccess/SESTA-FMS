@@ -12,6 +12,7 @@ import DateTimepicker from "../../components/UI/DateTimepicker/DateTimepicker.js
 import Button from "../../components/UI/Button/Button";
 import { Link } from "react-router-dom";
 import { CSVLink, CSVDownload } from "react-csv";
+import style from "./Dashboard.module.css";
 
 const useStyles = (theme) => ({
   root: {},
@@ -27,14 +28,18 @@ const useStyles = (theme) => ({
   },
   searchInput: {
     marginRight: theme.spacing(1),
+    marginBottom: "8px",
   },
   Districts: {
-    marginRight: theme.spacing(1),
     width: "230px",
   },
   csvData: {
     color: "white",
     textDecoration: "none"
+  },
+  buttonRow: {
+    height: "42px",
+    marginTop: theme.spacing(1),
   },
 });
 class DashboardViewMoreDetailsCSP extends Component {
@@ -402,10 +407,13 @@ class DashboardViewMoreDetailsCSP extends Component {
       <Layout>
         <Grid>
           <Grid>
-            <div align="right">
-              <Button color="primary" component={Link} to="/">
-                Back
-              </Button>
+            <div className={style.headerWrap}>
+              {dbLoanData ? <h2 className={style.title}>EMI Due</h2> : null}
+              <div className={classes.buttonRow}>
+                <Button color="primary" component={Link} to="/">
+                  Back
+                </Button>
+              </div>
             </div>
             {dbLoanData ? <h3>EMI Due</h3> : null}
             {dbLoanData ? (
@@ -457,7 +465,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                   </div>
                 </div>
                 <div className={classes.searchInput}>
-                  <div className={classes.Districts}>
+                  <div>
                     <Grid item md={12} xs={12}>
                       <DateTimepicker
                         label="Start Date"
@@ -472,7 +480,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                   </div>
                 </div>
                 <div className={classes.searchInput}>
-                  <div className={classes.Districts}>
+                  <div>
                     <Grid item md={12} xs={12}>
                       <DateTimepicker
                         label="End Date"
@@ -486,11 +494,14 @@ class DashboardViewMoreDetailsCSP extends Component {
                     </Grid>
                   </div>
                 </div>
-                <Button onClick={this.handleLoanEMISearch.bind(this)}>
+                <Button
+                  style={{ marginRight: "5px", marginBottom: "8px", }}
+                  onClick={this.handleLoanEMISearch.bind(this)}>
                   Search
                 </Button>
-                &nbsp;&nbsp;&nbsp;
-                <Button color="secondary" clicked={this.cancelForm}>
+                <Button
+                  style={{marginBottom: "8px", }}
+                  color="secondary" clicked={this.cancelForm}>
                   reset
                 </Button>
               </div>
@@ -552,7 +563,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                   </div>
                 </div>
                 <div className={classes.searchInput}>
-                  <div className={classes.Districts}>
+                  <div>
                     <Grid item md={12} xs={12}>
                       <DateTimepicker
                         label="Start Date"
@@ -567,7 +578,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                   </div>
                 </div>
                 <div className={classes.searchInput}>
-                  <div className={classes.Districts}>
+                  <div>
                     <Grid item md={12} xs={12}>
                       <DateTimepicker
                         label="End Date"
@@ -581,11 +592,14 @@ class DashboardViewMoreDetailsCSP extends Component {
                     </Grid>
                   </div>
                 </div>
-                <Button onClick={this.handleActivitySearch.bind(this)}>
+                <Button
+                  style={{ marginRight: "5px", marginBottom: "8px", }}
+                  onClick={this.handleActivitySearch.bind(this)}>
                   Search
                 </Button>
-                &nbsp;&nbsp;&nbsp;
-                <Button color="secondary" clicked={this.cancelForm}>
+                <Button
+                  style={{ marginBottom: "8px", }}
+                  color="secondary" clicked={this.cancelForm}>
                   reset
                 </Button>
               </div>
