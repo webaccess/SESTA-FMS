@@ -15,7 +15,8 @@
       "required": true
     },
     "phone": {
-      "type": "string"
+      "type": "string",
+      "unique": true
     },
     "phone_other": {
       "type": "string"
@@ -76,9 +77,9 @@
       "via": "contact"
     },
     "activitytypes": {
-      "via": "contact",
       "plugin": "crm-plugin",
-      "collection": "activitytype"
+      "collection": "activitytype",
+      "via": "contact"
     },
     "block": {
       "type": "string"
@@ -96,8 +97,8 @@
       "via": "contact"
     },
     "loan_app_approvedby": {
-      "via": "approved_by",
-      "model": "loan-application"
+      "model": "loan-application",
+      "via": "approved_by"
     },
     "organization": {
       "plugin": "crm-plugin",
@@ -115,8 +116,8 @@
       "via": "fpo"
     },
     "loan_applications": {
-      "via": "contact",
-      "collection": "loan-application"
+      "collection": "loan-application",
+      "via": "contact"
     },
     "creator_id": {
       "plugin": "crm-plugin",
