@@ -38,6 +38,7 @@ const useStyles = (theme) => ({
   },
   searchInput: {
     marginRight: theme.spacing(1),
+    marginBottom: "8px",
   },
   Districts: {
     marginRight: theme.spacing(1),
@@ -52,8 +53,8 @@ const useStyles = (theme) => ({
     marginRight: theme.spacing(1),
   },
   menuName: {
-    position: "relative",
-    top: "20px",
+    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+    margin: "0px",
   },
 });
 
@@ -334,20 +335,19 @@ export class Vos extends React.Component {
         <Grid>
           <div className="App">
             <h5 className={classes.menuName}>MASTERS</h5>
-            <h2 className={style.title}>
-              Manage Village Organizations
-              <div className={classes.floatRow}>
-                <div className={classes.buttonRow}>
-                  <Button
-                    variant="contained"
-                    component={Link}
-                    to="/Village-organizations/add"
-                  >
-                    Add Village Organization
-                  </Button>
-                </div>
+            <div className={style.headerWrap}>
+              <h2 className={style.title}>
+                Manage Village Organizations</h2>
+              <div className={classes.buttonRow}>
+                <Button
+                  variant="contained"
+                  component={Link}
+                  to="/Village-organizations/add"
+                >
+                  Add Village Organization
+                </Button>
               </div>
-            </h2>
+            </div>
             {this.props.location.addVoData ? (
               <Snackbar severity="success">
                 Village organization added successfully.
@@ -380,7 +380,7 @@ export class Vos extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            <div className={classes.row}>
+            <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -493,15 +493,15 @@ export class Vos extends React.Component {
                   </Grid>
                 </div>
               </div>
-              <br></br>
               <Button
+                style={{ marginRight: "5px", marginBottom: "8px", }}
                 variant="contained"
                 onClick={this.handleSearch.bind(this)}
               >
                 Search
               </Button>
-              &nbsp;&nbsp;&nbsp;
               <Button
+                style={{ marginRight: "5px", marginBottom: "8px", }}
                 color="secondary"
                 variant="contained"
                 // clicked={this.cancelForm}

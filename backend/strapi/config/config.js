@@ -4,8 +4,8 @@ const knex = require("knex")({
     host: "127.0.0.1",
     port: "5432",
     user: "postgres",
-    password: "root",
-    database: "sesta",
+    password: "postgres",
+    database: "newSesta",
     // host: "${process.env.DATABASE_HOST || '127.0.0.1'}",
     // port: "${process.env.DATABASE_PORT || 5432}",
     // user: "${process.env.DATABASE_USERNAME || ''}",
@@ -49,6 +49,22 @@ bookshelf.model("permission", {
 bookshelf.model("roleModule", {
   requireFetch: false,
   tableName: "modules_roles__roles_modules",
+});
+
+bookshelf.model("state", {
+  requireFetch: false,
+  tableName: "states",
+  district() {
+    return this.hasMany("district", "state", "id");
+  },
+});
+
+bookshelf.model("district", {
+  requireFetch: false,
+  tableName: "districts",
+  state() {
+    return this.belongsTo("state", "state", "id");
+  },
 });
 
 bookshelf.model("activitytype", {

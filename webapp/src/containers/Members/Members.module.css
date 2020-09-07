@@ -1,6 +1,12 @@
 .title {
   color: #263238;
 }
+.headerWrap{
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
 .addButton {
   float: right;
   /* padding-bottom: px; */
@@ -18,6 +24,9 @@
 }
 
 .menuName {
-  position: relative;
-  top: 20px;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  margin: 0px;
+}
+.manageTable p{
+  margin: 0px;
 }

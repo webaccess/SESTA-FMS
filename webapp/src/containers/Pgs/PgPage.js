@@ -188,7 +188,7 @@ class PgPage extends Component {
           this.state.editPage[0] ? EDIT_PG_BREADCRUMBS : ADD_PG_BREADCRUMBS
         }
       >
-        <Card>
+        <Card style={{ maxWidth: '45rem' }}>
           <form
             autoComplete="off"
             noValidate
@@ -259,7 +259,7 @@ class PgPage extends Component {
               </Grid>
             </CardContent>
             <Divider />
-            <CardActions>
+            <CardActions style={{padding: "15px",}}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"

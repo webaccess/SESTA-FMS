@@ -527,7 +527,7 @@ class ShgPage extends Component {
           this.state.editPage[0] ? EDIT_SHG_BREADCRUMBS : ADD_SHG_BREADCRUMBS
         }
       >
-        <Card>
+        <Card style={{ maxWidth: '45rem' }}>
           <form
             autoComplete="off"
             noValidate
@@ -869,7 +869,7 @@ class ShgPage extends Component {
               </Grid>
             </CardContent>
             <Divider />
-            <CardActions>
+            <CardActions style={{padding: "15px",}}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"

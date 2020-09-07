@@ -369,7 +369,7 @@ export class CSPSummaryReport extends React.Component {
           <Grid>
             <div className="App">
               <h3>CSP Summary Report</h3>
-              <div className={classes.row}>
+              <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
                 <div className={classes.searchInput}>
                   <div className={classes.Districts}>
                     <Grid item md={12} xs={12}>

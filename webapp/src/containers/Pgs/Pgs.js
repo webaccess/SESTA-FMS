@@ -38,6 +38,7 @@ const useStyles = (theme) => ({
   },
   searchInput: {
     marginRight: theme.spacing(1),
+    marginBottom: "8px",
   },
   Districts: {
     marginRight: theme.spacing(1),
@@ -52,8 +53,8 @@ const useStyles = (theme) => ({
     marginRight: theme.spacing(1),
   },
   menuName: {
-    position: "relative",
-    top: "20px",
+    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+    margin: "0px",
   },
 });
 
@@ -265,16 +266,15 @@ export class Pgs extends React.Component {
         <Grid>
           <div className="App">
             <h5 className={classes.menuName}>MASTERS</h5>
-            <h2 className={style.title}>
-              Manage Producer Group
-              <div className={classes.floatRow}>
-                <div className={classes.buttonRow}>
-                  <Button variant="contained" component={Link} to="/Pgs/add">
-                    Add PG
-                  </Button>
-                </div>
+            <div className={style.headerWrap}>
+              <h2 className={style.title}>
+                Manage Producer Group</h2>
+              <div className={classes.buttonRow}>
+                <Button variant="contained" component={Link} to="/Pgs/add">
+                  Add PG
+                </Button>
               </div>
-            </h2>
+            </div>
             {this.props.location.addData ? (
               <Snackbar severity="success">
                 Producer Group added successfully.
@@ -322,8 +322,7 @@ export class Pgs extends React.Component {
                 {this.state.errorCode}
               </Snackbar>
             ) : null}
-            <br></br>
-            <div className={classes.row}>
+            <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -340,11 +339,12 @@ export class Pgs extends React.Component {
                   </Grid>
                 </div>
               </div>
-              <div className={classes.searchInput}></div>
-              <br></br>
-              <Button onClick={this.handleSearch.bind(this)}>Search</Button>
-              &nbsp;&nbsp;&nbsp;
-              <Button color="secondary" clicked={this.resetForm}>
+              <Button
+                style={{ marginRight: "5px", marginBottom: "8px", }}
+                onClick={this.handleSearch.bind(this)}>Search</Button>
+              <Button
+                style={{ marginBottom: "8px", }}
+                color="secondary" clicked={this.resetForm}>
                 reset
               </Button>
             </div>

@@ -693,7 +693,7 @@ class ActivityPage extends Component {
             : ADD_MEMBERS_BREADCRUMBS
         }
       >
-        <Card>
+        <Card style={{ maxWidth: '45rem' }}>
           <form
             autoComplete="off"
             noValidate
@@ -1043,7 +1043,7 @@ class ActivityPage extends Component {
                 </Grid>
                 <Divider />
                 {this.state.isShareholder ? (
-                  <Grid container spacing={3}>
+                  <Grid container spacing={3} style={{width: "100%", margin: "0px",}}>
                     <Grid item md={6} xs={12}>
                       <Input
                         fullWidth
@@ -1135,7 +1135,7 @@ class ActivityPage extends Component {
               </Grid>
             </CardContent>
             <Divider />
-            <CardActions>
+            <CardActions style={{padding: "15px",}}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"

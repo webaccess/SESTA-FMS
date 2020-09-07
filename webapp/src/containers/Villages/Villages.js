@@ -11,6 +11,8 @@ import { Grid } from "@material-ui/core";
 import Autocomplete from "../../components/Autocomplete/Autocomplete";
 import Input from "../../components/UI/Input/Input";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
+import Modal from "../../components/UI/Modal/Modal.js";
+import Switch from "../../components/UI/Switch/Switch";
 
 const useStyles = (theme) => ({
   root: {},
@@ -38,6 +40,7 @@ const useStyles = (theme) => ({
   },
   searchInput: {
     marginRight: theme.spacing(1),
+    marginBottom: "8px",
   },
   Districts: {
     marginRight: theme.spacing(1),
@@ -52,8 +55,8 @@ const useStyles = (theme) => ({
     marginRight: theme.spacing(1),
   },
   menuName: {
-    position: "relative",
-    top: "20px",
+    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+    margin: "0px",
   },
 });
 
@@ -70,6 +73,7 @@ export class Villages extends React.Component {
       data: [],
       selectedid: 0,
       open: false,
+      isActiveAllShowing: false,
       columnsvalue: [],
       DeleteData: false,
       properties: props,
@@ -80,6 +84,8 @@ export class Villages extends React.Component {
       dataCellId: [],
       singleDelete: "",
       multipleDelete: "",
+      active: {},
+      allIsActive: [],
     };
   }
   async componentDidMount() {
@@ -220,6 +226,125 @@ export class Villages extends React.Component {
     }
   };
 
+  ActiveAll = (selectedId, selected) => {
+    if (selectedId.length !== 0) {
+      let numberOfIsActive = [];
+      for (let i in selected) {
+        numberOfIsActive.push(selected[i]["is_active"]);
+      }
+      this.setState({ allIsActive: numberOfIsActive });
+      let IsActive = "";
+      numberOfIsActive.forEach((element, index) => {
+        if (numberOfIsActive[index] === true) {
+          IsActive = false;
+        } else {
+          IsActive = true;
+        }
+
+        let setActiveId = selectedId[index];
+        serviceProvider
+          .serviceProviderForPutRequest(
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/villages",
+            setActiveId,
+            {
+              is_active: IsActive,
+            }
+          )
+          .then((res) => {
+            this.setState({ formSubmitted: true });
+            this.componentDidMount({ updateData: true });
+            this.props.history.push({
+              pathname: "/villages",
+              updateData: true,
+            });
+            this.clearSelected(selected);
+          })
+          .catch((error) => {
+            this.setState({ formSubmitted: false });
+            if (error.response !== undefined) {
+              this.setState({
+                errorCode:
+                  error.response.data.statusCode +
+                  " Error- " +
+                  error.response.data.error +
+                  " Message- " +
+                  error.response.data.message +
+                  " Please try again!",
+              });
+            } else {
+              this.setState({
+                errorCode: "Network Error - Please try again!",
+              });
+            }
+            console.log(error);
+          });
+      });
+    }
+  };
+
+  clearSelected = (selected) => {
+    let clearselected = "";
+  };
+
+  confirmActive = (event) => {
+    this.setState({ isActiveAllShowing: true });
+    this.setState({ setActiveId: event.target.id });
+    this.setState({ IsActive: event.target.checked });
+  };
+
+  handleClose = () => {
+    this.setState({ open: false });
+  };
+
+  handleActive = (event) => {
+    this.setState({ isActiveAllShowing: false });
+    let setActiveId = this.state.setActiveId;
+    let IsActive = this.state.IsActive;
+    serviceProvider
+      .serviceProviderForPutRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/villages",
+        setActiveId,
+        {
+          is_active: IsActive,
+        }
+      )
+      .then((res) => {
+        this.setState({ formSubmitted: true });
+        this.setState({ open: true });
+        this.componentDidMount({ updateData: true });
+        this.props.history.push({ pathname: "/villages", updateData: true });
+        if (this.props.location.updateData && this.snackbar.current !== null) {
+          this.snackbar.current.handleClick();
+        }
+      })
+      .catch((error) => {
+        this.setState({ formSubmitted: false });
+        if (error.response !== undefined) {
+          this.setState({
+            errorCode:
+              error.response.data.statusCode +
+              " Error- " +
+              error.response.data.error +
+              " Message- " +
+              error.response.data.message +
+              " Please try again!",
+          });
+        } else {
+          this.setState({ errorCode: "Network Error - Please try again!" });
+        }
+        console.log(error);
+      });
+  };
+
+  closeActiveAllModalHandler = (event) => {
+    this.setState({ isActiveAllShowing: false });
+  };
+
+  handleCheckBox = (event) => {
+    this.setState({ [event.target.name]: event.target.checked });
+    this.setState({ addIsActive: true });
+  };
+
   cancelForm = () => {
     this.setState({
       filterState: "",
@@ -274,14 +399,29 @@ export class Villages extends React.Component {
         sortable: true,
       },
       {
+        name: "State",
+        selector: "state.name",
+        sortable: true,
+      },
+      {
         name: "District",
         selector: "district.name",
         sortable: true,
       },
       {
-        name: "State",
-        selector: "state.name",
+        name: "Active",
+        cell: (cell) => (
+          <Switch
+            id={cell.id}
+            onChange={(e) => {
+              this.confirmActive(e);
+            }}
+            defaultChecked={cell.is_active}
+            Small={true}
+          />
+        ),
         sortable: true,
+        button: true,
       },
     ];
 
@@ -320,20 +460,19 @@ export class Villages extends React.Component {
         <Grid>
           <div className="App">
             <h5 className={classes.menuName}>MASTERS</h5>
-            <h2 className={style.title}>
-              Manage Villages
-              <div className={classes.floatRow}>
-                <div className={classes.buttonRow}>
-                  <Button
-                    variant="contained"
-                    component={Link}
-                    to="/Villages/add"
-                  >
-                    Add Village
-                  </Button>
-                </div>
+            <div className={style.headerWrap}>
+              <h2 className={style.title}>
+                Manage Villages</h2>
+              <div className={classes.buttonRow}>
+                <Button
+                  variant="contained"
+                  component={Link}
+                  to="/Villages/add"
+                >
+                  Add Village
+                </Button>
               </div>
-            </h2>
+            </div>
             {this.props.location.addData ? (
               <Snackbar severity="success">
                 Village added successfully.
@@ -341,6 +480,16 @@ export class Villages extends React.Component {
             ) : this.props.location.editData ? (
               <Snackbar severity="success">
                 Village edited successfully.
+              </Snackbar>
+            ) : null}
+            {this.props.location.updateData ? (
+              <Snackbar
+                ref={this.snackbar}
+                open={true}
+                autoHideDuration={4000}
+                severity="success"
+              >
+                Village updated successfully.
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
@@ -365,8 +514,7 @@ export class Villages extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            <br></br>
-            <div className={classes.row}>
+            <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -444,11 +592,12 @@ export class Villages extends React.Component {
                   </Grid>
                 </div>
               </div>
-              <div className={classes.searchInput}></div>
-              <br></br>
-              <Button onClick={this.handleSearch.bind(this)}>Search</Button>
-              &nbsp;&nbsp;&nbsp;
-              <Button color="secondary" clicked={this.cancelForm}>
+              <Button
+                style={{ marginRight: "5px", marginBottom: "8px", }}
+                onClick={this.handleSearch.bind(this)}>Search</Button>
+              <Button
+                style={{ marginBottom: "8px", }}
+                color="secondary" clicked={this.cancelForm}>
                 reset
               </Button>
             </div>
@@ -457,7 +606,8 @@ export class Villages extends React.Component {
                 title={"Villages"}
                 showSearch={false}
                 filterData={true}
-                Searchplaceholder={"Seacrh by Village Name"}
+                allIsActive={this.state.allIsActive}
+                Searchplaceholder={"Search by Village Name"}
                 filterBy={["name", "state.name"]}
                 filters={filters}
                 data={data}
@@ -465,6 +615,8 @@ export class Villages extends React.Component {
                 editData={this.editData}
                 DeleteData={this.DeleteData}
                 DeleteAll={this.DeleteAll}
+                handleActive={this.handleActive}
+                ActiveAll={this.ActiveAll}
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 selectableRows
@@ -474,6 +626,24 @@ export class Villages extends React.Component {
             ) : (
               <h1>Loading...</h1>
             )}
+            <Modal
+              className="modal"
+              show={this.state.isActiveAllShowing}
+              close={this.closeActiveAllModalHandler}
+              displayCross={{ display: "none" }}
+              handleEventChange={true}
+              event={this.handleActive}
+              footer={{
+                footerSaveName: "OKAY",
+                footerCloseName: "CLOSE",
+                displayClose: { display: "true" },
+                displaySave: { display: "true" },
+              }}
+            >
+              {this.state.IsActive
+                ? " Do you want to activate selected village ?"
+                : "Do you want to deactivate selected village?"}
+            </Modal>
           </div>
         </Grid>
       </Layout>

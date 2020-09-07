@@ -39,6 +39,7 @@ const useStyles = (theme) => ({
   },
   searchInput: {
     marginRight: theme.spacing(1),
+    marginBottom: "8px",
   },
   Districts: {
     marginRight: theme.spacing(1),
@@ -498,15 +499,22 @@ export class Members extends React.Component {
         selector: "name",
         sortable: true,
       },
+      //{
+      //  name: "State",
+      //  sortable: true,
+      //  cell: (row) => (row.state ? row.state.name : "-"),
+      //},
+      {
+        name: "District",
+        //selector: "addresses[1].district.name",
+        sortable: true,
+        cell: (row) => (row.district ? row.addresses[1].district.name : "-"),
+      },
       {
         name: "Village",
         selector: "addresses[2].village.name",
         sortable: true,
-      },
-      {
-        name: "District",
-        selector: "addresses[1].district.name",
-        sortable: true,
+        //cell: (row) => (row.villages[0] ? row.villages[0].name : "-"),
       },
       {
         name: "SHG Name",
@@ -534,20 +542,14 @@ export class Members extends React.Component {
         <Grid>
           <div className="App">
             <h5 className={style.menuName}>MEMBERS</h5>
-            <h2 className={style.title}>
-              Manage Members
-              <div className={classes.floatRow}>
-                <div className={classes.buttonRow}>
-                  <Button
-                    variant="contained"
-                    component={Link}
-                    to="/members/add"
-                  >
-                    Add New Member
-                  </Button>
-                </div>
+            <div className={style.headerWrap}>
+              <h2 className={style.title}>Manage Members</h2>
+              <div className={classes.buttonRow}>
+                <Button variant="contained" component={Link} to="/members/add">
+                  Add New Member
+                </Button>
               </div>
-            </h2>
+            </div>
             {!this.state.bankDetailsFound ? (
               <Snackbar severity="info">
                 No bank details found for SHG of this member
@@ -582,8 +584,10 @@ export class Members extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            <br></br>
-            <div className={classes.row}>
+            <div
+              className={classes.row}
+              style={{ flexWrap: "wrap", height: "auto" }}
+            >
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -707,15 +711,15 @@ export class Members extends React.Component {
                   </Grid>
                 </div>
               </div>
-              <br></br>
               <Button
+                style={{ marginRight: "5px", marginBottom: "8px" }}
                 variant="contained"
                 onClick={this.handleSearch.bind(this)}
               >
                 Search
               </Button>
-              &nbsp;&nbsp;&nbsp;
               <Button
+                style={{ marginBottom: "8px" }}
                 color="secondary"
                 variant="contained"
                 onClick={this.cancelForm.bind(this)}
@@ -723,34 +727,36 @@ export class Members extends React.Component {
                 Reset
               </Button>
             </div>
-            {data && data.name !== "fpouser" ? (
-              <Table
-                {...data.name}
-                title={"Members"}
-                showSearch={false}
-                filterData={true}
-                filterBy={[
-                  "name",
-                  "villages[0].name",
-                  "district.name",
-                  "shgName",
-                  "phone",
-                ]}
-                filters={filters}
-                data={data}
-                column={Usercolumns}
-                viewData={this.viewData}
-                editData={this.editData}
-                DeleteData={this.DeleteData}
-                DeleteAll={this.DeleteAll}
-                columnsvalue={columnsvalue}
-                selectableRows
-                pagination
-                DeleteMessage={"Are you Sure you want to Delete"}
-              />
-            ) : (
-              <h1>Loading...</h1>
-            )}
+            <div className={style.manageTable}>
+              {data ? (
+                <Table
+                  {...data.name}
+                  title={"Members"}
+                  showSearch={false}
+                  filterData={true}
+                  filterBy={[
+                    "name",
+                    "villages[0].name",
+                    "district.name",
+                    "shgName",
+                    "phone",
+                  ]}
+                  filters={filters}
+                  data={data}
+                  column={Usercolumns}
+                  viewData={this.viewData}
+                  editData={this.editData}
+                  DeleteData={this.DeleteData}
+                  DeleteAll={this.DeleteAll}
+                  columnsvalue={columnsvalue}
+                  selectableRows
+                  pagination
+                  DeleteMessage={"Are you Sure you want to Delete"}
+                />
+              ) : (
+                <h1>Loading...</h1>
+              )}
+            </div>
           </div>
         </Grid>
       </Layout>

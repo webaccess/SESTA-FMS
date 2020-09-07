@@ -330,7 +330,7 @@ class ActivitytypePage extends Component {
             : ADD_ACTIVITYTYPE_BREADCRUMBS
         }
       >
-        <Card>
+        <Card style={{ maxWidth: '45rem' }}>
           <form
             autoComplete="off"
             noValidate
@@ -480,7 +480,7 @@ class ActivitytypePage extends Component {
               </Grid>
             </CardContent>
             <Divider />
-            <CardActions>
+            <CardActions style={{padding: "15px",}}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"

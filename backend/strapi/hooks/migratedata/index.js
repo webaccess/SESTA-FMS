@@ -5,7 +5,7 @@ const emiDetailsData = require("./emidetails.json");
 const loanTasksData = require("./loantasks.json");
 const userData = require("./user.json");
 
-// genreric method to iterate over data
+// genric method to iterate over data
 async function asyncForEach(array, callback) {
   for (let index = 0; index < array.length; index++) {
     await callback(array[index], index, array);

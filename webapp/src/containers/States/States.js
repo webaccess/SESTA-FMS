@@ -38,6 +38,7 @@ const useStyles = (theme) => ({
   },
   searchInput: {
     marginRight: theme.spacing(1),
+    marginBottom: "8px",
   },
   Districts: {
     marginRight: theme.spacing(1),
@@ -52,8 +53,8 @@ const useStyles = (theme) => ({
     marginRight: theme.spacing(1),
   },
   menuName: {
-    position: "relative",
-    top: "20px",
+    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+    margin: "0px",
   },
 });
 
@@ -250,10 +251,6 @@ export class States extends React.Component {
     this.setState({ open: false });
   };
 
-  handleClose = () => {
-    this.setState({ open: false });
-  };
-
   handleActive = (event) => {
     this.setState({ isActiveAllShowing: false });
     let setActiveId = this.state.setActiveId;
@@ -342,16 +339,15 @@ export class States extends React.Component {
         <Grid>
           <div className="App">
             <h5 className={classes.menuName}>MASTERS</h5>
-            <h2 className={style.title}>
-              Manage States
-              <div className={classes.floatRow}>
-                <div className={classes.buttonRow}>
-                  <Button variant="contained" component={Link} to="/states/add">
-                    Add State
-                  </Button>
-                </div>
+            <div className={style.headerWrap}>
+              <h2 className={style.title}>
+                Manage States</h2>
+              <div className={classes.buttonRow}>
+                <Button variant="contained" component={Link} to="/states/add">
+                  Add State
+                </Button>
               </div>
-            </h2>
+            </div>
             {this.props.location.addData ? (
               <Snackbar severity="success">State added successfully.</Snackbar>
             ) : null}
@@ -390,8 +386,7 @@ export class States extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            <br></br>
-            <div className={classes.row}>
+            <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -408,18 +403,17 @@ export class States extends React.Component {
                   </Grid>
                 </div>
               </div>
-              <div className={classes.searchInput}>
-                <Button onClick={this.handleSearch.bind(this)}>Search</Button>
-                &nbsp;&nbsp;&nbsp;
-                <Button color="secondary" clicked={this.cancelForm}>
+                <Button
+                  style={{ marginRight: "5px", marginBottom: "8px", }}
+                  onClick={this.handleSearch.bind(this)}>Search</Button>
+                <Button
+                  style={{ marginBottom: "8px", }}
+                  color="secondary" clicked={this.cancelForm}>
                   Reset
                 </Button>
               </div>
-            </div>
-            <br></br>
             {data ? (
               <Table
-                showSetAllActive={true}
                 title={"States"}
                 showSearch={false}
                 filterData={true}

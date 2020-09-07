@@ -37,7 +37,6 @@ const useStyles = (theme) => ({
   },
   dataRow: {
     display: "flex",
-    paddingLeft: "75px",
   },
 });
 
@@ -275,8 +274,8 @@ class LoanEmiPage extends Component {
           <div className="App">
             <h5 className={style.loan}>LOANS</h5>
             <div style={{ display: "flex" }}>
-              <h2 style={{ margin: "13px" }}>{data.loanee}</h2>
-              <div className={classes.dataRow}>
+              <h2 style={{ margin: "13px" }} style={{paddingRight: "4rem",}}>{data.loanee}</h2>
+              <div className={classes.dataRow} style={{paddingRight: "4rem",}}>
                 <p>
                   SHG GROUP <b>{data.shg}</b>
                 </p>

@@ -44,8 +44,8 @@ const useStyles = (theme) => ({
     marginRight: theme.spacing(1),
   },
   menuName: {
-    position: "relative",
-    top: "20px",
+    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+    margin: "0px",
   },
 });
 
@@ -369,27 +369,22 @@ export class Shgs extends React.Component {
         sortable: true,
       },
       {
-        name: "Village Organization",
-        selector: "organization.vos[0].name",
+        name: "State",
+        selector: "addresses[1].state.name",
         sortable: true,
-      },
-      {
-        name: "Village",
-        cell: (row) => (row.addresses[3] ? addresses[3].village.name : "-"),
-        //selector: "addresses[3].village.name",
-        sortable: true,
+        //cell: (row) => (row.addresses[1] ? addresses[1].state.name : "-"),
       },
       {
         name: "District",
-        //selector: "addresses[2].district.name",
+        selector: "addresses[2].district.name",
         sortable: true,
-        cell: (row) => (row.addresses[2] ? addresses[2].district.name : "-"),
+        //cell: (row) => (row.addresses[2] ? addresses[2].district.name : "-"),
       },
       {
-        name: "State",
-        //selector: "addresses[1].state.name",
+        name: "Village",
+        //cell: (row) => (row.addresses[3] ? addresses[3].village.name : "-"),
+        selector: "addresses[3].village.name",
         sortable: true,
-        cell: (row) => (row.addresses[1] ? addresses[1].state.name : "-"),
       },
     ];
 
@@ -435,21 +430,19 @@ export class Shgs extends React.Component {
       <Layout>
         <div className="App">
           <h5 className={classes.menuName}>MASTERS</h5>
-          <h2 className={style.title}>
-            Manage Self Help Group
-            <div className={classes.floatRow}>
-              <div className={style.addButton}>
-                <Button
-                  color="primary"
-                  variant="contained"
-                  component={Link}
-                  to="/Shgs/add"
-                >
-                  Add SHG
-                </Button>
-              </div>
+          <div className={style.headerWrap}>
+            <h2 className={style.title}>Manage Self Help Group</h2>
+            <div className={style.addButton}>
+              <Button
+                color="primary"
+                variant="contained"
+                component={Link}
+                to="/Shgs/add"
+              >
+                Add SHG
+              </Button>
             </div>
-          </h2>
+          </div>
           {this.props.location.addData ? (
             <Snackbar severity="success">SHG added successfully.</Snackbar>
           ) : this.props.location.editData ? (
@@ -477,7 +470,10 @@ export class Shgs extends React.Component {
               An error occured - Please try again!
             </Snackbar>
           ) : null}
-          <div className={classes.row}>
+          <div
+            className={classes.row}
+            style={{ flexWrap: "wrap", height: "auto" }}
+          >
             <div className={classes.searchInput}>
               <div className={style.Districts}>
                 <Grid item md={12} xs={12}>
@@ -603,9 +599,17 @@ export class Shgs extends React.Component {
               </div>
             </div>
             <br></br>
-            <Button onClick={this.handleSearch.bind(this)}>Search</Button>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <Button color="secondary" clicked={this.cancelForm}>
+            <Button
+              style={{ marginRight: "5px", marginBottom: "8px" }}
+              onClick={this.handleSearch.bind(this)}
+            >
+              Search
+            </Button>
+            <Button
+              style={{ marginBottom: "8px" }}
+              color="secondary"
+              clicked={this.cancelForm}
+            >
               reset
             </Button>
           </div>
