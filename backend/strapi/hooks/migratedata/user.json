@@ -1,26 +1,17 @@
 {
   "user": [
     {
-      "username": "WAfpoadmin",
-      "provider": "local",
-      "email": "WAfpoadmin@mail.com",
-      "password": "$2a$10$Pg24BdHmzcje1fM/yRL6ceAxBlP5UX5Gf.Grw3Ki2r19rNB23fqeS",
-      "confirmed": true,
-      "blocked": false,
-      "first_name": "WA",
-      "last_name": "FPO Admin",
-      "role": 2,
       "contact": {
-        "name": "WAfpoadmin",
+        "name": "WAfpo",
         "contact_type": "organization",
         "organization": {
-          "name": "WAfpoadmin",
+          "name": "WAfpo",
           "sub_type": "FPO"
         }
       }
     },
     {
-      "username": "WAsuperadmin",
+      "username": "2222222222",
       "provider": "local",
       "email": "WAsuperadmin@mail.com",
       "password": "$2a$10$Pg24BdHmzcje1fM/yRL6ceAxBlP5UX5Gf.Grw3Ki2r19rNB23fqeS",
@@ -31,6 +22,7 @@
       "role": 5,
       "contact": {
         "name": "WAsuperadmin",
+        "phone": "2222222222",
         "contact_type": "individual",
         "individual": {
           "first_name": "WA",
@@ -39,21 +31,22 @@
       }
     },
     {
-      "username": "fpouser",
+      "username": "1111111111",
       "provider": "local",
-      "email": "fpouser@mail.com",
+      "email": "fpoadmin@mail.com",
       "password": "$2a$10$Pg24BdHmzcje1fM/yRL6ceAxBlP5UX5Gf.Grw3Ki2r19rNB23fqeS",
       "confirmed": true,
       "blocked": false,
       "first_name": "WA",
-      "last_name": "FPO User",
+      "last_name": "FPO admin",
       "role": 2,
       "contact": {
-        "name": "fpouser",
+        "name": "WAfpoadmin",
+        "phone": "1111111111",
         "contact_type": "individual",
         "individual": {
           "first_name": "WA",
-          "last_name": "FPO User"
+          "last_name": "FPO admin"
         }
       }
     }

@@ -29,21 +29,21 @@ module.exports = (strapi) => {
       // calls to all functions to store data
       (async () => {
         addIndividual();
-        console.log("--After Individual\n");
+        console.log("\n");
         addOrganization();
-        console.log("--After Organization\n");
+        console.log("\n");
         addContact();
-        console.log("--After Contact\n");
+        console.log("\n");
         addUser();
-        console.log("--After User\n");
+        console.log("\n");
         addActivitytypes();
-        console.log("--After activitytypes\n");
+        console.log("\n");
         addLoanModel();
-        console.log("--After loanmodels\n");
+        console.log("\n");
         addEmiDetails();
-        console.log("--After emidetails\n");
+        console.log("\n");
         addLoanTasks();
-        console.log("--After loantasks\n");
+        console.log("\n");
       })();
 
       // add activity types
@@ -85,7 +85,7 @@ module.exports = (strapi) => {
         const fpoPresent = await bookshelf
           .model("contact")
           .where({
-            name: "WAfpoadmin",
+            name: "WAfpo",
             contact_type: "organization",
           })
           .fetch();
@@ -271,11 +271,6 @@ module.exports = (strapi) => {
                   `Skipping individual ${user.contact.individual.first_name} ---`
                 );
               } else {
-                console.log(
-                  "userData ind--",
-                  user.contact.individual,
-                  user.contact.individual.first_name
-                );
                 await bookshelf
                   .model("individual")
                   .forge({
@@ -355,11 +350,11 @@ module.exports = (strapi) => {
           }
           try {
             if (contactTypePresent) {
-              if (user.username === "fpouser") {
+              if (user.username === "1111111111") {
                 fpoPresent = await bookshelf
                   .model("organization")
                   .where({
-                    name: "WAfpoadmin",
+                    name: "WAfpo",
                     sub_type: "FPO",
                   })
                   .fetch();
@@ -382,13 +377,14 @@ module.exports = (strapi) => {
 
                 if (
                   user.contact.contact_type == "individual" &&
-                  user.username !== "fpouser"
+                  user.username !== "1111111111"
                 ) {
                   await bookshelf
                     .model("contact")
                     .forge({
                       name: user.contact.name,
                       contact_type: user.contact.contact_type,
+                      phone: user.contact.phone,
                       individual: contactId.id,
                     })
                     .save()
@@ -401,6 +397,7 @@ module.exports = (strapi) => {
                     .forge({
                       name: user.contact.name,
                       contact_type: user.contact.contact_type,
+                      phone: user.contact.phone,
                       organization: contactId.id,
                     })
                     .save()
@@ -415,6 +412,7 @@ module.exports = (strapi) => {
                     .forge({
                       name: user.contact.name,
                       contact_type: user.contact.contact_type,
+                      phone: user.contact.phone,
                       individual: contactId.id,
                       org_fpo: fpotId.id,
                     })
@@ -437,7 +435,7 @@ module.exports = (strapi) => {
           .model("individual")
           .where({
             first_name: "WA",
-            last_name: "FPO User",
+            last_name: "FPO admin",
           })
           .save({ fpo: obj.id }, { patch: true })
           .then(() => {
