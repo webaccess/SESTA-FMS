@@ -40,10 +40,6 @@ class UsersPage extends Component {
           required: { value: "true", message: "Last name is required" },
         },
         addEmail: {
-          required: {
-            value: "true",
-            message: "Email is required",
-          },
           email: {
             value: "true",
             message: "Please enter valid email id",
@@ -515,7 +511,7 @@ class UsersPage extends Component {
             : ADD_USERS_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: '45rem' }}>
+        <Card style={{ maxWidth: "45rem" }}>
           <form
             autoComplete="off"
             noValidate
@@ -748,7 +744,7 @@ class UsersPage extends Component {
               </Grid>
             </CardContent>
             <Divider />
-            <CardActions style={{padding: "15px",}}>
+            <CardActions style={{ padding: "15px" }}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"
