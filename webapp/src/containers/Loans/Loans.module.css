@@ -46,9 +46,6 @@ tr {
   border-collapse: collapse;
   background-color:"#dddddd";
 }
-.manageTable p{
-  margin: 0px;
-}
 .loanPurposeGrid{
   widows: 100%;
   margin:0px;

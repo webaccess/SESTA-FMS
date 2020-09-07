@@ -20,6 +20,7 @@ import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autotext from "../../components/Autotext/Autotext";
 import DateTimepicker from "../../components/UI/DateTimepicker/DateTimepicker.js";
+import style from "./Activity.module.css";
 
 class ActivityPage extends Component {
   constructor(props) {
@@ -418,7 +419,7 @@ class ActivityPage extends Component {
                     variant="outlined"
                   />
                 </Grid>
-                <Grid item md={3} xs={12}>
+                <Grid item md={3} xs={12} className={style.dateTimeWrap}>
                   <DateTimepicker
                     label="Start Date/Time*"
                     name="addStartDate"
@@ -436,7 +437,7 @@ class ActivityPage extends Component {
                     }
                   />
                 </Grid>
-                <Grid item md={3} xs={12}>
+                <Grid item md={3} xs={12} className={style.dateTimeWrap}>
                   <DateTimepicker
                     label="End Date/Time"
                     name="addEndDate"

@@ -7,6 +7,7 @@ import PersonIcon from "@material-ui/icons/Person";
 import PeopleIcon from "@material-ui/icons/People";
 import NaturePeopleIcon from "@material-ui/icons/NaturePeople";
 import MoneyIcon from "@material-ui/icons/Money";
+import style from "./Dashboard.module.css";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -139,9 +140,9 @@ class DashboardForFPO extends Component {
     return (
       <div className="App">
         <Grid container>
-          <Grid item md={6} xs={12} spacing={3} style={{ backgroundColor: "#e5e9e3" }}>
+          <Grid item md={6} xs={12} spacing={3} className={style.dashboardSestawrap}>
             <Grid container>
-              <Grid item md={6} xs={6} spacing={3} style={{ display: "inline-flex" }}>
+              <Grid item sm={6} xs={12} spacing={3} style={{ display: "inline-flex" }}>
                 <div className={classes.oddBlock}>
                   <PersonIcon className={classes.Icon} />
                   <h3 style={{ color: "white", marginBottom: "5px", flex: "auto", }}>MEMBERS </h3>
@@ -150,7 +151,7 @@ class DashboardForFPO extends Component {
                   </h2>
                 </div>
               </Grid>
-              <Grid item md={6} xs={6} spacing={3} style={{ display: "inline-flex" }}>
+              <Grid item sm={6} xs={12} spacing={3} style={{ display: "inline-flex", borderBottom: "1px solid black",}}>
                 <div className={classes.evenBlock}>
                   <PeopleIcon className={classes.Icon} />
                   <h3 style={{ color: "white", marginBottom: "5px", flex: "auto", }}>
@@ -163,7 +164,7 @@ class DashboardForFPO extends Component {
               </Grid>
             </Grid>
             <Grid container>
-              <Grid item md={6} xs={6} spacing={3} style={{ display: "inline-flex" }}>
+              <Grid item sm={6} xs={12} spacing={3} style={{ display: "inline-flex"}}>
                 <div className={classes.evenBlock}>
                   <NaturePeopleIcon className={classes.Icon} />
                   <h3 style={{ color: "white", marginBottom: "5px", flex: "auto", }}>
@@ -174,7 +175,7 @@ class DashboardForFPO extends Component {
                   </h2>
                 </div>
               </Grid>
-              <Grid item md={6} xs={6} spacing={3} style={{ display: "inline-flex" }}>
+              <Grid item sm={6} xs={12} spacing={3} style={{ display: "inline-flex" }}>
                 <div className={classes.oddBlock}>
                   <MoneyIcon className={classes.Icon} />
                   <h3 style={{ color: "white", marginBottom: "5px", flex: "auto", }}>

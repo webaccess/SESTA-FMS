@@ -692,7 +692,7 @@ export class Members extends React.Component {
                 Reset
               </Button>
             </div>
-            <div className={style.manageTable}>
+            <div>
             {data ? (
               <Table
                 title={"Members"}
