@@ -150,30 +150,33 @@ const Table = (props) => {
     column = [
       {
         cell: (cell) => (
-          <div onClick={(event) => editData(cell.id)} id={cell.id}>
-            <Tooltip title="Edit">
-              <IconButton aria-label="edit" value={cell[valueformodal]}>
-                <EditIcon className={classes.editIcon} />
-              </IconButton>
-            </Tooltip>
+          <div>
+            <div
+              style={{ display: "inline-flex" }}
+              onClick={(event) => editData(cell.id)}
+              id={cell.id}
+            >
+              <Tooltip title="Edit">
+                <IconButton aria-label="edit" value={cell[valueformodal]}>
+                  <EditIcon className={classes.editIcon} />
+                </IconButton>
+              </Tooltip>
+            </div>
+            <div
+              style={{ display: "inline-flex" }}
+              onClick={(event) => deleteDataModal(cell.id, cell[valueformodal])}
+              id={cell.id}
+            >
+              <Tooltip title="Delete">
+                <IconButton aria-label="delete">
+                  <DeleteIcon className={classes.deleteIcon} />
+                </IconButton>
+              </Tooltip>
+            </div>
           </div>
         ),
         button: true,
-      },
-      {
-        cell: (cell) => (
-          <div
-            onClick={(event) => deleteDataModal(cell.id, cell[valueformodal])}
-            id={cell.id}
-          >
-            <Tooltip title="Delete">
-              <IconButton aria-label="delete">
-                <DeleteIcon className={classes.deleteIcon} />
-              </IconButton>
-            </Tooltip>
-          </div>
-        ),
-        button: true,
+        width: "200px",
       },
     ];
   }
@@ -213,42 +216,48 @@ const Table = (props) => {
     column = [
       {
         cell: (cell) => (
-          <div onClick={(event) => editData(cell.id)} id={cell.id}>
-            <Tooltip title="Edit">
-              <IconButton aria-label="edit" value={cell[valueformodal]}>
-                <EditIcon className={classes.editIcon} />
-              </IconButton>
-            </Tooltip>
+          <div>
+            <div
+              style={{ display: "inline-flex" }}
+              onClick={(event) => editData(cell.id)}
+              id={cell.id}
+            >
+              <Tooltip title="Edit">
+                <IconButton aria-label="edit" value={cell[valueformodal]}>
+                  <EditIcon className={classes.editIcon} />
+                </IconButton>
+              </Tooltip>
+            </div>
+            <div
+              style={{ display: "inline-flex" }}
+              onClick={(event) => deleteDataModal(cell.id, cell[valueformodal])}
+              id={cell.id}
+            >
+              <Tooltip title="Delete">
+                <IconButton aria-label="delete">
+                  <DeleteIcon className={classes.deleteIcon} />
+                </IconButton>
+              </Tooltip>
+            </div>
+            <div
+              style={{ display: "inline-flex" }}
+              onClick={(event) => viewData(cell.id, cell[valueformodal])}
+            >
+              {auth.getUserInfo().role.name ===
+              "CSP (Community Service Provider)" ? (
+                <Tooltip title="Apply Loan">
+                  <IconButton aria-label="applyloan">
+                    <MoneyIcon className={classes.MoneyIcon} />
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                ""
+              )}
+            </div>
           </div>
         ),
         button: true,
-      },
-      {
-        cell: (cell) => (
-          <div
-            onClick={(event) => deleteDataModal(cell.id, cell[valueformodal])}
-            id={cell.id}
-          >
-            <Tooltip title="Delete">
-              <IconButton aria-label="delete">
-                <DeleteIcon className={classes.deleteIcon} />
-              </IconButton>
-            </Tooltip>
-          </div>
-        ),
-        button: true,
-      },
-      {
-        cell: (cell) => (
-          <div onClick={(event) => viewData(cell.id, cell[valueformodal])}>
-            <Tooltip title="Apply Loan">
-              <IconButton aria-label="applyloan">
-                <MoneyIcon className={classes.MoneyIcon} />
-              </IconButton>
-            </Tooltip>
-          </div>
-        ),
-        button: true,
+        width: "200px",
       },
     ];
   }
@@ -279,11 +288,15 @@ const Table = (props) => {
               onClick={(event) => customAction(cell.id, cell[valueformodal])}
               style={{ display: "inline-flex" }}
             >
-              <Tooltip title="Print">
-                <IconButton aria-label="print">
-                  <PrintIcon className={classes.AssignmentTurnedInIcon} />
-                </IconButton>
-              </Tooltip>
+              {auth.getUserInfo().role.name !== "Sesta Admin" ? (
+                <Tooltip title="Print">
+                  <IconButton aria-label="print">
+                    <PrintIcon className={classes.AssignmentTurnedInIcon} />
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                ""
+              )}
             </div>
             <div
               onClick={
@@ -293,16 +306,21 @@ const Table = (props) => {
               }
               style={{ display: "inline-flex" }}
             >
-              <Tooltip title="EMI">
-                <IconButton
-                  aria-label="activity"
-                  disabled={cell.status === "Approved" ? false : true}
-                >
-                  <AssignmentIndIcon
-                    className={classes.AssignmentTurnedInIcon}
-                  />
-                </IconButton>
-              </Tooltip>
+              {auth.getUserInfo().role.name ===
+              "CSP (Community Service Provider)" ? (
+                <Tooltip title="EMI">
+                  <IconButton
+                    aria-label="activity"
+                    disabled={cell.status === "Approved" ? false : true}
+                  >
+                    <AssignmentIndIcon
+                      className={classes.AssignmentTurnedInIcon}
+                    />
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                ""
+              )}
             </div>
             <div
               onClick={
@@ -312,16 +330,21 @@ const Table = (props) => {
               }
               style={{ display: "inline-flex" }}
             >
-              <Tooltip title="Task">
-                <IconButton
-                  aria-label="task"
-                  disabled={cell.status === "Approved" ? false : true}
-                >
-                  <AssignmentTurnedInIcon
-                    className={classes.AssignmentTurnedInIcon}
-                  />
-                </IconButton>
-              </Tooltip>
+              {auth.getUserInfo().role.name ===
+              "CSP (Community Service Provider)" ? (
+                <Tooltip title="Task">
+                  <IconButton
+                    aria-label="task"
+                    disabled={cell.status === "Approved" ? false : true}
+                  >
+                    <AssignmentTurnedInIcon
+                      className={classes.AssignmentTurnedInIcon}
+                    />
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                ""
+              )}
             </div>
             <div
               onClick={(event) => loanApproveData(cell.id, cell[valueformodal])}
