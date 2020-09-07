@@ -594,7 +594,7 @@ class UsersPage extends Component {
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
-                    label="Phone Number"
+                    label="Phone Number*"
                     type="tel"
                     name="addPhone"
                     error={this.hasError("addPhone")}
