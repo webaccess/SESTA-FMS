@@ -9,6 +9,8 @@ import Moment from "moment";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import { LOAN_TASK_BREADCRUMBS } from "./config";
 import style from "./Loans.module.css";
+import Button from "../../components/UI/Button/Button";
+import { Link } from "react-router-dom";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -210,6 +212,7 @@ class LoanUpdateTaskPage extends Component {
         name: "Comments",
         selector: "comments",
         sortable: true,
+        cell: row => row.comments ? row.comments : "-"
       },
     ];
     let selectors = [];
@@ -343,7 +346,6 @@ class LoanUpdateTaskPage extends Component {
               </Grid>
             </Grid>
           </Card>
-          <div className={style.loanEmiTable}>
 
           {loantasks ? (
             <Table
@@ -362,7 +364,11 @@ class LoanUpdateTaskPage extends Component {
           ) : (
             <h1>Loading...</h1>
           )}
-        </div>
+        <div style={{ padding: "15px" }}>
+            <Button color="primary" component={Link} to="/loans">
+              Done
+              </Button>
+          </div>
         </Grid>
       </Layout>
     );

@@ -48,13 +48,26 @@ export class Account extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      users: [],
       values: {
+        addPhone: "",
         password: "",
         showPassword: false,
       },
       error: "",
       success: "",
+      userExists: "",
       validations: {
+        addPhone: {
+          required: {
+            value: true,
+            message: "Phone number required",
+          },
+          phone: {
+            value: true,
+            message: "Please enter valid phone number",
+          },
+        },
         password: {
           required: { value: true, message: "Password required" },
         },
@@ -64,6 +77,22 @@ export class Account extends Component {
       },
     };
     this.snackbar = React.createRef();
+  }
+
+  async componentDidMount() {
+    let userInfo = auth.getUserInfo();
+    this.setState({
+      values: {
+        addPhone: userInfo.username
+      }
+    });
+
+    axios
+      .get(
+        process.env.REACT_APP_SERVER_URL + "users")
+      .then(res => {
+        this.setState({ users: res.data });
+      })
   }
 
   handleClickShowPassword = () => {
@@ -86,33 +115,62 @@ export class Account extends Component {
   };
 
   handleSubmit = (e) => {
+    let userAlreadyExist = false;
+    let users = this.state.users;
     e.preventDefault();
     this.validate();
 
     if (Object.keys(this.state.errors).length > 0) return;
     let userInfo = auth.getUserInfo();
-    axios
-      .put(
-        process.env.REACT_APP_SERVER_URL + "users/" + userInfo.id,
-        {
-          password: this.state.values.password,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + auth.getToken(),
-          },
-        }
-      )
-      .then((res) => {
-        this.setState({ success: "Password changed successfully!!" });
-        if (this.snackbar.current !== null) {
-          this.snackbar.current.handleClick();
-        }
-      })
-      .catch((error) => {
-        this.setState({ error });
-        console.log(error);
-      });
+
+    let emailAddr, postdata;
+    emailAddr = this.state.values.addPhone + "@example.com";
+
+    if (userInfo.username == this.state.values.addPhone) {
+      // only update password of current loggedin user
+      postdata = {
+        password: this.state.values.password,
+      }
+    } else {
+      // check if user already exists
+      if (users.length > 0 && users.find(user => user.username === this.state.values.addPhone)) {
+        userAlreadyExist = true;
+        this.setState({ userExists: "User with this phone number already exists, please use other phone number" });
+      }
+      // update user details if username/phone no. and password is changed
+      postdata = {
+        username: this.state.values.addPhone,
+        password: this.state.values.password,
+        email: emailAddr
+      }
+    }
+    if (!userAlreadyExist) {
+      axios
+        .put(
+          process.env.REACT_APP_SERVER_URL + "users/" + userInfo.id,
+          postdata,
+          {
+            headers: {
+              Authorization: "Bearer " + auth.getToken(),
+            },
+          }
+        )
+        .then((res) => {
+          this.setState({
+            values: {
+              addPhone: res.data.username
+            }
+          })
+          this.setState({ success: "User details updated successfully!!" });
+          if (this.snackbar.current !== null) {
+            this.snackbar.current.handleClick();
+          }
+        })
+        .catch((error) => {
+          this.setState({ error });
+          console.log(error);
+        });
+    }
   };
 
   validate = () => {
@@ -120,15 +178,12 @@ export class Account extends Component {
     const validations = this.state.validations;
     map(validations, (validation, key) => {
       let value = values[key] ? values[key] : "";
-      console.log();
-      const errors = validateInput(value, validation);
-
+      let errors = validateInput(value, validation);
       let errorset = this.state.errors;
       if (errors.length > 0) errorset[key] = errors;
       else delete errorset[key];
       this.setState({ errors: errorset });
     });
-    console.log(this.state.errors.password);
   };
 
   hasError = (field) => {
@@ -142,7 +197,6 @@ export class Account extends Component {
 
   render() {
     let userInfo = auth.getUserInfo();
-    console.log(userInfo);
     const { classes } = this.props;
     return (
       <Layout>
@@ -151,6 +205,11 @@ export class Account extends Component {
             {this.state.error ? (
               <Snackbar severity="error" Showbutton={false}>
                 {this.state.error}
+              </Snackbar>
+            ) : null}
+            {this.state.userExists ? (
+              <Snackbar severity="error" Showbutton={false}>
+                {this.state.userExists}
               </Snackbar>
             ) : null}
             {this.state.success ? (
@@ -164,7 +223,7 @@ export class Account extends Component {
               </Snackbar>
             ) : null}
           </Grid>
-          <Grid item lg={4} md={6} xl={4} xs={12}>
+          {/* <Grid item lg={4} md={6} xl={4} xs={12}>
             <Card className={classes.root}>
               <CardContent>
                 <div className={classes.details}>
@@ -190,8 +249,9 @@ export class Account extends Component {
               </CardContent>
               <Divider />
             </Card>
-          </Grid>
-          <Grid item lg={8} md={6} xl={8} xs={12}>
+          </Grid> */}
+          {/* <Grid item lg={8} md={6} xl={8} xs={12}> */}
+          <Grid item md={12} xs={12}>
             <Card className={classes.root}>
               <form
                 autoComplete="off"
@@ -200,12 +260,30 @@ export class Account extends Component {
                 method="post"
               >
                 <CardHeader
-                  subheader="You can update password here."
-                  title="Change Password"
+                  subheader="You can update your details here."
+                  title="Update User Details"
                 />
                 <Divider />
                 <CardContent>
                   <Grid container spacing={3}>
+                    <Grid item md={12} xs={12}>
+                      <Input
+                        fullWidth
+                        id="standard-adornment-password"
+                        name="addPhone"
+                        label="Phone Number*"
+                        type="number"
+                        error={this.hasError("addPhone")}
+                        helperText={
+                          this.hasError("addPhone")
+                            ? this.state.errors.addPhone[0]
+                            : null
+                        }
+                        value={this.state.values.addPhone || ""}
+                        onChange={this.handleChange}
+                      />
+                      {/* </FormControl> */}
+                    </Grid>
                     <Grid item md={12} xs={12}>
                       {/* <FormControl> */}
                       {/* <InputLabel htmlFor="standard-adornment-password">
@@ -215,7 +293,7 @@ export class Account extends Component {
                         fullWidth
                         id="standard-adornment-password"
                         name="password"
-                        label="Password"
+                        label="Password*"
                         error={this.hasError("password")}
                         helperText={
                           this.hasError("password")
@@ -251,7 +329,7 @@ export class Account extends Component {
                 </CardContent>
                 <Divider />
                 <CardActions>
-                  <Button type="submit">Save details</Button>
+                  <Button type="submit">Save</Button>
                 </CardActions>
               </form>
             </Card>
