@@ -504,18 +504,18 @@ export class Members extends React.Component {
       //  sortable: true,
       //  cell: (row) => (row.state ? row.state.name : "-"),
       //},
-      {
-        name: "District",
-        //selector: "addresses[1].district.name",
-        sortable: true,
-        cell: (row) => (row.district ? row.addresses[1].district.name : "-"),
-      },
-      {
-        name: "Village",
-        selector: "addresses[2].village.name",
-        sortable: true,
-        //cell: (row) => (row.villages[0] ? row.villages[0].name : "-"),
-      },
+      //{
+      //  name: "District",
+      //  //selector: "addresses[1].district.name",
+      //  sortable: true,
+      //  cell: (row) => (row.district ? row.addresses[1].district.name : "-"),
+      //},
+      //{
+      //  name: "Village",
+      //  selector: "addresses[2].village.name",
+      //  sortable: true,
+      //  //cell: (row) => (row.villages[0] ? row.villages[0].name : "-"),
+      //},
       {
         name: "SHG Name",
         selector: "shgName",
