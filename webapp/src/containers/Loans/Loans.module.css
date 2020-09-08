@@ -58,9 +58,7 @@ tr {
 :global(.MuiPaper-root) {
   margin: 0px;
 }
-.loanEmiTable p{
-  margin: 0px;
-}
+
 .loanIconBtn{
   padding-left: 0px !important;
   padding-right: 3rem !important;

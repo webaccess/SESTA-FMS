@@ -9,6 +9,8 @@ import Moment from "moment";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import { LOAN_EMI_BREADCRUMBS } from "./config";
 import style from "./Loans.module.css";
+import Button from "../../components/UI/Button/Button";
+import { Link } from "react-router-dom";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -415,6 +417,11 @@ class LoanEmiPage extends Component {
           ) : (
               <h1>Loading...</h1>
             )}
+            <div style={{ padding: "15px" }}>
+            <Button color="primary" component={Link} to="/loans">
+              Done
+              </Button>
+          </div>
         </Grid>
       </Layout>
     );

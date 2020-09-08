@@ -372,7 +372,6 @@ class LoanEmiViewPage extends Component {
               </Grid>
             </Grid>
           </Card>
-          <div className={style.loanEmiTable}>
           {loanEmiData ? (
             <Table
               title={"ViewLoanEMI"}
@@ -398,11 +397,10 @@ class LoanEmiViewPage extends Component {
           ) : (
               <h1>Loading...</h1>
             )}
-            <div style={{padding:"15px"}}>
-              <Button color="primary" component={Link} to="/loans">
-                Done
+          <div style={{ padding: "15px" }}>
+            <Button color="primary" component={Link} to="/loans">
+              Done
               </Button>
-            </div>
           </div>
         </Grid>
       </Layout>
