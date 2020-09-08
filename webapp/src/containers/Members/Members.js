@@ -727,10 +727,9 @@ export class Members extends React.Component {
                 Reset
               </Button>
             </div>
-            <div className={style.manageTable}>
+            <div>
               {data ? (
                 <Table
-                  {...data.name}
                   title={"Members"}
                   showSearch={false}
                   filterData={true}

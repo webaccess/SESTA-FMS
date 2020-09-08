@@ -74,7 +74,7 @@ button {
 }
 
 .buttonContainer {
-  padding-top: 3px;
+  padding-top: 5px;
   display: flex;
   justify-content: center;
 }
@@ -114,9 +114,18 @@ img {
 }
 
 .errorContainer {
-  margin-top: 5px;
   margin-bottom: 5px;
   line-height: 13px;
   font-size: 13px;
   color: red;
+  width: 70%;
+  margin: 5px auto;
+}
+:global(.MuiFormControl-root) {
+  width: 100%;
+}
+.loginKeyWrap {
+  width:70%;
+  margin: 8px auto;
+  text-align: center;
 }

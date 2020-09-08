@@ -28,22 +28,22 @@ module.exports = (strapi) => {
     async initialize() {
       // calls to all functions to store data
       (async () => {
-        addIndividual();
-        console.log("--After Individual\n");
-        addOrganization();
-        console.log("--After Organization\n");
-        addContact();
-        console.log("--After Contact\n");
-        addUser();
-        console.log("--After User\n");
-        addActivitytypes();
-        console.log("--After activitytypes\n");
-        addLoanModel();
-        console.log("--After loanmodels\n");
-        addEmiDetails();
-        console.log("--After emidetails\n");
-        addLoanTasks();
-        console.log("--After loantasks\n");
+        await addIndividual();
+        console.log("\n");
+        await addOrganization();
+        console.log("\n");
+        await addContact();
+        console.log("\n");
+        await addUser();
+        console.log("\n");
+        await addActivitytypes();
+        console.log("\n");
+        await addLoanModel();
+        console.log("\n");
+        await addEmiDetails();
+        console.log("\n");
+        await addLoanTasks();
+        console.log("\n");
       })();
 
       // add activity types
@@ -85,7 +85,7 @@ module.exports = (strapi) => {
         const fpoPresent = await bookshelf
           .model("contact")
           .where({
-            name: "WAfpoadmin",
+            name: "WAfpo",
             contact_type: "organization",
           })
           .fetch();
@@ -114,7 +114,7 @@ module.exports = (strapi) => {
                   })
                   .save()
                   .then(() => {
-                    console.log(`Added loanmodel ${loanmodel.name}`);
+                    console.log(`Added loanmodel ${loanmodel.product_name}`);
                   });
               }
             } catch (error) {
@@ -271,11 +271,6 @@ module.exports = (strapi) => {
                   `Skipping individual ${user.contact.individual.first_name} ---`
                 );
               } else {
-                console.log(
-                  "userData ind--",
-                  user.contact.individual,
-                  user.contact.individual.first_name
-                );
                 await bookshelf
                   .model("individual")
                   .forge({
@@ -350,16 +345,19 @@ module.exports = (strapi) => {
           } else {
             contactTypePresent = await bookshelf
               .model("individual")
-              .where({ first_name: user.contact.individual.first_name })
+              .where({
+                first_name: user.contact.individual.first_name,
+                last_name: user.contact.individual.last_name,
+              })
               .fetch();
           }
           try {
             if (contactTypePresent) {
-              if (user.username === "fpouser") {
+              if (user.username === "1111111111") {
                 fpoPresent = await bookshelf
                   .model("organization")
                   .where({
-                    name: "WAfpoadmin",
+                    name: "WAfpo",
                     sub_type: "FPO",
                   })
                   .fetch();
@@ -382,18 +380,21 @@ module.exports = (strapi) => {
 
                 if (
                   user.contact.contact_type == "individual" &&
-                  user.username !== "fpouser"
+                  user.username !== "1111111111"
                 ) {
                   await bookshelf
                     .model("contact")
                     .forge({
                       name: user.contact.name,
                       contact_type: user.contact.contact_type,
+                      phone: user.contact.phone,
                       individual: contactId.id,
                     })
                     .save()
-                    .then(() => {
+                    .then((res) => {
+                      res.toJSON();
                       console.log(`Added contact ${user.contact.name}`);
+                      linkcontactToInd(res.id, contactId.id);
                     });
                 } else if (user.contact.contact_type == "organization") {
                   await bookshelf
@@ -401,6 +402,7 @@ module.exports = (strapi) => {
                     .forge({
                       name: user.contact.name,
                       contact_type: user.contact.contact_type,
+                      phone: user.contact.phone,
                       organization: contactId.id,
                     })
                     .save()
@@ -408,6 +410,7 @@ module.exports = (strapi) => {
                       res.toJSON();
                       console.log(`Added contact ${user.contact.name}`);
                       linkFpo(res);
+                      linkcontactToOrg(res.id, contactId.id);
                     });
                 } else {
                   await bookshelf
@@ -415,12 +418,15 @@ module.exports = (strapi) => {
                     .forge({
                       name: user.contact.name,
                       contact_type: user.contact.contact_type,
+                      phone: user.contact.phone,
                       individual: contactId.id,
                       org_fpo: fpotId.id,
                     })
                     .save()
-                    .then(() => {
+                    .then((res) => {
+                      res.toJSON();
                       console.log(`Added contact ${user.contact.name}`);
+                      linkcontactToInd(res.id, contactId.id);
                     });
                 }
               }
@@ -437,12 +443,57 @@ module.exports = (strapi) => {
           .model("individual")
           .where({
             first_name: "WA",
-            last_name: "FPO User",
+            last_name: "FPO admin",
           })
           .save({ fpo: obj.id }, { patch: true })
           .then(() => {
             console.log("Linked FPO admin to FPO user...");
           });
+      }
+
+      // links contact to individual user
+      async function linkcontactToInd(contactId, indId) {
+        if (indId) {
+          await bookshelf
+            .model("individual")
+            .where({
+              id: indId,
+            })
+            .save({ contact: contactId }, { patch: true })
+            .then(() => {
+              console.log("Linked contact to individual user...");
+            });
+        }
+      }
+
+      // links contact to organization user
+      async function linkcontactToOrg(contactId, orgId) {
+        if (orgId) {
+          await bookshelf
+            .model("organization")
+            .where({
+              id: orgId,
+            })
+            .save({ contact: contactId }, { patch: true })
+            .then(() => {
+              console.log("Linked contact to organization user...");
+            });
+        }
+      }
+
+      // links user to contact
+      async function linkUsertoContact(userId, contactId) {
+        if (contactId) {
+          await bookshelf
+            .model("contact")
+            .where({
+              id: contactId,
+            })
+            .save({ user: userId }, { patch: true })
+            .then(() => {
+              console.log("Linked user to contact...");
+            });
+        }
       }
 
       // add users
@@ -483,8 +534,10 @@ module.exports = (strapi) => {
                     contact: contactModel.id,
                   })
                   .save()
-                  .then(() => {
+                  .then((res) => {
+                    res.toJSON();
                     console.log(`Added user ${user.username}..`);
+                    linkUsertoContact(res.id, contactModel.id);
                   });
               }
             }

@@ -14,6 +14,7 @@ import NaturePeopleIcon from "@material-ui/icons/NaturePeople";
 import MoneyIcon from "@material-ui/icons/Money";
 import Moment from "moment";
 import { Link } from "react-router-dom";
+import style from "./Dashboard.module.css";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -287,7 +288,7 @@ class DashboardForFPO extends Component {
     return (
       <div className="App" style={{ paddingTop: "15px" }}>
         <Grid container style={{ border: "1px solid #ccc" }}>
-          <Grid className={classes.fpoInlineGrid} item md={3} spacing={3}>
+          <Grid className={classes.fpoInlineGrid} item md={3} sm={6} xs={12} spacing={3}>
             <div className={classes.oddBlock}>
               <PersonIcon className={classes.Icon} />
               <h3 className={classes.fpoHead3}>MEMBERS </h3>
@@ -297,7 +298,7 @@ class DashboardForFPO extends Component {
             </div>
           </Grid>
 
-          <Grid className={classes.fpoInlineGrid} item md={3} spacing={3}>
+          <Grid className={classes.fpoInlineGrid} item md={3} sm={6} xs={12} spacing={3}>
             <div className={classes.evenBlock}>
               <PeopleIcon className={classes.Icon} />
               <h3 className={classes.fpoHead3}>
@@ -309,7 +310,7 @@ class DashboardForFPO extends Component {
             </div>
           </Grid>
 
-          <Grid className={classes.fpoInlineGrid} item md={3} spacing={3}>
+          <Grid className={classes.fpoInlineGrid} item md={3} sm={6} xs={12} spacing={3}>
             <div className={classes.oddBlock}>
               <NaturePeopleIcon className={classes.Icon} />
               <h3 className={classes.fpoHead3}>
@@ -322,7 +323,7 @@ class DashboardForFPO extends Component {
             </div>
           </Grid>
 
-          <Grid className={classes.fpoInlineGrid} item md={3} spacing={3}>
+          <Grid className={classes.fpoInlineGrid} item md={3} sm={6} xs={12} spacing={3}>
             <div className={classes.evenBlock}>
               <MoneyIcon className={classes.Icon} />
               <h3 className={classes.fpoHead3}>
@@ -351,10 +352,8 @@ class DashboardForFPO extends Component {
         <Grid container style={{ border: "1px solid #ccc" }}>
           <Grid
             item
-            md={3}
-            spacing={3}
-            style={{ padding: "15px", backgroundColor: "#fff" }}
-          >
+            sm={3} xs={12}
+            style={{ padding: "15px", backgroundColor: "#fff" }}>
             <h3 align="center">LOAN AMOUNT DISTRIBUTED</h3>
             <h2 align="center" className={classes.fieldValues}>
               ₹ {this.state.totalLoanDistributed.toLocaleString()}
@@ -377,15 +376,9 @@ class DashboardForFPO extends Component {
             )}
           </Grid>
 
-          <Grid item md={6} spacing={3}>
+          <Grid item sm={6} xs={12}>
             <div
-              style={{
-                border: "1px solid #ccc",
-                backgroundColor: "#fff",
-                marginTop: "-1px",
-                height: "100%",
-              }}
-            >
+              className = {style.loanDashboardTable}>
               <h3 align="center">LOANS</h3>
               <div style={{ height: "calc(100% - 115px)" }}>
                 {loanData ? (
@@ -423,10 +416,8 @@ class DashboardForFPO extends Component {
 
           <Grid
             item
-            md={3}
-            spacing={3}
-            style={{ padding: "15px", backgroundColor: "#fff" }}
-          >
+            sm={3}  xs={12} 
+            className = {style.loanPurposesDashboard}>
             <h3 align="center">LOAN BY PURPOSE</h3>
             {this.state.purposes && this.state.purposes.length > 0 ? (
               <Piechart

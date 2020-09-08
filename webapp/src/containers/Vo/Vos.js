@@ -501,7 +501,7 @@ export class Vos extends React.Component {
                 Search
               </Button>
               <Button
-                style={{ marginRight: "5px", marginBottom: "8px", }}
+                style={{ marginBottom: "8px", }}
                 color="secondary"
                 variant="contained"
                 // clicked={this.cancelForm}

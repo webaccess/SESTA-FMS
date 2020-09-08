@@ -1,0 +1,47 @@
+.title {
+  color: #263238;
+}
+.headerWrap{
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.addButton {
+  float: right;
+  /* padding-bottom: px; */
+}
+.loanDashboardTable {
+  border: 1px solid #ccc;
+  background-color: #fff;
+  margin-top: -1px;
+  height: 100%;
+}
+.loanPurposesDashboard {
+  padding: 15px;
+  background-color: #fff;
+}
+.emiDueHead {
+  padding-left: 15px;
+  padding-top: 1em;
+  margin-top: 0px;
+}
+.dashboardSestawrap{
+  background-color: #e5e9e3;
+}
+@media (min-width: 599px){
+  .dashboardSestawrap{
+    min-width: 540px;
+    max-width: 540px;;
+  }
+}
+@media (max-width: 599px){
+  .loanDashboardTable {
+    border-width: 1px 0px;
+    border-style: solid;
+    border-color: #c1c1c1;
+  }
+  .loanPurposesDashboard{
+    margin-top: 2px !important;
+  }
+}

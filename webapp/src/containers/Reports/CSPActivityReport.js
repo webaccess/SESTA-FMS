@@ -319,7 +319,7 @@ export class CSPSummaryReport extends React.Component {
                       label="Start Date"
                       name="startDate"
                       value={this.state.filterStartDate || ""}
-                      // format={"dd MMM yyyy"}
+                      format={"dd MMM yyyy"}
                       onChange={(event, value) =>
                         this.handleStartDateChange(event, value)
                       }
@@ -334,7 +334,7 @@ export class CSPSummaryReport extends React.Component {
                       label="End Date"
                       name="endDate"
                       value={this.state.filterEndDate || ""}
-                      // format={"dd MMM yyyy"}
+                      format={"dd MMM yyyy"}
                       onChange={(event, value) =>
                         this.handleEndDateChange(event, value)
                       }

@@ -293,13 +293,13 @@ class LoanUpdateTaskPage extends Component {
                     <b>
                       <div className={classes.member}
                         style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
-                        PENDING AMOUNT <br />
+                        PENDING AMOUNT<br />
                         {loantasks.length > 0 ? (
                           <span className={classes.fieldValues}>
                             {pendingAmount}
                           </span>
                         ) : (
-                          "-"
+                          <span className={classes.fieldValues}>-</span>
                         )}
                       </div>
                     </b>
@@ -334,7 +334,7 @@ class LoanUpdateTaskPage extends Component {
                             {data.loanEndsOn}
                           </span>
                         ) : (
-                          "-"
+                          <span className={classes.fieldValues}>-</span>
                         )}
                       </div>
                     </b>

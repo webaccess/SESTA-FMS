@@ -369,7 +369,7 @@ class AuthPage extends PureComponent {
                       JSON.stringify(get(input, "validations"))
                     );
                     return (
-                      <div key={"field" + key} style={{ margin: "8px" }}>
+                      <div key={"field" + key} className={styles.loginKeyWrap}>
                         {get(input, "subheading") ? (
                           <h4>{get(input, "subheading")}</h4>
                         ) : (
