@@ -15,8 +15,8 @@ import clsx from "clsx";
 import { makeStyles, useTheme } from "@material-ui/styles";
 import { useMediaQuery } from "@material-ui/core";
 import QueuePlayNextIcon from "@material-ui/icons/QueuePlayNext";
-import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
+import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 
 const StyledMenu = withStyles({
   paper: {
@@ -98,7 +98,7 @@ const useStyles = makeStyles((theme) => ({
   subMenuList: {
     padding: "0px !important",
     margin: "0px !important",
-  }
+  },
 }));
 
 const StyledMenuItem = withStyles((theme) => ({
@@ -203,7 +203,7 @@ function NavigationItems(props) {
         if (moduleArray.includes(module.name)) {
           masterMenu.push(
             <Collapse in={openMenu} timeout="auto" unmountOnExit>
-              <ListItem className={clsx(classes.subMenuList, className)} >
+              <ListItem className={clsx(classes.subMenuList, className)}>
                 <NavigationItem link={module.url} text={module.name} />
               </ListItem>
             </Collapse>
@@ -272,11 +272,12 @@ function NavigationItems(props) {
                   Masters{" "}
                 </span>
                 {openMenu ? (
-                  <ExpandLess
+                  <ExpandMore
                     className={clsx(classes.masterMenuExtendIcon, className)}
                   />
                 ) : (
-                  <ExpandMore
+                  <ArrowForwardIosIcon
+                    style={{ fontSize: "medium" }}
                     className={clsx(classes.masterMenuExtendIcon, className)}
                   />
                 )}

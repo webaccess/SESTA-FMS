@@ -280,14 +280,18 @@ class AuthPage extends PureComponent {
     if (this.props.match.params.authType === "login") {
       return (
         <div>
-          <Link href="/forgot-password">Forgot Password</Link>
+          <Link style={{ textDecoration: "underline" }} href="/forgot-password">
+            Forgot Password
+          </Link>
         </div>
       );
     }
 
     return (
       <div>
-        <Link href="/login">Ready to signin</Link>
+        <Link style={{ textDecoration: "underline" }} href="/login">
+          Click here to login
+        </Link>
       </div>
     );
   };
@@ -482,16 +486,32 @@ class AuthPage extends PureComponent {
                     return renderFormErrors;
                   })}
                   {this.state.showSuccessMsg ? this.renderSuccessMsg() : ""}
+                  {this.props.match.params.authType === "login" ? (
+                    <div
+                      style={{ paddingLeft: "212px" }}
+                      className={styles.linkContainer}
+                    >
+                      {this.renderLink()}
+                    </div>
+                  ) : (
+                    ""
+                  )}
                   <div className={`col-md-12 ${styles.buttonContainer}`}>
                     <Button type="submit" disabled={this.state.buttonView}>
-                      Submit
+                      {this.props.match.params.authType === "login"
+                        ? "Login"
+                        : "Submit"}
                     </Button>
                   </div>
                 </div>
               </form>
             </Container>
           </div>
-          <div className={styles.linkContainer}>{this.renderLink()}</div>
+          {this.props.match.params.authType !== "login" ? (
+            <div className={styles.linkContainer}>{this.renderLink()}</div>
+          ) : (
+            ""
+          )}
         </div>
       </div>
     );

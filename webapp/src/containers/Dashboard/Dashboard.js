@@ -18,14 +18,18 @@ class Dashboard extends Component {
 
     return (
       <Layout>
-        <h3 style={{ fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif" }}>DASHBOARD</h3>
+        <h3
+          style={{ fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif" }}
+        >
+          DASHBOARD
+        </h3>
 
         {userInfo.role.name === "FPO Admin" ? (
           <DashboardFPO></DashboardFPO>
         ) : null}
 
         {userInfo.role.name === "Sesta Admin" ||
-        userInfo.role.name === "Superdmin" ? (
+        userInfo.role.name === "Superadmin" ? (
           <DashboardSestaAdmin></DashboardSestaAdmin>
         ) : null}
 
