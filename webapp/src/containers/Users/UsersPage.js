@@ -586,7 +586,7 @@ class UsersPage extends Component {
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
-                    label="Email*"
+                    label="Email"
                     type="email"
                     name="addEmail"
                     error={this.hasError("addEmail")}
