@@ -112,6 +112,7 @@ ClearButton {
   min-width: unset !important;
 }
 
-:global(.cLiCmx div:first-child) {
-  white-space: unset !important;
-}
+/* :global(.cLiCmx div:first-child) {
+  white-space: normal;
+  line-height: 1.6;
+} */
