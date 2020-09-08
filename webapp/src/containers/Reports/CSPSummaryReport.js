@@ -443,7 +443,10 @@ export class CSPSummaryReport extends React.Component {
               <Card style={{ maxHeight: "max-content" }}>
                 <List>
                   <ListItem>
-                    <ListItemText primary="No of livelihood activites" />
+                  <ListItemText primary={
+                    <Typography style={{ fontWeight: '500' }}>
+                      No of livelihood activites
+                    </Typography>}/>
                     <ListItemSecondaryAction style={{ paddingRight: "100px" }}>
                       {this.state.completedActivities.length}
                     </ListItemSecondaryAction>
@@ -453,23 +456,20 @@ export class CSPSummaryReport extends React.Component {
 
                 <div style={{ paddingTop: "15px" }}>
                   <Typography
-                    variant="h4"
                     style={{
-                      paddingLeft: "13px",
-                      textDecoration: "underline",
+                      paddingLeft: "15px",
+                      fontWeight: "500",
                     }}
                   >
-                    {" "}
                     Type of activities
                   </Typography>
-                  <div>
+                  <div style={{paddingLeft:"15px"}}>
                     {elements.length > 0 ? (
                       <List>{elements}</List>
                     ) : (
-                      <h4 style={{ paddingTop: "15px", paddingLeft: "13px" }}>
-                        {" "}
+                      <h5 style={{ paddingTop: "15px", paddingLeft: "13px" }}>
                         No records found
-                      </h4>
+                      </h5>
                     )}
                   </div>
                 </div>
@@ -477,7 +477,10 @@ export class CSPSummaryReport extends React.Component {
 
                 <List>
                   <ListItem>
-                    <ListItemText primary="No of loans sanctioned" />
+                  <ListItemText primary={
+                    <Typography style={{ fontWeight: '500' }}>
+                      No of loans sanctioned
+                    </Typography>}/>
                     <ListItemSecondaryAction style={{ paddingRight: "100px" }}>
                       {this.state.sanctionedLoans.length}
                     </ListItemSecondaryAction>
@@ -487,7 +490,10 @@ export class CSPSummaryReport extends React.Component {
 
                 <List>
                   <ListItem>
-                    <ListItemText primary="No of loan defaulters" />
+                  <ListItemText primary={
+                    <Typography style={{ fontWeight: '500' }}>
+                      No of loan defaulters
+                    </Typography>}/>
                     <ListItemSecondaryAction style={{ paddingRight: "100px" }}>
                       {this.state.loanDefaulters.length}
                     </ListItemSecondaryAction>
@@ -497,7 +503,10 @@ export class CSPSummaryReport extends React.Component {
 
                 <List>
                   <ListItem>
-                    <ListItemText primary="Amount of principal collected" />
+                  <ListItemText primary={
+                    <Typography style={{ fontWeight: '500' }}>
+                      Amount of principal collected
+                    </Typography>}/>
                     <ListItemSecondaryAction style={{ paddingRight: "100px" }}>
                       ₹{this.state.principalCollected.toLocaleString()}
                     </ListItemSecondaryAction>
@@ -507,7 +516,10 @@ export class CSPSummaryReport extends React.Component {
 
                 <List>
                   <ListItem>
-                    <ListItemText primary="Amount of interest collected" />
+                  <ListItemText primary={
+                    <Typography style={{ fontWeight: '500' }}>
+                      Amount of interest collected
+                    </Typography>}/>
                     <ListItemSecondaryAction style={{ paddingRight: "100px" }}>
                       ₹{this.state.interestCollected.toLocaleString()}
                     </ListItemSecondaryAction>

@@ -363,7 +363,7 @@ const Table = (props) => {
           </div>
         ),
         button: true,
-        width: "250px",
+        width: "200px",
       },
     ];
   }
