@@ -7,8 +7,10 @@ const userData = require("./user.json");
 
 // genric method to iterate over data
 async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array);
+  if (array) {
+    for (let index = 0; index < array.length; index++) {
+      await callback(array[index], index, array);
+    }
   }
 }
 

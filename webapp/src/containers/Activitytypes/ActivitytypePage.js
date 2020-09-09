@@ -32,7 +32,10 @@ class ActivitytypePage extends Component {
     super(props);
     let userInfo = auth.getUserInfo();
     let validateFpo;
-    if (userInfo.role.name == "Sesta Admin") {
+    if (
+      userInfo.role.name == "Sesta Admin" ||
+      userInfo.role.name == "Superadmin"
+    ) {
       validateFpo = {
         required: {
           value: true,
@@ -330,7 +333,7 @@ class ActivitytypePage extends Component {
             : ADD_ACTIVITYTYPE_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: '45rem' }}>
+        <Card style={{ maxWidth: "45rem" }}>
           <form
             autoComplete="off"
             noValidate
@@ -480,7 +483,7 @@ class ActivitytypePage extends Component {
               </Grid>
             </CardContent>
             <Divider />
-            <CardActions style={{padding: "15px",}}>
+            <CardActions style={{ padding: "15px" }}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"
