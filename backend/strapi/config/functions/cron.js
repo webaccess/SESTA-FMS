@@ -23,8 +23,8 @@ module.exports = {
   //
   // }
 
-  "*/1 * * * *": async () => {
-    // "0 10 * * *": async () => {
+  // "*/1 * * * *": async () => {
+  "0 10 * * *": async () => {
     const application = await strapi.services["loan-application"].find({});
     application.map((item) => {
       if (item.loan_app_installments) {
@@ -38,7 +38,7 @@ module.exports = {
           let content;
           let amount = inst.expected_principal + inst.expected_interest;
           console.log("diff", diff);
-          if (Math.floor(diff) == -5) {
+          if (Math.floor(diff) == -5 && inst.actual_principal == null) {
             if (item.contact.phone) {
               //individual sms
               content =
@@ -46,7 +46,7 @@ module.exports = {
                 item.contact.name +
                 ",\nThe EMI installment of amount Rs. " +
                 amount +
-                " for loan " +
+                " for loan application no. " +
                 item.application_no +
                 " is due. This is a reminder for EMI payment. Please ignore, if you have already made a payment.";
               console.log(
@@ -73,9 +73,9 @@ module.exports = {
               item.creator_id.name +
               ",\nThe EMI installment of amount Rs. " +
               amount +
-              " for loan " +
+              " for loan application no. " +
               item.application_no +
-              " is due. This is a reminder for EMI payment. Please ignore, if you have already made a payment.";
+              " is due. This is a reminder for EMI payment. Please ignore, if you have already collected the payment.";
             if (mobileNo) {
               console.log("enters case 2");
               let config = {
