@@ -1,0 +1,52 @@
+{
+  "user": [
+    {
+      "contact": {
+        "name": "WAfpo",
+        "contact_type": "organization",
+        "organization": {
+          "name": "WAfpo",
+          "sub_type": "FPO"
+        }
+      }
+    },
+    {
+      "username": "2222222222",
+      "provider": "local",
+      "email": "2222222222@example.com",
+      "password": "$2a$10$Pg24BdHmzcje1fM/yRL6ceAxBlP5UX5Gf.Grw3Ki2r19rNB23fqeS",
+      "confirmed": true,
+      "blocked": false,
+      "first_name": "WA",
+      "last_name": "Superadmin",
+      "contact": {
+        "name": "WASuper Admin",
+        "phone": "2222222222",
+        "contact_type": "individual",
+        "individual": {
+          "first_name": "WA",
+          "last_name": "Super Admin"
+        }
+      }
+    },
+    {
+      "username": "1111111111",
+      "provider": "local",
+      "email": "1111111111@example.com",
+      "password": "$2a$10$Pg24BdHmzcje1fM/yRL6ceAxBlP5UX5Gf.Grw3Ki2r19rNB23fqeS",
+      "confirmed": true,
+      "blocked": false,
+      "first_name": "WA",
+      "last_name": "FPO Admin",
+      "contact": {
+        "name": "WAFPO Admin",
+        "phone": "1111111111",
+        "contact_type": "individual",
+        "individual": {
+          "first_name": "WA",
+          "last_name": "FPO admin"
+        }
+      }
+    }
+  ]
+}
