@@ -97,14 +97,13 @@
           "principal": 906,
           "interest": 9
         }
-      ],
-      "loantasks": ["Grafts of crop 1", "Grafts of crop 2"]
+      ]
     },
     {
       "product_name": "Turmeric",
       "specification": "half bigha",
       "loan_amount": 10000,
-      "duration": 18,
+      "duration": 12,
       "emi": 888,
       "emidetails": [
         {
