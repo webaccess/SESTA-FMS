@@ -117,12 +117,17 @@ async function addEmiDetails() {
     // save emidetails
     try {
       if (loanModelPresent) {
+        const loanModel = loanModelPresent.toJSON
+          ? loanModelPresent.toJSON()
+          : loanModelPresent;
+        console.log("loanModel.id", loanModel.id);
         await asyncForEach(emidetails, async (emidetail) => {
           const emiPresent = await bookshelf
             .model("emidetail")
             .where({
               principal: emidetail.principal,
               interest: emidetail.interest,
+              loan_model: loanModel.id,
             })
             .fetch();
           if (emiPresent) {
@@ -130,10 +135,6 @@ async function addEmiDetails() {
               `Skipping emi details for loan model ${loanmodel.product_name}.....`
             );
           } else {
-            const loanModel = loanModelPresent.toJSON
-              ? loanModelPresent.toJSON()
-              : loanModelPresent;
-
             await emiDetailsData.emidetail
 
               .filter(
