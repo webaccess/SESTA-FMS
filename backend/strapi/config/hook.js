@@ -11,8 +11,5 @@ module.exports = {
     autoload: {
       enabled: true,
     },
-    migratedata: {
-      enabled: true,
-    },
   },
 };
