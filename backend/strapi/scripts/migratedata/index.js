@@ -122,7 +122,6 @@ async function addEmiDetails() {
         const loanModel = loanModelPresent.toJSON
           ? loanModelPresent.toJSON()
           : loanModelPresent;
-        console.log("loanModel.id", loanModel.id);
         await asyncForEach(emidetails, async (emidetail) => {
           const emiPresent = await bookshelf
             .model("emidetail")
