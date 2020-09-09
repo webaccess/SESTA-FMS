@@ -109,7 +109,7 @@ ClearButton {
 }
 
 :global(.cLiCmx) {
-  min-width: unset !important;
+  /* min-width: unset !important; */
 }
 
 /* :global(.cLiCmx div:first-child) {

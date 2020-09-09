@@ -218,6 +218,7 @@ export class Loanpurposes extends React.Component {
         name: "EMI",
         selector: "emi",
         sortable: true,
+        cell: (row) => (row.emi ? "₹" + row.emi.toLocaleString() : "-"),
       },
       {
         name: "FPO",
@@ -238,11 +239,9 @@ export class Loanpurposes extends React.Component {
       <Layout>
         <Grid>
           <div className="App">
-          <h5 className={classes.menuName}>MASTER</h5>
+            <h5 className={classes.menuName}>MASTER</h5>
             <div className={style.headerWrap}>
-              <h2 className={style.title}>
-                Manage Loan Purpose
-              </h2>
+              <h2 className={style.title}>Manage Loan Purpose</h2>
               <div className={classes.buttonRow}>
                 <Button
                   variant="contained"
@@ -284,7 +283,10 @@ export class Loanpurposes extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
+            <div
+              className={classes.row}
+              style={{ flexWrap: "wrap", height: "auto" }}
+            >
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -301,14 +303,14 @@ export class Loanpurposes extends React.Component {
                 </div>
               </div>
               <Button
-                style={{ marginRight: "5px", marginBottom: "8px", }}
+                style={{ marginRight: "5px", marginBottom: "8px" }}
                 variant="contained"
                 onClick={this.handleSearch.bind(this)}
               >
                 Search
               </Button>
               <Button
-                style={{ marginBottom: "8px", }}
+                style={{ marginBottom: "8px" }}
                 color="secondary"
                 variant="contained"
                 onClick={this.cancelForm.bind(this)}
