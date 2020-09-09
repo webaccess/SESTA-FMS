@@ -69,7 +69,7 @@ async function addLoanModel() {
   const fpoPresent = await bookshelf
     .model("contact")
     .where({
-      name: "WAfpo",
+      name: "WAFPO",
       contact_type: "organization",
     })
     .fetch();
