@@ -64,19 +64,13 @@ class ActivityPage extends Component {
         },
         addPincode: {},
         addPhone: {
+          required: {
+            value: "true",
+            message: "Phone number is required",
+          },
           phone: {
             value: "true",
             message: "Please enter valid phone number",
-          },
-        },
-        addEmail: {
-          required: {
-            value: "true",
-            message: "Email is required",
-          },
-          email: {
-            value: "true",
-            message: "Please enter valid email id",
           },
         },
         addShg: {
@@ -119,8 +113,8 @@ class ActivityPage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/" +
-          this.state.editPage[1]
+            "crm-plugin/contact/" +
+            this.state.editPage[1]
         )
         .then((res) => {
           this.handleStateChange(res.data.state);
@@ -143,7 +137,7 @@ class ActivityPage extends Component {
           });
 
           if (this.state.getState.length > 0) {
-            this.state.getState.map(state => {
+            this.state.getState.map((state) => {
               if (state.id === res.data.state.id) {
                 this.setState({
                   values: {
@@ -154,7 +148,7 @@ class ActivityPage extends Component {
                   },
                 });
               }
-            })
+            });
           }
 
           // if isShareholder is checked
@@ -210,15 +204,15 @@ class ActivityPage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?individual=" +
-          auth.getUserInfo().contact.individual
+            "crm-plugin/contact/?individual=" +
+            auth.getUserInfo().contact.individual
         )
         .then((res) => {
           serviceProvider
             .serviceProviderForGetRequest(
               process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/contact/?id=" +
-              res.data[0].individual.vo
+                "crm-plugin/contact/?id=" +
+                res.data[0].individual.vo
             )
             .then((response) => {
               this.setState({ getShgs: response.data[0].org_vos });
@@ -292,8 +286,8 @@ class ActivityPage extends Component {
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId
+              "crm-plugin/districts/?is_active=true&&state.id=" +
+              stateId
           )
           .then((res) => {
             this.setState({ getDistrict: res.data });
@@ -309,10 +303,10 @@ class ActivityPage extends Component {
           ...this.state.values,
           addState: "",
           addDistrict: "",
-          addVillage: ""
+          addVillage: "",
         },
         getDistrict: [],
-        getVillage: []
+        getVillage: [],
       });
       this.setState({ stateSelected: false });
     }
@@ -327,8 +321,8 @@ class ActivityPage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/villages/?is_active=true&&district.id=" +
-          districtId
+            "crm-plugin/villages/?is_active=true&&district.id=" +
+            districtId
         )
         .then((res) => {
           this.setState({ getVillage: res.data });
@@ -344,7 +338,7 @@ class ActivityPage extends Component {
           addDistrict: "",
           addVillage: "",
         },
-        getVillage: []
+        getVillage: [],
       });
       this.setState({ districtSelected: false });
     }
@@ -539,7 +533,7 @@ class ActivityPage extends Component {
             this.state.shareInfoId,
             postShareData
           )
-          .then((res) => { })
+          .then((res) => {})
           .catch((error) => {
             console.log(error);
           });
@@ -550,7 +544,7 @@ class ActivityPage extends Component {
               process.env.REACT_APP_SERVER_URL + "shareinformations",
               this.state.shareInfoId
             )
-            .then((res) => { })
+            .then((res) => {})
             .catch((error) => {
               console.log(error);
             });
@@ -563,7 +557,7 @@ class ActivityPage extends Component {
           process.env.REACT_APP_SERVER_URL + "shareinformations/",
           postShareData
         )
-        .then((res) => { })
+        .then((res) => {})
         .catch((error) => {
           console.log(error);
         });
@@ -597,7 +591,7 @@ class ActivityPage extends Component {
             : ADD_MEMBERS_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: '45rem' }}>
+        <Card style={{ maxWidth: "45rem" }}>
           <form
             autoComplete="off"
             noValidate
@@ -699,10 +693,10 @@ class ActivityPage extends Component {
                     value={
                       addState
                         ? stateFilter[
-                        stateFilter.findIndex(function (item, i) {
-                          return item.id === addState;
-                        })
-                        ] || null
+                            stateFilter.findIndex(function (item, i) {
+                              return item.id === addState;
+                            })
+                          ] || null
                         : null
                     }
                     error={this.hasError("addState")}
@@ -736,10 +730,10 @@ class ActivityPage extends Component {
                     value={
                       addDistrict
                         ? districtFilter[
-                        districtFilter.findIndex(function (item, i) {
-                          return item.id === addDistrict;
-                        })
-                        ] || null
+                            districtFilter.findIndex(function (item, i) {
+                              return item.id === addDistrict;
+                            })
+                          ] || null
                         : null
                     }
                     error={this.hasError("addDistrict")}
@@ -747,8 +741,8 @@ class ActivityPage extends Component {
                       this.hasError("addDistrict")
                         ? this.state.errors.addDistrict[0]
                         : this.state.stateSelected
-                          ? null
-                          : "Please select the state first"
+                        ? null
+                        : "Please select the state first"
                     }
                     renderInput={(params) => (
                       <Input
@@ -806,10 +800,10 @@ class ActivityPage extends Component {
                     value={
                       addVillage
                         ? villageFilter[
-                        villageFilter.findIndex(function (item, i) {
-                          return item.id === addVillage;
-                        })
-                        ] || null
+                            villageFilter.findIndex(function (item, i) {
+                              return item.id === addVillage;
+                            })
+                          ] || null
                         : null
                     }
                     error={this.hasError("addVillage")}
@@ -817,8 +811,8 @@ class ActivityPage extends Component {
                       this.hasError("addVillage")
                         ? this.state.errors.addVillage[0]
                         : this.state.districtSelected
-                          ? null
-                          : "Please select the district first"
+                        ? null
+                        : "Please select the district first"
                     }
                     renderInput={(params) => (
                       <Input
@@ -850,13 +844,15 @@ class ActivityPage extends Component {
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
-                    label="Phone Number"
+                    label="Phone Number*"
                     type="tel"
                     name="addPhone"
                     error={this.hasError("addPhone")}
                     helperText={
                       this.hasError("addPhone")
-                        ? this.state.errors.addPhone[0]
+                        ? this.state.errors["addPhone"].map((error) => {
+                            return error + " ";
+                          })
                         : null
                     }
                     value={this.state.values.addPhone || ""}
@@ -867,17 +863,9 @@ class ActivityPage extends Component {
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
-                    label="Email*"
+                    label="Email"
                     type="email"
                     name="addEmail"
-                    error={this.hasError("addEmail")}
-                    helperText={
-                      this.hasError("addEmail")
-                        ? this.state.errors["addEmail"].map((error) => {
-                          return error + " ";
-                        })
-                        : null
-                    }
                     value={this.state.values.addEmail || ""}
                     onChange={this.handleChange}
                     variant="outlined"
@@ -895,25 +883,25 @@ class ActivityPage extends Component {
                     }}
                     value={
                       this.state.loggedInUserRole ===
-                        "CSP (Community Service Provider)"
+                      "CSP (Community Service Provider)"
                         ? addShg
                           ? this.state.isCancel === true
                             ? null
                             : shgFilters[
-                            shgFilters.findIndex(function (item, i) {
-                              return item.contact === addShg;
-                            })
-                            ] || null
+                                shgFilters.findIndex(function (item, i) {
+                                  return item.contact === addShg;
+                                })
+                              ] || null
                           : null
                         : addShg
-                          ? this.state.isCancel === true
-                            ? null
-                            : shgFilters[
-                            shgFilters.findIndex(function (item, i) {
-                              return item.id === addShg;
-                            })
+                        ? this.state.isCancel === true
+                          ? null
+                          : shgFilters[
+                              shgFilters.findIndex(function (item, i) {
+                                return item.id === addShg;
+                              })
                             ] || null
-                          : null
+                        : null
                     }
                     error={this.hasError("addShg")}
                     helperText={
@@ -947,7 +935,11 @@ class ActivityPage extends Component {
                 </Grid>
                 <Divider />
                 {this.state.isShareholder ? (
-                  <Grid container spacing={3} style={{width: "100%", margin: "0px",}}>
+                  <Grid
+                    container
+                    spacing={3}
+                    style={{ width: "100%", margin: "0px" }}
+                  >
                     <Grid item md={6} xs={12}>
                       <Input
                         fullWidth
@@ -1039,7 +1031,7 @@ class ActivityPage extends Component {
               </Grid>
             </CardContent>
             <Divider />
-            <CardActions style={{padding: "15px",}}>
+            <CardActions style={{ padding: "15px" }}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"
