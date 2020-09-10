@@ -294,6 +294,7 @@ class LoanEditEmiPage extends Component {
                     fullWidth
                     label="Principal Paid*"
                     name="actual_principal"
+                    type="number"
                     value={this.state.values.actual_principal ? this.state.values.actual_principal : this.state.values.expected_principal || ""}
                     error={this.hasError("actual_principal")}
                     helperText={
@@ -310,6 +311,7 @@ class LoanEditEmiPage extends Component {
                     fullWidth
                     label="Interest Paid*"
                     name="actual_interest"
+                    type="number"
                     value={this.state.values.actual_interest ? this.state.values.actual_interest : this.state.values.expected_interest || ""}
                     error={this.hasError("actual_interest")}
                     helperText={
@@ -346,6 +348,7 @@ class LoanEditEmiPage extends Component {
                     label="Fine"
                     name="fine"
                     value={this.state.values.fine || ""}
+                    type="number"
                     onChange={this.handleChange}
                     variant="outlined"
                   />

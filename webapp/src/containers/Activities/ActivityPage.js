@@ -19,7 +19,7 @@ import { ADD_ACTIVITY_BREADCRUMBS, EDIT_ACTIVITY_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autotext from "../../components/Autotext/Autotext";
-import DateTimepicker from "../../components/UI/DateTimepicker/DateTimepicker.js";
+import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 import style from "./Activity.module.css";
 
 class ActivityPage extends Component {
@@ -96,7 +96,7 @@ class ActivityPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activitytypes/?is_active=true"
+          "crm-plugin/activitytypes/?is_active=true&&autocreated=false&&_sort=name:asc"
       )
       .then((res) => {
         this.setState({ getActivitytype: res.data });
@@ -420,8 +420,8 @@ class ActivityPage extends Component {
                   />
                 </Grid>
                 <Grid item md={3} xs={12} className={style.dateTimeWrap}>
-                  <DateTimepicker
-                    label="Start Date/Time*"
+                  <Datepicker
+                    label="Start Date*"
                     name="addStartDate"
                     error={this.hasError("addStartDate")}
                     helperText={
@@ -430,6 +430,7 @@ class ActivityPage extends Component {
                         : null
                     }
                     value={this.state.values.addStartDate || null}
+                    format={"dd MMM yyyy"}
                     onChange={(value) =>
                       this.setState({
                         values: { ...this.state.values, addStartDate: value },
@@ -438,10 +439,11 @@ class ActivityPage extends Component {
                   />
                 </Grid>
                 <Grid item md={3} xs={12} className={style.dateTimeWrap}>
-                  <DateTimepicker
-                    label="End Date/Time"
+                  <Datepicker
+                    label="End Date"
                     name="addEndDate"
                     value={this.state.values.addEndDate}
+                    format={"dd MMM yyyy"}
                     onChange={(value) =>
                       this.setState({
                         values: { ...this.state.values, addEndDate: value },

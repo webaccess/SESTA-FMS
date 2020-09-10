@@ -154,6 +154,7 @@ class LoanEditTask extends Component {
                     fdata.contact = {
                       id: auth.getUserInfo().contact.id
                     }
+                    fdata.start_datetime = this.state.values.editDate;
                     fdata.end_datetime = this.state.values.editDate;
                     fdata.description = loanTaskData.comments;
                     serviceProvider

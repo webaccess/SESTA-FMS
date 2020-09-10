@@ -71,24 +71,35 @@ class VillagePage extends Component {
               addAbbreviation: res.data[0].abbreviation,
               addIdentifier: res.data[0].identifier,
               addIsActive: res.data[0].is_active,
-              addDistrict: res.data[0].district.id,
-              addState: res.data[0].state.id,
             },
           });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      this.stateIds = this.state.values.addState;
+          if (this.state.getState.length > 0) {
+            this.state.getState.map(state => {
+              if (state.id === res.data[0].state.id) {
+                this.setState({
+                  values: {
+                    ...this.state.values,
+                    addState: res.data[0].state.id,
+                    addDistrict: res.data[0].district.id,
+                  },
+                });
+              }
+            })
 
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/districts/?is_active=true&&state.id=" +
-          this.state.values.addState
-        )
-        .then((res) => {
-          this.setState({ getDistrict: res.data });
+            let stateId = res.data[0].state.id;
+            serviceProvider
+              .serviceProviderForGetRequest(
+                process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/districts/?is_active=true&&state.id=" +
+                stateId
+              )
+              .then((res) => {
+                this.setState({ getDistrict: res.data });
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          }
         })
         .catch((error) => {
           console.log(error);
@@ -129,6 +140,7 @@ class VillagePage extends Component {
       this.setState({
         values: { ...this.state.values, addState: value.id },
       });
+      if (value.is_active == true) {
       let stateId = value.id;
       serviceProvider
         .serviceProviderForGetRequest(
@@ -143,6 +155,7 @@ class VillagePage extends Component {
           console.log(error);
         });
       this.setState({ stateSelected: true });
+      }
     } else {
       this.setState({
         values: {
@@ -291,7 +304,6 @@ class VillagePage extends Component {
     let addState = this.state.values.addState;
     let districtFilter = this.state.getDistrict;
     let addDistrict = this.state.values.addDistrict;
-
     return (
       <Layout
         breadcrumbs={
