@@ -37,7 +37,7 @@ const useStyles = (theme) => ({
   },
   searchInput: {
     marginRight: theme.spacing(1),
-	marginBottom: "8px",
+    marginBottom: "8px",
   },
   Districts: {
     marginRight: theme.spacing(1),
@@ -79,6 +79,7 @@ export class Activitytypes extends React.Component {
       multipleDelete: "",
       active: {},
       allIsActive: [],
+      isActTypePresent: false,
     };
   }
 
@@ -197,62 +198,6 @@ export class Activitytypes extends React.Component {
     }
   };
 
-  ActiveAll = (selectedId, selected) => {
-    if (selectedId.length !== 0) {
-      let numberOfIsActive = [];
-      for (let i in selected) {
-        numberOfIsActive.push(selected[i]["is_active"]);
-      }
-      this.setState({ allIsActive: numberOfIsActive });
-      let IsActive = "";
-      numberOfIsActive.forEach((element, index) => {
-        if (numberOfIsActive[index] === true) {
-          IsActive = false;
-        } else {
-          IsActive = true;
-        }
-
-        let setActiveId = selectedId[index];
-        serviceProvider
-          .serviceProviderForPutRequest(
-            process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
-            setActiveId,
-            {
-              is_active: IsActive,
-            }
-          )
-          .then((res) => {
-            this.setState({ formSubmitted: true });
-            this.componentDidMount({ updateData: true });
-            this.props.history.push({
-              pathname: "/activitytypes",
-              updateData: true,
-            });
-            this.clearSelected(selected);
-          })
-          .catch((error) => {
-            this.setState({ formSubmitted: false });
-            if (error.response !== undefined) {
-              this.setState({
-                errorCode:
-                  error.response.data.statusCode +
-                  " Error- " +
-                  error.response.data.error +
-                  " Message- " +
-                  error.response.data.message +
-                  " Please try again!",
-              });
-            } else {
-              this.setState({
-                errorCode: "Network Error - Please try again!",
-              });
-            }
-            console.log(error);
-          });
-      });
-    }
-  };
-
   clearSelected = (selected) => {
     let clearselected = "";
   };
@@ -261,6 +206,9 @@ export class Activitytypes extends React.Component {
     this.setState({ isActiveAllShowing: true });
     this.setState({ setActiveId: event.target.id });
     this.setState({ IsActive: event.target.checked });
+    if (this.state.isActTypePresent === true) {
+      this.setState({ isActTypePresent: false });
+    }
   };
 
   handle = () => {
@@ -272,36 +220,55 @@ export class Activitytypes extends React.Component {
     let setActiveId = this.state.setActiveId;
     let IsActive = this.state.IsActive;
     serviceProvider
-      .serviceProviderForPutRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
-        setActiveId,
-        {
-          is_active: IsActive,
-        }
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/activities/?activitytype.id=" +
+          setActiveId
       )
-      .then((res) => {
-        this.setState({ formSubmitted: true });
-        this.setState({ open: true });
-        this.componentDidMount({ editData: true });
-        this.props.history.push({ pathname: "/activitytypes", editData: true });
-      })
-      .catch((error) => {
-        this.setState({ formSubmitted: false });
-        if (error.response !== undefined) {
-          this.setState({
-            errorCode:
-              error.response.data.statusCode +
-              " Error- " +
-              error.response.data.error +
-              " Message- " +
-              error.response.data.message +
-              " Please try again!",
-          });
+      .then((typeRes) => {
+        if (typeRes.data.length > 0) {
+          this.setState({ isActTypePresent: true });
         } else {
-          this.setState({ errorCode: "Network Error - Please try again!" });
+          this.setState({ isActTypePresent: false });
+          serviceProvider
+            .serviceProviderForPutRequest(
+              process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
+              setActiveId,
+              {
+                is_active: IsActive,
+              }
+            )
+            .then((res) => {
+              this.setState({ formSubmitted: true });
+              this.setState({ open: true });
+              this.componentDidMount({ editData: true });
+              this.props.history.push({
+                pathname: "/activitytypes",
+                editData: true,
+              });
+            })
+            .catch((error) => {
+              this.setState({ formSubmitted: false });
+              if (error.response !== undefined) {
+                this.setState({
+                  errorCode:
+                    error.response.data.statusCode +
+                    " Error- " +
+                    error.response.data.error +
+                    " Message- " +
+                    error.response.data.message +
+                    " Please try again!",
+                });
+              } else {
+                this.setState({
+                  errorCode: "Network Error - Please try again!",
+                });
+              }
+              console.log(error);
+            });
         }
-        console.log(error);
-      });
+      })
+      .catch((error) => {});
   };
 
   closeActiveAllModalHandler = (event) => {
@@ -356,9 +323,7 @@ export class Activitytypes extends React.Component {
           <div className="App">
             <h5 className={classes.menuName}>MASTERS</h5>
             <div className={style.headerWrap}>
-              <h2 className={style.title}>
-                Manage Activity Types
-              </h2>
+              <h2 className={style.title}>Manage Activity Types</h2>
               <div className={classes.buttonRow}>
                 <Button
                   variant="contained"
@@ -406,12 +371,20 @@ export class Activitytypes extends React.Component {
                 Activity types deleted successfully!
               </Snackbar>
             ) : null}
+            {this.state.isActTypePresent === true ? (
+              <Snackbar severity="error" Showbutton={false}>
+                Activity type is in use, it can not be Deactivated!!
+              </Snackbar>
+            ) : null}
             {this.state.multipleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
+            <div
+              className={classes.row}
+              style={{ flexWrap: "wrap", height: "auto" }}
+            >
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -428,14 +401,19 @@ export class Activitytypes extends React.Component {
                   </Grid>
                 </div>
               </div>
-                <Button
-                  style={{ marginRight: "5px", marginBottom: "8px", }}
-                  onClick={this.handleSearch.bind(this)}>Search</Button>
-                <Button
-                  style={{ marginBottom: "8px", }}
-                  color="secondary" clicked={this.cancelForm}>
-                  Reset
-                </Button>
+              <Button
+                style={{ marginRight: "5px", marginBottom: "8px" }}
+                onClick={this.handleSearch.bind(this)}
+              >
+                Search
+              </Button>
+              <Button
+                style={{ marginBottom: "8px" }}
+                color="secondary"
+                clicked={this.cancelForm}
+              >
+                Reset
+              </Button>
             </div>
             {data ? (
               <Table
@@ -454,7 +432,6 @@ export class Activitytypes extends React.Component {
                 clearSelected={this.clearSelected}
                 DeleteAll={this.DeleteAll}
                 handleActive={this.handleActive}
-                ActiveAll={this.ActiveAll}
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 selectableRows
