@@ -52,6 +52,12 @@ class AuthPage extends PureComponent {
       ? replace(props.location.search, "?code=", "")
       : props.match.params.id;
     this.setForm(props.match.params.authType, params);
+    if (
+      props.location.search &&
+      props.location.search.includes("?reset=true")
+    ) {
+      this.setState({ showSuccessMsg: true });
+    }
   };
 
   /**
@@ -267,6 +273,7 @@ class AuthPage extends PureComponent {
       this.props.history.push("/");
     else {
       console.log("in here====");
+      this.props.history.push("/login?reset=true");
       this.setState({ showSuccessMsg: true });
       this.setState({ value: {} });
     }
@@ -323,7 +330,7 @@ class AuthPage extends PureComponent {
     let message = "";
     if (this.props.match.params.authType === "forgot-password")
       message = "Reset password link is sent to your mail.";
-    else if (this.props.match.params.authType === "reset-password")
+    else if (this.props.match.params.authType === "login")
       message = "Password reset successfully.";
     else if (this.props.match.params.authType === "verify-otp")
       message = "OTP sent successfully.";
