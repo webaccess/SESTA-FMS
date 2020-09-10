@@ -132,7 +132,7 @@ const Table = (props) => {
   };
 
   let valueformodal = props.columnsvalue;
-  let valueForMemberPage = props.title;
+  let dtPageTitle = props.title;
   let str = "notview";
 
   const [isDeleteShowing, setisDeleteShowing] = React.useState(false);
@@ -140,12 +140,12 @@ const Table = (props) => {
   const [isActiveAllShowing, setisActiveAllShowing] = React.useState(false);
   let column = [];
   if (
-    valueForMemberPage !== "FPO Loans" &&
-    valueForMemberPage !== "Loans" &&
-    valueForMemberPage !== "ViewLoanEMI" &&
-    valueForMemberPage !== "EMI Due" &&
-    valueForMemberPage !== "Recent Activities" &&
-    valueForMemberPage !== "CSP Report"
+    dtPageTitle !== "FPO Loans" &&
+    dtPageTitle !== "Loans" &&
+    dtPageTitle !== "ViewLoanEMI" &&
+    dtPageTitle !== "EMI Due" &&
+    dtPageTitle !== "Recent Activities" &&
+    dtPageTitle !== "CSP Report"
   ) {
     column = [
       {
@@ -180,7 +180,7 @@ const Table = (props) => {
       },
     ];
   }
-  if (valueForMemberPage === "UpdateLoanTask") {
+  if (dtPageTitle === "UpdateLoanTask") {
     column = [
       {
         cell: (cell) => (
@@ -196,7 +196,58 @@ const Table = (props) => {
       },
     ];
   }
-  if (valueForMemberPage === "LoanEMI") {
+  if (dtPageTitle === "Activities") {
+    column = [
+      {
+        cell: (cell) => (
+          <div>
+            <div
+              style={{ display: "inline-flex" }}
+              onClick={(cell.activitytype.name !== "Loan application collection" &&
+                cell.activitytype.name !== "Collection of principal amount" &&
+                cell.activitytype.name !== "Interest collection" &&
+                cell.loan_application_task === null) ?
+                (event) => editData(cell.id) : null
+              }
+              id={cell.id}
+            >
+              <Tooltip title="Edit">
+                <IconButton
+                  aria-label="task"
+                  value={cell[valueformodal]}
+                  disabled={(cell.activitytype.name !== "Loan application collection" &&
+                    cell.activitytype.name !== "Collection of principal amount" &&
+                    cell.activitytype.name !== "Interest collection" &&
+                    cell.loan_application_task === null) ? false : true}
+                >
+                  {(cell.activitytype.name !== "Loan application collection" &&
+                    cell.activitytype.name !== "Collection of principal amount" &&
+                    cell.activitytype.name !== "Interest collection" &&
+                    cell.loan_application_task === null) ?
+                    <EditIcon className={classes.editIcon} /> :
+                    <EditIcon className={classes.VisibilityIcon} />}
+                </IconButton>
+              </Tooltip>
+            </div>
+            <div
+              style={{ display: "inline-flex" }}
+              onClick={(event) => deleteDataModal(cell.id, cell[valueformodal])}
+              id={cell.id}
+            >
+              <Tooltip title="Delete">
+                <IconButton aria-label="delete">
+                  <DeleteIcon className={classes.deleteIcon} />
+                </IconButton>
+              </Tooltip>
+            </div>
+          </div>
+        ),
+        button: true,
+        width: "200px",
+      },
+    ];
+  }
+  if (dtPageTitle === "LoanEMI") {
     column = [
       {
         cell: (cell) => (
@@ -212,7 +263,7 @@ const Table = (props) => {
       },
     ];
   }
-  if (valueForMemberPage === "Members") {
+  if (dtPageTitle === "Members") {
     column = [
       {
         cell: (cell) => (
@@ -261,7 +312,7 @@ const Table = (props) => {
       },
     ];
   }
-  if (valueForMemberPage === "Loans") {
+  if (dtPageTitle === "Loans") {
     column = [
       {
         cell: (cell) => (

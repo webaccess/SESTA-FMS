@@ -180,16 +180,17 @@ class LoanEmiPage extends Component {
     }
 
     // get Loan Ends On Date
-    let sortedPaymentDate = loanAppData.loan_app_installments.sort(
-      (a, b) =>
-        new Date(...a.payment_date.split("/").reverse()) -
-        new Date(...b.payment_date.split("/").reverse())
-    );
-    let len = sortedPaymentDate.length - 1;
-    data.loanEndsOn = Moment(sortedPaymentDate[len].payment_date).format(
-      "DD MMM YYYY"
-    );
-
+    if (loanAppData.loan_app_installments.length > 0) {
+      let sortedPaymentDate = loanAppData.loan_app_installments.sort(
+        (a, b) =>
+          new Date(...a.payment_date.split("/").reverse()) -
+          new Date(...b.payment_date.split("/").reverse())
+      );
+      let len = sortedPaymentDate.length - 1;
+      data.loanEndsOn = Moment(sortedPaymentDate[len].payment_date).format(
+        "DD MMM YYYY"
+      );
+    }
     const Usercolumns = [
       {
         name: "Due Date",
