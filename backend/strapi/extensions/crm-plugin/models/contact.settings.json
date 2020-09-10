@@ -122,6 +122,10 @@
     "creator_id": {
       "plugin": "crm-plugin",
       "model": "contact"
+    },
+    "pg": {
+      "plugin": "crm-plugin",
+      "model": "tag"
     }
   }
 }

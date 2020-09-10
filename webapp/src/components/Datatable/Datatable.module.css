@@ -101,9 +101,6 @@ ClearButton {
   display: none !important;
 }
 
-/*  */
-/* class="sc-fzqBZW dNoAIX" */
-
 :global(.dNoAIX) {
   display: none;
 }
@@ -111,8 +108,3 @@ ClearButton {
 :global(.cLiCmx) {
   /* min-width: unset !important; */
 }
-
-/* :global(.cLiCmx div:first-child) {
-  white-space: normal;
-  line-height: 1.6;
-} */
