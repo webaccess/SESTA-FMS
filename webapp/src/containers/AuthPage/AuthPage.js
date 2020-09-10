@@ -119,6 +119,8 @@ class AuthPage extends PureComponent {
     console.log("getOTP==", resend);
     const requestURL = process.env.REACT_APP_SERVER_URL + "otps/requestotp";
     const body = this.state.value;
+    this.setState({ fieldErrors: { ...this.state.errors } });
+    this.setState({ formErrors: [] });
     if (resend)
       body["contact_number"] = this.props.location.state.contact_number;
     axios({
@@ -153,6 +155,8 @@ class AuthPage extends PureComponent {
     console.log("cc", contact_number);
     const body = this.state.value;
     body.contact_number = contact_number;
+    this.setState({ fieldErrors: { ...this.state.errors } });
+    this.setState({ formErrors: [] });
     axios({
       method: "post",
       url: requestURL,
