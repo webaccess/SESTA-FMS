@@ -419,9 +419,9 @@ class ActivityPage extends Component {
                     variant="outlined"
                   />
                 </Grid>
-                <Grid item md={3} xs={12} className={style.dateTimeWrap}>
+                <Grid item md={3} xs={12}>
                   <Datepicker
-                    label="Start Date*"
+                    label="Date*"
                     name="addStartDate"
                     error={this.hasError("addStartDate")}
                     helperText={
@@ -434,19 +434,6 @@ class ActivityPage extends Component {
                     onChange={(value) =>
                       this.setState({
                         values: { ...this.state.values, addStartDate: value },
-                      })
-                    }
-                  />
-                </Grid>
-                <Grid item md={3} xs={12} className={style.dateTimeWrap}>
-                  <Datepicker
-                    label="End Date"
-                    name="addEndDate"
-                    value={this.state.values.addEndDate}
-                    format={"dd MMM yyyy"}
-                    onChange={(value) =>
-                      this.setState({
-                        values: { ...this.state.values, addEndDate: value },
                       })
                     }
                   />
@@ -483,7 +470,7 @@ class ActivityPage extends Component {
                     />
                   </Grid>
                 ) : null}
-                <Grid item md={12} xs={12}>
+                <Grid item md={9} xs={12}>
                   <TextField
                     id="outlined-multiline-static"
                     fullWidth

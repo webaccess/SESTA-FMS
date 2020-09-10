@@ -71,35 +71,24 @@ class VillagePage extends Component {
               addAbbreviation: res.data[0].abbreviation,
               addIdentifier: res.data[0].identifier,
               addIsActive: res.data[0].is_active,
+              addState: res.data[0].state.id,
+              addDistrict: res.data[0].district.id,
             },
           });
-          if (this.state.getState.length > 0) {
-            this.state.getState.map(state => {
-              if (state.id === res.data[0].state.id) {
-                this.setState({
-                  values: {
-                    ...this.state.values,
-                    addState: res.data[0].state.id,
-                    addDistrict: res.data[0].district.id,
-                  },
-                });
-              }
-            })
 
-            let stateId = res.data[0].state.id;
-            serviceProvider
-              .serviceProviderForGetRequest(
-                process.env.REACT_APP_SERVER_URL +
-                "crm-plugin/districts/?is_active=true&&state.id=" +
-                stateId
-              )
-              .then((res) => {
-                this.setState({ getDistrict: res.data });
-              })
-              .catch((error) => {
-                console.log(error);
-              });
-          }
+          let stateId = res.data[0].state.id;
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+              "crm-plugin/districts/?is_active=true&&state.id=" +
+              stateId
+            )
+            .then((res) => {
+              this.setState({ getDistrict: res.data });
+            })
+            .catch((error) => {
+              console.log(error);
+            });
         })
         .catch((error) => {
           console.log(error);
