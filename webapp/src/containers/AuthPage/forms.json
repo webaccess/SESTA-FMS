@@ -9,7 +9,10 @@
         "type": "tel",
         "placeholder": "Mobile Number",
         "validations": {
-          "required": { "value": "true", "message": "Email field required" }
+          "required": {
+            "value": "true",
+            "message": "Mobile Number field required"
+          }
         }
       }
     ],
@@ -22,7 +25,10 @@
         "type": "text",
         "placeholder": "Mobile Number",
         "validations": {
-          "required": { "value": "true", "message": "Username field required" }
+          "required": {
+            "value": "true",
+            "message": "Mobile Number field required"
+          }
         }
       },
       {
