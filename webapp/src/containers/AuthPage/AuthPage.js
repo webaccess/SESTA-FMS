@@ -144,6 +144,10 @@ class AuthPage extends PureComponent {
       })
       .catch((error) => {
         this.setState({ buttonView: false });
+        console.log("error", error.response.data);
+        this.setState({
+          formErrors: { contact_number: [error.response.data.message] },
+        });
       });
   };
 

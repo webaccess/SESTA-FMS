@@ -41,10 +41,10 @@
         "customBootstrapClass": "col-md-12",
         "subheading": "Please enter the OTP",
         "name": "otp",
-        "type": "number",
+        "type": "password",
         "label": "OTP",
         "validations": {
-          "required": { "value": "true", "message": "Password field required" }
+          "required": { "value": "true", "message": "OTP field required" }
         }
       }
     ],
