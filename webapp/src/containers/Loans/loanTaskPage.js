@@ -56,7 +56,7 @@ const useStyles = (theme) => ({
   }
 });
 
-class LoanUpdateTaskPage extends Component {
+class loanTaskPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -375,4 +375,4 @@ class LoanUpdateTaskPage extends Component {
   }
 }
 
-export default withStyles(useStyles)(LoanUpdateTaskPage);
+export default withStyles(useStyles)(loanTaskPage);

@@ -48,6 +48,7 @@ class VillagePage extends Component {
       serverErrors: {},
       formSubmitted: "",
       errorCode: "",
+      villageInUse: "",
       stateSelected: false,
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
@@ -93,6 +94,18 @@ class VillagePage extends Component {
         .catch((error) => {
           console.log(error);
         });
+
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/contact/?villages=" +
+          this.state.editPage[1]
+        )
+        .then((res) => {
+          if (res.data.length > 0) {
+            this.setState({ villageInUse: true });
+          }
+        })
     }
     serviceProvider
       .serviceProviderForGetRequest(
@@ -130,20 +143,20 @@ class VillagePage extends Component {
         values: { ...this.state.values, addState: value.id },
       });
       if (value.is_active == true) {
-      let stateId = value.id;
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/districts/?is_active=true&&state.id=" +
-          stateId
-        )
-        .then((res) => {
-          this.setState({ getDistrict: res.data });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      this.setState({ stateSelected: true });
+        let stateId = value.id;
+        serviceProvider
+          .serviceProviderForGetRequest(
+            process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/districts/?is_active=true&&state.id=" +
+            stateId
+          )
+          .then((res) => {
+            this.setState({ getDistrict: res.data });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        this.setState({ stateSelected: true });
       }
     } else {
       this.setState({
@@ -459,6 +472,7 @@ class VillagePage extends Component {
                         onChange={this.handleCheckBox}
                         name="addIsActive"
                         color="primary"
+                        disabled={this.state.villageInUse ? true : false}
                       />
                     }
                     label="Active"
@@ -467,7 +481,7 @@ class VillagePage extends Component {
               </Grid>
             </CardContent>
             <Divider />
-            <CardActions style={{padding: "15px",}}>
+            <CardActions style={{ padding: "15px", }}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"
