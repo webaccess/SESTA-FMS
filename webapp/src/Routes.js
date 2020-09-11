@@ -26,11 +26,11 @@ import ActivityPage from "./containers/Activities/ActivityPage";
 import Members from "./containers/Members/Members";
 import MembersPage from "./containers/Members/MembersPage";
 import Loans from "./containers/Loans/Loans";
-import LoansPage from "./containers/Loans/LoansPage";
+import LoanApplyPage from "./containers/Loans/LoanApplyPage";
 import LoanApprovalPage from "./containers/Loans/LoanApprovalPage";
 import Loanpurposes from "./containers/Loanpurpose/Loanpurposes";
 import LoanpurposePage from "./containers/Loanpurpose/LoanpurposePage";
-import LoanUpdateTaskPage from "./containers/Loans/LoanUpdateTaskPage";
+import LoanTaskPage from "./containers/Loans/LoanTaskPage";
 import LoanEditTask from "./containers/Loans/LoanEditTask";
 import ActivitytypePage from "./containers/Activitytypes/ActivitytypePage";
 import Activitytypes from "./containers/Activitytypes/Activitytypes";
@@ -140,10 +140,10 @@ function Routes() {
               exact
             />
             <PrivateRoute path="/loans" component={Loans} exact />
-            <PrivateRoute path="/loans/apply/:id" component={LoansPage} exact />
+            <PrivateRoute path="/loans/apply/:id" component={LoanApplyPage} exact />
             <PrivateRoute
               path="/loan/update/:id"
-              component={LoanUpdateTaskPage}
+              component={LoanTaskPage}
               exact
             />
             <PrivateRoute

@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import { EDIT_LOAN_EMI_BREADCRUMBS } from "./config";
 import Input from "../../components/UI/Input/Input";
-import DateTimepicker from "../../components/UI/DateTimepicker/DateTimepicker.js";
+import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 import Button from "../../components/UI/Button/Button";
 import { Link } from "react-router-dom";
 import * as serviceProvider from "../../api/Axios";
@@ -324,7 +324,7 @@ class LoanEditEmiPage extends Component {
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <DateTimepicker
+                  <Datepicker
                     label="Payment Date*"
                     name="actual_payment_date"
                     error={this.hasError("actual_payment_date")}

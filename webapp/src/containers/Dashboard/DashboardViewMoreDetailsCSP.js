@@ -8,7 +8,7 @@ import { Grid, Card } from "@material-ui/core";
 import Moment from "moment";
 import Input from "../../components/UI/Input/Input";
 import Autocomplete from "../../components/Autocomplete/Autocomplete";
-import DateTimepicker from "../../components/UI/DateTimepicker/DateTimepicker.js";
+import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 import Button from "../../components/UI/Button/Button";
 import { Link } from "react-router-dom";
 import { CSVLink, CSVDownload } from "react-csv";
@@ -467,7 +467,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                 <div className={classes.searchInput}>
                   <div>
                     <Grid item md={12} xs={12}>
-                      <DateTimepicker
+                      <Datepicker
                         label="Start Date"
                         name="startDate"
                         value={this.state.filterStartDate || ""}
@@ -482,7 +482,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                 <div className={classes.searchInput}>
                   <div>
                     <Grid item md={12} xs={12}>
-                      <DateTimepicker
+                      <Datepicker
                         label="End Date"
                         name="endDate"
                         value={this.state.filterEndDate || ""}
@@ -564,7 +564,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                 <div className={classes.searchInput}>
                   <div>
                     <Grid item md={12} xs={12}>
-                      <DateTimepicker
+                      <Datepicker
                         label="Start Date"
                         name="startDate"
                         value={this.state.filterStartDate || ""}
@@ -579,7 +579,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                 <div className={classes.searchInput}>
                   <div>
                     <Grid item md={12} xs={12}>
-                      <DateTimepicker
+                      <Datepicker
                         label="End Date"
                         name="endDate"
                         value={this.state.filterEndDate || ""}
