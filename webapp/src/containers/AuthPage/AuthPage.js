@@ -119,6 +119,9 @@ class AuthPage extends PureComponent {
     console.log("getOTP==", resend);
     const requestURL = process.env.REACT_APP_SERVER_URL + "otps/requestotp";
     const body = this.state.value;
+    this.setState({ fieldErrors: { ...this.state.errors } });
+    this.setState({ formErrors: [] });
+    this.setState({ showSuccessMsg: false });
     if (resend)
       body["contact_number"] = this.props.location.state.contact_number;
     axios({
@@ -157,6 +160,9 @@ class AuthPage extends PureComponent {
     console.log("cc", contact_number);
     const body = this.state.value;
     body.contact_number = contact_number;
+    this.setState({ fieldErrors: { ...this.state.errors } });
+    this.setState({ formErrors: [] });
+    this.setState({ showSuccessMsg: false });
     axios({
       method: "post",
       url: requestURL,
@@ -191,6 +197,10 @@ class AuthPage extends PureComponent {
     this.setState({ formSubmitted: true });
     this.setState({ fieldErrors: { ...this.state.errors } });
     this.setState({ formErrors: [] });
+    if (Object.keys(this.state.errors).length > 0) {
+      this.setState({ buttonView: false });
+      return;
+    }
     // This line is required for the callback url to redirect your user to app
     if (this.props.match.params.authType === "forgot-password") {
       // set(body, "url", process.env.REACT_APP_CLIENT_URL + "reset-password");
@@ -203,11 +213,6 @@ class AuthPage extends PureComponent {
     }
     if (this.props.match.params.authType === "reset-password") {
       body.passwordConfirmation = body.password;
-    }
-
-    if (Object.keys(this.state.errors).length > 0) {
-      this.setState({ buttonView: false });
-      return;
     }
 
     axios({
