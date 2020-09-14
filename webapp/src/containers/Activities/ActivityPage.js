@@ -11,6 +11,7 @@ import {
   CardActions,
   Divider,
   Grid,
+  IconButton,
   Fab,
 } from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
@@ -23,6 +24,7 @@ import Autotext from "../../components/Autotext/Autotext";
 import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 import style from "./Activity.module.css";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
+import CancelIcon from "@material-ui/icons/Cancel";
 
 class ActivityPage extends Component {
   constructor(props) {
@@ -60,6 +62,7 @@ class ActivityPage extends Component {
       fileDataArray: [],
       fileName: "",
       uploadedFile: "",
+      isCancelFile: false,
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
@@ -241,7 +244,9 @@ class ActivityPage extends Component {
     ) {
       postData["document"] = this.state.fileDataArray;
     }
-
+    if (this.state.isCancelFile) {
+      postData["document"] = "";
+    }
     if (this.state.editPage[0]) {
       // for edit data page
       serviceProvider
@@ -357,6 +362,10 @@ class ActivityPage extends Component {
       loaded: 0,
       fileName: event.target.files[0].name,
     });
+  };
+
+  cancelFile = (event) => {
+    this.setState({ isCancelFile: true, fileName: "" });
   };
 
   render() {
@@ -492,6 +501,13 @@ class ActivityPage extends Component {
                     <FileCopyIcon /> Upload Activity Document
                   </Fab>
                 </label>{" "}
+                <IconButton
+                  aria-label="cancel"
+                  color="secondary"
+                  style={{ paddingLeft: "2px" }}
+                >
+                  <CancelIcon onClick={this.cancelFile} />
+                </IconButton>
                 &nbsp;&nbsp;&nbsp;
                 {this.state.fileName !== "" ? (
                   <label style={{ color: "green", fontSize: "11px" }}>
