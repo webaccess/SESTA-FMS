@@ -17,7 +17,7 @@ import Input from "../../components/UI/Input/Input";
 import Button from "../../components/UI/Button/Button";
 import Autocomplete from "../../components/Autocomplete/Autocomplete";
 import { CSP_SUMMARY_REPORT_BREADCRUMBS } from "./config";
-import DateTimepicker from "../../components/UI/DateTimepicker/DateTimepicker.js";
+import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 import { CSVLink } from "react-csv";
 import Moment from "moment";
 
@@ -403,7 +403,7 @@ export class CSPSummaryReport extends React.Component {
                 </div>
                 <div className={classes.searchInput}>
                   <Grid item md={12} xs={12}>
-                    <DateTimepicker
+                    <Datepicker
                       label="Start Date"
                       name="startDate"
                       value={this.state.filterStartDate || ""}
@@ -416,7 +416,7 @@ export class CSPSummaryReport extends React.Component {
                 </div>
                 <div className={classes.searchInput}>
                   <Grid item md={12} xs={12}>
-                    <DateTimepicker
+                    <Datepicker
                       label="End Date"
                       name="endDate"
                       value={this.state.filterEndDate || ""}

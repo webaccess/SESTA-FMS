@@ -71,6 +71,7 @@ export class Villages extends React.Component {
       Result: [],
       TestData: [],
       data: [],
+      contacts: [],
       selectedid: 0,
       open: false,
       isActiveAllShowing: false,
@@ -84,6 +85,7 @@ export class Villages extends React.Component {
       dataCellId: [],
       singleDelete: "",
       multipleDelete: "",
+      villageInUse: "",
       active: {},
       allIsActive: [],
     };
@@ -107,6 +109,14 @@ export class Villages extends React.Component {
       })
       .catch((error) => {
         console.log(error);
+      });
+
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/?_sort=id:ASC"
+      )
+      .then((res) => {
+        this.setState({ contacts: res.data });
       });
   }
 
@@ -133,8 +143,8 @@ export class Villages extends React.Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId
+          "crm-plugin/districts/?is_active=true&&state.id=" +
+          stateId
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
@@ -300,40 +310,52 @@ export class Villages extends React.Component {
     this.setState({ isActiveAllShowing: false });
     let setActiveId = this.state.setActiveId;
     let IsActive = this.state.IsActive;
-    serviceProvider
-      .serviceProviderForPutRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/villages",
-        setActiveId,
-        {
-          is_active: IsActive,
+    let villageInUse = false;
+    this.state.contacts.find(cd => {
+      if (cd.villages.length > 0) {
+        console.log(cd.villages[0].id, '===', parseInt(setActiveId));
+        if (cd.villages[0].id === parseInt(setActiveId)) {
+          this.setState({ villageInUse: true })
+          villageInUse = true;
         }
-      )
-      .then((res) => {
-        this.setState({ formSubmitted: true });
-        this.setState({ open: true });
-        this.componentDidMount({ updateData: true });
-        this.props.history.push({ pathname: "/villages", updateData: true });
-        if (this.props.location.updateData && this.snackbar.current !== null) {
-          this.snackbar.current.handleClick();
-        }
-      })
-      .catch((error) => {
-        this.setState({ formSubmitted: false });
-        if (error.response !== undefined) {
-          this.setState({
-            errorCode:
-              error.response.data.statusCode +
-              " Error- " +
-              error.response.data.error +
-              " Message- " +
-              error.response.data.message +
-              " Please try again!",
-          });
-        } else {
-          this.setState({ errorCode: "Network Error - Please try again!" });
-        }
-        console.log(error);
-      });
+      }
+    })
+    if (!villageInUse) {
+      serviceProvider
+        .serviceProviderForPutRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/villages",
+          setActiveId,
+          {
+            is_active: IsActive,
+          }
+        )
+        .then((res) => {
+          this.setState({ formSubmitted: true });
+          this.setState({ open: true });
+          this.componentDidMount({ updateData: true });
+          this.props.history.push({ pathname: "/villages", updateData: true });
+          if (this.props.location.updateData && this.snackbar.current !== null) {
+            this.snackbar.current.handleClick();
+          }
+        })
+        .catch((error) => {
+          this.setState({ formSubmitted: false });
+          if (error.response !== undefined) {
+            this.setState({
+              errorCode:
+                error.response.data.statusCode +
+                " Error- " +
+                error.response.data.error +
+                " Message- " +
+                error.response.data.message +
+                " Please try again!",
+            });
+          } else {
+            this.setState({ errorCode: "Network Error - Please try again!" });
+          }
+          console.log(error);
+        });
+    }
   };
 
   closeActiveAllModalHandler = (event) => {
@@ -378,9 +400,9 @@ export class Villages extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/villages/?" +
-          searchData +
-          "&&_sort=name:ASC"
+        "crm-plugin/villages/?" +
+        searchData +
+        "&&_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ data: this.getData(res.data) });
@@ -493,12 +515,12 @@ export class Villages extends React.Component {
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
-            this.state.singleDelete !== "" &&
-            this.state.singleDelete ? (
-              <Snackbar severity="success" Showbutton={false}>
-                Village {this.state.singleDelete} deleted successfully!
-              </Snackbar>
-            ) : null}
+              this.state.singleDelete !== "" &&
+              this.state.singleDelete ? (
+                <Snackbar severity="success" Showbutton={false}>
+                  Village {this.state.singleDelete} deleted successfully!
+                </Snackbar>
+              ) : null}
             {this.state.singleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
@@ -514,7 +536,12 @@ export class Villages extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
+            {this.state.villageInUse === true ? (
+              <Snackbar severity="error" Showbutton={false}>
+                Village is in use, it can not be Deactivated!!
+              </Snackbar>
+            ) : null}
+            <div className={classes.row} style={{ flexWrap: "wrap", height: "auto", }}>
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -624,8 +651,8 @@ export class Villages extends React.Component {
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (
-              <h1>Loading...</h1>
-            )}
+                <h1>Loading...</h1>
+              )}
             <Modal
               className="modal"
               show={this.state.isActiveAllShowing}

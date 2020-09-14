@@ -48,6 +48,7 @@ class VillagePage extends Component {
       serverErrors: {},
       formSubmitted: "",
       errorCode: "",
+      villageInUse: "",
       stateSelected: false,
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
@@ -71,28 +72,40 @@ class VillagePage extends Component {
               addAbbreviation: res.data[0].abbreviation,
               addIdentifier: res.data[0].identifier,
               addIsActive: res.data[0].is_active,
-              addDistrict: res.data[0].district.id,
               addState: res.data[0].state.id,
+              addDistrict: res.data[0].district.id,
             },
           });
+
+          let stateId = res.data[0].state.id;
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+              "crm-plugin/districts/?is_active=true&&state.id=" +
+              stateId
+            )
+            .then((res) => {
+              this.setState({ getDistrict: res.data });
+            })
+            .catch((error) => {
+              console.log(error);
+            });
         })
         .catch((error) => {
           console.log(error);
         });
-      this.stateIds = this.state.values.addState;
 
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/districts/?is_active=true&&state.id=" +
-          this.state.values.addState
+          "crm-plugin/contact/?villages=" +
+          this.state.editPage[1]
         )
         .then((res) => {
-          this.setState({ getDistrict: res.data });
+          if (res.data.length > 0) {
+            this.setState({ villageInUse: true });
+          }
         })
-        .catch((error) => {
-          console.log(error);
-        });
     }
     serviceProvider
       .serviceProviderForGetRequest(
@@ -129,20 +142,22 @@ class VillagePage extends Component {
       this.setState({
         values: { ...this.state.values, addState: value.id },
       });
-      let stateId = value.id;
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/districts/?is_active=true&&state.id=" +
-          stateId
-        )
-        .then((res) => {
-          this.setState({ getDistrict: res.data });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      this.setState({ stateSelected: true });
+      if (value.is_active == true) {
+        let stateId = value.id;
+        serviceProvider
+          .serviceProviderForGetRequest(
+            process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/districts/?is_active=true&&state.id=" +
+            stateId
+          )
+          .then((res) => {
+            this.setState({ getDistrict: res.data });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        this.setState({ stateSelected: true });
+      }
     } else {
       this.setState({
         values: {
@@ -291,7 +306,6 @@ class VillagePage extends Component {
     let addState = this.state.values.addState;
     let districtFilter = this.state.getDistrict;
     let addDistrict = this.state.values.addDistrict;
-
     return (
       <Layout
         breadcrumbs={
@@ -458,6 +472,7 @@ class VillagePage extends Component {
                         onChange={this.handleCheckBox}
                         name="addIsActive"
                         color="primary"
+                        disabled={this.state.villageInUse ? true : false}
                       />
                     }
                     label="Active"
@@ -466,7 +481,7 @@ class VillagePage extends Component {
               </Grid>
             </CardContent>
             <Divider />
-            <CardActions style={{padding: "15px",}}>
+            <CardActions style={{ padding: "15px", }}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"

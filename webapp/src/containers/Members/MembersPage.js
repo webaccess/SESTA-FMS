@@ -31,6 +31,7 @@ class ActivityPage extends Component {
       getDistrict: [],
       getVillage: [],
       getShgs: [],
+      getPgs: [],
       stateSelected: false,
       districtSelected: false,
       values: {
@@ -120,6 +121,7 @@ class ActivityPage extends Component {
           this.handleStateChange(res.data.state);
           this.handleDistrictChange(res.data.district);
           this.handleShgChange("", res.data.individual.shg);
+          this.handlePgChange(res.data.pg);
 
           this.setState({
             values: {
@@ -129,25 +131,20 @@ class ActivityPage extends Component {
               address: res.data.address_1,
               addBlock: res.data.block,
               addGp: res.data.gp,
+              addState: res.data.state.id,
+              addDistrict: res.data.district.id,
+              addVillage: res.data.villages[0].id,
               addPincode: res.data.pincode,
               addPhone: res.data.phone,
               addEmail: res.data.email,
               addShg: res.data.individual.shg,
             },
           });
-
-          if (this.state.getState.length > 0) {
-            this.state.getState.map((state) => {
-              if (state.id === res.data.state.id) {
-                this.setState({
-                  values: {
-                    ...this.state.values,
-                    addState: res.data.state.id,
-                    addDistrict: res.data.district.id,
-                    addVillage: res.data.villages[0].id,
-                  },
-                });
-              }
+          if (res.data.pg) {
+            let pgValue = this.state.values;
+            pgValue["addPg"] = res.data.pg.id;
+            this.setState({
+              values: pgValue,
             });
           }
 
@@ -179,6 +176,19 @@ class ActivityPage extends Component {
       )
       .then((res) => {
         this.setState({ getState: res.data });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    // get all active pg
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/tags/?_sort=name:ASC&&is_active=true"
+      )
+      .then((res) => {
+        this.setState({ getPgs: res.data });
       })
       .catch((error) => {
         console.log(error);
@@ -359,18 +369,25 @@ class ActivityPage extends Component {
     }
   }
 
+  handlePgChange(value) {
+    if (value !== null) {
+      this.setState({
+        values: { ...this.state.values, addPg: value.id },
+      });
+    } else {
+      this.setState({
+        values: {
+          ...this.state.values,
+          addPg: 0,
+        },
+      });
+    }
+  }
+
   handleOnCheck = (event, type) => {
     this.setState({
       isShareholder: !this.state.isShareholder,
     });
-  };
-
-  handleClickShowPassword = () => {
-    this.setState({ showPassword: !this.state.showPassword });
-  };
-
-  handleMouseDownPassword = (event) => {
-    event.preventDefault();
   };
 
   handleShgChange(event, value) {
@@ -413,6 +430,7 @@ class ActivityPage extends Component {
     let pincodeNo = this.state.values.addPincode;
     let villageId = this.state.values.addVillage;
     let shgId = this.state.values.addShg;
+    let pgId = this.state.values.addPg;
 
     let postData = {
       name: fName + " " + lName,
@@ -434,11 +452,13 @@ class ActivityPage extends Component {
       },
       block: block,
       gp: gp,
+      pg: pgId,
       first_name: fName,
       last_name: lName,
       partner_name: hName,
       shg: shgId,
     };
+
     if (this.state.editPage[0]) {
       // edit present member (update API)
       serviceProvider
@@ -582,6 +602,8 @@ class ActivityPage extends Component {
     let addVillage = this.state.values.addVillage;
     let shgFilters = this.state.getShgs;
     let addShg = this.state.values.addShg;
+    let pgFilter = this.state.getPgs;
+    let addPg = this.state.values.addPg;
 
     return (
       <Layout
@@ -914,6 +936,36 @@ class ActivityPage extends Component {
                         fullWidth
                         label="Select SHG"
                         name="addShg"
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Autotext
+                    id="combo-box-demo"
+                    options={pgFilter}
+                    variant="outlined"
+                    label="Select PG"
+                    getOptionLabel={(option) => option.name}
+                    onChange={(event, value) => {
+                      this.handlePgChange(value);
+                    }}
+                    defaultValue={[]}
+                    value={
+                      addPg
+                        ? pgFilter[
+                            pgFilter.findIndex(function (item, i) {
+                              return item.id === addPg;
+                            })
+                          ] || null
+                        : null
+                    }
+                    renderInput={(params) => (
+                      <Input
+                        fullWidth
+                        label="Select PG"
+                        name="addPg"
                         variant="outlined"
                       />
                     )}

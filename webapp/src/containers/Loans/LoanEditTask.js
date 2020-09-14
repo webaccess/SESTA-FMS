@@ -12,7 +12,7 @@ import { EDIT_LOAN_TASK_BREADCRUMBS } from "./config";
 import Input from "../../components/UI/Input/Input";
 import Autotext from "../../components/Autotext/Autotext";
 import * as constants from "../../constants/Constants";
-import DateTimepicker from "../../components/UI/DateTimepicker/DateTimepicker.js";
+import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 import Button from "../../components/UI/Button/Button";
 import { Link } from "react-router-dom";
 import * as serviceProvider from "../../api/Axios";
@@ -154,6 +154,7 @@ class LoanEditTask extends Component {
                     fdata.contact = {
                       id: auth.getUserInfo().contact.id
                     }
+                    fdata.start_datetime = this.state.values.editDate;
                     fdata.end_datetime = this.state.values.editDate;
                     fdata.description = loanTaskData.comments;
                     serviceProvider
@@ -317,7 +318,7 @@ class LoanEditTask extends Component {
                 </Grid>
 
                 <Grid item md={6} xs={12}>
-                  <DateTimepicker
+                  <Datepicker
                     label="Date*"
                     name="editDate"
                     error={this.hasError("editDate")}

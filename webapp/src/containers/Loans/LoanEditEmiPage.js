@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import { EDIT_LOAN_EMI_BREADCRUMBS } from "./config";
 import Input from "../../components/UI/Input/Input";
-import DateTimepicker from "../../components/UI/DateTimepicker/DateTimepicker.js";
+import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 import Button from "../../components/UI/Button/Button";
 import { Link } from "react-router-dom";
 import * as serviceProvider from "../../api/Axios";
@@ -294,6 +294,7 @@ class LoanEditEmiPage extends Component {
                     fullWidth
                     label="Principal Paid*"
                     name="actual_principal"
+                    type="number"
                     value={this.state.values.actual_principal ? this.state.values.actual_principal : this.state.values.expected_principal || ""}
                     error={this.hasError("actual_principal")}
                     helperText={
@@ -310,6 +311,7 @@ class LoanEditEmiPage extends Component {
                     fullWidth
                     label="Interest Paid*"
                     name="actual_interest"
+                    type="number"
                     value={this.state.values.actual_interest ? this.state.values.actual_interest : this.state.values.expected_interest || ""}
                     error={this.hasError("actual_interest")}
                     helperText={
@@ -322,7 +324,7 @@ class LoanEditEmiPage extends Component {
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <DateTimepicker
+                  <Datepicker
                     label="Payment Date*"
                     name="actual_payment_date"
                     error={this.hasError("actual_payment_date")}
@@ -346,6 +348,7 @@ class LoanEditEmiPage extends Component {
                     label="Fine"
                     name="fine"
                     value={this.state.values.fine || ""}
+                    type="number"
                     onChange={this.handleChange}
                     variant="outlined"
                   />
