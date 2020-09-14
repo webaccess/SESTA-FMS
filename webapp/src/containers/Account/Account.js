@@ -49,6 +49,7 @@ export class Account extends Component {
     super(props);
     this.state = {
       users: [],
+      contacts: [],
       values: {
         addPhone: "",
         password: "",
@@ -68,13 +69,8 @@ export class Account extends Component {
             message: "Please enter valid phone number",
           },
         },
-        password: {
-          required: { value: true, message: "Password required" },
-        },
       },
-      errors: {
-        password: [],
-      },
+      errors: {},
     };
     this.snackbar = React.createRef();
   }
@@ -92,6 +88,13 @@ export class Account extends Component {
         process.env.REACT_APP_SERVER_URL + "users")
       .then(res => {
         this.setState({ users: res.data });
+      })
+
+    await axios
+      .get(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact")
+      .then(res => {
+        this.setState({ contacts: res.data });
       })
   }
 
@@ -119,17 +122,28 @@ export class Account extends Component {
     let users = this.state.users;
     e.preventDefault();
     this.validate();
-
+    let userInfo;
     if (Object.keys(this.state.errors).length > 0) return;
-    let userInfo = auth.getUserInfo();
+
+    this.state.users.map(uid => {
+      if (uid.id === auth.getUserInfo().id) {
+        userInfo = uid;
+      }
+    })
 
     let emailAddr, postdata;
     emailAddr = this.state.values.addPhone + "@example.com";
 
     if (userInfo.username == this.state.values.addPhone) {
       // only update password of current loggedin user
-      postdata = {
-        password: this.state.values.password,
+      if (this.state.values.password) {
+        postdata = {
+          password: this.state.values.password
+        }
+      } else {
+        postdata = {
+          email: emailAddr
+        }
       }
     } else {
       // check if user already exists
@@ -137,11 +151,18 @@ export class Account extends Component {
         userAlreadyExist = true;
         this.setState({ userExists: "User with this phone number already exists, please use other phone number" });
       }
-      // update user details if username/phone no. and password is changed
-      postdata = {
-        username: this.state.values.addPhone,
-        password: this.state.values.password,
-        email: emailAddr
+      if (this.state.values.password) {
+        // update user details if username/phone no. and password is changed
+        postdata = {
+          username: this.state.values.addPhone,
+          password: this.state.values.password,
+          email: emailAddr,
+        }
+      } else {
+        postdata = {
+          username: this.state.values.addPhone,
+          email: emailAddr
+        }
       }
     }
     if (!userAlreadyExist) {
@@ -156,6 +177,25 @@ export class Account extends Component {
           }
         )
         .then((res) => {
+
+          //update phone and email of contact
+          let contactdata = {
+            phone: this.state.values.addPhone,
+            email: emailAddr,
+            contact_type: userInfo.contact.contact_type,
+          }
+          axios
+            .put(
+              process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/" + userInfo.contact.id,
+              contactdata,
+              {
+                headers: {
+                  Authorization: "Bearer " + auth.getToken(),
+                },
+              }
+            )
+            .then((res) => { })
+
           this.setState({
             values: {
               addPhone: res.data.username
@@ -223,33 +263,6 @@ export class Account extends Component {
               </Snackbar>
             ) : null}
           </Grid>
-          {/* <Grid item lg={4} md={6} xl={4} xs={12}>
-            <Card className={classes.root}>
-              <CardContent>
-                <div className={classes.details}>
-                  <div>
-                    <Typography gutterBottom variant="h2">
-                      {userInfo.first_name} {userInfo.last_name}
-                    </Typography>
-                    <Typography
-                      className={classes.locationText}
-                      color="textSecondary"
-                      variant="body1"
-                    >
-                      {userInfo.email}
-                    </Typography>
-                    <Typography
-                      className={classes.dateText}
-                      color="textSecondary"
-                      variant="body1"
-                    ></Typography>
-                  </div>
-                  <Avatar className={classes.avatar} src="" />
-                </div>
-              </CardContent>
-              <Divider />
-            </Card>
-          </Grid> */}
           {/* <Grid item lg={8} md={6} xl={8} xs={12}> */}
           <Grid item md={12} xs={12}>
             <Card className={classes.root}>
@@ -293,13 +306,13 @@ export class Account extends Component {
                         fullWidth
                         id="standard-adornment-password"
                         name="password"
-                        label="Password*"
-                        error={this.hasError("password")}
-                        helperText={
-                          this.hasError("password")
-                            ? this.state.errors.password[0]
-                            : null
-                        }
+                        label="Password"
+                        // error={this.hasError("password")}
+                        // helperText={
+                        //   this.hasError("password")
+                        //     ? this.state.errors.password[0]
+                        //     : null
+                        // }
                         type={
                           this.state.values.showPassword ? "text" : "password"
                         }
@@ -316,8 +329,8 @@ export class Account extends Component {
                                 {this.state.values.showPassword ? (
                                   <Visibility />
                                 ) : (
-                                  <VisibilityOff />
-                                )}
+                                    <VisibilityOff />
+                                  )}
                               </IconButton>
                             </InputAdornment>
                           ),
