@@ -14,6 +14,7 @@ import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import IconButton from "@material-ui/core/IconButton";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import Snackbar from "../../components/UI/Snackbar/Snackbar";
 
 class AuthPage extends PureComponent {
   constructor(props) {
@@ -366,6 +367,14 @@ class AuthPage extends PureComponent {
             <Container>
               <form onSubmit={this.handleSubmit} method="post" noValidate>
                 <div className="row" style={{ textAlign: "start" }}>
+                  {this.state.showSuccessMsg ? (
+                    <Snackbar severity="success">
+                      {" "}
+                      {this.renderSuccessMsg()}
+                    </Snackbar>
+                  ) : (
+                    ""
+                  )}
                   {map(inputs, (input, key) => {
                     let fieldErrorVal = "";
                     let formSubmitted = this.state.formSubmitted;
@@ -493,7 +502,7 @@ class AuthPage extends PureComponent {
                     );
                     return renderFormErrors;
                   })}
-                  {this.state.showSuccessMsg ? this.renderSuccessMsg() : ""}
+
                   {this.props.match.params.authType === "login" ? (
                     <div
                       style={{ paddingLeft: "212px" }}
