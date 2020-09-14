@@ -383,7 +383,6 @@ class UsersPage extends Component {
       contact: data.id,
       email: emailAdd,
     };
-    console.log("postUserData", postUserData);
     let postIndividualData = {};
     if (roleId) {
       if (roleId.name === "CSP (Community Service Provider)") {
@@ -489,9 +488,7 @@ class UsersPage extends Component {
             this.state.errors.addPhone.push("Duplicate phone number!!");
             this.setState({ errorCode: "Duplicate phone number!!" });
           }
-
-          console.log("errorr");
-          console.log("err", error);
+          console.log(error);
         });
     }
   };
