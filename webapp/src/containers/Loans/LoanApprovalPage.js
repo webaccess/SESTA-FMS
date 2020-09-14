@@ -66,6 +66,7 @@ class LoanApprovalPage extends Component {
       selectedFile: null,
       fileDataArray: [],
       fileName: "",
+      uploadedFile: "",
       validations: {
         comment: {
           required: {
@@ -143,6 +144,7 @@ class LoanApprovalPage extends Component {
               },
               values: { selectedStatus: status, comment: comment },
               fileName: document,
+              uploadedFile: data.document[0],
             });
           })
           .catch();
@@ -241,8 +243,17 @@ class LoanApprovalPage extends Component {
       approved_date: Moment().format("YYYY-MM-DD"),
       review_comments: this.state.values.comment,
       approved_by: approvedBy,
-      document: this.state.fileDataArray,
     };
+    if (this.state.uploadedFile && this.state.selectedFile === null) {
+      postData["document"] = this.state.uploadedFile;
+    } else if (this.state.uploadedFile && this.state.selectedFile) {
+      postData["document"] = this.state.fileDataArray;
+    } else if (
+      this.state.uploadedFile === undefined &&
+      this.state.selectedFile
+    ) {
+      postData["document"] = this.state.fileDataArray;
+    }
     serviceProvider
       .serviceProviderForPutRequest(
         process.env.REACT_APP_SERVER_URL + "loan-applications",
@@ -285,14 +296,13 @@ class LoanApprovalPage extends Component {
                   process.env.REACT_APP_SERVER_URL + "loan-application-tasks",
                   postLoanTaskData
                 )
-                .then((res) => {
-                  this.props.history.push({
-                    pathname: "/loans",
-                    loanApproved: true,
-                  });
-                })
+                .then((res) => {})
                 .catch((error) => {});
             }
+          });
+          this.props.history.push({
+            pathname: "/loans",
+            loanApproved: true,
           });
         })
         .catch((error) => {
@@ -344,7 +354,6 @@ class LoanApprovalPage extends Component {
                     )
                     .then((resp) => {
                       this.props.history.push({
-                        pathname: "/loans",
                         loanApproved: true,
                         state: {
                           loanAppResData: resp.data,
@@ -356,6 +365,10 @@ class LoanApprovalPage extends Component {
             }
           });
         }
+        this.props.history.push({
+          pathname: "/loans",
+          loanApproved: true,
+        });
       })
       .catch((error) => {});
   };
