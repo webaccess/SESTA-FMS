@@ -85,7 +85,7 @@ export class Activity extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/activitytypes/?is_active=true"
+        "crm-plugin/activitytypes/?is_active=true&&_sort=name:asc"
       )
       .then((res) => {
         this.setState({ getActivitytype: res.data });
@@ -210,7 +210,7 @@ export class Activity extends React.Component {
         sortable: true,
       },
       {
-        name: "Start Date/Time",
+        name: "Date",
         selector: "start_datetime",
         format: (row) =>
           `${
@@ -222,21 +222,6 @@ export class Activity extends React.Component {
         cell: (row) =>
           row.start_datetime
             ? Moment(row.start_datetime).format("DD MMM YYYY")
-            : null,
-      },
-      {
-        name: "End Date/Time",
-        selector: "end_datetime",
-        format: (row) =>
-          `${
-          row.end_datetime != null
-            ? new Date(row.end_datetime).toLocaleString()
-            : ""
-          }`,
-        sortable: true,
-        cell: (row) =>
-          row.end_datetime
-            ? Moment(row.end_datetime).format("DD MMM YYYY")
             : null,
       },
     ];

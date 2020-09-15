@@ -9,17 +9,26 @@ const bookshelf = require("../../../config/bookshelf");
 module.exports = {
   async requestOTP(ctx) {
     const num = ctx.request.body.contact_number;
-    const OTP = Math.floor(100000 + Math.random() * 900000);
-    await strapi.services.otp.sendOTP(num, OTP);
-    return await strapi
-      .query("otp")
-      .model.forge({ contact_number: num, otp: OTP })
-      .save()
-      .then(() => {
-        return {
-          result: { status: "Ok" },
-        };
-      });
+
+    // Check if the user exists.
+    const user = await strapi
+      .query("user", "users-permissions")
+      .findOne({ username: num });
+    if (user) {
+      const OTP = Math.floor(100000 + Math.random() * 900000);
+      await strapi.services.otp.sendOTP(num, OTP);
+      return await strapi
+        .query("otp")
+        .model.forge({ contact_number: num, otp: OTP })
+        .save()
+        .then(() => {
+          return {
+            result: { status: "Ok" },
+          };
+        });
+    } else {
+      return ctx.response.badRequest("Phone number does not exist!!");
+    }
   },
 
   async validateOTP(ctx) {

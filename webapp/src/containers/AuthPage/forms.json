@@ -9,7 +9,10 @@
         "type": "tel",
         "placeholder": "Mobile Number",
         "validations": {
-          "required": { "value": "true", "message": "Email field required" }
+          "required": {
+            "value": "true",
+            "message": "Mobile Number field required"
+          }
         }
       }
     ],
@@ -22,7 +25,10 @@
         "type": "text",
         "placeholder": "Mobile Number",
         "validations": {
-          "required": { "value": "true", "message": "Username field required" }
+          "required": {
+            "value": "true",
+            "message": "Mobile Number field required"
+          }
         }
       },
       {
@@ -41,10 +47,10 @@
         "customBootstrapClass": "col-md-12",
         "subheading": "Please enter the OTP",
         "name": "otp",
-        "type": "number",
+        "type": "password",
         "label": "OTP",
         "validations": {
-          "required": { "value": "true", "message": "Password field required" }
+          "required": { "value": "true", "message": "OTP field required" }
         }
       }
     ],

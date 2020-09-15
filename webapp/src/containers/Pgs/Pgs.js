@@ -71,6 +71,7 @@ export class Pgs extends React.Component {
       multipleDelete: "",
       errorCode: "",
       successCode: "",
+      isPgPresent: false,
     };
     this.snackbar = React.createRef();
   }
@@ -152,6 +153,9 @@ export class Pgs extends React.Component {
     this.setState({ isActiveAllShowing: true });
     this.setState({ setActiveId: event.target.id });
     this.setState({ IsActive: event.target.checked });
+    if (this.state.isPgPresent === true) {
+      this.setState({ isPgPresent: false });
+    }
   };
 
   handleActive = async (e) => {
@@ -159,49 +163,69 @@ export class Pgs extends React.Component {
     this.setState({ successCode: "", errorCode: "" });
     let setActiveId = this.state.setActiveId;
     let IsActive = this.state.IsActive;
+
     serviceProvider
-      .serviceProviderForPutRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/tags",
-        setActiveId,
-        {
-          is_active: IsActive,
-        }
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/contact/?pg=" +
+          setActiveId
       )
-      .then((res) => {
-        let isActive = "";
-        if (res.data.is_active) {
-          isActive = "Active";
+      .then((pgRes) => {
+        if (pgRes.data.length > 0) {
+          this.setState({ isPgPresent: true });
         } else {
-          isActive = "Inactive";
-        }
-        this.setState({ formSubmitted: true });
-        this.setState({
-          successCode:
-            "Producer group " + res.data.name + " is " + isActive + ".",
-        });
-        this.componentDidMount();
-        this.props.history.push({ pathname: "/pgs", updateData: true });
-        if (this.props.location.updateData && this.snackbar.current !== null) {
-          this.snackbar.current.handleClick();
+          this.setState({ isPgPresent: false });
+          serviceProvider
+            .serviceProviderForPutRequest(
+              process.env.REACT_APP_SERVER_URL + "crm-plugin/tags",
+              setActiveId,
+              {
+                is_active: IsActive,
+              }
+            )
+            .then((res) => {
+              let isActive = "";
+              if (res.data.is_active) {
+                isActive = "Active";
+              } else {
+                isActive = "Inactive";
+              }
+              this.setState({ formSubmitted: true });
+              this.setState({
+                successCode:
+                  "Producer group " + res.data.name + " is " + isActive + ".",
+              });
+              this.componentDidMount();
+              this.props.history.push({ pathname: "/pgs", updateData: true });
+              if (
+                this.props.location.updateData &&
+                this.snackbar.current !== null
+              ) {
+                this.snackbar.current.handleClick();
+              }
+            })
+            .catch((error) => {
+              this.setState({ formSubmitted: false });
+              if (error.response !== undefined) {
+                this.setState({
+                  errorCode:
+                    error.response.data.statusCode +
+                    " Error- " +
+                    error.response.data.error +
+                    " Message- " +
+                    error.response.data.message +
+                    " Please try again!",
+                });
+              } else {
+                this.setState({
+                  errorCode: "Network Error - Please try again!",
+                });
+              }
+              console.log(error);
+            });
         }
       })
-      .catch((error) => {
-        this.setState({ formSubmitted: false });
-        if (error.response !== undefined) {
-          this.setState({
-            errorCode:
-              error.response.data.statusCode +
-              " Error- " +
-              error.response.data.error +
-              " Message- " +
-              error.response.data.message +
-              " Please try again!",
-          });
-        } else {
-          this.setState({ errorCode: "Network Error - Please try again!" });
-        }
-        console.log(error);
-      });
+      .catch((error) => {});
   };
 
   closeActiveAllModalHandler = (event) => {
@@ -267,8 +291,7 @@ export class Pgs extends React.Component {
           <div className="App">
             <h5 className={classes.menuName}>MASTERS</h5>
             <div className={style.headerWrap}>
-              <h2 className={style.title}>
-                Manage Producer Group</h2>
+              <h2 className={style.title}>Manage Producer Group</h2>
               <div className={classes.buttonRow}>
                 <Button variant="contained" component={Link} to="/Pgs/add">
                   Add PG
@@ -292,14 +315,14 @@ export class Pgs extends React.Component {
                 autoHideDuration={4000}
                 severity="success"
               >
-                State updated successfully.
+                Producer Group updated successfully.
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
             this.state.singleDelete !== "" &&
             this.state.singleDelete ? (
               <Snackbar severity="success" Showbutton={false}>
-                PG {this.state.singleDelete} deleted successfully!
+                Producer Group {this.state.singleDelete} deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.singleDelete === false ? (
@@ -309,7 +332,12 @@ export class Pgs extends React.Component {
             ) : null}
             {this.state.multipleDelete === true ? (
               <Snackbar severity="success" Showbutton={false}>
-                PGs deleted successfully!
+                Producer Groups deleted successfully!
+              </Snackbar>
+            ) : null}
+            {this.state.isPgPresent === true ? (
+              <Snackbar severity="error" Showbutton={false}>
+                Producer Group is in use, it can not be Deactivated!!
               </Snackbar>
             ) : null}
             {this.state.multipleDelete === false ? (
@@ -322,7 +350,10 @@ export class Pgs extends React.Component {
                 {this.state.errorCode}
               </Snackbar>
             ) : null}
-            <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
+            <div
+              className={classes.row}
+              style={{ flexWrap: "wrap", height: "auto" }}
+            >
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -340,11 +371,16 @@ export class Pgs extends React.Component {
                 </div>
               </div>
               <Button
-                style={{ marginRight: "5px", marginBottom: "8px", }}
-                onClick={this.handleSearch.bind(this)}>Search</Button>
+                style={{ marginRight: "5px", marginBottom: "8px" }}
+                onClick={this.handleSearch.bind(this)}
+              >
+                Search
+              </Button>
               <Button
-                style={{ marginBottom: "8px", }}
-                color="secondary" clicked={this.resetForm}>
+                style={{ marginBottom: "8px" }}
+                color="secondary"
+                clicked={this.resetForm}
+              >
                 reset
               </Button>
             </div>
@@ -385,8 +421,8 @@ export class Pgs extends React.Component {
               }}
             >
               {this.state.IsActive
-                ? " Do you want to set selected Active ?"
-                : "Do you want to Deactivate selected State.?"}
+                ? " Do you want to set selected PG Active ?"
+                : "Do you want to Deactivate selected PG.?"}
             </Modal>
           </div>
         </Grid>

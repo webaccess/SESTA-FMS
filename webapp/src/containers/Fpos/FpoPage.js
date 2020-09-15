@@ -76,7 +76,8 @@ class FpoPage extends Component {
             this.state.editPage[1]
         )
         .then((res) => {
-          this.handleStateChange("", res.data.state);
+          this.handleStateChange("", res.data.addresses[0].state);
+          //this.handleDistrictChange(res.data.addresses[0].district);
           this.setState({
             values: {
               addFpo: res.data.organization.name,
@@ -321,7 +322,7 @@ class FpoPage extends Component {
           this.state.editPage[0] ? EDIT_FPO_BREADCRUMBS : ADD_FPO_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: '45rem' }}>
+        <Card style={{ maxWidth: "45rem" }}>
           <form
             autoComplete="off"
             noValidate
@@ -524,7 +525,7 @@ class FpoPage extends Component {
               </Grid>
             </CardContent>
             <Divider />
-            <CardActions style={{padding: "15px",}}>
+            <CardActions style={{ padding: "15px" }}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"

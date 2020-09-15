@@ -362,6 +362,7 @@ export class Shgs extends React.Component {
 
   render() {
     let data = this.state.data;
+    console.log("data.addresses", data);
     const Usercolumns = [
       {
         name: "Name of the Group",

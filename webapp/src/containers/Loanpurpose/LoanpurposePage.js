@@ -105,7 +105,6 @@ class LoanpurposePage extends Component {
         addFPO: [],
         addEMI: [],
         task: [],
-        addVillage: [],
       },
       formSubmitted: "",
       stateSelected: false,
@@ -683,7 +682,7 @@ class LoanpurposePage extends Component {
             : ADD_LOANPURPOSE_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: '45rem' }}>
+        <Card style={{ maxWidth: "45rem" }}>
           <form
             autoComplete="off"
             noValidate
@@ -875,7 +874,7 @@ class LoanpurposePage extends Component {
                 <span className={classes.labelHeader}>Add Task</span>
               </IconButton>
             </CardContent>
-            <CardActions style={{padding: "15px",}}>
+            <CardActions style={{ padding: "15px" }}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"

@@ -35,6 +35,7 @@ class StatePage extends Component {
       },
       formSubmitted: "",
       errorCode: "",
+      stateInUse: "",
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
@@ -47,8 +48,8 @@ class StatePage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/states/?id=" +
-            this.state.editPage[1]
+          "crm-plugin/states/?id=" +
+          this.state.editPage[1]
         )
         .then((res) => {
           this.setState({
@@ -64,6 +65,17 @@ class StatePage extends Component {
         .catch((error) => {
           console.log(error);
         });
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/contact/?state=" +
+          this.state.editPage[1]
+        )
+        .then((res) => {
+          if (res.data.length > 0) {
+            this.setState({ stateInUse: true });
+          }
+        })
     }
   }
 
@@ -274,6 +286,7 @@ class StatePage extends Component {
                         onChange={this.handleCheckBox}
                         name="addIsActive"
                         color="primary"
+                        disabled={this.state.stateInUse ? true : false}
                       />
                     }
                     label="Active"
@@ -282,7 +295,7 @@ class StatePage extends Component {
               </Grid>
             </CardContent>
             <Divider />
-            <CardActions style={{padding: "15px",}}>
+            <CardActions style={{ padding: "15px", }}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"

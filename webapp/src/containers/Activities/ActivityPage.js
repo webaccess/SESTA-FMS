@@ -19,7 +19,7 @@ import { ADD_ACTIVITY_BREADCRUMBS, EDIT_ACTIVITY_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autotext from "../../components/Autotext/Autotext";
-import DateTimepicker from "../../components/UI/DateTimepicker/DateTimepicker.js";
+import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 import style from "./Activity.module.css";
 
 class ActivityPage extends Component {
@@ -96,7 +96,7 @@ class ActivityPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activitytypes/?is_active=true"
+          "crm-plugin/activitytypes/?is_active=true&&autocreated=false&&_sort=name:asc"
       )
       .then((res) => {
         this.setState({ getActivitytype: res.data });
@@ -335,7 +335,7 @@ class ActivityPage extends Component {
             : ADD_ACTIVITY_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: '45rem' }}>
+        <Card style={{ maxWidth: "45rem" }}>
           <form
             autoComplete="off"
             noValidate
@@ -406,7 +406,7 @@ class ActivityPage extends Component {
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
-                    label="Activity Title*"
+                    label="Description*"
                     name="addTitle"
                     error={this.hasError("addTitle")}
                     helperText={
@@ -419,9 +419,9 @@ class ActivityPage extends Component {
                     variant="outlined"
                   />
                 </Grid>
-                <Grid item md={3} xs={12} className={style.dateTimeWrap}>
-                  <DateTimepicker
-                    label="Start Date/Time*"
+                <Grid item md={3} xs={12}>
+                  <Datepicker
+                    label="Date*"
                     name="addStartDate"
                     error={this.hasError("addStartDate")}
                     helperText={
@@ -430,21 +430,10 @@ class ActivityPage extends Component {
                         : null
                     }
                     value={this.state.values.addStartDate || null}
+                    format={"dd MMM yyyy"}
                     onChange={(value) =>
                       this.setState({
                         values: { ...this.state.values, addStartDate: value },
-                      })
-                    }
-                  />
-                </Grid>
-                <Grid item md={3} xs={12} className={style.dateTimeWrap}>
-                  <DateTimepicker
-                    label="End Date/Time"
-                    name="addEndDate"
-                    value={this.state.values.addEndDate}
-                    onChange={(value) =>
-                      this.setState({
-                        values: { ...this.state.values, addEndDate: value },
                       })
                     }
                   />
@@ -481,7 +470,7 @@ class ActivityPage extends Component {
                     />
                   </Grid>
                 ) : null}
-                <Grid item md={12} xs={12}>
+                <Grid item md={9} xs={12}>
                   <TextField
                     id="outlined-multiline-static"
                     fullWidth
@@ -496,7 +485,7 @@ class ActivityPage extends Component {
               </Grid>
             </CardContent>
             <Divider />
-            <CardActions style={{padding: "15px",}}>
+            <CardActions style={{ padding: "15px" }}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"

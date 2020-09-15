@@ -70,7 +70,7 @@ const useStyles = (theme) => ({
     color: "white",
     marginBottom: "5px",
     flex: "auto",
-  }
+  },
 });
 
 class DashboardForFPO extends Component {
@@ -94,9 +94,7 @@ class DashboardForFPO extends Component {
   async componentDidMount() {
     /** get members */
     let newDataArray = [];
-    let url =
-      "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&creator_id=" +
-      auth.getUserInfo().contact.id;
+    let url = "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC";
 
     serviceProvider
       .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
@@ -288,7 +286,14 @@ class DashboardForFPO extends Component {
     return (
       <div className="App" style={{ paddingTop: "15px" }}>
         <Grid container style={{ border: "1px solid #ccc" }}>
-          <Grid className={classes.fpoInlineGrid} item md={3} sm={6} xs={12} spacing={3}>
+          <Grid
+            className={classes.fpoInlineGrid}
+            item
+            md={3}
+            sm={6}
+            xs={12}
+            spacing={3}
+          >
             <div className={classes.oddBlock}>
               <PersonIcon className={classes.Icon} />
               <h3 className={classes.fpoHead3}>MEMBERS </h3>
@@ -298,37 +303,51 @@ class DashboardForFPO extends Component {
             </div>
           </Grid>
 
-          <Grid className={classes.fpoInlineGrid} item md={3} sm={6} xs={12} spacing={3}>
+          <Grid
+            className={classes.fpoInlineGrid}
+            item
+            md={3}
+            sm={6}
+            xs={12}
+            spacing={3}
+          >
             <div className={classes.evenBlock}>
               <PeopleIcon className={classes.Icon} />
-              <h3 className={classes.fpoHead3}>
-                SELF HELP GROUPS{" "}
-              </h3>
+              <h3 className={classes.fpoHead3}>SELF HELP GROUPS </h3>
               <h2 className={classes.labelValues}>
                 {this.state.shgData.toLocaleString()}
               </h2>
             </div>
           </Grid>
 
-          <Grid className={classes.fpoInlineGrid} item md={3} sm={6} xs={12} spacing={3}>
+          <Grid
+            className={classes.fpoInlineGrid}
+            item
+            md={3}
+            sm={6}
+            xs={12}
+            spacing={3}
+          >
             <div className={classes.oddBlock}>
               <NaturePeopleIcon className={classes.Icon} />
-              <h3 className={classes.fpoHead3}>
-                {" "}
-                VILLAGE ORGANIZATIONS{" "}
-              </h3>
+              <h3 className={classes.fpoHead3}> VILLAGE ORGANIZATIONS </h3>
               <h2 className={classes.labelValues}>
                 {this.state.voData.toLocaleString()}
               </h2>
             </div>
           </Grid>
 
-          <Grid className={classes.fpoInlineGrid} item md={3} sm={6} xs={12} spacing={3}>
+          <Grid
+            className={classes.fpoInlineGrid}
+            item
+            md={3}
+            sm={6}
+            xs={12}
+            spacing={3}
+          >
             <div className={classes.evenBlock}>
               <MoneyIcon className={classes.Icon} />
-              <h3 className={classes.fpoHead3}>
-                LOAN APPLICATIONS{" "}
-              </h3>
+              <h3 className={classes.fpoHead3}>LOAN APPLICATIONS </h3>
               <div style={{ display: "inline-flex" }}>
                 <div
                   style={{ borderRight: "1px solid #fff", padding: "0px 15px" }}
@@ -352,8 +371,10 @@ class DashboardForFPO extends Component {
         <Grid container style={{ border: "1px solid #ccc" }}>
           <Grid
             item
-            sm={3} xs={12}
-            style={{ padding: "15px", backgroundColor: "#fff" }}>
+            sm={3}
+            xs={12}
+            style={{ padding: "15px", backgroundColor: "#fff" }}
+          >
             <h3 align="center">LOAN AMOUNT DISTRIBUTED</h3>
             <h2 align="center" className={classes.fieldValues}>
               ₹ {this.state.totalLoanDistributed.toLocaleString()}
@@ -377,8 +398,7 @@ class DashboardForFPO extends Component {
           </Grid>
 
           <Grid item sm={6} xs={12}>
-            <div
-              className = {style.loanDashboardTable}>
+            <div className={style.loanDashboardTable}>
               <h3 align="center">LOANS</h3>
               <div style={{ height: "calc(100% - 115px)" }}>
                 {loanData ? (
@@ -414,10 +434,7 @@ class DashboardForFPO extends Component {
             </div>
           </Grid>
 
-          <Grid
-            item
-            sm={3}  xs={12} 
-            className = {style.loanPurposesDashboard}>
+          <Grid item sm={3} xs={12} className={style.loanPurposesDashboard}>
             <h3 align="center">LOAN BY PURPOSE</h3>
             {this.state.purposes && this.state.purposes.length > 0 ? (
               <Piechart

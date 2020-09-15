@@ -202,24 +202,39 @@ class ShgPage extends Component {
       if (typeof value === "object") {
         newVal = value.id;
       }
-      this.setState({
-        values: { ...this.state.values, addState: newVal },
-      });
-      //if (value.is_active == true) {
+
       serviceProvider
         .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/?is_active=true&&state.id=" +
-            newVal
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/states/" + newVal
         )
         .then((res) => {
-          this.setState({ getDistrict: res.data });
+          //this.setState({ getDistrict: res.data });
+          value = res.data;
+          console.log("res in name state ", res.data);
         })
         .catch((error) => {
           console.log(error);
         });
-      this.setState({ stateSelected: true });
-      //}
+
+      this.setState({
+        values: { ...this.state.values, addState: value.id },
+      });
+
+      if (value.is_active == true) {
+        serviceProvider
+          .serviceProviderForGetRequest(
+            process.env.REACT_APP_SERVER_URL +
+              "crm-plugin/districts/?is_active=true&&state.id=" +
+              newVal
+          )
+          .then((res) => {
+            this.setState({ getDistrict: res.data });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        this.setState({ stateSelected: true });
+      }
     } else {
       this.setState({
         values: {
@@ -241,8 +256,19 @@ class ShgPage extends Component {
       if (typeof value === "object") {
         newVal = value.id;
       }
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/districts/" + newVal
+        )
+        .then((res) => {
+          value = res.data;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
       this.setState({
-        values: { ...this.state.values, addDistrict: newVal },
+        values: { ...this.state.values, addDistrict: value.id },
       });
       serviceProvider
         .serviceProviderForGetRequest(
@@ -252,10 +278,12 @@ class ShgPage extends Component {
         )
         .then((res) => {
           this.setState({ getVillage: res.data });
+          console.log("this.state.getVillage", this.state.getVillage);
         })
         .catch((error) => {
           console.log(error);
         });
+
       this.setState({ districtSelected: true });
     } else {
       this.setState({
@@ -273,11 +301,9 @@ class ShgPage extends Component {
   handleVillageChange(event, value) {
     if (value !== null) {
       let newVal = value;
-      console.log("value--", value);
       if (typeof value === "object") {
         newVal = value.id;
       }
-      console.log("newVal", newVal);
       this.setState({
         values: { ...this.state.values, addVillage: newVal },
       });
@@ -293,6 +319,7 @@ class ShgPage extends Component {
 
   handleVoChange(event, value) {
     if (value !== null) {
+      console.log("value in vo", value);
       this.setState({
         values: { ...this.state.values, addVo: value.id },
       });
@@ -520,14 +547,14 @@ class ShgPage extends Component {
     let addState = this.state.values.addState;
     let districtFilter = this.state.getDistrict;
     let addDistrict = this.state.values.addDistrict;
-
+    console.log("addVillage in render", addVillage);
     return (
       <Layout
         breadcrumbs={
           this.state.editPage[0] ? EDIT_SHG_BREADCRUMBS : ADD_SHG_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: '45rem' }}>
+        <Card style={{ maxWidth: "45rem" }}>
           <form
             autoComplete="off"
             noValidate
@@ -869,7 +896,7 @@ class ShgPage extends Component {
               </Grid>
             </CardContent>
             <Divider />
-            <CardActions style={{padding: "15px",}}>
+            <CardActions style={{ padding: "15px" }}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"

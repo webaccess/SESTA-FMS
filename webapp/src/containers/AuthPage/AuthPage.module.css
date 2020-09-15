@@ -74,9 +74,10 @@ button {
 }
 
 .buttonContainer {
-  padding-top: 5px;
+  padding-top: 15px;
   display: flex;
   justify-content: center;
+  clear: both;
 }
 
 .linkContainer {
@@ -118,14 +119,25 @@ img {
   line-height: 13px;
   font-size: 13px;
   color: red;
-  width: 70%;
+  text-align: left;
   margin: 5px auto;
+  width: 70%;
+}
+
+.successContainer {
+  margin-bottom: 5px;
+  line-height: 13px;
+  font-size: 13px;
+  color: green;
+  text-align: left;
+  margin: 5px auto;
+  width: 70%;
 }
 :global(.MuiFormControl-root) {
   width: 100%;
 }
 .loginKeyWrap {
-  width:70%;
+  width: 70%;
   margin: 8px auto;
   text-align: center;
 }

@@ -32,7 +32,10 @@ class ActivitytypePage extends Component {
     super(props);
     let userInfo = auth.getUserInfo();
     let validateFpo;
-    if (userInfo.role.name == "Sesta Admin") {
+    if (
+      userInfo.role.name == "Sesta Admin" ||
+      userInfo.role.name == "Superadmin"
+    ) {
       validateFpo = {
         required: {
           value: true,
@@ -45,6 +48,7 @@ class ActivitytypePage extends Component {
       values: {},
       getFPO: [],
       addIsActive: false,
+      isActTypePresent: false,
       validations: {
         addActivitytype: {
           required: {
@@ -98,8 +102,30 @@ class ActivitytypePage extends Component {
               addRemuneration: res.data.remuneration,
               selectedNotation: res.data.notation,
             },
-            addIsActive: res.data.is_active,
+            // addIsActive: res.data.is_active,
           });
+
+          // disable active field if activity type is in use
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/activities/?activitytype.id=" +
+                this.state.editPage[1]
+            )
+            .then((typeRes) => {
+              if (typeRes.data.length > 0) {
+                this.setState({
+                  isActTypePresent: true,
+                  addIsActive: res.data.is_active,
+                });
+              } else {
+                this.setState({
+                  isActTypePresent: false,
+                  addIsActive: res.data.is_active,
+                });
+              }
+            })
+            .catch((error) => {});
 
           if (res.data.contact[0]) {
             let tempValues = this.state.values;
@@ -330,7 +356,7 @@ class ActivitytypePage extends Component {
             : ADD_ACTIVITYTYPE_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: '45rem' }}>
+        <Card style={{ maxWidth: "45rem" }}>
           <form
             autoComplete="off"
             noValidate
@@ -472,6 +498,7 @@ class ActivitytypePage extends Component {
                         onChange={this.handleCheckBox}
                         name="addIsActive"
                         color="primary"
+                        disabled={this.state.isActTypePresent ? true : false}
                       />
                     }
                     label="Active"
@@ -480,7 +507,7 @@ class ActivitytypePage extends Component {
               </Grid>
             </CardContent>
             <Divider />
-            <CardActions style={{padding: "15px",}}>
+            <CardActions style={{ padding: "15px" }}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"

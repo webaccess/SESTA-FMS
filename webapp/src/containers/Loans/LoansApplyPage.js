@@ -113,7 +113,7 @@ const useStyles = (theme) => ({
   },
 });
 
-class LoansPage extends Component {
+class LoansApplyPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -482,8 +482,7 @@ class LoansPage extends Component {
                       VILLAGE
                       <br />
                       <span className={classes.fieldValues}>
-                        {data.villages[0].name}
-                        {/*{data.addresses[0].village.name}*/}
+                        {data.addresses[2].village.name}
                       </span>
                     </div>
                   </b>
@@ -659,4 +658,4 @@ class LoansPage extends Component {
   }
 }
 
-export default withStyles(useStyles)(LoansPage);
+export default withStyles(useStyles)(LoansApplyPage);

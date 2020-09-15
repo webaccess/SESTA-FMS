@@ -9,6 +9,8 @@ import Moment from "moment";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import { LOAN_EMI_BREADCRUMBS } from "./config";
 import style from "./Loans.module.css";
+import Button from "../../components/UI/Button/Button";
+import { Link } from "react-router-dom";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -50,7 +52,7 @@ const useStyles = (theme) => ({
   loaneeName: {
     margin: "10px 0",
     display: "inline-flex",
-  }
+  },
 });
 
 class LoanEmiPage extends Component {
@@ -58,6 +60,7 @@ class LoanEmiPage extends Component {
     super(props);
     this.state = {
       data: [],
+      newDta: [],
       loanEmiData: [],
     };
   }
@@ -69,12 +72,28 @@ class LoanEmiPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "loan-application-installments/?loan_application.id=" +
-        memberData.id +
-        "&&_sort=payment_date:ASC"
+          "loan-application-installments/?loan_application.id=" +
+          memberData.id +
+          "&&_sort=payment_date:ASC"
       )
       .then((res) => {
         this.setState({ loanEmiData: res.data });
+      });
+  }
+
+  async getVillage(data) {
+    await serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/villages/" + data.village
+      )
+      .then((res) => {
+        this.setState({
+          newData: { ...this.state.newData, village: res.data.name },
+        });
+        this.setState({ data: this.state.newData });
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }
 
@@ -90,8 +109,8 @@ class LoanEmiPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/individuals/" +
-        memberData.contact.individual
+          "crm-plugin/individuals/" +
+          memberData.contact.individual
       )
       .then((res) => {
         let shgName = res.data.shg.name;
@@ -99,13 +118,13 @@ class LoanEmiPage extends Component {
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/?organization.id=" +
-            res.data.shg.organization
+              "crm-plugin/contact/?organization.id=" +
+              res.data.shg.organization
           )
           .then((response) => {
-            let villageName = response.data[0].villages[0].name;
+            let villageName = response.data[0].addresses[0].village;
             this.setState({
-              data: {
+              newData: {
                 loanee: loaneeName,
                 shg: shgName,
                 village: villageName,
@@ -119,6 +138,7 @@ class LoanEmiPage extends Component {
                   : "-",
               },
             });
+            this.getVillage(this.state.newData);
           });
       });
   };
@@ -178,16 +198,17 @@ class LoanEmiPage extends Component {
     }
 
     // get Loan Ends On Date
-    let sortedPaymentDate = loanAppData.loan_app_installments.sort(
-      (a, b) =>
-        new Date(...a.payment_date.split("/").reverse()) -
-        new Date(...b.payment_date.split("/").reverse())
-    );
-    let len = sortedPaymentDate.length - 1;
-    data.loanEndsOn = Moment(sortedPaymentDate[len].payment_date).format(
-      "DD MMM YYYY"
-    );
-
+    if (loanAppData.loan_app_installments.length > 0) {
+      let sortedPaymentDate = loanAppData.loan_app_installments.sort(
+        (a, b) =>
+          new Date(...a.payment_date.split("/").reverse()) -
+          new Date(...b.payment_date.split("/").reverse())
+      );
+      let len = sortedPaymentDate.length - 1;
+      data.loanEndsOn = Moment(sortedPaymentDate[len].payment_date).format(
+        "DD MMM YYYY"
+      );
+    }
     const Usercolumns = [
       {
         name: "Due Date",
@@ -287,8 +308,13 @@ class LoanEmiPage extends Component {
           <div className="App">
             <h5 className={style.loan}>LOANS</h5>
             <div className={classes.emiViewWrap}>
-              <h2 className={classes.loaneeName} style={{paddingRight: "4rem",}}>{data.loanee}</h2>
-              <div className={classes.dataRow} style={{paddingRight: "4rem",}}>
+              <h2
+                className={classes.loaneeName}
+                style={{ paddingRight: "4rem" }}
+              >
+                {data.loanee}
+              </h2>
+              <div className={classes.dataRow} style={{ paddingRight: "4rem" }}>
                 <p>
                   SHG GROUP <b>{data.shg}</b>
                 </p>
@@ -332,8 +358,13 @@ class LoanEmiPage extends Component {
                   </Grid>
                   <Grid spacing={2} xs={2}>
                     <b>
-                      <div className={classes.member}
-                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
+                      <div
+                        className={classes.member}
+                        style={{
+                          borderLeft: "1px solid #c1c1c1",
+                          paddingLeft: "10px",
+                        }}
+                      >
                         AMOUNT <br />
                         <span className={classes.fieldValues}>
                           ₹{data.amount}
@@ -343,8 +374,13 @@ class LoanEmiPage extends Component {
                   </Grid>
                   <Grid spacing={2} xs={2}>
                     <b>
-                      <div className={classes.member}
-                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
+                      <div
+                        className={classes.member}
+                        style={{
+                          borderLeft: "1px solid #c1c1c1",
+                          paddingLeft: "10px",
+                        }}
+                      >
                         PENDING AMOUNT <br />
                         <span className={classes.fieldValues}>
                           {pendingAmount}
@@ -354,8 +390,13 @@ class LoanEmiPage extends Component {
                   </Grid>
                   <Grid spacing={2} xs={2}>
                     <b>
-                      <div className={classes.member}
-                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
+                      <div
+                        className={classes.member}
+                        style={{
+                          borderLeft: "1px solid #c1c1c1",
+                          paddingLeft: "10px",
+                        }}
+                      >
                         EMI <br />
                         <span className={classes.fieldValues}>{data.emi}</span>
                       </div>
@@ -363,8 +404,13 @@ class LoanEmiPage extends Component {
                   </Grid>
                   <Grid spacing={2} xs={2}>
                     <b>
-                      <div className={classes.member}
-                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
+                      <div
+                        className={classes.member}
+                        style={{
+                          borderLeft: "1px solid #c1c1c1",
+                          paddingLeft: "10px",
+                        }}
+                      >
                         DURATION <br />
                         <span className={classes.fieldValues}>
                           {data.duration}
@@ -374,8 +420,13 @@ class LoanEmiPage extends Component {
                   </Grid>
                   <Grid spacing={2} xs={2}>
                     <b>
-                      <div className={classes.member}
-                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
+                      <div
+                        className={classes.member}
+                        style={{
+                          borderLeft: "1px solid #c1c1c1",
+                          paddingLeft: "10px",
+                        }}
+                      >
                         LOAN ENDS ON <br />
                         <span className={classes.fieldValues}>
                           {data.loanEndsOn}
@@ -413,8 +464,13 @@ class LoanEmiPage extends Component {
               pagination
             />
           ) : (
-              <h1>Loading...</h1>
-            )}
+            <h1>Loading...</h1>
+          )}
+          <div style={{ padding: "15px" }}>
+            <Button color="primary" component={Link} to="/loans">
+              Done
+            </Button>
+          </div>
         </Grid>
       </Layout>
     );

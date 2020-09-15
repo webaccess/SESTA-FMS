@@ -8,7 +8,7 @@ import { Grid, Card } from "@material-ui/core";
 import Moment from "moment";
 import Input from "../../components/UI/Input/Input";
 import Autocomplete from "../../components/Autocomplete/Autocomplete";
-import DateTimepicker from "../../components/UI/DateTimepicker/DateTimepicker.js";
+import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 import Button from "../../components/UI/Button/Button";
 import { Link } from "react-router-dom";
 import { CSVLink, CSVDownload } from "react-csv";
@@ -409,13 +409,13 @@ class DashboardViewMoreDetailsCSP extends Component {
           <Grid>
             <div className={style.headerWrap}>
               {dbLoanData ? <h2 className={style.title}>EMI Due</h2> : null}
+              {dbActivitiesData ? <h2 className={style.title}>Recent Activities</h2> : null}
               <div className={classes.buttonRow}>
                 <Button color="primary" component={Link} to="/">
                   Back
                 </Button>
               </div>
             </div>
-            {dbLoanData ? <h3>EMI Due</h3> : null}
             {dbLoanData ? (
               <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
                 <div className={classes.searchInput}>
@@ -467,7 +467,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                 <div className={classes.searchInput}>
                   <div>
                     <Grid item md={12} xs={12}>
-                      <DateTimepicker
+                      <Datepicker
                         label="Start Date"
                         name="startDate"
                         value={this.state.filterStartDate || ""}
@@ -482,7 +482,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                 <div className={classes.searchInput}>
                   <div>
                     <Grid item md={12} xs={12}>
-                      <DateTimepicker
+                      <Datepicker
                         label="End Date"
                         name="endDate"
                         value={this.state.filterEndDate || ""}
@@ -529,7 +529,6 @@ class DashboardViewMoreDetailsCSP extends Component {
             ) : null}
           </Grid>
           <Grid>
-            {dbActivitiesData ? <h3>Recent Activities</h3> : null}
             {dbActivitiesData ? (
               <div className={classes.row}>
                 <div className={classes.searchInput}>
@@ -565,7 +564,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                 <div className={classes.searchInput}>
                   <div>
                     <Grid item md={12} xs={12}>
-                      <DateTimepicker
+                      <Datepicker
                         label="Start Date"
                         name="startDate"
                         value={this.state.filterStartDate || ""}
@@ -580,7 +579,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                 <div className={classes.searchInput}>
                   <div>
                     <Grid item md={12} xs={12}>
-                      <DateTimepicker
+                      <Datepicker
                         label="End Date"
                         name="endDate"
                         value={this.state.filterEndDate || ""}

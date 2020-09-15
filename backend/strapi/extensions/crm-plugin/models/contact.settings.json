@@ -34,20 +34,6 @@
       "type": "string",
       "required": true
     },
-    "country": {
-      "plugin": "crm-plugin",
-      "model": "country"
-    },
-    "villages": {
-      "plugin": "crm-plugin",
-      "collection": "village",
-      "via": "contacts",
-      "dominant": true
-    },
-    "state": {
-      "plugin": "crm-plugin",
-      "model": "state"
-    },
     "individual": {
       "plugin": "crm-plugin",
       "model": "individual",
@@ -108,6 +94,10 @@
       "plugin": "crm-plugin",
       "collection": "address",
       "via": "contact"
+    },
+    "pg": {
+      "plugin": "crm-plugin",
+      "model": "tag"
     }
   }
 }

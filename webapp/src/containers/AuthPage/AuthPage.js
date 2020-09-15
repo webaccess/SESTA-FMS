@@ -52,6 +52,12 @@ class AuthPage extends PureComponent {
       ? replace(props.location.search, "?code=", "")
       : props.match.params.id;
     this.setForm(props.match.params.authType, params);
+    if (
+      props.location.search &&
+      props.location.search.includes("?reset=true")
+    ) {
+      this.setState({ showSuccessMsg: true });
+    }
   };
 
   /**
@@ -116,9 +122,11 @@ class AuthPage extends PureComponent {
   };
 
   getOTP = (resend) => {
-    console.log("getOTP==", resend);
+    console.log("getOTP =>", resend);
     const requestURL = process.env.REACT_APP_SERVER_URL + "otps/requestotp";
     const body = this.state.value;
+    this.setState({ fieldErrors: { ...this.state.errors } });
+    this.setState({ formErrors: [] });
     if (resend)
       body["contact_number"] = this.props.location.state.contact_number;
     axios({
@@ -144,15 +152,20 @@ class AuthPage extends PureComponent {
       })
       .catch((error) => {
         this.setState({ buttonView: false });
+        console.log("error", error.response.data);
+        this.setState({
+          formErrors: { contact_number: [error.response.data.message] },
+        });
       });
   };
 
   validateOTP = () => {
     const requestURL = this.getRequestURL();
     const contact_number = this.props.location.state.contact_number;
-    console.log("cc", contact_number);
     const body = this.state.value;
     body.contact_number = contact_number;
+    this.setState({ fieldErrors: { ...this.state.errors } });
+    this.setState({ formErrors: [] });
     axios({
       method: "post",
       url: requestURL,
@@ -160,11 +173,9 @@ class AuthPage extends PureComponent {
         "Content-Type": "application/json",
       },
       data: this.state.value,
-      // withCredentials: true,
       responseType: "json",
     })
       .then((response) => {
-        console.log("response", response);
         this.setState({ buttonView: false });
         this.props.history.push("/reset-password?code=" + response.data.result);
       })
@@ -190,11 +201,9 @@ class AuthPage extends PureComponent {
     // This line is required for the callback url to redirect your user to app
     if (this.props.match.params.authType === "forgot-password") {
       // set(body, "url", process.env.REACT_APP_CLIENT_URL + "reset-password");
-      console.log("enters this1");
       return this.getOTP(false);
     }
     if (this.props.match.params.authType === "verify-otp") {
-      console.log("enters this2");
       return this.validateOTP();
     }
     if (this.props.match.params.authType === "reset-password") {
@@ -221,7 +230,6 @@ class AuthPage extends PureComponent {
           auth.setToken(response.data.jwt);
           auth.setUserInfo(response.data.user);
         }
-        console.log("in here= 11===");
         this.setState({ buttonView: false });
         this.redirectUser();
       })
@@ -266,7 +274,7 @@ class AuthPage extends PureComponent {
     if (this.props.match.params.authType === "login")
       this.props.history.push("/");
     else {
-      console.log("in here====");
+      this.props.history.push("/login?reset=true");
       this.setState({ showSuccessMsg: true });
       this.setState({ value: {} });
     }
@@ -280,14 +288,18 @@ class AuthPage extends PureComponent {
     if (this.props.match.params.authType === "login") {
       return (
         <div>
-          <Link href="/forgot-password">Forgot Password</Link>
+          <Link style={{ textDecoration: "underline" }} href="/forgot-password">
+            Forgot Password
+          </Link>
         </div>
       );
     }
 
     return (
       <div>
-        <Link href="/login">Ready to signin</Link>
+        <Link style={{ textDecoration: "underline" }} href="/login">
+          Click here to login
+        </Link>
       </div>
     );
   };
@@ -319,12 +331,12 @@ class AuthPage extends PureComponent {
     let message = "";
     if (this.props.match.params.authType === "forgot-password")
       message = "Reset password link is sent to your mail.";
-    else if (this.props.match.params.authType === "reset-password")
+    else if (this.props.match.params.authType === "login")
       message = "Password reset successfully.";
     else if (this.props.match.params.authType === "verify-otp")
       message = "OTP sent successfully.";
 
-    return <div style={{ color: "green" }}>{message}</div>;
+    return <div className={styles.successContainer}>{message}</div>;
   };
 
   handleClickShowPassword = () => {
@@ -444,8 +456,7 @@ class AuthPage extends PureComponent {
                           }
                         />
                         {get(input, "name") == "otp" ? (
-                          <div>
-                            <br />
+                          <div style={{ float: "right", marginTop: "5px" }}>
                             <Link
                               href="javascript:void(0)"
                               onClick={this.resendOTP}
@@ -482,16 +493,32 @@ class AuthPage extends PureComponent {
                     return renderFormErrors;
                   })}
                   {this.state.showSuccessMsg ? this.renderSuccessMsg() : ""}
+                  {this.props.match.params.authType === "login" ? (
+                    <div
+                      style={{ paddingLeft: "212px" }}
+                      className={styles.linkContainer}
+                    >
+                      {this.renderLink()}
+                    </div>
+                  ) : (
+                    ""
+                  )}
                   <div className={`col-md-12 ${styles.buttonContainer}`}>
                     <Button type="submit" disabled={this.state.buttonView}>
-                      Submit
+                      {this.props.match.params.authType === "login"
+                        ? "Login"
+                        : "Submit"}
                     </Button>
                   </div>
                 </div>
               </form>
             </Container>
           </div>
-          <div className={styles.linkContainer}>{this.renderLink()}</div>
+          {this.props.match.params.authType !== "login" ? (
+            <div className={styles.linkContainer}>{this.renderLink()}</div>
+          ) : (
+            ""
+          )}
         </div>
       </div>
     );

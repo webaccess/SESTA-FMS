@@ -12,7 +12,7 @@ import { EDIT_LOAN_TASK_BREADCRUMBS } from "./config";
 import Input from "../../components/UI/Input/Input";
 import Autotext from "../../components/Autotext/Autotext";
 import * as constants from "../../constants/Constants";
-import DateTimepicker from "../../components/UI/DateTimepicker/DateTimepicker.js";
+import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 import Button from "../../components/UI/Button/Button";
 import { Link } from "react-router-dom";
 import * as serviceProvider from "../../api/Axios";
@@ -34,33 +34,32 @@ class LoanEditTask extends Component {
         },
         editDate: {
           required: { value: "true", message: "Date field is required" },
-        }
+        },
       },
       errors: {},
       formSubmitted: "",
       editPage: [
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
-      ]
-    }
+      ],
+    };
   }
 
   async componentDidMount() {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "loan-application-tasks/" +
-        this.state.editPage[1]
+          "loan-application-tasks/" +
+          this.state.editPage[1]
       )
       .then((res) => {
         this.setState({
           values: {
             editStatus: res.data.status,
             editDate: res.data.date,
-            comments: res.data.comments
-          }
-        })
-
+            comments: res.data.comments,
+          },
+        });
       })
       .catch((error) => {
         console.log(error);
@@ -126,8 +125,8 @@ class LoanEditTask extends Component {
     let postData = {
       status: status,
       date: editDate,
-      comments: comments
-    }
+      comments: comments,
+    };
 
     serviceProvider
       .serviceProviderForPutRequest(
@@ -137,35 +136,38 @@ class LoanEditTask extends Component {
       )
       .then((res) => {
         let updateActivityFlag;
-        if (auth.getUserInfo().role.name === 'CSP (Community Service Provider)') {
-
+        if (
+          auth.getUserInfo().role.name === "CSP (Community Service Provider)"
+        ) {
           //get all activities
           serviceProvider
             .serviceProviderForGetRequest(
-              process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
+              process.env.REACT_APP_SERVER_URL + "crm-plugin/activities"
             )
             .then((resp) => {
-              resp.data.map(fdata => {
+              resp.data.map((fdata) => {
                 if (fdata.loan_application_task != null) {
                   if (fdata.loan_application_task.id == loanTaskData.id) {
                     updateActivityFlag = true;
                     delete fdata.contacts;
                     fdata.unit = 1;
                     fdata.contact = {
-                      id: auth.getUserInfo().contact.id
-                    }
+                      id: auth.getUserInfo().contact.id,
+                    };
+                    fdata.start_datetime = this.state.values.editDate;
                     fdata.end_datetime = this.state.values.editDate;
                     fdata.description = loanTaskData.comments;
                     serviceProvider
                       .serviceProviderForPutRequest(
-                        process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
+                        process.env.REACT_APP_SERVER_URL +
+                          "crm-plugin/activities",
                         fdata.id,
                         fdata
                       )
-                      .then((activtyRes) => { });
+                      .then((activtyRes) => {});
                   }
                 }
-              })
+              });
               if (!updateActivityFlag && resp.data.length !== 0) {
                 this.addActivity();
               }
@@ -173,16 +175,16 @@ class LoanEditTask extends Component {
               if (resp.data.length == 0) {
                 this.addActivity();
               }
-            })
+            });
         }
         this.setState({ formSubmitted: true });
         let app_id = res.data.loan_application["id"];
         this.props.history.push("/loan/update/" + app_id, {
           loanAppData: this.props.location.state.loanAppData,
-          loanEditTaskPage: true
+          loanEditTaskPage: true,
         });
-      })
-  }
+      });
+  };
 
   addActivity() {
     let loanTaskData = this.props.location.state.loantask;
@@ -190,14 +192,17 @@ class LoanEditTask extends Component {
 
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes"
       )
       .then((activityTypeResp) => {
-        activityTypeResp.data.map(type => {
+        activityTypeResp.data.map((type) => {
           if (type.name == loanTaskData.name) {
             let activityTypeId = type.id;
             let activitiyData = {
-              title: this.props.location.state.loanAppData.contact.name + ": " + loanTaskData.name,
+              title:
+                this.props.location.state.loanAppData.contact.name +
+                ": " +
+                loanTaskData.name,
               start_datetime: this.state.values.editDate,
               end_datetime: this.state.values.editDate,
               unit: 1,
@@ -206,9 +211,9 @@ class LoanEditTask extends Component {
                 id: activityTypeId,
               },
               loan_application_task: {
-                id: loanAppId
-              }
-            }
+                id: loanAppId,
+              },
+            };
 
             serviceProvider
               .serviceProviderForPostRequest(
@@ -221,22 +226,23 @@ class LoanEditTask extends Component {
                 // add activityassingnees
                 let activityassignee = {
                   contact: {
-                    id: auth.getUserInfo().contact.id
+                    id: auth.getUserInfo().contact.id,
                   },
                   activity: {
-                    id: cid
-                  }
-                }
+                    id: cid,
+                  },
+                };
                 serviceProvider
                   .serviceProviderForPostRequest(
-                    process.env.REACT_APP_SERVER_URL + "crm-plugin/activityassignees",
+                    process.env.REACT_APP_SERVER_URL +
+                      "crm-plugin/activityassignees",
                     activityassignee
                   )
-                  .then((assigneeResp) => { })
-              })
+                  .then((assigneeResp) => {});
+              });
           }
-        })
-      })
+        });
+      });
   }
 
   cancelForm = () => {
@@ -246,7 +252,9 @@ class LoanEditTask extends Component {
       isCancel: true,
     });
     this.componentDidMount();
-    this.props.history.push(this.props.history.goBack(), { loantask: this.props.location.state.loantask });
+    this.props.history.push(this.props.history.goBack(), {
+      loantask: this.props.location.state.loantask,
+    });
     //routing code #route to loan_application_list page
   };
 
@@ -256,22 +264,17 @@ class LoanEditTask extends Component {
     let statusValue = this.state.values.editStatus;
 
     return (
-      <Layout
-        breadcrumbs={
-          EDIT_LOAN_TASK_BREADCRUMBS
-        }
-      >
+      <Layout breadcrumbs={EDIT_LOAN_TASK_BREADCRUMBS}>
         <Card>
           <form
             autoComplete="off"
             noValidate
             onSubmit={this.handleSubmit}
-            method="post">
+            method="post"
+          >
             <CardHeader
               title={"Edit Loan task"}
-              subheader={
-                "You can edit loan task here!"
-              }
+              subheader={"You can edit loan task here!"}
             />
             <Divider />
 
@@ -290,13 +293,13 @@ class LoanEditTask extends Component {
                     value={
                       statusValue
                         ? this.state.loanTaskStatus[
-                        this.state.loanTaskStatus.findIndex(function (
-                          item,
-                          i
-                        ) {
-                          return item.id === statusValue;
-                        })
-                        ] || null
+                            this.state.loanTaskStatus.findIndex(function (
+                              item,
+                              i
+                            ) {
+                              return item.id === statusValue;
+                            })
+                          ] || null
                         : null
                     }
                     error={this.hasError("editStatus")}
@@ -317,7 +320,7 @@ class LoanEditTask extends Component {
                 </Grid>
 
                 <Grid item md={6} xs={12}>
-                  <DateTimepicker
+                  <Datepicker
                     label="Date*"
                     name="editDate"
                     error={this.hasError("editDate")}
@@ -330,7 +333,7 @@ class LoanEditTask extends Component {
                     format={"dd MMM yyyy"}
                     onChange={(value) =>
                       this.setState({
-                        values: { ...this.state.values, editDate: value }
+                        values: { ...this.state.values, editDate: value },
                       })
                     }
                   />
@@ -346,24 +349,20 @@ class LoanEditTask extends Component {
                     variant="outlined"
                   />
                 </Grid>
-
               </Grid>
             </CardContent>
             <Divider />
 
             <CardActions>
               <Button type="submit">Save</Button>
-              <Button
-                color="secondary"
-                clicked={this.cancelForm}
-              >
+              <Button color="secondary" clicked={this.cancelForm}>
                 cancel
               </Button>
             </CardActions>
           </form>
         </Card>
       </Layout>
-    )
+    );
   }
 }
 

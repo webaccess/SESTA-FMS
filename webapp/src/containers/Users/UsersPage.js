@@ -373,7 +373,7 @@ class UsersPage extends Component {
     let roleId = this.state.values.role;
     let selectFieldId = this.state.values.selectField;
     if (emailAdd == "" || emailAdd == undefined) {
-      emailAdd = username + "@sesta.com";
+      emailAdd = username + "@example.com";
     }
     let postUserData = {
       username: username,

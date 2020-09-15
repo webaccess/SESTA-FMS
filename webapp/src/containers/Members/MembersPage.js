@@ -31,6 +31,7 @@ class ActivityPage extends Component {
       getDistrict: [],
       getVillage: [],
       getShgs: [],
+      getPgs: [],
       stateSelected: false,
       districtSelected: false,
       values: {
@@ -64,19 +65,13 @@ class ActivityPage extends Component {
         },
         addPincode: {},
         addPhone: {
+          required: {
+            value: "true",
+            message: "Phone number is required",
+          },
           phone: {
             value: "true",
             message: "Please enter valid phone number",
-          },
-        },
-        addEmail: {
-          required: {
-            value: "true",
-            message: "Email is required",
-          },
-          email: {
-            value: "true",
-            message: "Please enter valid email id",
           },
         },
         addShg: {
@@ -126,24 +121,8 @@ class ActivityPage extends Component {
           this.handleStateChange(res.data.addresses[0].state);
           this.handleDistrictChange(res.data.addresses[0].district);
           this.handleShgChange("", res.data.individual.shg);
-          //getdistid();
-          //async function getdistid() {
-          //  console.log("res in", res.data.addresses[0].district);
-          //  await serviceProvider
-          //    .serviceProviderForGetRequest(
-          //      process.env.REACT_APP_SERVER_URL +
-          //        "crm-plugin/districts/" +
-          //        res.data.addresses[0].district
-          //    )
-          //    .then((res) => {
-          //      this.setState({ values: { addDistrict: res.data } });
-          //      console.log("distData", res.data.id);
-          //      console.log("addDistrict", this.state.values.addDistrict);
-          //    })
-          //    .catch((error) => {
-          //      console.log(error);
-          //    });
-          //}
+          this.handlePgChange(res.data.pg);
+
           this.setState({
             values: {
               firstName: res.data.individual.first_name,
@@ -162,21 +141,12 @@ class ActivityPage extends Component {
               addShg: res.data.individual.shg,
             },
           });
-          //getDistName(res.data.addresses[0].district);
-          console.log("values", this.state.values);
-
-          if (this.state.getState.length > 0) {
-            this.state.getState.map((state) => {
-              if (state.id === res.data.state.id) {
-                this.setState({
-                  values: {
-                    ...this.state.values,
-                    addState: res.data.state.id,
-                    addDistrict: res.data.district.id,
-                    addVillage: res.data.villages[0].id,
-                  },
-                });
-              }
+          console.log("village add", res.data.addresses[0].village);
+          if (res.data.pg) {
+            let pgValue = this.state.values;
+            pgValue["addPg"] = res.data.pg.id;
+            this.setState({
+              values: pgValue,
             });
           }
 
@@ -212,16 +182,19 @@ class ActivityPage extends Component {
       .catch((error) => {
         console.log(error);
       });
-    console.log(
-      "addDistrict before,addState",
-      this.state.values.firstName,
-      this.state.addState
-    );
 
-    //async function getDistName(id) {
-    //  console.log("id", id);
-
-    //}
+    // get all active pg
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/tags/?_sort=name:ASC&&is_active=true"
+      )
+      .then((res) => {
+        this.setState({ getPgs: res.data });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
     // get all shgs
     let url =
@@ -321,25 +294,36 @@ class ActivityPage extends Component {
       if (typeof value === "object") {
         newVal = value.id;
       }
-      this.setState({
-        values: { ...this.state.values, addState: newVal },
-      });
-      //if (value.is_active == true) {
       serviceProvider
         .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/?is_active=true&&state.id=" +
-            newVal
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/states/" + newVal
         )
         .then((res) => {
-          this.setState({ getDistrict: res.data });
-          console.log("res in state ", res.data, this.state.getDistrict);
+          //this.setState({ getDistrict: res.data });
+          value = res.data;
+          console.log("res in name state ", res.data);
         })
         .catch((error) => {
           console.log(error);
         });
-      this.setState({ stateSelected: true });
-      //}
+      this.setState({
+        values: { ...this.state.values, addState: value.id },
+      });
+      if (value.is_active == true) {
+        serviceProvider
+          .serviceProviderForGetRequest(
+            process.env.REACT_APP_SERVER_URL +
+              "crm-plugin/districts/?is_active=true&&state.id=" +
+              value.id
+          )
+          .then((res) => {
+            this.setState({ getDistrict: res.data });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        this.setState({ stateSelected: true });
+      }
     } else {
       this.setState({
         values: {
@@ -362,24 +346,37 @@ class ActivityPage extends Component {
       if (typeof value === "object") {
         newVal = value.id;
       }
-      this.setState({
-        values: { ...this.state.values, addDistrict: newVal },
-      });
-      let districtId = value.id;
-      console.log("value", newVal);
       serviceProvider
         .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/villages/?is_active=true&&district.id=" +
-            newVal
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/districts/" + newVal
         )
         .then((res) => {
-          this.setState({ getVillage: res.data });
+          //this.setState({ getDistrict: res.data });
+          value = res.data;
+          console.log("res in name dist ", res.data);
         })
         .catch((error) => {
           console.log(error);
         });
-      this.setState({ districtSelected: true });
+
+      this.setState({
+        values: { ...this.state.values, addDistrict: value.id },
+      });
+      if (value.is_active == true) {
+        serviceProvider
+          .serviceProviderForGetRequest(
+            process.env.REACT_APP_SERVER_URL +
+              "crm-plugin/villages/?is_active=true&&district.id=" +
+              newVal
+          )
+          .then((res) => {
+            this.setState({ getVillage: res.data });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        this.setState({ districtSelected: true });
+      }
     } else {
       this.setState({
         values: {
@@ -407,6 +404,21 @@ class ActivityPage extends Component {
         values: {
           ...this.state.values,
           addVillage: "",
+        },
+      });
+    }
+  }
+
+  handlePgChange(value) {
+    if (value !== null) {
+      this.setState({
+        values: { ...this.state.values, addPg: value.id },
+      });
+    } else {
+      this.setState({
+        values: {
+          ...this.state.values,
+          addPg: 0,
         },
       });
     }
@@ -450,7 +462,6 @@ class ActivityPage extends Component {
     let hName = this.state.values.husbandName;
     let phoneNo = this.state.values.addPhone;
     let emailAdd = this.state.values.addEmail;
-    let shgId = this.state.values.addShg;
     let block = this.state.values.addBlock;
     let gp = this.state.values.addGp;
     let pincodeNo = this.state.values.addPincode;
@@ -459,6 +470,8 @@ class ActivityPage extends Component {
     let stateId = this.state.values.addState;
     let districtId = this.state.values.addDistrict;
     let villageId = this.state.values.addVillage;
+    let shgId = this.state.values.addShg;
+    let pgId = this.state.values.addPg;
 
     console.log("villageId", villageId);
     let postAddressData = {
@@ -489,6 +502,7 @@ class ActivityPage extends Component {
         "Individual"
       ][0],
       addresses: [postAddressData],
+      pg: pgId,
       first_name: fName,
       last_name: lName,
       partner_name: hName,
@@ -684,6 +698,8 @@ class ActivityPage extends Component {
     let addVillage = this.state.values.addVillage;
     let shgFilters = this.state.getShgs;
     let addShg = this.state.values.addShg;
+    let pgFilter = this.state.getPgs;
+    let addPg = this.state.values.addPg;
 
     return (
       <Layout
@@ -693,7 +709,7 @@ class ActivityPage extends Component {
             : ADD_MEMBERS_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: '45rem' }}>
+        <Card style={{ maxWidth: "45rem" }}>
           <form
             autoComplete="off"
             noValidate
@@ -946,13 +962,15 @@ class ActivityPage extends Component {
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
-                    label="Phone Number"
+                    label="Phone Number*"
                     type="tel"
                     name="addPhone"
                     error={this.hasError("addPhone")}
                     helperText={
                       this.hasError("addPhone")
-                        ? this.state.errors.addPhone[0]
+                        ? this.state.errors["addPhone"].map((error) => {
+                            return error + " ";
+                          })
                         : null
                     }
                     value={this.state.values.addPhone || ""}
@@ -963,17 +981,9 @@ class ActivityPage extends Component {
                 <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
-                    label="Email*"
+                    label="Email"
                     type="email"
                     name="addEmail"
-                    error={this.hasError("addEmail")}
-                    helperText={
-                      this.hasError("addEmail")
-                        ? this.state.errors["addEmail"].map((error) => {
-                            return error + " ";
-                          })
-                        : null
-                    }
                     value={this.state.values.addEmail || ""}
                     onChange={this.handleChange}
                     variant="outlined"
@@ -1027,6 +1037,36 @@ class ActivityPage extends Component {
                     )}
                   />
                 </Grid>
+                <Grid item md={6} xs={12}>
+                  <Autotext
+                    id="combo-box-demo"
+                    options={pgFilter}
+                    variant="outlined"
+                    label="Select PG"
+                    getOptionLabel={(option) => option.name}
+                    onChange={(event, value) => {
+                      this.handlePgChange(value);
+                    }}
+                    defaultValue={[]}
+                    value={
+                      addPg
+                        ? pgFilter[
+                            pgFilter.findIndex(function (item, i) {
+                              return item.id === addPg;
+                            })
+                          ] || null
+                        : null
+                    }
+                    renderInput={(params) => (
+                      <Input
+                        fullWidth
+                        label="Select PG"
+                        name="addPg"
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                </Grid>
 
                 <Grid item xs={12}>
                   <FormControlLabel
@@ -1043,7 +1083,11 @@ class ActivityPage extends Component {
                 </Grid>
                 <Divider />
                 {this.state.isShareholder ? (
-                  <Grid container spacing={3} style={{width: "100%", margin: "0px",}}>
+                  <Grid
+                    container
+                    spacing={3}
+                    style={{ width: "100%", margin: "0px" }}
+                  >
                     <Grid item md={6} xs={12}>
                       <Input
                         fullWidth
@@ -1135,7 +1179,7 @@ class ActivityPage extends Component {
               </Grid>
             </CardContent>
             <Divider />
-            <CardActions style={{padding: "15px",}}>
+            <CardActions style={{ padding: "15px" }}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"

@@ -26,6 +26,7 @@ class PgPage extends Component {
     this.state = {
       values: {},
       addIsActive: false,
+      isPgPresent: false,
       validations: {
         addPg: {
           required: { value: "true", message: "Producer Group field required" },
@@ -52,13 +53,33 @@ class PgPage extends Component {
             this.state.editPage[1]
         )
         .then((res) => {
+          // disable active field if PG is in use
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/contact/?pg=" +
+                this.state.editPage[1]
+            )
+            .then((pgRes) => {
+              if (pgRes.data.length > 0) {
+                this.setState({
+                  isPgPresent: true,
+                  addIsActive: res.data[0].is_active,
+                });
+              } else {
+                this.setState({
+                  isPgPresent: false,
+                  addIsActive: res.data[0].is_active,
+                });
+              }
+            })
+            .catch((error) => {});
           this.setState({
             values: {
               addPg: res.data[0].name,
               addDescription: res.data[0].description,
             },
           });
-          this.setState({ addIsActive: res.data[0].is_active });
         })
         .catch((error) => {
           console.log(error);
@@ -188,7 +209,7 @@ class PgPage extends Component {
           this.state.editPage[0] ? EDIT_PG_BREADCRUMBS : ADD_PG_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: '45rem' }}>
+        <Card style={{ maxWidth: "45rem" }}>
           <form
             autoComplete="off"
             noValidate
@@ -231,7 +252,6 @@ class PgPage extends Component {
                     variant="outlined"
                   />
                 </Grid>
-
                 <Grid item md={6} xs={12}>
                   <FormControlLabel
                     control={
@@ -240,12 +260,12 @@ class PgPage extends Component {
                         onChange={this.handleCheckBox}
                         name="addIsActive"
                         color="primary"
+                        disabled={this.state.isPgPresent ? true : false}
                       />
                     }
                     label="Active"
                   />
                 </Grid>
-
                 <Grid item md={12} xs={12}>
                   <Input
                     fullWidth
@@ -259,7 +279,7 @@ class PgPage extends Component {
               </Grid>
             </CardContent>
             <Divider />
-            <CardActions style={{padding: "15px",}}>
+            <CardActions style={{ padding: "15px" }}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"
