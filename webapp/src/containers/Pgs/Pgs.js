@@ -421,8 +421,8 @@ export class Pgs extends React.Component {
               }}
             >
               {this.state.IsActive
-                ? " Do you want to set selected PG Active ?"
-                : "Do you want to Deactivate selected PG.?"}
+                ? "Do you want to activate selected PG ?"
+                : "Do you want to deactivate selected PG ?"}
             </Modal>
           </div>
         </Grid>
