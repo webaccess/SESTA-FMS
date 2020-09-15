@@ -132,42 +132,27 @@ class VillagePage extends Component {
 
   handleStateChange(value) {
     if (value !== null) {
-      console.log("value", value);
       let newVal = value;
       if (typeof value === "object") {
         newVal = value.id;
       }
-
+      this.setState({
+        values: { ...this.state.values, addState: value.id },
+      });
       serviceProvider
         .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/states/" + newVal
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/districts/?is_active=true&&state.id=" +
+            newVal
         )
         .then((res) => {
-          value = res.data;
+          this.setState({ getDistrict: res.data });
+          console.log("res in state ", res.data, this.state.getDistrict);
         })
         .catch((error) => {
           console.log(error);
         });
-
-      this.setState({
-        values: { ...this.state.values, addState: value.id },
-      });
-      if (value.is_active == true) {
-        serviceProvider
-          .serviceProviderForGetRequest(
-            process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/districts/?is_active=true&&state.id=" +
-              newVal
-          )
-          .then((res) => {
-            this.setState({ getDistrict: res.data });
-            console.log("res in state ", res.data, this.state.getDistrict);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-        this.setState({ stateSelected: true });
-      }
+      this.setState({ stateSelected: true });
     } else {
       this.setState({
         values: {

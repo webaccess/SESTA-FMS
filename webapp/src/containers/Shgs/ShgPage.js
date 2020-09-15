@@ -202,39 +202,22 @@ class ShgPage extends Component {
       if (typeof value === "object") {
         newVal = value.id;
       }
-
+      this.setState({
+        values: { ...this.state.values, addState: newVal },
+      });
       serviceProvider
         .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/states/" + newVal
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/districts/?is_active=true&&state.id=" +
+            newVal
         )
         .then((res) => {
-          //this.setState({ getDistrict: res.data });
-          value = res.data;
-          console.log("res in name state ", res.data);
+          this.setState({ getDistrict: res.data });
         })
         .catch((error) => {
           console.log(error);
         });
-
-      this.setState({
-        values: { ...this.state.values, addState: value.id },
-      });
-
-      if (value.is_active == true) {
-        serviceProvider
-          .serviceProviderForGetRequest(
-            process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/districts/?is_active=true&&state.id=" +
-              newVal
-          )
-          .then((res) => {
-            this.setState({ getDistrict: res.data });
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-        this.setState({ stateSelected: true });
-      }
+      this.setState({ stateSelected: true });
     } else {
       this.setState({
         values: {
@@ -256,19 +239,8 @@ class ShgPage extends Component {
       if (typeof value === "object") {
         newVal = value.id;
       }
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/districts/" + newVal
-        )
-        .then((res) => {
-          value = res.data;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-
       this.setState({
-        values: { ...this.state.values, addDistrict: value.id },
+        values: { ...this.state.values, addDistrict: newVal },
       });
       serviceProvider
         .serviceProviderForGetRequest(
@@ -278,7 +250,6 @@ class ShgPage extends Component {
         )
         .then((res) => {
           this.setState({ getVillage: res.data });
-          console.log("this.state.getVillage", this.state.getVillage);
         })
         .catch((error) => {
           console.log(error);

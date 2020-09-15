@@ -294,36 +294,22 @@ class ActivityPage extends Component {
       if (typeof value === "object") {
         newVal = value.id;
       }
+      this.setState({
+        values: { ...this.state.values, addState: newVal },
+      });
       serviceProvider
         .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/states/" + newVal
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/districts/?is_active=true&&state.id=" +
+            newVal
         )
         .then((res) => {
-          //this.setState({ getDistrict: res.data });
-          value = res.data;
-          console.log("res in name state ", res.data);
+          this.setState({ getDistrict: res.data });
         })
         .catch((error) => {
           console.log(error);
         });
-      this.setState({
-        values: { ...this.state.values, addState: value.id },
-      });
-      if (value.is_active == true) {
-        serviceProvider
-          .serviceProviderForGetRequest(
-            process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/districts/?is_active=true&&state.id=" +
-              value.id
-          )
-          .then((res) => {
-            this.setState({ getDistrict: res.data });
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-        this.setState({ stateSelected: true });
-      }
+      this.setState({ stateSelected: true });
     } else {
       this.setState({
         values: {
@@ -340,43 +326,27 @@ class ActivityPage extends Component {
   }
 
   handleDistrictChange(value) {
-    console.log("value", value);
     if (value !== null) {
       let newVal = value;
       if (typeof value === "object") {
         newVal = value.id;
       }
+      this.setState({
+        values: { ...this.state.values, addDistrict: newVal },
+      });
       serviceProvider
         .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/districts/" + newVal
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/villages/?is_active=true&&district.id=" +
+            newVal
         )
         .then((res) => {
-          //this.setState({ getDistrict: res.data });
-          value = res.data;
-          console.log("res in name dist ", res.data);
+          this.setState({ getVillage: res.data });
         })
         .catch((error) => {
           console.log(error);
         });
-
-      this.setState({
-        values: { ...this.state.values, addDistrict: value.id },
-      });
-      if (value.is_active == true) {
-        serviceProvider
-          .serviceProviderForGetRequest(
-            process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/villages/?is_active=true&&district.id=" +
-              newVal
-          )
-          .then((res) => {
-            this.setState({ getVillage: res.data });
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-        this.setState({ districtSelected: true });
-      }
+      this.setState({ districtSelected: true });
     } else {
       this.setState({
         values: {
