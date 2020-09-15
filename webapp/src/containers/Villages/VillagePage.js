@@ -66,7 +66,7 @@ class VillagePage extends Component {
             this.state.editPage[1]
         )
         .then((res) => {
-          this.handleStateChange(res.data[0].state);
+          // this.handleStateChange(res.data[0].state);
 
           this.setState({
             values: {
@@ -100,7 +100,7 @@ class VillagePage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/?villages=" +
+            "crm-plugin/contact/?addresses.village=" +
             this.state.editPage[1]
         )
         .then((res) => {
@@ -130,14 +130,23 @@ class VillagePage extends Component {
     });
   };
 
-  handleStateChange(value) {
+  handleCheckBox = (event) => {
+    this.setState({
+      values: {
+        ...this.state.values,
+        [event.target.name]: event.target.checked,
+      },
+    });
+  };
+
+  handleStateChange(event, value) {
     if (value !== null) {
       let newVal = value;
       if (typeof value === "object") {
         newVal = value.id;
       }
       this.setState({
-        values: { ...this.state.values, addState: value.id },
+        values: { ...this.state.values, addState: newVal },
       });
       serviceProvider
         .serviceProviderForGetRequest(
@@ -147,7 +156,6 @@ class VillagePage extends Component {
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
-          console.log("res in state ", res.data, this.state.getDistrict);
         })
         .catch((error) => {
           console.log(error);
@@ -166,19 +174,14 @@ class VillagePage extends Component {
     }
   }
 
-  handleCheckBox = (event) => {
-    this.setState({
-      values: {
-        ...this.state.values,
-        [event.target.name]: event.target.checked,
-      },
-    });
-  };
-
   handleDistrictChange(event, value) {
     if (value !== null) {
+      let newVal = value;
+      if (typeof value === "object") {
+        newVal = value.id;
+      }
       this.setState({
-        values: { ...this.state.values, addDistrict: value.id },
+        values: { ...this.state.values, addDistrict: newVal },
       });
     } else {
       this.setState({
@@ -400,7 +403,7 @@ class VillagePage extends Component {
                     label="Select State*"
                     getOptionLabel={(option) => option.name}
                     onChange={(event, value) => {
-                      this.handleStateChange(value);
+                      this.handleStateChange(event, value);
                     }}
                     defaultValue={[]}
                     value={

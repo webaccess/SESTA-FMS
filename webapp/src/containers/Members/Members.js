@@ -63,7 +63,7 @@ export class Members extends React.Component {
       data: [],
       getState: [],
       getDistrict: [],
-      ge: [],
+      getVillage: [],
       getShg: [],
       filterState: "",
       filterDistrict: "",
@@ -487,6 +487,7 @@ export class Members extends React.Component {
         }
       });
     });
+    //if (data) {
     const Usercolumns = [
       {
         name: "Name",
@@ -522,238 +523,244 @@ export class Members extends React.Component {
         cell: (row) => (row.phone ? row.phone : "-"),
       },
     ];
+    //}
 
     let selectors = [];
     for (let i in Usercolumns) {
-      console.log("i", Usercolumns[i]["selector"]);
       selectors.push(Usercolumns[i]["selector"]);
     }
     let columnsvalue = selectors[0];
-    console.log("columnsvalue", columnsvalue);
-
-    return (
-      <Layout>
-        <Grid>
-          <div className="App">
-            <h5 className={style.menuName}>MEMBERS</h5>
-            <div className={style.headerWrap}>
-              <h2 className={style.title}>Manage Members</h2>
-              <div className={classes.buttonRow}>
-                <Button variant="contained" component={Link} to="/members/add">
-                  Add New Member
+    if (data) {
+      return (
+        <Layout>
+          <Grid>
+            <div className="App">
+              <h5 className={style.menuName}>MEMBERS</h5>
+              <div className={style.headerWrap}>
+                <h2 className={style.title}>Manage Members</h2>
+                <div className={classes.buttonRow}>
+                  <Button
+                    variant="contained"
+                    component={Link}
+                    to="/members/add"
+                  >
+                    Add New Member
+                  </Button>
+                </div>
+              </div>
+              {!this.state.bankDetailsFound ? (
+                <Snackbar severity="info">
+                  No bank details found for SHG of this member
+                </Snackbar>
+              ) : null}
+              {this.props.location.addData ? (
+                <Snackbar severity="success">
+                  Member added successfully.
+                </Snackbar>
+              ) : this.props.location.editData ? (
+                <Snackbar severity="success">
+                  Member edited successfully.
+                </Snackbar>
+              ) : null}
+              {this.state.singleDelete !== false &&
+              this.state.singleDelete !== "" &&
+              this.state.singleDelete ? (
+                <Snackbar severity="success" Showbutton={false}>
+                  Member {this.state.singleDelete} deleted successfully!
+                </Snackbar>
+              ) : null}
+              {this.state.singleDelete === false ? (
+                <Snackbar severity="error" Showbutton={false}>
+                  An error occured - Please try again!
+                </Snackbar>
+              ) : null}
+              {this.state.multipleDelete === true ? (
+                <Snackbar severity="success" Showbutton={false}>
+                  Members deleted successfully!
+                </Snackbar>
+              ) : null}
+              {this.state.multipleDelete === false ? (
+                <Snackbar severity="error" Showbutton={false}>
+                  An error occured - Please try again!
+                </Snackbar>
+              ) : null}
+              <div
+                className={classes.row}
+                style={{ flexWrap: "wrap", height: "auto" }}
+              >
+                <div className={classes.searchInput}>
+                  <div className={style.Districts}>
+                    <Grid item md={12} xs={12}>
+                      <Autocomplete
+                        id="combo-box-demo"
+                        options={statesFilter}
+                        getOptionLabel={(option) => option.name}
+                        onChange={(event, value) => {
+                          this.handleStateChange(event, value);
+                        }}
+                        value={
+                          filterState
+                            ? this.state.isCancel === true
+                              ? null
+                              : filterState
+                            : null
+                        }
+                        renderInput={(params) => (
+                          <Input
+                            {...params}
+                            fullWidth
+                            label="Select State"
+                            name="addState"
+                            variant="outlined"
+                          />
+                        )}
+                      />
+                    </Grid>
+                  </div>
+                </div>
+                <div className={classes.searchInput}>
+                  <div className={style.Districts}>
+                    <Grid item md={12} xs={12}>
+                      <Autocomplete
+                        id="combo-box-demo"
+                        options={districtsFilter}
+                        name="filterDistrict"
+                        getOptionLabel={(option) => option.name}
+                        onChange={(event, value) => {
+                          this.handleDistrictChange(event, value);
+                        }}
+                        value={
+                          filterDistrict
+                            ? this.state.isCancel === true
+                              ? null
+                              : filterDistrict
+                            : null
+                        }
+                        renderInput={(params) => (
+                          <Input
+                            {...params}
+                            fullWidth
+                            label="Select District"
+                            name="filterDistrict"
+                            variant="outlined"
+                          />
+                        )}
+                      />
+                    </Grid>
+                  </div>
+                </div>
+                <div className={classes.searchInput}>
+                  <div className={style.Districts}>
+                    <Grid item md={12} xs={12}>
+                      <Autocomplete
+                        id="combo-box-demo"
+                        options={villagesFilter}
+                        name="filterVillage"
+                        getOptionLabel={(option) => option.name}
+                        onChange={(event, value) => {
+                          this.handleVillageChange(event, value);
+                        }}
+                        value={
+                          filterVillage
+                            ? this.state.isCancel === true
+                              ? null
+                              : filterVillage
+                            : null
+                        }
+                        renderInput={(params) => (
+                          <Input
+                            {...params}
+                            fullWidth
+                            label="Select Village"
+                            name="filterVillage"
+                            variant="outlined"
+                          />
+                        )}
+                      />
+                    </Grid>
+                  </div>
+                </div>
+                <div className={classes.searchInput}>
+                  <div className={style.Districts}>
+                    <Grid item md={12} xs={12}>
+                      <Autocomplete
+                        id="combo-box-demo"
+                        options={shgFilter}
+                        name="filterShg"
+                        getOptionLabel={(option) => option.name}
+                        onChange={(event, value) => {
+                          this.handleShgChange(event, value);
+                        }}
+                        value={
+                          filterShg
+                            ? this.state.isCancel === true
+                              ? null
+                              : filterShg
+                            : null
+                        }
+                        renderInput={(params) => (
+                          <Input
+                            {...params}
+                            fullWidth
+                            label="Select SHG"
+                            name="filterShg"
+                            variant="outlined"
+                          />
+                        )}
+                      />
+                    </Grid>
+                  </div>
+                </div>
+                <Button
+                  style={{ marginRight: "5px", marginBottom: "8px" }}
+                  variant="contained"
+                  onClick={this.handleSearch.bind(this)}
+                >
+                  Search
+                </Button>
+                <Button
+                  style={{ marginBottom: "8px" }}
+                  color="secondary"
+                  variant="contained"
+                  onClick={this.cancelForm.bind(this)}
+                >
+                  Reset
                 </Button>
               </div>
+              <div>
+                {data ? (
+                  <Table
+                    title={"Members"}
+                    showSearch={false}
+                    filterData={true}
+                    filterBy={[
+                      "name",
+                      "villages[0].name",
+                      "district.name",
+                      "shgName",
+                      "phone",
+                    ]}
+                    filters={filters}
+                    data={data}
+                    column={Usercolumns}
+                    viewData={this.viewData}
+                    editData={this.editData}
+                    DeleteData={this.DeleteData}
+                    DeleteAll={this.DeleteAll}
+                    columnsvalue={columnsvalue}
+                    selectableRows
+                    pagination
+                    DeleteMessage={"Are you Sure you want to Delete"}
+                  />
+                ) : (
+                  <h1>Loading...</h1>
+                )}
+              </div>
             </div>
-            {!this.state.bankDetailsFound ? (
-              <Snackbar severity="info">
-                No bank details found for SHG of this member
-              </Snackbar>
-            ) : null}
-            {this.props.location.addData ? (
-              <Snackbar severity="success">Member added successfully.</Snackbar>
-            ) : this.props.location.editData ? (
-              <Snackbar severity="success">
-                Member edited successfully.
-              </Snackbar>
-            ) : null}
-            {this.state.singleDelete !== false &&
-            this.state.singleDelete !== "" &&
-            this.state.singleDelete ? (
-              <Snackbar severity="success" Showbutton={false}>
-                Member {this.state.singleDelete} deleted successfully!
-              </Snackbar>
-            ) : null}
-            {this.state.singleDelete === false ? (
-              <Snackbar severity="error" Showbutton={false}>
-                An error occured - Please try again!
-              </Snackbar>
-            ) : null}
-            {this.state.multipleDelete === true ? (
-              <Snackbar severity="success" Showbutton={false}>
-                Members deleted successfully!
-              </Snackbar>
-            ) : null}
-            {this.state.multipleDelete === false ? (
-              <Snackbar severity="error" Showbutton={false}>
-                An error occured - Please try again!
-              </Snackbar>
-            ) : null}
-            <div
-              className={classes.row}
-              style={{ flexWrap: "wrap", height: "auto" }}
-            >
-              <div className={classes.searchInput}>
-                <div className={style.Districts}>
-                  <Grid item md={12} xs={12}>
-                    <Autocomplete
-                      id="combo-box-demo"
-                      options={statesFilter}
-                      getOptionLabel={(option) => option.name}
-                      onChange={(event, value) => {
-                        this.handleStateChange(event, value);
-                      }}
-                      value={
-                        filterState
-                          ? this.state.isCancel === true
-                            ? null
-                            : filterState
-                          : null
-                      }
-                      renderInput={(params) => (
-                        <Input
-                          {...params}
-                          fullWidth
-                          label="Select State"
-                          name="addState"
-                          variant="outlined"
-                        />
-                      )}
-                    />
-                  </Grid>
-                </div>
-              </div>
-              <div className={classes.searchInput}>
-                <div className={style.Districts}>
-                  <Grid item md={12} xs={12}>
-                    <Autocomplete
-                      id="combo-box-demo"
-                      options={districtsFilter}
-                      name="filterDistrict"
-                      getOptionLabel={(option) => option.name}
-                      onChange={(event, value) => {
-                        this.handleDistrictChange(event, value);
-                      }}
-                      value={
-                        filterDistrict
-                          ? this.state.isCancel === true
-                            ? null
-                            : filterDistrict
-                          : null
-                      }
-                      renderInput={(params) => (
-                        <Input
-                          {...params}
-                          fullWidth
-                          label="Select District"
-                          name="filterDistrict"
-                          variant="outlined"
-                        />
-                      )}
-                    />
-                  </Grid>
-                </div>
-              </div>
-              <div className={classes.searchInput}>
-                <div className={style.Districts}>
-                  <Grid item md={12} xs={12}>
-                    <Autocomplete
-                      id="combo-box-demo"
-                      options={villagesFilter}
-                      name="filterVillage"
-                      getOptionLabel={(option) => option.name}
-                      onChange={(event, value) => {
-                        this.handleVillageChange(event, value);
-                      }}
-                      value={
-                        filterVillage
-                          ? this.state.isCancel === true
-                            ? null
-                            : filterVillage
-                          : null
-                      }
-                      renderInput={(params) => (
-                        <Input
-                          {...params}
-                          fullWidth
-                          label="Select Village"
-                          name="filterVillage"
-                          variant="outlined"
-                        />
-                      )}
-                    />
-                  </Grid>
-                </div>
-              </div>
-              <div className={classes.searchInput}>
-                <div className={style.Districts}>
-                  <Grid item md={12} xs={12}>
-                    <Autocomplete
-                      id="combo-box-demo"
-                      options={shgFilter}
-                      name="filterShg"
-                      getOptionLabel={(option) => option.name}
-                      onChange={(event, value) => {
-                        this.handleShgChange(event, value);
-                      }}
-                      value={
-                        filterShg
-                          ? this.state.isCancel === true
-                            ? null
-                            : filterShg
-                          : null
-                      }
-                      renderInput={(params) => (
-                        <Input
-                          {...params}
-                          fullWidth
-                          label="Select SHG"
-                          name="filterShg"
-                          variant="outlined"
-                        />
-                      )}
-                    />
-                  </Grid>
-                </div>
-              </div>
-              <Button
-                style={{ marginRight: "5px", marginBottom: "8px" }}
-                variant="contained"
-                onClick={this.handleSearch.bind(this)}
-              >
-                Search
-              </Button>
-              <Button
-                style={{ marginBottom: "8px" }}
-                color="secondary"
-                variant="contained"
-                onClick={this.cancelForm.bind(this)}
-              >
-                Reset
-              </Button>
-            </div>
-            <div>
-              {data ? (
-                <Table
-                  title={"Members"}
-                  showSearch={false}
-                  filterData={true}
-                  filterBy={[
-                    "name",
-                    "villages[0].name",
-                    "district.name",
-                    "shgName",
-                    "phone",
-                  ]}
-                  filters={filters}
-                  data={data}
-                  column={Usercolumns}
-                  viewData={this.viewData}
-                  editData={this.editData}
-                  DeleteData={this.DeleteData}
-                  DeleteAll={this.DeleteAll}
-                  columnsvalue={columnsvalue}
-                  selectableRows
-                  pagination
-                  DeleteMessage={"Are you Sure you want to Delete"}
-                />
-              ) : (
-                <h1>Loading...</h1>
-              )}
-            </div>
-          </div>
-        </Grid>
-      </Layout>
-    );
+          </Grid>
+        </Layout>
+      );
+    }
   }
 }
 export default withStyles(useStyles)(Members);

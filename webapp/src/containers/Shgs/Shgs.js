@@ -89,7 +89,6 @@ export class Shgs extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
-        console.log("res.data", res.data);
         this.setState({ TestData: res.data });
         this.getStateData(this.state.TestData);
         this.getDistrictData(this.state.TestData);
@@ -162,7 +161,6 @@ export class Shgs extends React.Component {
         });
     }
     this.setState({ data: data });
-    console.log("data in ", data);
   }
 
   handleStateChange = async (event, value) => {
@@ -349,7 +347,6 @@ export class Shgs extends React.Component {
         process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
       )
       .then((res) => {
-        //this.setState({ testData: res.data });
         this.setState({ TestData: res.data });
         this.getStateData(this.state.TestData);
         this.getDistrictData(this.state.TestData);
@@ -362,7 +359,6 @@ export class Shgs extends React.Component {
 
   render() {
     let data = this.state.data;
-    console.log("data.addresses", data);
     const Usercolumns = [
       {
         name: "Name of the Group",
@@ -386,6 +382,12 @@ export class Shgs extends React.Component {
         //cell: (row) => (row.addresses[3] ? addresses[3].village.name : "-"),
         selector: "addresses[3].village.name",
         sortable: true,
+      },
+      {
+        name: "Village Organization",
+        sortable: true,
+        cell: (row) =>
+          row.organization.vos[0] ? row.organization.vos[0].name : "-",
       },
     ];
 

@@ -157,16 +157,12 @@ module.exports = {
           id: entity["shg"]["organization"]["id"],
         });
 
-      // }
-      //console.log("shg_villages", entity.shg);
-
       if (entity.shg.addresses.length > 0) {
         entity.shg_village = await strapi
           .query("village", "crm-plugin")
           .findOne({
             id: entity.shg.addresses[0].village,
           });
-        console.log("shg_villages", entity.shg_village);
       }
       if (entity.loan_model.fpo) {
         entity.fpo = await strapi.query("contact", "crm-plugin").findOne({
@@ -183,7 +179,6 @@ module.exports = {
           .findOne({
             id: entity.fpo_add.district,
           });
-        //console.log("entity.fpo", entity.fpo);
       }
     }
     // }

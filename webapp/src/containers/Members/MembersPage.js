@@ -12,7 +12,7 @@ import {
   Divider,
   Grid,
 } from "@material-ui/core";
-import { map, values } from "lodash";
+import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
 import { ADD_MEMBERS_BREADCRUMBS, EDIT_MEMBERS_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
@@ -141,7 +141,6 @@ class ActivityPage extends Component {
               addShg: res.data.individual.shg,
             },
           });
-          console.log("village add", res.data.addresses[0].village);
           if (res.data.pg) {
             let pgValue = this.state.values;
             pgValue["addPg"] = res.data.pg.id;
@@ -443,26 +442,20 @@ class ActivityPage extends Component {
     let shgId = this.state.values.addShg;
     let pgId = this.state.values.addPg;
 
-    console.log("villageId", villageId);
     let postAddressData = {
       block: block,
       gp: gp,
       pincode: pincodeNo,
       address_line_1: address,
-      district:
-        //districtId,
-        {
-          id: districtId,
-        },
+      district: {
+        id: districtId,
+      },
       state: {
         id: stateId,
       },
-      //stateId,
-      village:
-        //villageId,
-        {
-          id: villageId,
-        },
+      village: {
+        id: villageId,
+      },
     };
     let postData = {
       name: fName + " " + lName,
@@ -526,9 +519,7 @@ class ActivityPage extends Component {
           if (this.state.isShareholder) {
             this.saveShareInfo(res.data);
           }
-          //if (this.state.values.address) {
-          //  this.saveaddressInfo(res.data);
-          //}
+
           this.setState({
             formSubmitted: true,
           });
@@ -636,18 +627,6 @@ class ActivityPage extends Component {
         id: villageId,
       },
     };
-
-    serviceProvider
-      .serviceProviderForPostRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/address/",
-        postAddressData
-      )
-      .then((res) => {
-        console.log("res", res);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   };
 
   cancelForm = () => {
