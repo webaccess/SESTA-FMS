@@ -24,9 +24,9 @@
       "type": "richtext"
     },
     "activitytype": {
-      "via": "activities",
       "plugin": "crm-plugin",
-      "model": "activitytype"
+      "model": "activitytype",
+      "via": "activities"
     },
     "activityassignees": {
       "plugin": "crm-plugin",
@@ -41,6 +41,17 @@
     },
     "unit": {
       "type": "string"
+    },
+    "document": {
+      "collection": "file",
+      "via": "related",
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos"
+      ],
+      "plugin": "upload",
+      "required": false
     }
   }
 }

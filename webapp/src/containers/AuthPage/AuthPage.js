@@ -14,6 +14,7 @@ import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import IconButton from "@material-ui/core/IconButton";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import Snackbar from "../../components/UI/Snackbar/Snackbar";
 
 class AuthPage extends PureComponent {
   constructor(props) {
@@ -58,6 +59,9 @@ class AuthPage extends PureComponent {
     ) {
       this.setState({ showSuccessMsg: true });
     }
+
+    if (props.match.params.authType == "verify-otp")
+      this.setState({ showSuccessMsg: true });
   };
 
   /**
@@ -127,6 +131,7 @@ class AuthPage extends PureComponent {
     const body = this.state.value;
     this.setState({ fieldErrors: { ...this.state.errors } });
     this.setState({ formErrors: [] });
+    this.setState({ showSuccessMsg: false });
     if (resend)
       body["contact_number"] = this.props.location.state.contact_number;
     axios({
@@ -145,6 +150,7 @@ class AuthPage extends PureComponent {
           this.props.history.push({
             pathname: "/verify-otp",
             state: {
+              otp: true,
               contact_number: this.state.value.contact_number,
             },
           });
@@ -166,6 +172,7 @@ class AuthPage extends PureComponent {
     body.contact_number = contact_number;
     this.setState({ fieldErrors: { ...this.state.errors } });
     this.setState({ formErrors: [] });
+    this.setState({ showSuccessMsg: false });
     axios({
       method: "post",
       url: requestURL,
@@ -198,6 +205,10 @@ class AuthPage extends PureComponent {
     this.setState({ formSubmitted: true });
     this.setState({ fieldErrors: { ...this.state.errors } });
     this.setState({ formErrors: [] });
+    if (Object.keys(this.state.errors).length > 0) {
+      this.setState({ buttonView: false });
+      return;
+    }
     // This line is required for the callback url to redirect your user to app
     if (this.props.match.params.authType === "forgot-password") {
       // set(body, "url", process.env.REACT_APP_CLIENT_URL + "reset-password");
@@ -208,11 +219,6 @@ class AuthPage extends PureComponent {
     }
     if (this.props.match.params.authType === "reset-password") {
       body.passwordConfirmation = body.password;
-    }
-
-    if (Object.keys(this.state.errors).length > 0) {
-      this.setState({ buttonView: false });
-      return;
     }
 
     axios({
@@ -365,6 +371,14 @@ class AuthPage extends PureComponent {
             <Container>
               <form onSubmit={this.handleSubmit} method="post" noValidate>
                 <div className="row" style={{ textAlign: "start" }}>
+                  {this.state.showSuccessMsg ? (
+                    <Snackbar severity="success">
+                      {" "}
+                      {this.renderSuccessMsg()}
+                    </Snackbar>
+                  ) : (
+                    ""
+                  )}
                   {map(inputs, (input, key) => {
                     let fieldErrorVal = "";
                     let formSubmitted = this.state.formSubmitted;
@@ -492,7 +506,7 @@ class AuthPage extends PureComponent {
                     );
                     return renderFormErrors;
                   })}
-                  {this.state.showSuccessMsg ? this.renderSuccessMsg() : ""}
+
                   {this.props.match.params.authType === "login" ? (
                     <div
                       style={{ paddingLeft: "212px" }}

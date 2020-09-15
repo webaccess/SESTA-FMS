@@ -6,7 +6,7 @@ import * as serviceProvider from "../../api/Axios";
 import auth from "../../components/Auth/Auth";
 import Autocomplete from "../../components/Autocomplete/Autocomplete";
 import Input from "../../components/UI/Input/Input";
-import { Card, Divider, Grid, Fab } from "@material-ui/core";
+import { Card, Divider, Grid, Fab, IconButton } from "@material-ui/core";
 import PersonIcon from "@material-ui/icons/Person";
 import MoneyIcon from "@material-ui/icons/Money";
 import Button from "../../components/UI/Button/Button";
@@ -17,6 +17,7 @@ import FileCopyIcon from "@material-ui/icons/FileCopy";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
 import { APPROVE_LOAN_BREADCRUMBS } from "./config";
+import CancelIcon from "@material-ui/icons/Cancel";
 
 const useStyles = (theme) => ({
   root: {
@@ -67,6 +68,7 @@ class LoanApprovalPage extends Component {
       selectedFile: null,
       fileDataArray: [],
       fileName: "",
+      uploadedFile: "",
       validations: {
         comment: {
           required: {
@@ -161,6 +163,7 @@ class LoanApprovalPage extends Component {
               },
               values: { selectedStatus: status, comment: comment },
               fileName: document,
+              uploadedFile: data.document[0],
             });
             this.getVillage(this.state.newData);
           })
@@ -260,8 +263,20 @@ class LoanApprovalPage extends Component {
       approved_date: Moment().format("YYYY-MM-DD"),
       review_comments: this.state.values.comment,
       approved_by: approvedBy,
-      document: this.state.fileDataArray,
     };
+    if (this.state.uploadedFile && this.state.selectedFile === null) {
+      postData["document"] = this.state.uploadedFile;
+    } else if (this.state.uploadedFile && this.state.selectedFile) {
+      postData["document"] = this.state.fileDataArray;
+    } else if (
+      this.state.uploadedFile === undefined &&
+      this.state.selectedFile
+    ) {
+      postData["document"] = this.state.fileDataArray;
+    }
+    if (this.state.isCancelFile) {
+      postData["document"] = "";
+    }
     serviceProvider
       .serviceProviderForPutRequest(
         process.env.REACT_APP_SERVER_URL + "loan-applications",
@@ -304,14 +319,13 @@ class LoanApprovalPage extends Component {
                   process.env.REACT_APP_SERVER_URL + "loan-application-tasks",
                   postLoanTaskData
                 )
-                .then((res) => {
-                  this.props.history.push({
-                    pathname: "/loans",
-                    loanApproved: true,
-                  });
-                })
+                .then((res) => {})
                 .catch((error) => {});
             }
+          });
+          this.props.history.push({
+            pathname: "/loans",
+            loanApproved: true,
           });
         })
         .catch((error) => {
@@ -363,7 +377,6 @@ class LoanApprovalPage extends Component {
                     )
                     .then((resp) => {
                       this.props.history.push({
-                        pathname: "/loans",
                         loanApproved: true,
                         state: {
                           loanAppResData: resp.data,
@@ -375,8 +388,16 @@ class LoanApprovalPage extends Component {
             }
           });
         }
+        this.props.history.push({
+          pathname: "/loans",
+          loanApproved: true,
+        });
       })
       .catch((error) => {});
+  };
+
+  cancelFile = (event) => {
+    this.setState({ isCancelFile: true, fileName: "" });
   };
 
   render() {
@@ -522,6 +543,13 @@ class LoanApprovalPage extends Component {
                       <FileCopyIcon /> Upload loan application
                     </Fab>
                   </label>{" "}
+                  <IconButton
+                    aria-label="cancel"
+                    color="secondary"
+                    style={{ paddingLeft: "2px" }}
+                  >
+                    <CancelIcon onClick={this.cancelFile} />
+                  </IconButton>
                   &nbsp;&nbsp;&nbsp;
                   {this.state.fileName !== "" ? (
                     <label style={{ color: "green", fontSize: "11px" }}>
