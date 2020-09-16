@@ -335,7 +335,7 @@ class UsersPage extends Component {
       email: emailAdd,
       first_name: postData.first_name,
       last_name: postData.last_name,
-      mobile: postData.phone
+      mobile: postData.phone,
     };
     let postIndividualData = {};
     if (roleId) {
@@ -364,8 +364,8 @@ class UsersPage extends Component {
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/individuals/" +
-            auth.getUserInfo().contact.individual
+              "crm-plugin/individuals/" +
+              auth.getUserInfo().contact.individual
           )
           .then((indRes) => {
             postIndividualData = {
@@ -374,7 +374,7 @@ class UsersPage extends Component {
               fpo: indRes.data.fpo.id,
             };
           })
-          .catch((error) => { });
+          .catch((error) => {});
       }
     } else {
       postIndividualData = {
@@ -409,17 +409,23 @@ class UsersPage extends Component {
                   postIndividualData
                 )
                 .then((res) => {
-                  this.props.history.push({ pathname: "/users", editData: true });
-                })
+                  this.props.history.push({
+                    pathname: "/users",
+                    editData: true,
+                  });
+                });
             })
             .catch((error) => {
               console.log(error);
             });
         })
         .catch((error) => {
-          this.setState({ formSubmitted: false });
+          this.state.errors.addPhone = [];
+          this.state.errors.addPhone.push("");
           this.setState({
-            errorCode: "User with this phone number already exists, please use other phone number"
+            formSubmitted: false,
+            errorCode:
+              "Phone number already exists, please use another phone number.",
           });
         });
     } else {
@@ -450,10 +456,9 @@ class UsersPage extends Component {
                     pathname: "/users",
                     addData: true,
                   });
-                })
-
+                });
             })
-            .catch((error) => { });
+            .catch((error) => {});
         })
         .catch((error) => {
           if (
@@ -461,8 +466,12 @@ class UsersPage extends Component {
             "Auth.form.error.username.taken"
           ) {
             this.state.errors.addPhone = [];
-            this.state.errors.addPhone.push("Duplicate phone number!!");
-            this.setState({ errorCode: "Duplicate phone number!!" });
+            this.state.errors.addPhone.push("");
+            this.setState({
+              formSubmitted: false,
+              errorCode:
+                "Phone number already exists, please use another phone number.",
+            });
           }
           console.log(error);
         });

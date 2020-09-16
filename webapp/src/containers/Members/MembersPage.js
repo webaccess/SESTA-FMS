@@ -20,7 +20,6 @@ import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autotext from "../../components/Autotext/Autotext";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import { constants } from "buffer";
 import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 
 class ActivityPage extends Component {
@@ -84,12 +83,6 @@ class ActivityPage extends Component {
         },
         shareAmt: {
           required: { value: "true", message: "Share Amount is required" },
-        },
-        certificateNo: {
-          required: {
-            value: "true",
-            message: "Share Certificate Number is required",
-          },
         },
         nominee: {
           required: { value: "true", message: "Nominee is required" },
@@ -265,7 +258,6 @@ class ActivityPage extends Component {
     if (this.state.isShareholder) {
       Object.assign(allValiations, validationsShareholder);
     } else {
-      delete allValiations["certificateNo"];
       delete allValiations["nominee"];
       delete allValiations["shareAmt"];
       delete allValiations["noOfShares"];
@@ -490,19 +482,21 @@ class ActivityPage extends Component {
           this.props.history.push({ pathname: "/members", editData: true });
         })
         .catch((error) => {
-          this.setState({ formSubmitted: false });
           if (error.response !== undefined) {
-            this.setState({
-              errorCode:
-                error.response.data.statusCode +
-                " Error- " +
-                error.response.data.error +
-                " Message- " +
-                error.response.data.message +
-                " Please try again!",
-            });
+            if (error.response.data.data.includes("contacts_phone_unique")) {
+              this.state.errors.addPhone = [];
+              this.state.errors.addPhone.push("");
+              this.setState({
+                formSubmitted: false,
+                errorCode:
+                  "Phone number already exists, please use another phone number.",
+              });
+            }
           } else {
-            this.setState({ errorCode: "Network Error - Please try again!" });
+            this.setState({
+              formSubmitted: false,
+              errorCode: "Network Error - Please try again!",
+            });
           }
         });
     } else {
@@ -529,19 +523,21 @@ class ActivityPage extends Component {
           });
         })
         .catch((error) => {
-          this.setState({ formSubmitted: false });
           if (error.response !== undefined) {
-            this.setState({
-              errorCode:
-                error.response.data.statusCode +
-                " Error- " +
-                error.response.data.error +
-                " Message- " +
-                error.response.data.message +
-                " Please try again!",
-            });
+            if (error.response.data.data.includes("contacts_phone_unique")) {
+              this.state.errors.addPhone = [];
+              this.state.errors.addPhone.push("");
+              this.setState({
+                formSubmitted: false,
+                errorCode:
+                  "Phone number already exists, please use another phone number.",
+              });
+            }
           } else {
-            this.setState({ errorCode: "Network Error - Please try again!" });
+            this.setState({
+              formSubmitted: false,
+              errorCode: "Network Error - Please try again!",
+            });
           }
         });
     }
@@ -1072,14 +1068,8 @@ class ActivityPage extends Component {
                     <Grid item md={6} xs={12}>
                       <Input
                         fullWidth
-                        label="Share Certificate Numbers*"
+                        label="Share Certificate Number"
                         name="certificateNo"
-                        error={this.hasError("certificateNo")}
-                        helperText={
-                          this.hasError("certificateNo")
-                            ? this.state.errors.certificateNo[0]
-                            : null
-                        }
                         value={this.state.values.certificateNo || ""}
                         onChange={this.handleChange}
                         variant="outlined"
