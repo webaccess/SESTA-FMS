@@ -88,6 +88,7 @@ class DashboardForFPO extends Component {
       loansAllDetails: [],
       purposesValues: [],
       purposes: [],
+      isLoader: true,
     };
   }
 
@@ -201,6 +202,7 @@ class DashboardForFPO extends Component {
             loanDistributedAmounts[0] + loanDistributedAmounts[1],
           loansTableData: loansDetails.slice(0, 5),
           loansAllDetails: loansDetails,
+          isLoader: false,
         });
       })
       .catch((error) => {});
@@ -409,9 +411,9 @@ class DashboardForFPO extends Component {
                     filterData={false}
                     filterBy={["memberName", "loanAmount", "loanDate"]}
                     column={Usercolumns}
-                    // editData={this.editData}
                     rowsSelected={this.rowsSelect}
                     columnsvalue={columnsvalue}
+                    progressComponent={this.state.isLoader}
                   />
                 ) : (
                   <h1>Loading...</h1>
