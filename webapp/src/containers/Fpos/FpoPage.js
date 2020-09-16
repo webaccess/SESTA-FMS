@@ -77,7 +77,6 @@ class FpoPage extends Component {
         )
         .then((res) => {
           this.handleStateChange("", res.data.addresses[0].state);
-          //this.handleDistrictChange(res.data.addresses[0].district);
           this.setState({
             values: {
               addFpo: res.data.organization.name,
@@ -91,19 +90,6 @@ class FpoPage extends Component {
               addPhone: res.data.phone,
             },
           });
-          //if (this.state.getState.length > 0) {
-          //  this.state.getState.map((state) => {
-          //    if (state.id === res.data.addresses[0].state.id) {
-          //      this.setState({
-          //        values: {
-          //          ...this.state.values,
-          //          addState: res.data.addresses[0].state,
-          //          addDistrict: res.data.addresses[0].district,
-          //        },
-          //      });
-          //    }
-          //  });
-          //}
         })
         .catch((error) => {
           console.log(error);
@@ -139,7 +125,6 @@ class FpoPage extends Component {
         values: { ...this.state.values, addState: newVal },
       });
 
-      //if (value.is_active == true) {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
@@ -153,7 +138,6 @@ class FpoPage extends Component {
           console.log(error);
         });
       this.setState({ stateSelected: true });
-      //}
     } else {
       this.setState({
         values: {
