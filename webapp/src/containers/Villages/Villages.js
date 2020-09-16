@@ -143,8 +143,8 @@ export class Villages extends React.Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/districts/?is_active=true&&state.id=" +
-          stateId
+            "crm-plugin/districts/?is_active=true&&state.id=" +
+            stateId
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
@@ -236,62 +236,6 @@ export class Villages extends React.Component {
     }
   };
 
-  ActiveAll = (selectedId, selected) => {
-    if (selectedId.length !== 0) {
-      let numberOfIsActive = [];
-      for (let i in selected) {
-        numberOfIsActive.push(selected[i]["is_active"]);
-      }
-      this.setState({ allIsActive: numberOfIsActive });
-      let IsActive = "";
-      numberOfIsActive.forEach((element, index) => {
-        if (numberOfIsActive[index] === true) {
-          IsActive = false;
-        } else {
-          IsActive = true;
-        }
-
-        let setActiveId = selectedId[index];
-        serviceProvider
-          .serviceProviderForPutRequest(
-            process.env.REACT_APP_SERVER_URL + "crm-plugin/villages",
-            setActiveId,
-            {
-              is_active: IsActive,
-            }
-          )
-          .then((res) => {
-            this.setState({ formSubmitted: true });
-            this.componentDidMount({ updateData: true });
-            this.props.history.push({
-              pathname: "/villages",
-              updateData: true,
-            });
-            this.clearSelected(selected);
-          })
-          .catch((error) => {
-            this.setState({ formSubmitted: false });
-            if (error.response !== undefined) {
-              this.setState({
-                errorCode:
-                  error.response.data.statusCode +
-                  " Error- " +
-                  error.response.data.error +
-                  " Message- " +
-                  error.response.data.message +
-                  " Please try again!",
-              });
-            } else {
-              this.setState({
-                errorCode: "Network Error - Please try again!",
-              });
-            }
-            console.log(error);
-          });
-      });
-    }
-  };
-
   clearSelected = (selected) => {
     let clearselected = "";
   };
@@ -311,15 +255,14 @@ export class Villages extends React.Component {
     let setActiveId = this.state.setActiveId;
     let IsActive = this.state.IsActive;
     let villageInUse = false;
-    this.state.contacts.find(cd => {
+    this.state.contacts.find((cd) => {
       if (cd.villages.length > 0) {
-        console.log(cd.villages[0].id, '===', parseInt(setActiveId));
         if (cd.villages[0].id === parseInt(setActiveId)) {
-          this.setState({ villageInUse: true })
+          this.setState({ villageInUse: true });
           villageInUse = true;
         }
       }
-    })
+    });
     if (!villageInUse) {
       serviceProvider
         .serviceProviderForPutRequest(
@@ -334,7 +277,10 @@ export class Villages extends React.Component {
           this.setState({ open: true });
           this.componentDidMount({ updateData: true });
           this.props.history.push({ pathname: "/villages", updateData: true });
-          if (this.props.location.updateData && this.snackbar.current !== null) {
+          if (
+            this.props.location.updateData &&
+            this.snackbar.current !== null
+          ) {
             this.snackbar.current.handleClick();
           }
         })
@@ -400,9 +346,9 @@ export class Villages extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/villages/?" +
-        searchData +
-        "&&_sort=name:ASC"
+          "crm-plugin/villages/?" +
+          searchData +
+          "&&_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ data: this.getData(res.data) });
@@ -483,14 +429,9 @@ export class Villages extends React.Component {
           <div className="App">
             <h5 className={classes.menuName}>MASTERS</h5>
             <div className={style.headerWrap}>
-              <h2 className={style.title}>
-                Manage Villages</h2>
+              <h2 className={style.title}>Manage Villages</h2>
               <div className={classes.buttonRow}>
-                <Button
-                  variant="contained"
-                  component={Link}
-                  to="/Villages/add"
-                >
+                <Button variant="contained" component={Link} to="/Villages/add">
                   Add Village
                 </Button>
               </div>
@@ -515,12 +456,12 @@ export class Villages extends React.Component {
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
-              this.state.singleDelete !== "" &&
-              this.state.singleDelete ? (
-                <Snackbar severity="success" Showbutton={false}>
-                  Village {this.state.singleDelete} deleted successfully!
-                </Snackbar>
-              ) : null}
+            this.state.singleDelete !== "" &&
+            this.state.singleDelete ? (
+              <Snackbar severity="success" Showbutton={false}>
+                Village {this.state.singleDelete} deleted successfully!
+              </Snackbar>
+            ) : null}
             {this.state.singleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
@@ -541,7 +482,10 @@ export class Villages extends React.Component {
                 Village is in use, it can not be Deactivated!!
               </Snackbar>
             ) : null}
-            <div className={classes.row} style={{ flexWrap: "wrap", height: "auto", }}>
+            <div
+              className={classes.row}
+              style={{ flexWrap: "wrap", height: "auto" }}
+            >
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -620,11 +564,16 @@ export class Villages extends React.Component {
                 </div>
               </div>
               <Button
-                style={{ marginRight: "5px", marginBottom: "8px", }}
-                onClick={this.handleSearch.bind(this)}>Search</Button>
+                style={{ marginRight: "5px", marginBottom: "8px" }}
+                onClick={this.handleSearch.bind(this)}
+              >
+                Search
+              </Button>
               <Button
-                style={{ marginBottom: "8px", }}
-                color="secondary" clicked={this.cancelForm}>
+                style={{ marginBottom: "8px" }}
+                color="secondary"
+                clicked={this.cancelForm}
+              >
                 reset
               </Button>
             </div>
@@ -643,7 +592,6 @@ export class Villages extends React.Component {
                 DeleteData={this.DeleteData}
                 DeleteAll={this.DeleteAll}
                 handleActive={this.handleActive}
-                ActiveAll={this.ActiveAll}
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 selectableRows
@@ -651,8 +599,8 @@ export class Villages extends React.Component {
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (
-                <h1>Loading...</h1>
-              )}
+              <h1>Loading...</h1>
+            )}
             <Modal
               className="modal"
               show={this.state.isActiveAllShowing}
@@ -668,8 +616,8 @@ export class Villages extends React.Component {
               }}
             >
               {this.state.IsActive
-                ? " Do you want to activate selected village ?"
-                : "Do you want to deactivate selected village?"}
+                ? "Do you want to activate selected village ?"
+                : "Do you want to deactivate selected village ?"}
             </Modal>
           </div>
         </Grid>

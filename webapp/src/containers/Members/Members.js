@@ -71,11 +71,15 @@ export class Members extends React.Component {
       filterShg: "",
       isCancel: false,
       DeleteData: false,
-      dataCellId: [],
+      datacellId: [],
       singleDelete: "",
       multipleDelete: "",
       loggedInUserRole: auth.getUserInfo().role.name,
       bankDetailsFound: true,
+      confirmSingleDelete: true,
+      confirmDelete: true,
+      notDeleteArray: [],
+      singleDeleteName: "",
     };
   }
 
@@ -299,31 +303,53 @@ export class Members extends React.Component {
       });
   }
 
-  editData = (cellid) => {
-    this.props.history.push("/members/edit/" + cellid);
+  editData = (cellId) => {
+    this.props.history.push("/members/edit/" + cellId);
   };
 
-  DeleteData = async (cellid, selectedId) => {
-    if (cellid.length !== null && selectedId < 1) {
-      this.setState({ singleDelete: "", multipleDelete: "" });
+  DeleteData = async (cellId, selectedId) => {
+    if (cellId.length !== null && selectedId < 1) {
+      this.setState({
+        singleDelete: "",
+        multipleDelete: "",
+      });
+      if (this.state.confirmSingleDelete === false) {
+        this.setState({ confirmSingleDelete: true });
+      }
 
       serviceProvider
-        .serviceProviderForDeleteRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
-          cellid
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "loan-applications/?contact.id=" +
+            cellId
         )
-        .then((res) => {
-          if (res.data.shareinformation) {
-            this.deleteShareInfo(res.data.shareinformation.id);
+        .then((loanRes) => {
+          if (loanRes.data.length > 0) {
+            this.setState({
+              confirmSingleDelete: false,
+              singleDeleteName: loanRes.data[0].contact.name,
+            });
+          } else {
+            serviceProvider
+              .serviceProviderForDeleteRequest(
+                process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+                cellId
+              )
+              .then((res) => {
+                if (res.data.shareinformation) {
+                  this.deleteShareInfo(res.data.shareinformation.id);
+                }
+                this.setState({ singleDelete: res.data.name });
+                this.setState({ datacellId: "" });
+                this.componentDidMount();
+              })
+              .catch((error) => {
+                this.setState({ singleDelete: false });
+                console.log(error);
+              });
           }
-          this.setState({ singleDelete: res.data.name });
-          this.setState({ dataCellId: "" });
-          this.componentDidMount();
         })
-        .catch((error) => {
-          this.setState({ singleDelete: false });
-          console.log(error);
-        });
+        .catch((error) => {});
     }
   };
 
@@ -342,32 +368,48 @@ export class Members extends React.Component {
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-
       for (let i in selectedId) {
         serviceProvider
-          .serviceProviderForDeleteRequest(
-            process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
-            selectedId[i]
+          .serviceProviderForGetRequest(
+            process.env.REACT_APP_SERVER_URL +
+              "loan-applications/?contact.id=" +
+              selectedId[i]
           )
-          .then((res) => {
-            if (res.data.shareinformation) {
-              this.deleteShareInfo(res.data.shareinformation.id);
+          .then((loanRes) => {
+            if (loanRes.data.length > 0) {
+              this.setState({
+                confirmDelete: false,
+              });
+            } else {
+              serviceProvider
+                .serviceProviderForDeleteRequest(
+                  process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+                  selectedId[i]
+                )
+                .then((res) => {
+                  if (res.data.shareinformation) {
+                    this.deleteShareInfo(res.data.shareinformation.id);
+                  }
+                  this.setState({
+                    multipleDelete: true,
+                  });
+                  this.componentDidMount();
+                })
+                .catch((error) => {
+                  this.setState({ multipleDelete: false });
+                  console.log(error);
+                });
             }
-            this.setState({ multipleDelete: true });
-            this.componentDidMount();
           })
-          .catch((error) => {
-            this.setState({ multipleDelete: false });
-            console.log(error);
-          });
+          .catch((error) => {});
       }
     }
   };
 
-  viewData = (cellid) => {
+  viewData = (cellId) => {
     let memberData;
     this.state.data.map((memData) => {
-      if (cellid == memData.id) {
+      if (cellId == memData.id) {
         memberData = memData;
       }
     });
@@ -392,7 +434,7 @@ export class Members extends React.Component {
             let bankData = res.data;
             this.setState({ bankDetailsFound: true });
             if (bankData.length > 0) {
-              this.props.history.push("/loans/apply/" + cellid, memberData);
+              this.props.history.push("/loans/apply/" + cellId, memberData);
             } else {
               this.setState({ bankDetailsFound: false });
             }
@@ -514,6 +556,17 @@ export class Members extends React.Component {
                 No bank details found for SHG of this member
               </Snackbar>
             ) : null}
+            {!this.state.confirmDelete ? (
+              <Snackbar severity="info">
+                Loan exists for some of the members hence can not be deleted.
+              </Snackbar>
+            ) : null}
+            {!this.state.confirmSingleDelete ? (
+              <Snackbar severity="info">
+                Loan exists for the member {this.state.singleDeleteName}, it can
+                not be deleted.
+              </Snackbar>
+            ) : null}
             {this.props.location.addData ? (
               <Snackbar severity="success">Member added successfully.</Snackbar>
             ) : this.props.location.editData ? (
@@ -535,7 +588,7 @@ export class Members extends React.Component {
             ) : null}
             {this.state.multipleDelete === true ? (
               <Snackbar severity="success" Showbutton={false}>
-                Members deleted successfully!
+                Other members deleted successfully.
               </Snackbar>
             ) : null}
             {this.state.multipleDelete === false ? (
