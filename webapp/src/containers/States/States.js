@@ -76,6 +76,7 @@ export class States extends React.Component {
       multipleDelete: "",
       active: {},
       allIsActive: [],
+      isLoader: true,
     };
     this.snackbar = React.createRef();
   }
@@ -86,7 +87,7 @@ export class States extends React.Component {
         process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?_sort=name:ASC"
       )
       .then((res) => {
-        this.setState({ data: res.data });
+        this.setState({ data: res.data, isLoader: false });
       });
 
     serviceProvider
@@ -116,6 +117,7 @@ export class States extends React.Component {
   }
 
   handleSearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.values.FilterState) {
       searchData += "name_contains=" + this.state.values.FilterState;
@@ -128,7 +130,7 @@ export class States extends React.Component {
           "&&_sort=name:ASC"
       )
       .then((res) => {
-        this.setState({ data: this.getData(res.data) });
+        this.setState({ data: this.getData(res.data), isLoader: false });
       })
       .catch((err) => {
         console.log(err);
@@ -146,6 +148,7 @@ export class States extends React.Component {
       formSubmitted: "",
       stateSelected: false,
       isCancel: true,
+      isLoader: true,
     });
     this.componentDidMount();
   };
@@ -189,10 +192,6 @@ export class States extends React.Component {
           });
       }
     }
-  };
-
-  clearSelected = (selected) => {
-    let clearselected = "";
   };
 
   confirmActive = (event) => {
@@ -408,13 +407,13 @@ export class States extends React.Component {
                 column={Usercolumns}
                 editData={this.editData}
                 DeleteData={this.DeleteData}
-                clearSelected={this.clearSelected}
                 DeleteAll={this.DeleteAll}
                 handleActive={this.handleActive}
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 selectableRows
                 pagination
+                progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
                 ActiveMessage={
                   "Are you Sure you want to Deactivate selected State"

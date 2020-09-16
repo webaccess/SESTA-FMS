@@ -78,8 +78,8 @@ export class Members extends React.Component {
       bankDetailsFound: true,
       confirmSingleDelete: true,
       confirmDelete: true,
-      notDeleteArray: [],
       singleDeleteName: "",
+      isLoader: true,
     };
   }
 
@@ -148,7 +148,7 @@ export class Members extends React.Component {
             newDataArray.push(e); // add only those contacts having contact type=individual & users===null
           }
         });
-        this.setState({ data: newDataArray });
+        this.setState({ data: newDataArray, isLoader: false });
       })
       .catch((error) => {
         console.log(error);
@@ -252,12 +252,14 @@ export class Members extends React.Component {
       filterVillage: "",
       filterShg: "",
       isCancel: true,
+      isLoader: true,
     });
 
     this.componentDidMount();
   };
 
   handleSearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.filterState) {
       searchData += searchData ? "&&" : "";
@@ -296,7 +298,7 @@ export class Members extends React.Component {
             newDataArray.push(e);
           }
         });
-        this.setState({ data: newDataArray });
+        this.setState({ data: newDataArray, isLoader: false });
       })
       .catch((error) => {
         console.log(error);
@@ -762,6 +764,7 @@ export class Members extends React.Component {
                   columnsvalue={columnsvalue}
                   selectableRows
                   pagination
+                  progressComponent={this.state.isLoader}
                   DeleteMessage={"Are you Sure you want to Delete"}
                 />
               ) : (

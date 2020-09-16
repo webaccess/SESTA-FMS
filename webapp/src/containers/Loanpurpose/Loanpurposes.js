@@ -70,6 +70,7 @@ export class Loanpurposes extends React.Component {
       filterProduct: "",
       singleDelete: "",
       multipleDelete: "",
+      isLoader: true,
     };
 
     let history = props;
@@ -81,7 +82,7 @@ export class Loanpurposes extends React.Component {
         process.env.REACT_APP_SERVER_URL + "loan-models/"
       )
       .then((res) => {
-        this.setState({ data: res.data });
+        this.setState({ data: res.data, isLoader: false });
       })
       .catch((error) => {
         console.log(error);
@@ -147,6 +148,7 @@ export class Loanpurposes extends React.Component {
         console.log(error);
       });
   };
+
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
@@ -174,16 +176,19 @@ export class Loanpurposes extends React.Component {
       }
     }
   };
+
   cancelForm = () => {
     this.setState({
       filterProduct: "",
       isCancel: true,
+      isLoader: true,
     });
 
     this.componentDidMount();
   };
 
   handleSearch() {
+    this.setState({ isLoader: true });
     if (this.state.filterProduct) {
       //call api for searching product name
       serviceProvider
@@ -193,7 +198,7 @@ export class Loanpurposes extends React.Component {
             this.state.filterProduct
         )
         .then((res) => {
-          this.setState({ data: res.data });
+          this.setState({ data: res.data, isLoader: false });
         })
         .catch((error) => {
           console.log(error);
@@ -335,6 +340,7 @@ export class Loanpurposes extends React.Component {
                 columnsvalue={columnsvalue}
                 selectableRows
                 pagination
+                progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (

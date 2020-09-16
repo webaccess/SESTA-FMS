@@ -109,6 +109,7 @@ export class Loans extends React.Component {
       filterStatus: "",
       filterShg: "",
       loggedInUserRole: auth.getUserInfo().role.name,
+      isLoader: true,
     };
   }
 
@@ -237,10 +238,11 @@ export class Loans extends React.Component {
         loandata.outstandingAmount = outstandingAmount.toLocaleString();
       }
     });
-    this.setState({ data: data });
+    this.setState({ data: data, isLoader: false });
   };
 
   handleSearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.values.addMember) {
       searchData += searchData ? "&&" : "";
@@ -309,6 +311,7 @@ export class Loans extends React.Component {
       formSubmitted: "",
       filterShg: "",
       isCancel: true,
+      isLoader: true,
     });
     this.componentDidMount();
     //routing code #route to loan_application_list page
@@ -497,7 +500,10 @@ export class Loans extends React.Component {
             <Snackbar severity="success">Changes saved successfully</Snackbar>
           ) : null}
 
-          <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
+          <div
+            className={classes.row}
+            style={{ flexWrap: "wrap", height: "auto" }}
+          >
             <div className={classes.searchInput}>
               <div className={style.Districts}>
                 <Grid item md={12} xs={12}>
@@ -574,10 +580,17 @@ export class Loans extends React.Component {
                 </Grid>
               </div>
             </div>
-            <Button onClick={this.handleSearch.bind(this)} 
-              style={{ marginRight: "5px", marginBottom: "8px", }}>Search</Button>
-            <Button color="secondary" clicked={this.cancelForm}
-              style={{ marginBottom: "8px", }}>
+            <Button
+              onClick={this.handleSearch.bind(this)}
+              style={{ marginRight: "5px", marginBottom: "8px" }}
+            >
+              Search
+            </Button>
+            <Button
+              color="secondary"
+              clicked={this.cancelForm}
+              style={{ marginBottom: "8px" }}
+            >
               reset
             </Button>
           </div>
@@ -612,6 +625,7 @@ export class Loans extends React.Component {
               columnsvalue={columnsvalue}
               conditionalRowStyles={conditionalRowStyles}
               pagination
+              progressComponent={this.state.isLoader}
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (

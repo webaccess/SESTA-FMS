@@ -35,7 +35,7 @@ const useStyles = (theme) => ({
   },
   csvData: {
     color: "white",
-    textDecoration: "none"
+    textDecoration: "none",
   },
   buttonRow: {
     height: "42px",
@@ -59,6 +59,7 @@ class DashboardViewMoreDetailsCSP extends Component {
       remuneration: "",
       isCancel: false,
       filename: [],
+      isLoader: true,
     };
   }
 
@@ -66,7 +67,7 @@ class DashboardViewMoreDetailsCSP extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "loan-application-installments?_sort=id:asc"
+          "loan-application-installments?_sort=id:asc"
       )
       .then((res) => {
         this.setState({ loanInstallmentData: res.data });
@@ -83,7 +84,7 @@ class DashboardViewMoreDetailsCSP extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/activities?_sort=start_datetime:desc"
+          "crm-plugin/activities?_sort=start_datetime:desc"
       )
       .then((activityRes) => {
         this.getCspActivties(activityRes);
@@ -115,14 +116,14 @@ class DashboardViewMoreDetailsCSP extends Component {
   getCspActivties(activityRes) {
     let filteredArray = [];
     activityRes.data.map((e, i) => {
-      e.activityassignees.map((item) => { });
+      e.activityassignees.map((item) => {});
       e.activityassignees
         .filter((item) => item.contact === auth.getUserInfo().contact.id)
         .map((filteredData) => {
           filteredArray.push(e);
         });
     });
-    this.setState({ activitiesData: filteredArray });
+    this.setState({ activitiesData: filteredArray, isLoader: false });
   }
 
   handleNameChange(event, value) {
@@ -130,6 +131,7 @@ class DashboardViewMoreDetailsCSP extends Component {
       filterLoaneeName: event.target.value,
     });
   }
+
   handlePurposeChange(event, value) {
     if (value !== null) {
       this.setState({ filterPurpose: value, isCancel: false });
@@ -139,6 +141,7 @@ class DashboardViewMoreDetailsCSP extends Component {
       });
     }
   }
+
   handleActivityTypeChange(event, value) {
     if (value !== null) {
       this.setState({ filterActType: value, isCancel: false });
@@ -148,6 +151,7 @@ class DashboardViewMoreDetailsCSP extends Component {
       });
     }
   }
+
   handleStartDateChange(event, value) {
     if (event !== null) {
       this.setState({ filterStartDate: event, isCancel: false });
@@ -157,6 +161,7 @@ class DashboardViewMoreDetailsCSP extends Component {
       });
     }
   }
+
   handleEndDateChange(event, value) {
     if (event !== null) {
       this.setState({ filterEndDate: event, isCancel: false });
@@ -168,6 +173,7 @@ class DashboardViewMoreDetailsCSP extends Component {
   }
 
   handleActivitySearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.filterActType) {
       searchData += searchData ? "&&" : "";
@@ -187,8 +193,8 @@ class DashboardViewMoreDetailsCSP extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/activities/?" +
-        searchData
+          "crm-plugin/activities/?" +
+          searchData
       )
       .then((res) => {
         this.getCspActivties(res);
@@ -196,6 +202,7 @@ class DashboardViewMoreDetailsCSP extends Component {
   }
 
   handleLoanEMISearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     let memberId = 0;
     if (this.state.filterLoaneeName) {
@@ -239,11 +246,11 @@ class DashboardViewMoreDetailsCSP extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "loan-application-installments?" +
-        searchData
+          "loan-application-installments?" +
+          searchData
       )
       .then((res) => {
-        this.setState({ loanInstallmentData: res.data });
+        this.setState({ loanInstallmentData: res.data, isLoader: false });
       });
   }
 
@@ -253,27 +260,35 @@ class DashboardViewMoreDetailsCSP extends Component {
       filterStartDate: "",
       filterEndDate: "",
       isCancel: true,
+      isLoader: true,
     });
     this.componentDidMount();
   };
 
   manageLoanEMIData(loanInstallmentData) {
     this.state.loanInstallmentData.map((ldata) => {
-      if (ldata.loan_application.creator_id == auth.getUserInfo().contact.id) {
-        if (ldata.actual_principal === null && ldata.actual_interest === null) {
-          this.state.loanData.map((ld) => {
-            // calculate pending loan amount
-            let pendingAmount =
-              ldata.expected_principal + ldata.expected_interest;
-            ldata.pendingAmount = pendingAmount;
+      if (ldata.loan_application !== null) {
+        if (
+          ldata.loan_application.creator_id == auth.getUserInfo().contact.id
+        ) {
+          if (
+            ldata.actual_principal === null &&
+            ldata.actual_interest === null
+          ) {
+            this.state.loanData.map((ld) => {
+              // calculate pending loan amount
+              let pendingAmount =
+                ldata.expected_principal + ldata.expected_interest;
+              ldata.pendingAmount = pendingAmount;
 
-            // get Member name and EMI
-            if (ld.id == ldata.loan_application.id) {
-              ldata.loan_application.memName = ld.contact.name;
-              ldata.emi = ld.loan_model.emi;
-            }
-          });
-          loanInstallmentData.push(ldata);
+              // get Member name and EMI
+              if (ld.id == ldata.loan_application.id) {
+                ldata.loan_application.memName = ld.contact.name;
+                ldata.emi = ld.loan_model.emi;
+              }
+            });
+            loanInstallmentData.push(ldata);
+          }
         }
       }
     });
@@ -291,10 +306,11 @@ class DashboardViewMoreDetailsCSP extends Component {
       filename += "_of_" + this.state.filterActType.name;
     }
     if (this.state.filterStartDate) {
-      filename += "_from_" + Moment(this.state.filterStartDate).format('DDMMMYYYY');
+      filename +=
+        "_from_" + Moment(this.state.filterStartDate).format("DDMMMYYYY");
     }
     if (this.state.filterEndDate) {
-      filename += "_to_" + Moment(this.state.filterEndDate).format('DDMMMYYYY');
+      filename += "_to_" + Moment(this.state.filterEndDate).format("DDMMMYYYY");
     }
     filename = "csp_activities" + filename + ".csv";
     this.setState({ filename: filename });
@@ -322,14 +338,18 @@ class DashboardViewMoreDetailsCSP extends Component {
     let activityName, date, remuneration;
     let csvActivityData = [];
     let remunTotal = 0;
-    activitiesData.map(activity => {
+    activitiesData.map((activity) => {
       remunTotal = remunTotal + activity.activitytype.remuneration;
       activityName = activity.title;
-      date = Moment(activity.start_datetime).format('DD MMM YYYY');
+      date = Moment(activity.start_datetime).format("DD MMM YYYY");
       remuneration = activity.activitytype.remuneration;
-      csvActivityData.push({ "Activity Name": activityName, "Date": date, "Remuneration": remuneration })
-    })
-    remunTotal = "₹" + (remunTotal).toLocaleString();
+      csvActivityData.push({
+        "Activity Name": activityName,
+        Date: date,
+        Remuneration: remuneration,
+      });
+    });
+    remunTotal = "₹" + remunTotal.toLocaleString();
     if (csvActivityData.length <= 0) {
       csvActivityData = "There are no records to display";
     }
@@ -393,7 +413,7 @@ class DashboardViewMoreDetailsCSP extends Component {
         name: "Remuneration",
         selector: "activitytype.remuneration",
         sortable: true,
-        cell: (row) => "₹" + (row.activitytype.remuneration).toLocaleString()
+        cell: (row) => "₹" + row.activitytype.remuneration.toLocaleString(),
       },
     ];
 
@@ -409,7 +429,9 @@ class DashboardViewMoreDetailsCSP extends Component {
           <Grid>
             <div className={style.headerWrap}>
               {dbLoanData ? <h2 className={style.title}>EMI Due</h2> : null}
-              {dbActivitiesData ? <h2 className={style.title}>Recent Activities</h2> : null}
+              {dbActivitiesData ? (
+                <h2 className={style.title}>Recent Activities</h2>
+              ) : null}
               <div className={classes.buttonRow}>
                 <Button color="primary" component={Link} to="/">
                   Back
@@ -417,7 +439,10 @@ class DashboardViewMoreDetailsCSP extends Component {
               </div>
             </div>
             {dbLoanData ? (
-              <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
+              <div
+                className={classes.row}
+                style={{ flexWrap: "wrap", height: "auto" }}
+              >
                 <div className={classes.searchInput}>
                   <div className={classes.Districts}>
                     <Grid item md={12} xs={12}>
@@ -495,13 +520,16 @@ class DashboardViewMoreDetailsCSP extends Component {
                   </div>
                 </div>
                 <Button
-                  style={{ marginRight: "5px", marginBottom: "8px", }}
-                  onClick={this.handleLoanEMISearch.bind(this)}>
+                  style={{ marginRight: "5px", marginBottom: "8px" }}
+                  onClick={this.handleLoanEMISearch.bind(this)}
+                >
                   Search
                 </Button>
                 <Button
-                  style={{marginBottom: "8px", }}
-                  color="secondary" clicked={this.cancelForm}>
+                  style={{ marginBottom: "8px" }}
+                  color="secondary"
+                  clicked={this.cancelForm}
+                >
                   reset
                 </Button>
               </div>
@@ -525,6 +553,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 pagination
+                progressComponent={this.state.isLoader}
               />
             ) : null}
           </Grid>
@@ -592,13 +621,16 @@ class DashboardViewMoreDetailsCSP extends Component {
                   </div>
                 </div>
                 <Button
-                  style={{ marginRight: "5px", marginBottom: "8px", }}
-                  onClick={this.handleActivitySearch.bind(this)}>
+                  style={{ marginRight: "5px", marginBottom: "8px" }}
+                  onClick={this.handleActivitySearch.bind(this)}
+                >
                   Search
                 </Button>
                 <Button
-                  style={{ marginBottom: "8px", }}
-                  color="secondary" clicked={this.cancelForm}>
+                  style={{ marginBottom: "8px" }}
+                  color="secondary"
+                  clicked={this.cancelForm}
+                >
                   reset
                 </Button>
               </div>
@@ -622,6 +654,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue1}
                 pagination
+                progressComponent={this.state.isLoader}
               />
             ) : null}
           </Grid>
@@ -634,7 +667,8 @@ class DashboardViewMoreDetailsCSP extends Component {
                   this.formatCSVFilename(csvActivityData);
                 }}
                 filename={this.state.filename}
-                className={classes.csvData}>
+                className={classes.csvData}
+              >
                 Download
               </CSVLink>
             </Button>
