@@ -60,7 +60,7 @@ export class Shgs extends React.Component {
       filterShg: "",
       filterVo: "",
       Result: [],
-      TestData: [],
+      newData: [],
       data: [],
       selectedid: 0,
       open: false,
@@ -89,10 +89,10 @@ export class Shgs extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
-        this.setState({ TestData: res.data });
-        this.getStateData(this.state.TestData);
-        this.getDistrictData(this.state.TestData);
-        this.getVillageData(this.state.TestData);
+        this.setState({ newData: res.data });
+        this.getStateData(this.state.newData);
+        this.getDistrictData(this.state.newData);
+        this.getVillageData(this.state.newData);
       });
 
     //api call for states filter
@@ -347,10 +347,10 @@ export class Shgs extends React.Component {
         process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
       )
       .then((res) => {
-        this.setState({ TestData: res.data });
-        this.getStateData(this.state.TestData);
-        this.getDistrictData(this.state.TestData);
-        this.getVillageData(this.state.TestData);
+        this.setState({ newData: res.data });
+        this.getStateData(this.state.newData);
+        this.getDistrictData(this.state.newData);
+        this.getVillageData(this.state.newData);
       })
       .catch((err) => {
         console.log(err);

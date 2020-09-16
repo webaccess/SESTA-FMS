@@ -60,7 +60,7 @@ class LoanEmiPage extends Component {
     super(props);
     this.state = {
       data: [],
-      newDta: [],
+      newData: [],
       loanEmiData: [],
     };
   }
