@@ -236,62 +236,6 @@ export class Villages extends React.Component {
     }
   };
 
-  ActiveAll = (selectedId, selected) => {
-    if (selectedId.length !== 0) {
-      let numberOfIsActive = [];
-      for (let i in selected) {
-        numberOfIsActive.push(selected[i]["is_active"]);
-      }
-      this.setState({ allIsActive: numberOfIsActive });
-      let IsActive = "";
-      numberOfIsActive.forEach((element, index) => {
-        if (numberOfIsActive[index] === true) {
-          IsActive = false;
-        } else {
-          IsActive = true;
-        }
-
-        let setActiveId = selectedId[index];
-        serviceProvider
-          .serviceProviderForPutRequest(
-            process.env.REACT_APP_SERVER_URL + "crm-plugin/villages",
-            setActiveId,
-            {
-              is_active: IsActive,
-            }
-          )
-          .then((res) => {
-            this.setState({ formSubmitted: true });
-            this.componentDidMount({ updateData: true });
-            this.props.history.push({
-              pathname: "/villages",
-              updateData: true,
-            });
-            this.clearSelected(selected);
-          })
-          .catch((error) => {
-            this.setState({ formSubmitted: false });
-            if (error.response !== undefined) {
-              this.setState({
-                errorCode:
-                  error.response.data.statusCode +
-                  " Error- " +
-                  error.response.data.error +
-                  " Message- " +
-                  error.response.data.message +
-                  " Please try again!",
-              });
-            } else {
-              this.setState({
-                errorCode: "Network Error - Please try again!",
-              });
-            }
-            console.log(error);
-          });
-      });
-    }
-  };
-
   clearSelected = (selected) => {
     let clearselected = "";
   };
@@ -648,7 +592,6 @@ export class Villages extends React.Component {
                 DeleteData={this.DeleteData}
                 DeleteAll={this.DeleteAll}
                 handleActive={this.handleActive}
-                ActiveAll={this.ActiveAll}
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 selectableRows
@@ -673,8 +616,8 @@ export class Villages extends React.Component {
               }}
             >
               {this.state.IsActive
-                ? " Do you want to activate selected village ?"
-                : "Do you want to deactivate selected village?"}
+                ? "Do you want to activate selected village ?"
+                : "Do you want to deactivate selected village ?"}
             </Modal>
           </div>
         </Grid>

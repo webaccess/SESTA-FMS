@@ -71,11 +71,15 @@ export class Members extends React.Component {
       filterShg: "",
       isCancel: false,
       DeleteData: false,
-      dataCellId: [],
+      datacellId: [],
       singleDelete: "",
       multipleDelete: "",
       loggedInUserRole: auth.getUserInfo().role.name,
       bankDetailsFound: true,
+      confirmSingleDelete: true,
+      confirmDelete: true,
+      notDeleteArray: [],
+      singleDeleteName: "",
     };
   }
 
@@ -330,31 +334,53 @@ export class Members extends React.Component {
       });
   }
 
-  editData = (cellid) => {
-    this.props.history.push("/members/edit/" + cellid);
+  editData = (cellId) => {
+    this.props.history.push("/members/edit/" + cellId);
   };
 
-  DeleteData = async (cellid, selectedId) => {
-    if (cellid.length !== null && selectedId < 1) {
-      this.setState({ singleDelete: "", multipleDelete: "" });
+  DeleteData = async (cellId, selectedId) => {
+    if (cellId.length !== null && selectedId < 1) {
+      this.setState({
+        singleDelete: "",
+        multipleDelete: "",
+      });
+      if (this.state.confirmSingleDelete === false) {
+        this.setState({ confirmSingleDelete: true });
+      }
 
       serviceProvider
-        .serviceProviderForDeleteRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
-          cellid
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "loan-applications/?contact.id=" +
+            cellId
         )
-        .then((res) => {
-          if (res.data.shareinformation) {
-            this.deleteShareInfo(res.data.shareinformation.id);
+        .then((loanRes) => {
+          if (loanRes.data.length > 0) {
+            this.setState({
+              confirmSingleDelete: false,
+              singleDeleteName: loanRes.data[0].contact.name,
+            });
+          } else {
+            serviceProvider
+              .serviceProviderForDeleteRequest(
+                process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+                cellId
+              )
+              .then((res) => {
+                if (res.data.shareinformation) {
+                  this.deleteShareInfo(res.data.shareinformation.id);
+                }
+                this.setState({ singleDelete: res.data.name });
+                this.setState({ datacellId: "" });
+                this.componentDidMount();
+              })
+              .catch((error) => {
+                this.setState({ singleDelete: false });
+                console.log(error);
+              });
           }
-          this.setState({ singleDelete: res.data.name });
-          this.setState({ dataCellId: "" });
-          this.componentDidMount();
         })
-        .catch((error) => {
-          this.setState({ singleDelete: false });
-          console.log(error);
-        });
+        .catch((error) => {});
     }
   };
 
@@ -373,32 +399,48 @@ export class Members extends React.Component {
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-
       for (let i in selectedId) {
         serviceProvider
-          .serviceProviderForDeleteRequest(
-            process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
-            selectedId[i]
+          .serviceProviderForGetRequest(
+            process.env.REACT_APP_SERVER_URL +
+              "loan-applications/?contact.id=" +
+              selectedId[i]
           )
-          .then((res) => {
-            if (res.data.shareinformation) {
-              this.deleteShareInfo(res.data.shareinformation.id);
+          .then((loanRes) => {
+            if (loanRes.data.length > 0) {
+              this.setState({
+                confirmDelete: false,
+              });
+            } else {
+              serviceProvider
+                .serviceProviderForDeleteRequest(
+                  process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+                  selectedId[i]
+                )
+                .then((res) => {
+                  if (res.data.shareinformation) {
+                    this.deleteShareInfo(res.data.shareinformation.id);
+                  }
+                  this.setState({
+                    multipleDelete: true,
+                  });
+                  this.componentDidMount();
+                })
+                .catch((error) => {
+                  this.setState({ multipleDelete: false });
+                  console.log(error);
+                });
             }
-            this.setState({ multipleDelete: true });
-            this.componentDidMount();
           })
-          .catch((error) => {
-            this.setState({ multipleDelete: false });
-            console.log(error);
-          });
+          .catch((error) => {});
       }
     }
   };
 
-  viewData = (cellid) => {
+  viewData = (cellId) => {
     let memberData;
     this.state.data.map((memData) => {
-      if (cellid == memData.id) {
+      if (cellId == memData.id) {
         memberData = memData;
       }
     });
@@ -423,7 +465,7 @@ export class Members extends React.Component {
             let bankData = res.data;
             this.setState({ bankDetailsFound: true });
             if (bankData.length > 0) {
-              this.props.history.push("/loans/apply/" + cellid, memberData);
+              this.props.history.push("/loans/apply/" + cellId, memberData);
             } else {
               this.setState({ bankDetailsFound: false });
             }
@@ -530,237 +572,240 @@ export class Members extends React.Component {
       selectors.push(Usercolumns[i]["selector"]);
     }
     let columnsvalue = selectors[0];
-    if (data) {
-      return (
-        <Layout>
-          <Grid>
-            <div className="App">
-              <h5 className={style.menuName}>MEMBERS</h5>
-              <div className={style.headerWrap}>
-                <h2 className={style.title}>Manage Members</h2>
-                <div className={classes.buttonRow}>
-                  <Button
-                    variant="contained"
-                    component={Link}
-                    to="/members/add"
-                  >
-                    Add New Member
-                  </Button>
-                </div>
-              </div>
-              {!this.state.bankDetailsFound ? (
-                <Snackbar severity="info">
-                  No bank details found for SHG of this member
-                </Snackbar>
-              ) : null}
-              {this.props.location.addData ? (
-                <Snackbar severity="success">
-                  Member added successfully.
-                </Snackbar>
-              ) : this.props.location.editData ? (
-                <Snackbar severity="success">
-                  Member edited successfully.
-                </Snackbar>
-              ) : null}
-              {this.state.singleDelete !== false &&
-              this.state.singleDelete !== "" &&
-              this.state.singleDelete ? (
-                <Snackbar severity="success" Showbutton={false}>
-                  Member {this.state.singleDelete} deleted successfully!
-                </Snackbar>
-              ) : null}
-              {this.state.singleDelete === false ? (
-                <Snackbar severity="error" Showbutton={false}>
-                  An error occured - Please try again!
-                </Snackbar>
-              ) : null}
-              {this.state.multipleDelete === true ? (
-                <Snackbar severity="success" Showbutton={false}>
-                  Members deleted successfully!
-                </Snackbar>
-              ) : null}
-              {this.state.multipleDelete === false ? (
-                <Snackbar severity="error" Showbutton={false}>
-                  An error occured - Please try again!
-                </Snackbar>
-              ) : null}
-              <div
-                className={classes.row}
-                style={{ flexWrap: "wrap", height: "auto" }}
-              >
-                <div className={classes.searchInput}>
-                  <div className={style.Districts}>
-                    <Grid item md={12} xs={12}>
-                      <Autocomplete
-                        id="combo-box-demo"
-                        options={statesFilter}
-                        getOptionLabel={(option) => option.name}
-                        onChange={(event, value) => {
-                          this.handleStateChange(event, value);
-                        }}
-                        value={
-                          filterState
-                            ? this.state.isCancel === true
-                              ? null
-                              : filterState
-                            : null
-                        }
-                        renderInput={(params) => (
-                          <Input
-                            {...params}
-                            fullWidth
-                            label="Select State"
-                            name="addState"
-                            variant="outlined"
-                          />
-                        )}
-                      />
-                    </Grid>
-                  </div>
-                </div>
-                <div className={classes.searchInput}>
-                  <div className={style.Districts}>
-                    <Grid item md={12} xs={12}>
-                      <Autocomplete
-                        id="combo-box-demo"
-                        options={districtsFilter}
-                        name="filterDistrict"
-                        getOptionLabel={(option) => option.name}
-                        onChange={(event, value) => {
-                          this.handleDistrictChange(event, value);
-                        }}
-                        value={
-                          filterDistrict
-                            ? this.state.isCancel === true
-                              ? null
-                              : filterDistrict
-                            : null
-                        }
-                        renderInput={(params) => (
-                          <Input
-                            {...params}
-                            fullWidth
-                            label="Select District"
-                            name="filterDistrict"
-                            variant="outlined"
-                          />
-                        )}
-                      />
-                    </Grid>
-                  </div>
-                </div>
-                <div className={classes.searchInput}>
-                  <div className={style.Districts}>
-                    <Grid item md={12} xs={12}>
-                      <Autocomplete
-                        id="combo-box-demo"
-                        options={villagesFilter}
-                        name="filterVillage"
-                        getOptionLabel={(option) => option.name}
-                        onChange={(event, value) => {
-                          this.handleVillageChange(event, value);
-                        }}
-                        value={
-                          filterVillage
-                            ? this.state.isCancel === true
-                              ? null
-                              : filterVillage
-                            : null
-                        }
-                        renderInput={(params) => (
-                          <Input
-                            {...params}
-                            fullWidth
-                            label="Select Village"
-                            name="filterVillage"
-                            variant="outlined"
-                          />
-                        )}
-                      />
-                    </Grid>
-                  </div>
-                </div>
-                <div className={classes.searchInput}>
-                  <div className={style.Districts}>
-                    <Grid item md={12} xs={12}>
-                      <Autocomplete
-                        id="combo-box-demo"
-                        options={shgFilter}
-                        name="filterShg"
-                        getOptionLabel={(option) => option.name}
-                        onChange={(event, value) => {
-                          this.handleShgChange(event, value);
-                        }}
-                        value={
-                          filterShg
-                            ? this.state.isCancel === true
-                              ? null
-                              : filterShg
-                            : null
-                        }
-                        renderInput={(params) => (
-                          <Input
-                            {...params}
-                            fullWidth
-                            label="Select SHG"
-                            name="filterShg"
-                            variant="outlined"
-                          />
-                        )}
-                      />
-                    </Grid>
-                  </div>
-                </div>
-                <Button
-                  style={{ marginRight: "5px", marginBottom: "8px" }}
-                  variant="contained"
-                  onClick={this.handleSearch.bind(this)}
-                >
-                  Search
+    return (
+      <Layout>
+        <Grid>
+          <div className="App">
+            <h5 className={style.menuName}>MEMBERS</h5>
+            <div className={style.headerWrap}>
+              <h2 className={style.title}>Manage Members</h2>
+              <div className={classes.buttonRow}>
+                <Button variant="contained" component={Link} to="/members/add">
+                  Add New Member
                 </Button>
-                <Button
-                  style={{ marginBottom: "8px" }}
-                  color="secondary"
-                  variant="contained"
-                  onClick={this.cancelForm.bind(this)}
-                >
-                  Reset
-                </Button>
-              </div>
-              <div>
-                {data ? (
-                  <Table
-                    title={"Members"}
-                    showSearch={false}
-                    filterData={true}
-                    filterBy={[
-                      "name",
-                      "villages[0].name",
-                      "district.name",
-                      "shgName",
-                      "phone",
-                    ]}
-                    filters={filters}
-                    data={data}
-                    column={Usercolumns}
-                    viewData={this.viewData}
-                    editData={this.editData}
-                    DeleteData={this.DeleteData}
-                    DeleteAll={this.DeleteAll}
-                    columnsvalue={columnsvalue}
-                    selectableRows
-                    pagination
-                    DeleteMessage={"Are you Sure you want to Delete"}
-                  />
-                ) : (
-                  <h1>Loading...</h1>
-                )}
               </div>
             </div>
-          </Grid>
-        </Layout>
-      );
-    }
+            {!this.state.bankDetailsFound ? (
+              <Snackbar severity="info">
+                No bank details found for SHG of this member
+              </Snackbar>
+            ) : null}
+            {!this.state.confirmDelete ? (
+              <Snackbar severity="info">
+                Loan exists for some of the members hence can not be deleted.
+              </Snackbar>
+            ) : null}
+            {!this.state.confirmSingleDelete ? (
+              <Snackbar severity="info">
+                Loan exists for the member {this.state.singleDeleteName}, it can
+                not be deleted.
+              </Snackbar>
+            ) : null}
+            {this.props.location.addData ? (
+              <Snackbar severity="success">Member added successfully.</Snackbar>
+            ) : this.props.location.editData ? (
+              <Snackbar severity="success">
+                Member edited successfully.
+              </Snackbar>
+            ) : null}
+            {this.state.singleDelete !== false &&
+            this.state.singleDelete !== "" &&
+            this.state.singleDelete ? (
+              <Snackbar severity="success" Showbutton={false}>
+                Member {this.state.singleDelete} deleted successfully!
+              </Snackbar>
+            ) : null}
+            {this.state.singleDelete === false ? (
+              <Snackbar severity="error" Showbutton={false}>
+                An error occured - Please try again!
+              </Snackbar>
+            ) : null}
+            {this.state.multipleDelete === true ? (
+              <Snackbar severity="success" Showbutton={false}>
+                Members deleted successfully!
+              </Snackbar>
+            ) : null}
+            {this.state.multipleDelete === false ? (
+              <Snackbar severity="error" Showbutton={false}>
+                An error occured - Please try again!
+              </Snackbar>
+            ) : null}
+            <div
+              className={classes.row}
+              style={{ flexWrap: "wrap", height: "auto" }}
+            >
+              <div className={classes.searchInput}>
+                <div className={style.Districts}>
+                  <Grid item md={12} xs={12}>
+                    <Autocomplete
+                      id="combo-box-demo"
+                      options={statesFilter}
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handleStateChange(event, value);
+                      }}
+                      value={
+                        filterState
+                          ? this.state.isCancel === true
+                            ? null
+                            : filterState
+                          : null
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          {...params}
+                          fullWidth
+                          label="Select State"
+                          name="addState"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                </div>
+              </div>
+              <div className={classes.searchInput}>
+                <div className={style.Districts}>
+                  <Grid item md={12} xs={12}>
+                    <Autocomplete
+                      id="combo-box-demo"
+                      options={districtsFilter}
+                      name="filterDistrict"
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handleDistrictChange(event, value);
+                      }}
+                      value={
+                        filterDistrict
+                          ? this.state.isCancel === true
+                            ? null
+                            : filterDistrict
+                          : null
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          {...params}
+                          fullWidth
+                          label="Select District"
+                          name="filterDistrict"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                </div>
+              </div>
+              <div className={classes.searchInput}>
+                <div className={style.Districts}>
+                  <Grid item md={12} xs={12}>
+                    <Autocomplete
+                      id="combo-box-demo"
+                      options={villagesFilter}
+                      name="filterVillage"
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handleVillageChange(event, value);
+                      }}
+                      value={
+                        filterVillage
+                          ? this.state.isCancel === true
+                            ? null
+                            : filterVillage
+                          : null
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          {...params}
+                          fullWidth
+                          label="Select Village"
+                          name="filterVillage"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                </div>
+              </div>
+              <div className={classes.searchInput}>
+                <div className={style.Districts}>
+                  <Grid item md={12} xs={12}>
+                    <Autocomplete
+                      id="combo-box-demo"
+                      options={shgFilter}
+                      name="filterShg"
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handleShgChange(event, value);
+                      }}
+                      value={
+                        filterShg
+                          ? this.state.isCancel === true
+                            ? null
+                            : filterShg
+                          : null
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          {...params}
+                          fullWidth
+                          label="Select SHG"
+                          name="filterShg"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                </div>
+              </div>
+              <Button
+                style={{ marginRight: "5px", marginBottom: "8px" }}
+                variant="contained"
+                onClick={this.handleSearch.bind(this)}
+              >
+                Search
+              </Button>
+              <Button
+                style={{ marginBottom: "8px" }}
+                color="secondary"
+                variant="contained"
+                onClick={this.cancelForm.bind(this)}
+              >
+                Reset
+              </Button>
+            </div>
+            <div>
+              {data ? (
+                <Table
+                  title={"Members"}
+                  showSearch={false}
+                  filterData={true}
+                  filterBy={[
+                    "name",
+                    "villages[0].name",
+                    "district.name",
+                    "shgName",
+                    "phone",
+                  ]}
+                  filters={filters}
+                  data={data}
+                  column={Usercolumns}
+                  viewData={this.viewData}
+                  editData={this.editData}
+                  DeleteData={this.DeleteData}
+                  DeleteAll={this.DeleteAll}
+                  columnsvalue={columnsvalue}
+                  selectableRows
+                  pagination
+                  DeleteMessage={"Are you Sure you want to Delete"}
+                />
+              ) : (
+                <h1>Loading...</h1>
+              )}
+            </div>
+          </div>
+        </Grid>
+      </Layout>
+    );
   }
 }
 export default withStyles(useStyles)(Members);

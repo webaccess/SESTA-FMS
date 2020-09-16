@@ -456,8 +456,8 @@ export class Activitytypes extends React.Component {
               }}
             >
               {this.state.IsActive
-                ? " Do you want to activate selected activity type ?"
-                : " Do you want to deactivate selected activity type ?"}
+                ? "Do you want to activate selected activity type ?"
+                : "Do you want to deactivate selected activity type ?"}
             </Modal>
           </div>
         </Grid>
