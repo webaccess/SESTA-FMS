@@ -290,8 +290,11 @@ class UsersPage extends Component {
 
     let fName = this.state.values.firstName;
     let lName = this.state.values.lastName;
-    let emailAdd = this.state.values.addEmail;
     let phoneNo = this.state.values.addPhone;
+    let emailAdd = this.state.values.addEmail;
+    if (emailAdd == "" || emailAdd == undefined) {
+      emailAdd = phoneNo + "@example.com";
+    }
     let postData = {
       name: fName + " " + lName,
       phone: phoneNo,
@@ -302,71 +305,19 @@ class UsersPage extends Component {
       first_name: fName,
       last_name: lName,
     };
-
     if (this.state.editPage[0]) {
       /** edit present contact/individual record (update API) */
-      serviceProvider
-        .serviceProviderForPutRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
-          this.state.editContactId,
-          postData
-        )
-        .then((res) => {
-          this.saveUser(res.data);
-          this.setState({ formSubmitted: true });
-        })
-        .catch((error) => {
-          this.setState({ formSubmitted: false });
-          if (error.response !== undefined) {
-            this.setState({
-              errorCode:
-                error.response.data.statusCode +
-                " Error- " +
-                error.response.data.error +
-                " Message- " +
-                error.response.data.message +
-                " Please try again!",
-            });
-          } else {
-            this.setState({ errorCode: "Network Error - Please try again!" });
-          }
-        });
+      this.saveUser(postData);
     } else {
       /** save data in contact & individual table */
       Object.assign(postData, {
         creator_id: auth.getUserInfo().contact.id,
       });
-      serviceProvider
-        .serviceProviderForPostRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",
-          postData
-        )
-        .then((res) => {
-          this.saveUser(res.data);
-          this.setState({
-            formSubmitted: true,
-          });
-        })
-        .catch((error) => {
-          this.setState({ formSubmitted: false });
-          if (error.response !== undefined) {
-            this.setState({
-              errorCode:
-                error.response.data.statusCode +
-                " Error- " +
-                error.response.data.error +
-                " Message- " +
-                error.response.data.message +
-                " Please try again!",
-            });
-          } else {
-            this.setState({ errorCode: "Network Error - Please try again!" });
-          }
-        });
+      this.saveUser(postData);
     }
   };
 
-  saveUser = async (data) => {
+  saveUser = async (postData) => {
     let emailAdd = this.state.values.addEmail;
     let username = this.state.values.addPhone;
     let password = this.state.values.password;
@@ -380,8 +331,11 @@ class UsersPage extends Component {
       password: password,
       role: roleId,
       confirmed: true,
-      contact: data.id,
+      // contact: data.id,
       email: emailAdd,
+      first_name: postData.first_name,
+      last_name: postData.last_name,
+      mobile: postData.phone
     };
     let postIndividualData = {};
     if (roleId) {
@@ -410,8 +364,8 @@ class UsersPage extends Component {
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/individuals/" +
-              auth.getUserInfo().contact.individual
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
           )
           .then((indRes) => {
             postIndividualData = {
@@ -420,7 +374,7 @@ class UsersPage extends Component {
               fpo: indRes.data.fpo.id,
             };
           })
-          .catch((error) => {});
+          .catch((error) => { });
       }
     } else {
       postIndividualData = {
@@ -429,7 +383,6 @@ class UsersPage extends Component {
         fpo: 0,
       };
     }
-
     if (this.state.editPage[0]) {
       /** edit user in Users table */
       serviceProvider
@@ -440,20 +393,35 @@ class UsersPage extends Component {
         )
         .then((res) => {
           /** edit fpo/vo in Individuals table based on selected role */
+          postData.user = res.data.id;
           serviceProvider
             .serviceProviderForPutRequest(
-              process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
-              data.individual.id,
-              postIndividualData
+              process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+              this.state.editContactId,
+              postData
             )
             .then((res) => {
-              this.props.history.push({ pathname: "/users", editData: true });
+              let data = res.data;
+              serviceProvider
+                .serviceProviderForPutRequest(
+                  process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
+                  data.individual.id,
+                  postIndividualData
+                )
+                .then((res) => {
+                  this.props.history.push({ pathname: "/users", editData: true });
+                })
             })
             .catch((error) => {
               console.log(error);
             });
         })
-        .catch((error) => {});
+        .catch((error) => {
+          this.setState({ formSubmitted: false });
+          this.setState({
+            errorCode: "User with this phone number already exists, please use other phone number"
+          });
+        });
     } else {
       /** add user in Users table */
       serviceProvider
@@ -463,21 +431,29 @@ class UsersPage extends Component {
         )
         .then((res) => {
           /** add fpo/vo in Individuals table based on selected role */
+          postData.user = res.data.id;
           serviceProvider
-            .serviceProviderForPutRequest(
-              process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
-              data.individual.id,
-              postIndividualData
+            .serviceProviderForPostRequest(
+              process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",
+              postData
             )
             .then((res) => {
-              this.props.history.push({
-                pathname: "/users",
-                addData: true,
-              });
+              let data = res.data;
+              serviceProvider
+                .serviceProviderForPutRequest(
+                  process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
+                  data.individual.id,
+                  postIndividualData
+                )
+                .then((res) => {
+                  this.props.history.push({
+                    pathname: "/users",
+                    addData: true,
+                  });
+                })
+
             })
-            .catch((error) => {
-              // this.state.errors.addPhone
-            });
+            .catch((error) => { });
         })
         .catch((error) => {
           if (
