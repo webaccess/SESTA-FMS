@@ -48,9 +48,7 @@ class ActivityPage extends Component {
         lastName: {
           required: { value: "true", message: "Last name is required" },
         },
-        address: {
-          required: { value: "true", message: "Address is required" },
-        },
+
         addState: {
           required: { value: "true", message: "State is required" },
         },
@@ -729,9 +727,8 @@ class ActivityPage extends Component {
                 <Grid item xs={12}>
                   <Input
                     fullWidth
-                    label="Address*"
+                    label="Address"
                     name="address"
-                    error={this.hasError("address")}
                     helperText={
                       this.hasError("address")
                         ? this.state.errors.address[0]

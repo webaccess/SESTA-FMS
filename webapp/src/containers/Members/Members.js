@@ -148,6 +148,7 @@ export class Members extends React.Component {
             newDataArray.push(e); // add only those contacts having contact type=individual & users===null
           }
         });
+        this.getStateData(newDataArray);
         this.getDistrictData(newDataArray);
         this.getVillageData(newDataArray);
       })
@@ -167,6 +168,20 @@ export class Members extends React.Component {
         console.log(error);
       });
   };
+
+  async getStateData(data) {
+    for (let i in data) {
+      await serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/states/" +
+            data[i].addresses[0].state
+        )
+        .then((res) => {
+          data[i].addresses.push({ state: res.data }); // add corresponding district to record
+        });
+    }
+  }
 
   async getDistrictData(data) {
     for (let i in data) {
@@ -326,6 +341,7 @@ export class Members extends React.Component {
             newDataArray.push(e);
           }
         });
+        this.getStateData(newDataArray);
         this.getDistrictData(newDataArray);
         this.getVillageData(newDataArray);
       })
@@ -529,29 +545,26 @@ export class Members extends React.Component {
         }
       });
     });
-    //if (data) {
     const Usercolumns = [
       {
         name: "Name",
         selector: "name",
         sortable: true,
       },
-      //{
-      //  name: "State",
-      //  sortable: true,
-      //  cell: (row) => (row.state ? row.state.name : "-"),
-      //},
+      {
+        name: "State",
+        selector: "addresses[1].state.name",
+        sortable: true,
+      },
       {
         name: "District",
-        selector: "addresses[1].district.name",
+        selector: "addresses[2].district.name",
         sortable: true,
-        //cell: (row) => (row.district ? row.addresses[1].district.name : "-"),
       },
       {
         name: "Village",
-        selector: "addresses[2].village.name",
+        selector: "addresses[3].village.name",
         sortable: true,
-        //cell: (row) => (row.villages[0] ? row.villages[0].name : "-"),
       },
       {
         name: "SHG Name",
@@ -565,7 +578,6 @@ export class Members extends React.Component {
         cell: (row) => (row.phone ? row.phone : "-"),
       },
     ];
-    //}
 
     let selectors = [];
     for (let i in Usercolumns) {
