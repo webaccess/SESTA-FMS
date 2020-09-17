@@ -393,7 +393,7 @@ class LoanEmiPage extends Component {
 
           {loanEmiData ? (
             <Table
-              title={"LoanEMI"}
+              title={"Loan EMI"}
               data={loanEmiData}
               showSearch={false}
               filterData={false}

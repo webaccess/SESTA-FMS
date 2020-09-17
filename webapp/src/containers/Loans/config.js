@@ -28,3 +28,8 @@ export const APPROVE_LOAN_BREADCRUMBS = {
   list_loan: "Loans",
   approve_loan: "Approve Loan",
 };
+export const ADD_LOAN_TASK_BREADCRUMBS = {
+  home: "Home",
+  list_loan: "Loans",
+  update_loan_task: "Add Loan Task",
+};
