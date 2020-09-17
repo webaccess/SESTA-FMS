@@ -283,13 +283,15 @@ class LoanEmiViewPage extends Component {
               <h2 className={classes.loaneeName} style={{paddingRight: "4rem",}}>{data.loanee}</h2>
               <div className={classes.dataRow} style={{paddingRight: "4rem",}}>
                 <p>
-                  SHG GROUP <b>{data.shg}</b>
+                  <span className={style.filterLabel}>SHG GROUP </span>
+                  <span className={style.filterValue}>{data.shg}</span>
                 </p>
               </div>
 
               <div className={classes.dataRow}>
                 <p>
-                  VILLAGE <b>{data.village}</b>{" "}
+                  <span className={style.filterLabel}>VILLAGE  </span>
+                  <span className={style.filterValue}>{data.village}</span>
                 </p>
               </div>
             </div>
@@ -398,7 +400,7 @@ class LoanEmiViewPage extends Component {
           ) : (
               <h1>Loading...</h1>
             )}
-          <div style={{ padding: "15px" }}>
+          <div className={style.footerLoanBtn}>
             <Button color="primary" component={Link} to="/loans">
               Done
               </Button>
