@@ -64,6 +64,7 @@ class DashboardCSP extends Component {
       activitytypeData: [],
       remuneration: "",
       isLoader: true,
+      isLoaderAct: true,
     };
   }
 
@@ -100,7 +101,7 @@ class DashboardCSP extends Component {
               filteredArray.push(e);
             });
         });
-        this.setState({ activitiesData: filteredArray, isLoader: false });
+        this.setState({ activitiesData: filteredArray, isLoaderAct: false });
       })
       .catch((error) => {
         console.log(error);
@@ -414,10 +415,9 @@ class DashboardCSP extends Component {
                     "activitytype.remuneration",
                   ]}
                   column={Usercolumns1}
-                  editData={this.editData}
                   rowsSelected={this.rowsSelect}
                   columnsvalue={columnsvalue1}
-                  progressComponent={this.state.isLoader}
+                  progressComponent={this.state.isLoaderAct}
                 />
               ) : (
                 <h1>Loading...</h1>
