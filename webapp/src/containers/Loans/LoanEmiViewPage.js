@@ -375,7 +375,7 @@ class LoanEmiViewPage extends Component {
           </Card>
           {loanEmiData ? (
             <Table
-              title={"ViewLoanEMI"}
+              title={"Loan EMI Detail"}
               data={loanEmiData}
               showSearch={false}
               filterData={false}
