@@ -273,7 +273,7 @@ class LoanEditEmiPage extends Component {
           EDIT_LOAN_EMI_BREADCRUMBS
         }
       >
-        <Card>
+        <Card style={{ maxWidth: "45rem"}} >
           <form
             autoComplete="off"
             noValidate
@@ -356,8 +356,8 @@ class LoanEditEmiPage extends Component {
 
               </Grid>
             </CardContent>
-
-            <CardActions>
+            <Divider />
+            <CardActions style={{ padding: "15px" }}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"
