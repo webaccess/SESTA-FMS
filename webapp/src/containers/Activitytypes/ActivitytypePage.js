@@ -26,6 +26,7 @@ import {
 } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
+import Spinner from "../../components/Spinner/Spinner";
 
 class ActivitytypePage extends Component {
   constructor(props) {
@@ -84,11 +85,13 @@ class ActivitytypePage extends Component {
       ],
       assignedFPO: "",
       loggedInUserRole: auth.getUserInfo().role.name,
+      isLoader: "",
     };
   }
 
   async componentDidMount() {
     if (this.state.editPage[0]) {
+      this.setState({ isLoader: true });
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
@@ -101,8 +104,8 @@ class ActivitytypePage extends Component {
               addActivitytype: res.data.name,
               addRemuneration: res.data.remuneration,
               selectedNotation: res.data.notation,
+              // isLoader: false
             },
-            // addIsActive: res.data.is_active,
           });
 
           // disable active field if activity type is in use
@@ -117,11 +120,13 @@ class ActivitytypePage extends Component {
                 this.setState({
                   isActTypePresent: true,
                   addIsActive: res.data.is_active,
+                  // isLoader: false
                 });
               } else {
                 this.setState({
                   isActTypePresent: false,
                   addIsActive: res.data.is_active,
+                  // isLoader: false
                 });
               }
             })
@@ -134,6 +139,7 @@ class ActivitytypePage extends Component {
               values: tempValues,
             });
           }
+          this.setState({ isLoader: false });
         })
         .catch((error) => {
           console.log(error);
@@ -205,6 +211,7 @@ class ActivitytypePage extends Component {
       });
     }
   };
+
   validate = () => {
     const values = this.state.values;
     const validations = this.state.validations;
@@ -356,170 +363,174 @@ class ActivitytypePage extends Component {
             : ADD_ACTIVITYTYPE_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: "45rem" }}>
-          <form
-            autoComplete="off"
-            noValidate
-            onSubmit={this.handleSubmit}
-            method="post"
-          >
-            <CardHeader
-              title={
-                this.state.editPage[0]
-                  ? "Edit Activity Type"
-                  : "Add Activity Type"
-              }
-              subheader={
-                this.state.editPage[0]
-                  ? "You can edit activity type data here!"
-                  : "You can add new activity type data here!"
-              }
-            />
-            <Divider />
-            <CardContent>
-              <Grid container spacing={3}>
-                <Grid item md={12} xs={12}>
-                  {this.state.formSubmitted === false ? (
-                    <Snackbar severity="error" Showbutton={false}>
-                      {this.state.errorCode}
-                    </Snackbar>
-                  ) : null}
-                </Grid>
-                <Grid item md={12} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Name*"
-                    name="addActivitytype"
-                    error={this.hasError("addActivitytype")}
-                    helperText={
-                      this.hasError("addActivitytype")
-                        ? this.state.errors.addActivitytype[0]
-                        : null
-                    }
-                    value={this.state.values.addActivitytype || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Remuneration*"
-                    type="number"
-                    name="addRemuneration"
-                    error={this.hasError("addRemuneration")}
-                    helperText={
-                      this.hasError("addRemuneration")
-                        ? this.state.errors.addRemuneration[0]
-                        : null
-                    }
-                    value={this.state.values.addRemuneration || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-
-                <Grid item md={6} xs={12}>
-                  <TextField
-                    fullWidth
-                    id="outlined-select-currency"
-                    select
-                    label="Notation*"
-                    error={this.hasError("selectedNotation")}
-                    helperText={
-                      this.hasError("selectedNotation")
-                        ? this.state.errors.selectedNotation[0]
-                        : selectedNotation === "Flat"
-                        ? "Amount stored in rupees"
-                        : null
-                    }
-                    value={selectedNotation || ""}
-                    onChange={(event, value) => {
-                      this.handleNotationChange(event, value);
-                    }}
-                    variant="outlined"
-                  >
-                    3
-                    {this.state.remNotation.map((option) => (
-                      <MenuItem key={option.id} value={option.name}>
-                        {option.name}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-
-                {this.state.loggedInUserRole === "Sesta Admin" ||
-                this.state.loggedInUserRole === "Superadmin" ? (
+        {!this.state.isLoader ? (
+          <Card style={{ maxWidth: "45rem" }}>
+            <form
+              autoComplete="off"
+              noValidate
+              onSubmit={this.handleSubmit}
+              method="post"
+            >
+              <CardHeader
+                title={
+                  this.state.editPage[0]
+                    ? "Edit Activity Type"
+                    : "Add Activity Type"
+                }
+                subheader={
+                  this.state.editPage[0]
+                    ? "You can edit activity type data here!"
+                    : "You can add new activity type data here!"
+                }
+              />
+              <Divider />
+              <CardContent>
+                <Grid container spacing={3}>
                   <Grid item md={12} xs={12}>
-                    <Autotext
-                      id="combo-box-demo"
-                      options={fposFilter}
-                      variant="outlined"
-                      label="FPO"
-                      getOptionLabel={(option) => option.name}
-                      onChange={(event, value) => {
-                        this.handleFpoChange(event, value);
-                      }}
-                      value={
-                        addFpo
-                          ? this.state.isCancel === true
-                            ? null
-                            : fposFilter[
-                                fposFilter.findIndex(function (item, i) {
-                                  return item.id === addFpo;
-                                })
-                              ] || null
-                          : null
-                      }
-                      error={this.hasError("addFpo")}
+                    {this.state.formSubmitted === false ? (
+                      <Snackbar severity="error" Showbutton={false}>
+                        {this.state.errorCode}
+                      </Snackbar>
+                    ) : null}
+                  </Grid>
+                  <Grid item md={12} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Name*"
+                      name="addActivitytype"
+                      error={this.hasError("addActivitytype")}
                       helperText={
-                        this.hasError("addFpo")
-                          ? this.state.errors.addFpo[0]
+                        this.hasError("addActivitytype")
+                          ? this.state.errors.addActivitytype[0]
                           : null
                       }
-                      renderInput={(params) => (
-                        <Input
-                          fullWidth
-                          label="FPO*"
-                          name="addFpo"
-                          variant="outlined"
-                        />
-                      )}
+                      value={this.state.values.addActivitytype || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
                     />
                   </Grid>
-                ) : null}
 
-                <Grid item xs={12}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={this.state.addIsActive}
-                        onChange={this.handleCheckBox}
-                        name="addIsActive"
-                        color="primary"
-                        disabled={this.state.isActTypePresent ? true : false}
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Remuneration*"
+                      type="number"
+                      name="addRemuneration"
+                      error={this.hasError("addRemuneration")}
+                      helperText={
+                        this.hasError("addRemuneration")
+                          ? this.state.errors.addRemuneration[0]
+                          : null
+                      }
+                      value={this.state.values.addRemuneration || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+
+                  <Grid item md={6} xs={12}>
+                    <TextField
+                      fullWidth
+                      id="outlined-select-currency"
+                      select
+                      label="Notation*"
+                      error={this.hasError("selectedNotation")}
+                      helperText={
+                        this.hasError("selectedNotation")
+                          ? this.state.errors.selectedNotation[0]
+                          : selectedNotation === "Flat"
+                          ? "Amount stored in rupees"
+                          : null
+                      }
+                      value={selectedNotation || ""}
+                      onChange={(event, value) => {
+                        this.handleNotationChange(event, value);
+                      }}
+                      variant="outlined"
+                    >
+                      3
+                      {this.state.remNotation.map((option) => (
+                        <MenuItem key={option.id} value={option.name}>
+                          {option.name}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+
+                  {this.state.loggedInUserRole === "Sesta Admin" ||
+                  this.state.loggedInUserRole === "Superadmin" ? (
+                    <Grid item md={12} xs={12}>
+                      <Autotext
+                        id="combo-box-demo"
+                        options={fposFilter}
+                        variant="outlined"
+                        label="FPO"
+                        getOptionLabel={(option) => option.name}
+                        onChange={(event, value) => {
+                          this.handleFpoChange(event, value);
+                        }}
+                        value={
+                          addFpo
+                            ? this.state.isCancel === true
+                              ? null
+                              : fposFilter[
+                                  fposFilter.findIndex(function (item, i) {
+                                    return item.id === addFpo;
+                                  })
+                                ] || null
+                            : null
+                        }
+                        error={this.hasError("addFpo")}
+                        helperText={
+                          this.hasError("addFpo")
+                            ? this.state.errors.addFpo[0]
+                            : null
+                        }
+                        renderInput={(params) => (
+                          <Input
+                            fullWidth
+                            label="FPO*"
+                            name="addFpo"
+                            variant="outlined"
+                          />
+                        )}
                       />
-                    }
-                    label="Active"
-                  />
+                    </Grid>
+                  ) : null}
+
+                  <Grid item xs={12}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={this.state.addIsActive}
+                          onChange={this.handleCheckBox}
+                          name="addIsActive"
+                          color="primary"
+                          disabled={this.state.isActTypePresent ? true : false}
+                        />
+                      }
+                      label="Active"
+                    />
+                  </Grid>
                 </Grid>
-              </Grid>
-            </CardContent>
-            <Divider />
-            <CardActions style={{ padding: "15px" }}>
-              <Button type="submit">Save</Button>
-              <Button
-                color="secondary"
-                clicked={this.cancelForm}
-                component={Link}
-                to="/activitytypes"
-              >
-                Cancel
-              </Button>
-            </CardActions>
-          </form>
-        </Card>
+              </CardContent>
+              <Divider />
+              <CardActions style={{ padding: "15px" }}>
+                <Button type="submit">Save</Button>
+                <Button
+                  color="secondary"
+                  clicked={this.cancelForm}
+                  component={Link}
+                  to="/activitytypes"
+                >
+                  Cancel
+                </Button>
+              </CardActions>
+            </form>
+          </Card>
+        ) : (
+          <Spinner />
+        )}
       </Layout>
     );
   }

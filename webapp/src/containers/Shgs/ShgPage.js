@@ -22,6 +22,7 @@ import FormGroup from "@material-ui/core/FormGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import Aux from "../../hoc/Auxiliary/Auxiliary.js";
+import Spinner from "../../components/Spinner/Spinner";
 
 class ShgPage extends Component {
   constructor(props) {
@@ -82,16 +83,18 @@ class ShgPage extends Component {
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
       ],
+      isLoader: "",
     };
   }
 
   async componentDidMount() {
     if (this.state.editPage[0]) {
+      this.setState({ isLoader: true });
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/" +
-          this.state.editPage[1]
+            "crm-plugin/contact/" +
+            this.state.editPage[1]
         )
         .then((res) => {
           this.handleStateChange(res.data.state);
@@ -104,31 +107,20 @@ class ShgPage extends Component {
               addAddress: res.data.address_1,
               addPointOfContact: res.data.organization.person_incharge,
               addVo: res.data.organization.vos[0].id,
+              addState: res.data.state.id,
+              addDistrict: res.data.district.id,
+              addVillage: res.data.villages[0].id,
             },
+            isLoader: false,
           });
-
-          if (this.state.getState.length > 0) {
-            this.state.getState.map(state => {
-              if (state.id === res.data.state.id) {
-                this.setState({
-                  values: {
-                    ...this.state.values,
-                    addState: res.data.state.id,
-                    addDistrict: res.data.district.id,
-                    addVillage: res.data.villages[0].id,
-                  },
-                });
-              }
-            })
-          }
           // if "add bankdetails" is checked
           if (res.data.organization.bankdetail) {
             this.setState({ bankInfoId: res.data.organization.bankdetail });
             serviceProvider
               .serviceProviderForGetRequest(
                 process.env.REACT_APP_SERVER_URL +
-                "bankdetails/" +
-                res.data.organization.bankdetail
+                  "bankdetails/" +
+                  res.data.organization.bankdetail
               )
               .then((res) => {
                 let tempValues = this.state.values;
@@ -140,9 +132,10 @@ class ShgPage extends Component {
                 this.setState({
                   isBankDetailsChecked: true,
                   values: tempValues,
+                  isLoader: false,
                 });
               })
-              .catch((eror) => { });
+              .catch((eror) => {});
           }
         })
         .catch((error) => {
@@ -201,8 +194,8 @@ class ShgPage extends Component {
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId
+              "crm-plugin/districts/?is_active=true&&state.id=" +
+              stateId
           )
           .then((res) => {
             this.setState({ getDistrict: res.data });
@@ -236,8 +229,8 @@ class ShgPage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/villages/?is_active=true&&district.id=" +
-          districtId
+            "crm-plugin/villages/?is_active=true&&district.id=" +
+            districtId
         )
         .then((res) => {
           this.setState({ getVillage: res.data });
@@ -445,7 +438,7 @@ class ShgPage extends Component {
             this.state.bankInfoId,
             postBankData
           )
-          .then((res) => { })
+          .then((res) => {})
           .catch((error) => {
             console.log(error);
           });
@@ -456,7 +449,7 @@ class ShgPage extends Component {
               process.env.REACT_APP_SERVER_URL + "bankdetails",
               this.state.bankInfoId
             )
-            .then((res) => { })
+            .then((res) => {})
             .catch((error) => {
               console.log(error);
             });
@@ -469,7 +462,7 @@ class ShgPage extends Component {
           process.env.REACT_APP_SERVER_URL + "bankdetails/",
           postBankData
         )
-        .then((res) => { })
+        .then((res) => {})
         .catch((error) => {
           console.log(error);
         });
@@ -502,361 +495,367 @@ class ShgPage extends Component {
           this.state.editPage[0] ? EDIT_SHG_BREADCRUMBS : ADD_SHG_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: '45rem' }}>
-          <form
-            autoComplete="off"
-            noValidate
-            onSubmit={this.handleSubmit}
-            method="post"
-          >
-            <CardHeader
-              title={
-                this.state.editPage[0]
-                  ? "Edit Self Help Group"
-                  : "Add Self Help Group"
-              }
-              subheader={
-                this.state.editPage[0]
-                  ? "You can edit shg data here!"
-                  : "You can add new shg data here!"
-              }
-            />
-            <Divider />
-            <CardContent>
-              <Grid container spacing={3}>
-                <Grid item md={12} xs={12}>
-                  {this.state.formSubmitted === true ? (
-                    <Snackbar severity="success">
-                      Shg added successfully.
-                    </Snackbar>
-                  ) : null}
-                  {this.state.formSubmitted === false ? (
-                    <Snackbar severity="error" Showbutton={false}>
-                      Network Error - Please try again!
-                    </Snackbar>
-                  ) : null}
-                </Grid>
-                <Grid item md={12} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Self Help Group Name*"
-                    name="addShg"
-                    error={this.hasError("addShg")}
-                    helperText={
-                      this.hasError("addShg")
-                        ? this.state.errors.addShg[0]
-                        : null
-                    }
-                    value={this.state.values.addShg || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Autotext
-                    id="combo-box-demo"
-                    options={stateFilter}
-                    variant="outlined"
-                    label="Select State*"
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, value) => {
-                      this.handleStateChange(value);
-                    }}
-                    defaultValue={[]}
-                    value={
-                      addState
-                        ? stateFilter[
-                        stateFilter.findIndex(function (item, i) {
-                          return item.id === addState;
-                        })
-                        ] || null
-                        : null
-                    }
-                    error={this.hasError("addState")}
-                    helperText={
-                      this.hasError("addState")
-                        ? this.state.errors.addState[0]
-                        : null
-                    }
-                    renderInput={(params) => (
-                      <Input
-                        fullWidth
-                        label="Select State*"
-                        name="addState"
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Autotext
-                    id="combo-box-demo"
-                    options={districtFilter}
-                    variant="outlined"
-                    label="Select District*"
-                    name="addDistrict"
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, value) => {
-                      this.handleDistrictChange(value);
-                    }}
-                    defaultValue={[]}
-                    value={
-                      addDistrict
-                        ? districtFilter[
-                        districtFilter.findIndex(function (item, i) {
-                          return item.id === addDistrict;
-                        })
-                        ] || null
-                        : null
-                    }
-                    error={this.hasError("addDistrict")}
-                    helperText={
-                      this.hasError("addDistrict")
-                        ? this.state.errors.addDistrict[0]
-                        : this.state.stateSelected
+        {!this.state.isLoader ? (
+          <Card style={{ maxWidth: "45rem" }}>
+            <form
+              autoComplete="off"
+              noValidate
+              onSubmit={this.handleSubmit}
+              method="post"
+            >
+              <CardHeader
+                title={
+                  this.state.editPage[0]
+                    ? "Edit Self Help Group"
+                    : "Add Self Help Group"
+                }
+                subheader={
+                  this.state.editPage[0]
+                    ? "You can edit shg data here!"
+                    : "You can add new shg data here!"
+                }
+              />
+              <Divider />
+              <CardContent>
+                <Grid container spacing={3}>
+                  <Grid item md={12} xs={12}>
+                    {this.state.formSubmitted === true ? (
+                      <Snackbar severity="success">
+                        Shg added successfully.
+                      </Snackbar>
+                    ) : null}
+                    {this.state.formSubmitted === false ? (
+                      <Snackbar severity="error" Showbutton={false}>
+                        Network Error - Please try again!
+                      </Snackbar>
+                    ) : null}
+                  </Grid>
+                  <Grid item md={12} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Self Help Group Name*"
+                      name="addShg"
+                      error={this.hasError("addShg")}
+                      helperText={
+                        this.hasError("addShg")
+                          ? this.state.errors.addShg[0]
+                          : null
+                      }
+                      value={this.state.values.addShg || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Autotext
+                      id="combo-box-demo"
+                      options={stateFilter}
+                      variant="outlined"
+                      label="Select State*"
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handleStateChange(value);
+                      }}
+                      defaultValue={[]}
+                      value={
+                        addState
+                          ? stateFilter[
+                              stateFilter.findIndex(function (item, i) {
+                                return item.id === addState;
+                              })
+                            ] || null
+                          : null
+                      }
+                      error={this.hasError("addState")}
+                      helperText={
+                        this.hasError("addState")
+                          ? this.state.errors.addState[0]
+                          : null
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          fullWidth
+                          label="Select State*"
+                          name="addState"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Autotext
+                      id="combo-box-demo"
+                      options={districtFilter}
+                      variant="outlined"
+                      label="Select District*"
+                      name="addDistrict"
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handleDistrictChange(value);
+                      }}
+                      defaultValue={[]}
+                      value={
+                        addDistrict
+                          ? districtFilter[
+                              districtFilter.findIndex(function (item, i) {
+                                return item.id === addDistrict;
+                              })
+                            ] || null
+                          : null
+                      }
+                      error={this.hasError("addDistrict")}
+                      helperText={
+                        this.hasError("addDistrict")
+                          ? this.state.errors.addDistrict[0]
+                          : this.state.stateSelected
                           ? null
                           : "Please select the state first"
-                    }
-                    renderInput={(params) => (
-                      <Input
-                        {...params}
-                        fullWidth
-                        label="Select District*"
-                        name="addDistrict"
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Autotext
-                    id="combo-box-demo"
-                    options={villageFilter}
-                    variant="outlined"
-                    label="Select Village*"
-                    name="addVillage"
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, value) => {
-                      this.handleVillageChange(event, value);
-                    }}
-                    defaultValue={[]}
-                    value={
-                      addVillage
-                        ? villageFilter[
-                        villageFilter.findIndex(function (item, i) {
-                          return item.id === addVillage;
-                        })
-                        ] || null
-                        : null
-                    }
-                    error={this.hasError("addVillage")}
-                    helperText={
-                      this.hasError("addVillage")
-                        ? this.state.errors.addVillage[0]
-                        : this.state.districtSelected
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          {...params}
+                          fullWidth
+                          label="Select District*"
+                          name="addDistrict"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Autotext
+                      id="combo-box-demo"
+                      options={villageFilter}
+                      variant="outlined"
+                      label="Select Village*"
+                      name="addVillage"
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handleVillageChange(event, value);
+                      }}
+                      defaultValue={[]}
+                      value={
+                        addVillage
+                          ? villageFilter[
+                              villageFilter.findIndex(function (item, i) {
+                                return item.id === addVillage;
+                              })
+                            ] || null
+                          : null
+                      }
+                      error={this.hasError("addVillage")}
+                      helperText={
+                        this.hasError("addVillage")
+                          ? this.state.errors.addVillage[0]
+                          : this.state.districtSelected
                           ? null
                           : "Please select the district first"
-                    }
-                    renderInput={(params) => (
-                      <Input
-                        {...params}
-                        fullWidth
-                        label="Select Village"
-                        name="addVillage"
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item md={12} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Address"
-                    name="addAddress"
-                    error={this.hasError("addAddress")}
-                    helperText={
-                      this.hasError("addAddress")
-                        ? this.state.errors.addAddress[0]
-                        : null
-                    }
-                    value={this.state.values.addAddress || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Point Of Contact"
-                    name="addPointOfContact"
-                    error={this.hasError("addPointOfContact")}
-                    helperText={
-                      this.hasError("addPointOfContact")
-                        ? this.state.errors.addPointOfContact[0]
-                        : null
-                    }
-                    value={this.state.values.addPointOfContact || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Autotext
-                    id="combo-box-demo"
-                    options={voFilters}
-                    variant="outlined"
-                    label="Select VO*"
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, value) => {
-                      this.handleVoChange(event, value);
-                    }}
-                    value={
-                      addVo
-                        ? this.state.isCancel === true
-                          ? null
-                          : voFilters[
-                          voFilters.findIndex(function (item, i) {
-                            return item.id === addVo;
-                          })
-                          ] || null
-                        : null
-                    }
-                    error={this.hasError("addVo")}
-                    helperText={
-                      this.hasError("addVo") ? this.state.errors.addVo[0] : null
-                    }
-                    renderInput={(params) => (
-                      <Input
-                        fullWidth
-                        label="Select VO"
-                        name="addVo"
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item md={12} xs={12}>
-                  <FormGroup row>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={this.state.isBankDetailsChecked}
-                          onChange={this.handleCheckBox}
-                          name="isBankDetailsChecked"
-                          color="primary"
-                        />
                       }
-                      label="Add Bank details"
+                      renderInput={(params) => (
+                        <Input
+                          {...params}
+                          fullWidth
+                          label="Select Village"
+                          name="addVillage"
+                          variant="outlined"
+                        />
+                      )}
                     />
-                  </FormGroup>
-                </Grid>
-                {this.state.isBankDetailsChecked ? (
-                  <Aux>
-                    <Grid item md={6} xs={12}>
-                      <Input
-                        fullWidth
-                        label="Bank Account Name*"
-                        disabled={checked ? false : true}
-                        name="addAccountName"
-                        error={this.hasError("addAccountName")}
-                        helperText={
-                          this.hasError("addAccountName")
-                            ? this.state.errors.addAccountName[0]
-                            : null
+                  </Grid>
+                  <Grid item md={12} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Address"
+                      name="addAddress"
+                      error={this.hasError("addAddress")}
+                      helperText={
+                        this.hasError("addAddress")
+                          ? this.state.errors.addAddress[0]
+                          : null
+                      }
+                      value={this.state.values.addAddress || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Point Of Contact"
+                      name="addPointOfContact"
+                      error={this.hasError("addPointOfContact")}
+                      helperText={
+                        this.hasError("addPointOfContact")
+                          ? this.state.errors.addPointOfContact[0]
+                          : null
+                      }
+                      value={this.state.values.addPointOfContact || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Autotext
+                      id="combo-box-demo"
+                      options={voFilters}
+                      variant="outlined"
+                      label="Select VO*"
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handleVoChange(event, value);
+                      }}
+                      value={
+                        addVo
+                          ? this.state.isCancel === true
+                            ? null
+                            : voFilters[
+                                voFilters.findIndex(function (item, i) {
+                                  return item.id === addVo;
+                                })
+                              ] || null
+                          : null
+                      }
+                      error={this.hasError("addVo")}
+                      helperText={
+                        this.hasError("addVo")
+                          ? this.state.errors.addVo[0]
+                          : null
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          fullWidth
+                          label="Select VO"
+                          name="addVo"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item md={12} xs={12}>
+                    <FormGroup row>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={this.state.isBankDetailsChecked}
+                            onChange={this.handleCheckBox}
+                            name="isBankDetailsChecked"
+                            color="primary"
+                          />
                         }
-                        value={this.state.values.addAccountName || ""}
-                        onChange={this.handleChange}
-                        variant="outlined"
+                        label="Add Bank details"
                       />
-                    </Grid>
-                    <Grid item md={6} xs={12}>
-                      <Input
-                        fullWidth
-                        label="Account Number*"
-                        name="addAccountNo"
-                        disabled={checked ? false : true}
-                        error={this.hasError("addAccountNo")}
-                        helperText={
-                          this.hasError("addAccountNo")
-                            ? this.state.errors.addAccountNo[0]
-                            : null
-                        }
-                        value={this.state.values.addAccountNo || ""}
-                        onChange={this.handleChange}
-                        variant="outlined"
-                      />
-                    </Grid>
-                    <Grid item md={6} xs={12}>
-                      <Input
-                        fullWidth
-                        disabled={checked ? false : true}
-                        label="Bank Name*"
-                        name="addBankName"
-                        error={this.hasError("addBankName")}
-                        helperText={
-                          this.hasError("addBankName")
-                            ? this.state.errors.addBankName[0]
-                            : null
-                        }
-                        value={this.state.values.addBankName || ""}
-                        onChange={this.handleChange}
-                        variant="outlined"
-                      />
-                    </Grid>
-                    <Grid item md={6} xs={12}>
-                      <Input
-                        fullWidth
-                        label="Branch*"
-                        disabled={checked ? false : true}
-                        name="addBranch"
-                        error={this.hasError("addBranch")}
-                        helperText={
-                          this.hasError("addBranch")
-                            ? this.state.errors.addBranch[0]
-                            : null
-                        }
-                        value={this.state.values.addBranch || ""}
-                        onChange={this.handleChange}
-                        variant="outlined"
-                      />
-                    </Grid>
-                    <Grid item md={6} xs={12}>
-                      <Input
-                        fullWidth
-                        label="IFSC Code*"
-                        name="addIfsc"
-                        disabled={checked ? false : true}
-                        error={this.hasError("addIfsc")}
-                        helperText={
-                          this.hasError("addIfsc")
-                            ? this.state.errors.addIfsc[0]
-                            : null
-                        }
-                        value={this.state.values.addIfsc || ""}
-                        onChange={this.handleChange}
-                        variant="outlined"
-                      />
-                    </Grid>
-                  </Aux>
-                ) : (
+                    </FormGroup>
+                  </Grid>
+                  {this.state.isBankDetailsChecked ? (
+                    <Aux>
+                      <Grid item md={6} xs={12}>
+                        <Input
+                          fullWidth
+                          label="Bank Account Name*"
+                          disabled={checked ? false : true}
+                          name="addAccountName"
+                          error={this.hasError("addAccountName")}
+                          helperText={
+                            this.hasError("addAccountName")
+                              ? this.state.errors.addAccountName[0]
+                              : null
+                          }
+                          value={this.state.values.addAccountName || ""}
+                          onChange={this.handleChange}
+                          variant="outlined"
+                        />
+                      </Grid>
+                      <Grid item md={6} xs={12}>
+                        <Input
+                          fullWidth
+                          label="Account Number*"
+                          name="addAccountNo"
+                          disabled={checked ? false : true}
+                          error={this.hasError("addAccountNo")}
+                          helperText={
+                            this.hasError("addAccountNo")
+                              ? this.state.errors.addAccountNo[0]
+                              : null
+                          }
+                          value={this.state.values.addAccountNo || ""}
+                          onChange={this.handleChange}
+                          variant="outlined"
+                        />
+                      </Grid>
+                      <Grid item md={6} xs={12}>
+                        <Input
+                          fullWidth
+                          disabled={checked ? false : true}
+                          label="Bank Name*"
+                          name="addBankName"
+                          error={this.hasError("addBankName")}
+                          helperText={
+                            this.hasError("addBankName")
+                              ? this.state.errors.addBankName[0]
+                              : null
+                          }
+                          value={this.state.values.addBankName || ""}
+                          onChange={this.handleChange}
+                          variant="outlined"
+                        />
+                      </Grid>
+                      <Grid item md={6} xs={12}>
+                        <Input
+                          fullWidth
+                          label="Branch*"
+                          disabled={checked ? false : true}
+                          name="addBranch"
+                          error={this.hasError("addBranch")}
+                          helperText={
+                            this.hasError("addBranch")
+                              ? this.state.errors.addBranch[0]
+                              : null
+                          }
+                          value={this.state.values.addBranch || ""}
+                          onChange={this.handleChange}
+                          variant="outlined"
+                        />
+                      </Grid>
+                      <Grid item md={6} xs={12}>
+                        <Input
+                          fullWidth
+                          label="IFSC Code*"
+                          name="addIfsc"
+                          disabled={checked ? false : true}
+                          error={this.hasError("addIfsc")}
+                          helperText={
+                            this.hasError("addIfsc")
+                              ? this.state.errors.addIfsc[0]
+                              : null
+                          }
+                          value={this.state.values.addIfsc || ""}
+                          onChange={this.handleChange}
+                          variant="outlined"
+                        />
+                      </Grid>
+                    </Aux>
+                  ) : (
                     ""
                   )}
-              </Grid>
-            </CardContent>
-            <Divider />
-            <CardActions style={{padding: "15px",}}>
-              <Button type="submit">Save</Button>
-              <Button
-                color="secondary"
-                clicked={this.cancelForm}
-                component={Link}
-                to="/shgs"
-              >
-                cancel
-              </Button>
-            </CardActions>
-          </form>
-        </Card>
+                </Grid>
+              </CardContent>
+              <Divider />
+              <CardActions style={{ padding: "15px" }}>
+                <Button type="submit">Save</Button>
+                <Button
+                  color="secondary"
+                  clicked={this.cancelForm}
+                  component={Link}
+                  to="/shgs"
+                >
+                  cancel
+                </Button>
+              </CardActions>
+            </form>
+          </Card>
+        ) : (
+          <Spinner />
+        )}
       </Layout>
     );
   }

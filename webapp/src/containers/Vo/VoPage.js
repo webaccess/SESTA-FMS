@@ -20,6 +20,7 @@ import {
   EDIT_VILLAGE_ORGANIZATIONS_BREADCRUMBS,
 } from "./config";
 import { Link } from "react-router-dom";
+import Spinner from "../../components/Spinner/Spinner";
 
 class VoPage extends Component {
   constructor(props) {
@@ -46,11 +47,13 @@ class VoPage extends Component {
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
       ],
+      isLoader: "",
     };
   }
 
   async componentDidMount() {
     if (this.state.editPage[0]) {
+      this.setState({ isLoader: true });
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
@@ -66,6 +69,7 @@ class VoPage extends Component {
               addBlock: res.data.block,
               addGp: res.data.gp,
             },
+            isLoader: false,
           });
         })
         .catch((error) => {
@@ -186,127 +190,135 @@ class VoPage extends Component {
             : ADD_VILLAGE_ORGANIZATIONS_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: '45rem' }}>
-          <form
-            autoComplete="off"
-            noValidate
-            onSubmit={this.handleSubmit}
-            method="post"
-          >
-            <CardHeader
-              title={
-                this.state.editPage[0]
-                  ? "Edit Village Organization"
-                  : "Add Village Organization"
-              }
-              subheader={
-                this.state.editPage[0]
-                  ? "You can edit village organization here!"
-                  : "You can add new village organization here!"
-              }
-            />
-            <Divider />
-            <CardContent>
-              <Grid container spacing={2}>
-                <Grid item md={12} xs={12}>
-                  {this.state.formSubmitted === false ? (
-                    <Snackbar severity="error" Showbutton={false}>
-                      Network Error - Please try again!
-                    </Snackbar>
-                  ) : null}
+        {!this.state.isLoader ? (
+          <Card style={{ maxWidth: "45rem" }}>
+            <form
+              autoComplete="off"
+              noValidate
+              onSubmit={this.handleSubmit}
+              method="post"
+            >
+              <CardHeader
+                title={
+                  this.state.editPage[0]
+                    ? "Edit Village Organization"
+                    : "Add Village Organization"
+                }
+                subheader={
+                  this.state.editPage[0]
+                    ? "You can edit village organization here!"
+                    : "You can add new village organization here!"
+                }
+              />
+              <Divider />
+              <CardContent>
+                <Grid container spacing={2}>
+                  <Grid item md={12} xs={12}>
+                    {this.state.formSubmitted === false ? (
+                      <Snackbar severity="error" Showbutton={false}>
+                        Network Error - Please try again!
+                      </Snackbar>
+                    ) : null}
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Input
+                      fullWidth
+                      label="Village Organization Name*"
+                      name="addVo"
+                      error={this.hasError("addVo")}
+                      helperText={
+                        this.hasError("addVo")
+                          ? this.state.errors.addVo[0]
+                          : null
+                      }
+                      value={this.state.values.addVo || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Input
+                      fullWidth
+                      label="Address"
+                      name="addVoAddress"
+                      error={this.hasError("addVoAddress")}
+                      helperText={
+                        this.hasError("addVoAddress")
+                          ? this.state.errors.addVoAddress[0]
+                          : null
+                      }
+                      value={this.state.values.addVoAddress || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Block"
+                      name="addBlock"
+                      error={this.hasError("addBlock")}
+                      helperText={
+                        this.hasError("addBlock")
+                          ? this.state.errors.addBlock[0]
+                          : null
+                      }
+                      value={this.state.values.addBlock || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Gaon Panchayat"
+                      name="addGp"
+                      error={this.hasError("addGp")}
+                      helperText={
+                        this.hasError("addGp")
+                          ? this.state.errors.addGp[0]
+                          : null
+                      }
+                      value={this.state.values.addGp || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Point of Contact"
+                      name="addPerson"
+                      error={this.hasError("addPerson")}
+                      helperText={
+                        this.hasError("addPerson")
+                          ? this.state.errors.addPerson[0]
+                          : null
+                      }
+                      value={this.state.values.addPerson || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item xs={12}>
-                  <Input
-                    fullWidth
-                    label="Village Organization Name*"
-                    name="addVo"
-                    error={this.hasError("addVo")}
-                    helperText={
-                      this.hasError("addVo") ? this.state.errors.addVo[0] : null
-                    }
-                    value={this.state.values.addVo || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Input
-                    fullWidth
-                    label="Address"
-                    name="addVoAddress"
-                    error={this.hasError("addVoAddress")}
-                    helperText={
-                      this.hasError("addVoAddress")
-                        ? this.state.errors.addVoAddress[0]
-                        : null
-                    }
-                    value={this.state.values.addVoAddress || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Block"
-                    name="addBlock"
-                    error={this.hasError("addBlock")}
-                    helperText={
-                      this.hasError("addBlock")
-                        ? this.state.errors.addBlock[0]
-                        : null
-                    }
-                    value={this.state.values.addBlock || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Gaon Panchayat"
-                    name="addGp"
-                    error={this.hasError("addGp")}
-                    helperText={
-                      this.hasError("addGp") ? this.state.errors.addGp[0] : null
-                    }
-                    value={this.state.values.addGp || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Point of Contact"
-                    name="addPerson"
-                    error={this.hasError("addPerson")}
-                    helperText={
-                      this.hasError("addPerson")
-                        ? this.state.errors.addPerson[0]
-                        : null
-                    }
-                    value={this.state.values.addPerson || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-              </Grid>
-            </CardContent>
-            <Divider />
-            <CardActions style={{padding: "15px",}}>
-              <Button type="submit">Save</Button>
-              <Button
-                color="secondary"
-                clicked={this.cancelForm}
-                component={Link}
-                to="/village-organizations"
-              >
-                cancel
-              </Button>
-            </CardActions>
-          </form>
-        </Card>
+              </CardContent>
+              <Divider />
+              <CardActions style={{ padding: "15px" }}>
+                <Button type="submit">Save</Button>
+                <Button
+                  color="secondary"
+                  clicked={this.cancelForm}
+                  component={Link}
+                  to="/village-organizations"
+                >
+                  cancel
+                </Button>
+              </CardActions>
+            </form>
+          </Card>
+        ) : (
+          <Spinner />
+        )}
       </Layout>
     );
   }

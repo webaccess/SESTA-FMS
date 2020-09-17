@@ -18,6 +18,7 @@ import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
 import { APPROVE_LOAN_BREADCRUMBS } from "./config";
 import CancelIcon from "@material-ui/icons/Cancel";
+import Spinner from "../../components/Spinner/Spinner";
 
 const useStyles = (theme) => ({
   root: {
@@ -81,6 +82,7 @@ class LoanApprovalPage extends Component {
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
       ],
+      isLoader: true,
     };
   }
 
@@ -146,6 +148,7 @@ class LoanApprovalPage extends Component {
               values: { selectedStatus: status, comment: comment },
               fileName: document,
               uploadedFile: data.document[0],
+              isLoader: false,
             });
           })
           .catch();
@@ -389,225 +392,231 @@ class LoanApprovalPage extends Component {
 
     return (
       <Layout breadcrumbs={APPROVE_LOAN_BREADCRUMBS}>
-        <Grid>
-          <div className="App">
-            <h5 className={style.loan}>LOANS</h5>
-            <h2 className={style.title}>Loan Approval</h2>
+        {!this.state.isLoader ? (
+          <Grid>
+            <div className="App">
+              <h5 className={style.loan}>LOANS</h5>
+              <h2 className={style.title}>Loan Approval</h2>
 
-            <Card className={classes.mainContent}>
-              <Grid
-                container
-                spacing={3}
-                style={{ padding: "20px 0px", alignItems: "center" }}
-              >
-                <Grid spacing={1} xs={1}>
-                  <PersonIcon className={classes.Icon} />
-                </Grid>
-                <Grid spacing={1} xs={11}>
-                  <Grid container spacing={3}>
-                    <Grid spacing={2} xs={3}>
-                      <b>
-                        <div className={classes.member}>
-                          LOANEE
-                          <br />
-                          <span className={classes.fieldValues}>
-                            {data.loanee}
-                          </span>
-                        </div>
-                      </b>
-                    </Grid>
-                    <Grid spacing={2} xs={3}>
-                      <b>
-                        <div className={classes.member}>
-                          SHG GROUP <br />
-                          <span className={classes.fieldValues}>
-                            {data.shg}
-                          </span>
-                        </div>
-                      </b>
-                    </Grid>
-                    <Grid spacing={2} xs={3}>
-                      <b>
-                        <div className={classes.member}>
-                          VILLAGE <br />
-                          <span className={classes.fieldValues}>
-                            {data.village}
-                          </span>
-                        </div>
-                      </b>
-                    </Grid>
-                    <Grid spacing={2} xs={3}>
-                      <b>
-                        <div className={classes.member}>
-                          VILLAGE ORGANIZATION <br />
-                          <span className={classes.fieldValues}>{data.vo}</span>
-                        </div>
-                      </b>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Divider />
-              <Grid
-                container
-                spacing={3}
-                style={{ padding: "20px 0px", alignItems: "center" }}
-              >
-                <Grid spacing={1} xs={1}>
-                  <MoneyIcon className={classes.Icon} />
-                </Grid>
-                <Grid spacing={1} xs={11}>
-                  <Grid container spacing={3}>
-                    <Grid spacing={2} xs={3}>
-                      <b>
-                        <div className={classes.member}>
-                          PURPOSE
-                          <br />
-                          <span className={classes.fieldValues}>
-                            {data.purpose}
-                          </span>
-                        </div>
-                      </b>
-                    </Grid>
-                    <Grid spacing={2} xs={3}>
-                      <b>
-                        <div className={classes.member}>
-                          APPLICATION DATE <br />
-                          <span className={classes.fieldValues}>
-                            {data.applicationDate}
-                          </span>
-                        </div>
-                      </b>
-                    </Grid>
-                    <Grid spacing={2} xs={3}>
-                      <b>
-                        <div className={classes.member}>
-                          LOAN AMOUNT <br />
-                          <span className={classes.fieldValues}>
-                            {data.loanAmount}
-                          </span>
-                        </div>
-                      </b>
-                    </Grid>
-                    <Grid spacing={2} xs={3}>
-                      <b>
-                        <div className={classes.member}>
-                          LOAN DURATION <br />
-                          <span className={classes.fieldValues}>
-                            {data.duration}
-                          </span>
-                        </div>
-                      </b>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Divider />
-              <Grid container spacing={3} style={{ padding: "20px 0px" }}>
-                <Grid item md={12}>
-                  <label htmlFor="upload-file">
-                    <input
-                      style={{ display: "none" }}
-                      required
-                      type="file"
-                      name="upload-file"
-                      id="upload-file"
-                      onChange={this.onChangeHandler}
-                    />
-                    <Fab
-                      color="primary"
-                      size="medium"
-                      component="span"
-                      aria-label="add"
-                      variant="extended"
-                    >
-                      <FileCopyIcon /> Upload loan application
-                    </Fab>
-                  </label>{" "}
-                  <IconButton
-                    aria-label="cancel"
-                    color="secondary"
-                    style={{ paddingLeft: "2px" }}
-                  >
-                    <CancelIcon onClick={this.cancelFile} />
-                  </IconButton>
-                  &nbsp;&nbsp;&nbsp;
-                  {this.state.fileName !== "" ? (
-                    <label style={{ color: "green", fontSize: "11px" }}>
-                      Selected File: {this.state.fileName}
-                    </label>
-                  ) : (
-                    <label style={{ color: "red", fontSize: "11px" }}>
-                      No File Selected!
-                    </label>
-                  )}
-                </Grid>
-                <Grid item md={5} xs={12}>
-                  <Autocomplete
-                    id="selectStatus"
-                    name="loanStatus"
-                    options={this.state.loanStatusList}
-                    variant="outlined"
-                    getOptionLabel={(option) => option.name}
-                    placeholder="Select Status"
-                    onChange={this.handleStatusChange}
-                    value={
-                      statusValue
-                        ? this.state.loanStatusList[
-                            this.state.loanStatusList.findIndex(function (
-                              item,
-                              i
-                            ) {
-                              return item.id === statusValue;
-                            })
-                          ] || null
-                        : null
-                    }
-                    renderInput={(params) => (
-                      <Input
-                        {...params}
-                        fullWidth
-                        label="Select Status"
-                        name="loanStatus"
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item md={7} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Comment"
-                    name="comment"
-                    error={this.hasError("comment")}
-                    helperText={
-                      this.hasError("comment")
-                        ? this.state.errors.comment[0]
-                        : null
-                    }
-                    value={this.state.values.comment || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-              </Grid>
-              <Divider />
-              <br />
-              <Grid>
-                <Button onClick={this.onSave.bind(this)}>Save</Button>
-                &nbsp;&nbsp;&nbsp;
-                <Button
-                  color="secondary"
-                  clicked={this.cancelForm}
-                  component={Link}
-                  to="/loans"
+              <Card className={classes.mainContent}>
+                <Grid
+                  container
+                  spacing={3}
+                  style={{ padding: "20px 0px", alignItems: "center" }}
                 >
-                  Cancel
-                </Button>
-              </Grid>
-            </Card>
-          </div>
-        </Grid>
+                  <Grid spacing={1} xs={1}>
+                    <PersonIcon className={classes.Icon} />
+                  </Grid>
+                  <Grid spacing={1} xs={11}>
+                    <Grid container spacing={3}>
+                      <Grid spacing={2} xs={3}>
+                        <b>
+                          <div className={classes.member}>
+                            LOANEE
+                            <br />
+                            <span className={classes.fieldValues}>
+                              {data.loanee}
+                            </span>
+                          </div>
+                        </b>
+                      </Grid>
+                      <Grid spacing={2} xs={3}>
+                        <b>
+                          <div className={classes.member}>
+                            SHG GROUP <br />
+                            <span className={classes.fieldValues}>
+                              {data.shg}
+                            </span>
+                          </div>
+                        </b>
+                      </Grid>
+                      <Grid spacing={2} xs={3}>
+                        <b>
+                          <div className={classes.member}>
+                            VILLAGE <br />
+                            <span className={classes.fieldValues}>
+                              {data.village}
+                            </span>
+                          </div>
+                        </b>
+                      </Grid>
+                      <Grid spacing={2} xs={3}>
+                        <b>
+                          <div className={classes.member}>
+                            VILLAGE ORGANIZATION <br />
+                            <span className={classes.fieldValues}>
+                              {data.vo}
+                            </span>
+                          </div>
+                        </b>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                </Grid>
+                <Divider />
+                <Grid
+                  container
+                  spacing={3}
+                  style={{ padding: "20px 0px", alignItems: "center" }}
+                >
+                  <Grid spacing={1} xs={1}>
+                    <MoneyIcon className={classes.Icon} />
+                  </Grid>
+                  <Grid spacing={1} xs={11}>
+                    <Grid container spacing={3}>
+                      <Grid spacing={2} xs={3}>
+                        <b>
+                          <div className={classes.member}>
+                            PURPOSE
+                            <br />
+                            <span className={classes.fieldValues}>
+                              {data.purpose}
+                            </span>
+                          </div>
+                        </b>
+                      </Grid>
+                      <Grid spacing={2} xs={3}>
+                        <b>
+                          <div className={classes.member}>
+                            APPLICATION DATE <br />
+                            <span className={classes.fieldValues}>
+                              {data.applicationDate}
+                            </span>
+                          </div>
+                        </b>
+                      </Grid>
+                      <Grid spacing={2} xs={3}>
+                        <b>
+                          <div className={classes.member}>
+                            LOAN AMOUNT <br />
+                            <span className={classes.fieldValues}>
+                              {data.loanAmount}
+                            </span>
+                          </div>
+                        </b>
+                      </Grid>
+                      <Grid spacing={2} xs={3}>
+                        <b>
+                          <div className={classes.member}>
+                            LOAN DURATION <br />
+                            <span className={classes.fieldValues}>
+                              {data.duration}
+                            </span>
+                          </div>
+                        </b>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                </Grid>
+                <Divider />
+                <Grid container spacing={3} style={{ padding: "20px 0px" }}>
+                  <Grid item md={12}>
+                    <label htmlFor="upload-file">
+                      <input
+                        style={{ display: "none" }}
+                        required
+                        type="file"
+                        name="upload-file"
+                        id="upload-file"
+                        onChange={this.onChangeHandler}
+                      />
+                      <Fab
+                        color="primary"
+                        size="medium"
+                        component="span"
+                        aria-label="add"
+                        variant="extended"
+                      >
+                        <FileCopyIcon /> Upload loan application
+                      </Fab>
+                    </label>{" "}
+                    <IconButton
+                      aria-label="cancel"
+                      color="secondary"
+                      style={{ paddingLeft: "2px" }}
+                    >
+                      <CancelIcon onClick={this.cancelFile} />
+                    </IconButton>
+                    &nbsp;&nbsp;&nbsp;
+                    {this.state.fileName !== "" ? (
+                      <label style={{ color: "green", fontSize: "11px" }}>
+                        Selected File: {this.state.fileName}
+                      </label>
+                    ) : (
+                      <label style={{ color: "red", fontSize: "11px" }}>
+                        No File Selected!
+                      </label>
+                    )}
+                  </Grid>
+                  <Grid item md={5} xs={12}>
+                    <Autocomplete
+                      id="selectStatus"
+                      name="loanStatus"
+                      options={this.state.loanStatusList}
+                      variant="outlined"
+                      getOptionLabel={(option) => option.name}
+                      placeholder="Select Status"
+                      onChange={this.handleStatusChange}
+                      value={
+                        statusValue
+                          ? this.state.loanStatusList[
+                              this.state.loanStatusList.findIndex(function (
+                                item,
+                                i
+                              ) {
+                                return item.id === statusValue;
+                              })
+                            ] || null
+                          : null
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          {...params}
+                          fullWidth
+                          label="Select Status"
+                          name="loanStatus"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item md={7} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Comment"
+                      name="comment"
+                      error={this.hasError("comment")}
+                      helperText={
+                        this.hasError("comment")
+                          ? this.state.errors.comment[0]
+                          : null
+                      }
+                      value={this.state.values.comment || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                </Grid>
+                <Divider />
+                <br />
+                <Grid>
+                  <Button onClick={this.onSave.bind(this)}>Save</Button>
+                  &nbsp;&nbsp;&nbsp;
+                  <Button
+                    color="secondary"
+                    clicked={this.cancelForm}
+                    component={Link}
+                    to="/loans"
+                  >
+                    Cancel
+                  </Button>
+                </Grid>
+              </Card>
+            </div>
+          </Grid>
+        ) : (
+          <Spinner />
+        )}
       </Layout>
     );
   }

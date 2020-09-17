@@ -242,7 +242,6 @@ export class Loans extends React.Component {
   };
 
   handleSearch() {
-    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.values.addMember) {
       searchData += searchData ? "&&" : "";
@@ -286,22 +285,30 @@ export class Loans extends React.Component {
 
   searchData(searchData) {
     let url = "loan-applications/";
-    if (
-      // this.state.loggedInUserRole === "FPO Admin" ||
-      this.state.loggedInUserRole === "CSP (Community Service Provider)"
-    ) {
+    if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
       url += "?creator_id=" + auth.getUserInfo().contact.id;
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
+        )
+        .then((res) => {
+          this.getFormattedData(res.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + url + "?" + searchData
+        )
+        .then((res) => {
+          this.getFormattedData(res.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + url + "?" + searchData
-      )
-      .then((res) => {
-        this.getFormattedData(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   }
 
   cancelForm = () => {

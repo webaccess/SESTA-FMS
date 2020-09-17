@@ -29,6 +29,7 @@ import {
 } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
+import Spinner from "../../components/Spinner/Spinner";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -115,12 +116,13 @@ class LoanpurposePage extends Component {
       ],
       loggedInUserRole: auth.getUserInfo().role.name,
       assignedFPO: "",
+      isLoader: "",
     };
   }
 
   async componentDidMount() {
     if (this.state.editPage[0]) {
-      let stateId = "";
+      this.setState({ isLoader: true });
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
@@ -142,9 +144,11 @@ class LoanpurposePage extends Component {
               addFPO: res.data.fpo.id,
               addEMI: res.data.emi,
             },
+            isLoader: false,
           });
 
           if (res.data.emidetails) {
+            this.setState({ isLoader: false });
             let getEmi = res.data.emidetails;
             this.state.users = getEmi.map((obj) => {
               return obj;
@@ -152,6 +156,7 @@ class LoanpurposePage extends Component {
           }
 
           if (res.data.loantasks) {
+            this.setState({ isLoader: false });
             let getTask = res.data.loantasks;
             this.state.task = getTask.map((obj) => {
               return obj;
@@ -683,211 +688,219 @@ class LoanpurposePage extends Component {
             : ADD_LOANPURPOSE_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: '45rem' }}>
-          <form
-            autoComplete="off"
-            noValidate
-            onSubmit={this.handleSubmit}
-            method="post"
-          >
-            <CardHeader
-              title={
-                this.state.editPage[0]
-                  ? "Edit Loan Purpose"
-                  : "Add Loan Purpose "
-              }
-              subheader={
-                this.state.editPage[0]
-                  ? "You can edit loan purpose data here!"
-                  : "You can add new loan purpose data here!"
-              }
-            />
-            <Divider />
-            <CardContent>
-              <Grid container spacing={3}>
-                <Grid item md={12} xs={12}>
-                  {this.state.formSubmitted === true ? (
-                    <Snackbar severity="success">
-                      Loan Purpose added successfully.
-                    </Snackbar>
-                  ) : null}
-                  {this.state.formSubmitted === false ? (
-                    <Snackbar severity="error" Showbutton={false}>
-                      Network Error - Please try again!
-                    </Snackbar>
-                  ) : null}
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Product Name*"
-                    name="addPurpose"
-                    error={this.hasError("addPurpose")}
-                    helperText={
-                      this.hasError("addPurpose")
-                        ? this.state.errors.addPurpose[0]
-                        : null
-                    }
-                    value={this.state.values.addPurpose || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Duration*"
-                    type="number"
-                    name="addDuration"
-                    error={this.hasError("addDuration")}
-                    helperText={
-                      this.hasError("addDuration")
-                        ? this.state.errors.addDuration[0]
-                        : null
-                    }
-                    value={this.state.values.addDuration || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Area/Size/Specifications*"
-                    name="addSpecification"
-                    error={this.hasError("addSpecification")}
-                    helperText={
-                      this.hasError("addSpecification")
-                        ? this.state.errors.addSpecification[0]
-                        : null
-                    }
-                    value={this.state.values.addSpecification || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Total Amount*"
-                    type="number"
-                    name="addAmount"
-                    error={this.hasError("addAmount")}
-                    helperText={
-                      this.hasError("addAmount")
-                        ? this.state.errors.addAmount[0]
-                        : null
-                    }
-                    value={this.state.values.addAmount || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                {this.state.loggedInUserRole === "Sesta Admin" ||
-                this.state.loggedInUserRole === "Superadmin" ? (
+        {!this.state.isLoader ? (
+          <Card style={{ maxWidth: "45rem" }}>
+            <form
+              autoComplete="off"
+              noValidate
+              onSubmit={this.handleSubmit}
+              method="post"
+            >
+              <CardHeader
+                title={
+                  this.state.editPage[0]
+                    ? "Edit Loan Purpose"
+                    : "Add Loan Purpose "
+                }
+                subheader={
+                  this.state.editPage[0]
+                    ? "You can edit loan purpose data here!"
+                    : "You can add new loan purpose data here!"
+                }
+              />
+              <Divider />
+              <CardContent>
+                <Grid container spacing={3}>
+                  <Grid item md={12} xs={12}>
+                    {this.state.formSubmitted === true ? (
+                      <Snackbar severity="success">
+                        Loan Purpose added successfully.
+                      </Snackbar>
+                    ) : null}
+                    {this.state.formSubmitted === false ? (
+                      <Snackbar severity="error" Showbutton={false}>
+                        Network Error - Please try again!
+                      </Snackbar>
+                    ) : null}
+                  </Grid>
                   <Grid item md={6} xs={12}>
-                    <Autotext
-                      id="combo-box-demo"
-                      options={fpoFilters}
-                      variant="outlined"
-                      label="FPO"
-                      getOptionLabel={(option) => option.name}
-                      onChange={(event, value) => {
-                        this.handleFpoChange(event, value);
-                      }}
-                      value={
-                        addFPO
-                          ? this.state.isCancel === true
-                            ? null
-                            : fpoFilters[
-                                fpoFilters.findIndex(function (item, i) {
-                                  return item.id === addFPO;
-                                })
-                              ] || null
-                          : null
-                      }
-                      error={this.hasError("addFPO")}
+                    <Input
+                      fullWidth
+                      label="Product Name*"
+                      name="addPurpose"
+                      error={this.hasError("addPurpose")}
                       helperText={
-                        this.hasError("addFPO")
-                          ? this.state.errors.addFPO[0]
+                        this.hasError("addPurpose")
+                          ? this.state.errors.addPurpose[0]
                           : null
                       }
-                      renderInput={(params) => (
-                        <Input
-                          fullWidth
-                          label="FPO"
-                          name="addFPO"
-                          variant="outlined"
-                        />
-                      )}
+                      value={this.state.values.addPurpose || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
                     />
                   </Grid>
-                ) : null}
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="EMI"
-                    type="number"
-                    name="addEMI"
-                    error={this.hasError("addEMI")}
-                    helperText={
-                      this.hasError("addEMI")
-                        ? this.state.errors.addEMI[0]
-                        : null
-                    }
-                    value={this.state.values.addEMI || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Duration*"
+                      type="number"
+                      name="addDuration"
+                      error={this.hasError("addDuration")}
+                      helperText={
+                        this.hasError("addDuration")
+                          ? this.state.errors.addDuration[0]
+                          : null
+                      }
+                      value={this.state.values.addDuration || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Area/Size/Specifications*"
+                      name="addSpecification"
+                      error={this.hasError("addSpecification")}
+                      helperText={
+                        this.hasError("addSpecification")
+                          ? this.state.errors.addSpecification[0]
+                          : null
+                      }
+                      value={this.state.values.addSpecification || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Total Amount*"
+                      type="number"
+                      name="addAmount"
+                      error={this.hasError("addAmount")}
+                      helperText={
+                        this.hasError("addAmount")
+                          ? this.state.errors.addAmount[0]
+                          : null
+                      }
+                      value={this.state.values.addAmount || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  {this.state.loggedInUserRole === "Sesta Admin" ||
+                  this.state.loggedInUserRole === "Superadmin" ? (
+                    <Grid item md={6} xs={12}>
+                      <Autotext
+                        id="combo-box-demo"
+                        options={fpoFilters}
+                        variant="outlined"
+                        label="FPO"
+                        getOptionLabel={(option) => option.name}
+                        onChange={(event, value) => {
+                          this.handleFpoChange(event, value);
+                        }}
+                        value={
+                          addFPO
+                            ? this.state.isCancel === true
+                              ? null
+                              : fpoFilters[
+                                  fpoFilters.findIndex(function (item, i) {
+                                    return item.id === addFPO;
+                                  })
+                                ] || null
+                            : null
+                        }
+                        error={this.hasError("addFPO")}
+                        helperText={
+                          this.hasError("addFPO")
+                            ? this.state.errors.addFPO[0]
+                            : null
+                        }
+                        renderInput={(params) => (
+                          <Input
+                            fullWidth
+                            label="FPO"
+                            name="addFPO"
+                            variant="outlined"
+                          />
+                        )}
+                      />
+                    </Grid>
+                  ) : null}
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="EMI"
+                      type="number"
+                      name="addEMI"
+                      error={this.hasError("addEMI")}
+                      helperText={
+                        this.hasError("addEMI")
+                          ? this.state.errors.addEMI[0]
+                          : null
+                      }
+                      value={this.state.values.addEMI || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
                 </Grid>
-              </Grid>
-              <br></br>
-              <Divider className="style.border " style={{ height: "2px" }} />
-              <br />
-              <span style={{ "margin-left": "10px", "font-weight": "bolder" }}>
-                EMI Installments
-              </span>
-              <br />
-              <br />
-              {this.createUI()}
-              <IconButton
-                aria-label="add"
-                onClick={this.addClick.bind(this)}
-                style={{ position: "relative", left: "15px" }}
-              >
-                <AddCircleOutlined className={classes.Icon} />
-                <span className={classes.labelHeader}>Add EMI</span>
-              </IconButton>
-              <Divider className="style.border " style={{ height: "2px" }} />
-              <br />
-              <span style={{ "margin-left": "10px", "font-weight": "bolder" }}>
-                Tasks
-              </span>
-              <br />
-              <br />
-              {this.createTaskUI()}
-              <IconButton
-                style={{ position: "relative", left: "15px" }}
-                aria-label="add"
-                onClick={this.addTaskClick.bind(this)}
-              >
-                <AddCircleOutlined className={classes.Icon} />
-                <span className={classes.labelHeader}>Add Task</span>
-              </IconButton>
-            </CardContent>
-            <CardActions style={{padding: "15px",}}>
-              <Button type="submit">Save</Button>
-              <Button
-                color="secondary"
-                clicked={this.cancelForm}
-                component={Link}
-                to="/loanpurposes"
-              >
-                cancel
-              </Button>
-            </CardActions>
-          </form>
-        </Card>
+                <br></br>
+                <Divider className="style.border " style={{ height: "2px" }} />
+                <br />
+                <span
+                  style={{ "margin-left": "10px", "font-weight": "bolder" }}
+                >
+                  EMI Installments
+                </span>
+                <br />
+                <br />
+                {this.createUI()}
+                <IconButton
+                  aria-label="add"
+                  onClick={this.addClick.bind(this)}
+                  style={{ position: "relative", left: "15px" }}
+                >
+                  <AddCircleOutlined className={classes.Icon} />
+                  <span className={classes.labelHeader}>Add EMI</span>
+                </IconButton>
+                <Divider className="style.border " style={{ height: "2px" }} />
+                <br />
+                <span
+                  style={{ "margin-left": "10px", "font-weight": "bolder" }}
+                >
+                  Tasks
+                </span>
+                <br />
+                <br />
+                {this.createTaskUI()}
+                <IconButton
+                  style={{ position: "relative", left: "15px" }}
+                  aria-label="add"
+                  onClick={this.addTaskClick.bind(this)}
+                >
+                  <AddCircleOutlined className={classes.Icon} />
+                  <span className={classes.labelHeader}>Add Task</span>
+                </IconButton>
+              </CardContent>
+              <CardActions style={{ padding: "15px" }}>
+                <Button type="submit">Save</Button>
+                <Button
+                  color="secondary"
+                  clicked={this.cancelForm}
+                  component={Link}
+                  to="/loanpurposes"
+                >
+                  cancel
+                </Button>
+              </CardActions>
+            </form>
+          </Card>
+        ) : (
+          <Spinner />
+        )}
       </Layout>
     );
   }

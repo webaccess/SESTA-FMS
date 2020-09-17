@@ -18,6 +18,7 @@ import validateInput from "../../components/Validation/ValidateInput/ValidateInp
 import { ADD_STATE_BREADCRUMBS, EDIT_STATE_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
+import Spinner from "../../components/Spinner/Spinner";
 
 class StatePage extends Component {
   constructor(props) {
@@ -40,16 +41,18 @@ class StatePage extends Component {
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
       ],
+      isLoader: "",
     };
   }
 
   async componentDidMount() {
     if (this.state.editPage[0]) {
+      this.setState({ isLoader: true });
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/states/?id=" +
-          this.state.editPage[1]
+            "crm-plugin/states/?id=" +
+            this.state.editPage[1]
         )
         .then((res) => {
           this.setState({
@@ -60,6 +63,7 @@ class StatePage extends Component {
               addIdentifier: res.data[0].Identifier,
             },
             addIsActive: res.data[0].is_active,
+            isLoader: false,
           });
         })
         .catch((error) => {
@@ -68,14 +72,14 @@ class StatePage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?state=" +
-          this.state.editPage[1]
+            "crm-plugin/contact/?state=" +
+            this.state.editPage[1]
         )
         .then((res) => {
           if (res.data.length > 0) {
             this.setState({ stateInUse: true });
           }
-        })
+        });
     }
   }
 
@@ -205,109 +209,113 @@ class StatePage extends Component {
             : ADD_STATE_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: '45rem' }}>
-          <form
-            autoComplete="off"
-            noValidate
-            onSubmit={this.handleSubmit}
-            method="post"
-          >
-            <CardHeader
-              title={this.state.editPage[0] ? "Edit state" : "Add state"}
-              subheader={
-                this.state.editPage[0]
-                  ? "You can edit state data here!"
-                  : "You can add new state data here!"
-              }
-            />
-            <Divider />
-            <CardContent>
-              <Grid container spacing={3}>
-                <Grid item md={12} xs={12}>
-                  {this.state.formSubmitted === false ? (
-                    <Snackbar severity="error" Showbutton={false}>
-                      {this.state.errorCode}
-                    </Snackbar>
-                  ) : null}
+        {!this.state.isLoader ? (
+          <Card style={{ maxWidth: "45rem" }}>
+            <form
+              autoComplete="off"
+              noValidate
+              onSubmit={this.handleSubmit}
+              method="post"
+            >
+              <CardHeader
+                title={this.state.editPage[0] ? "Edit state" : "Add state"}
+                subheader={
+                  this.state.editPage[0]
+                    ? "You can edit state data here!"
+                    : "You can add new state data here!"
+                }
+              />
+              <Divider />
+              <CardContent>
+                <Grid container spacing={3}>
+                  <Grid item md={12} xs={12}>
+                    {this.state.formSubmitted === false ? (
+                      <Snackbar severity="error" Showbutton={false}>
+                        {this.state.errorCode}
+                      </Snackbar>
+                    ) : null}
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="State Name*"
+                      name="addState"
+                      error={this.hasError("addState")}
+                      helperText={
+                        this.hasError("addState")
+                          ? this.state.errors.addState[0]
+                          : null
+                      }
+                      value={this.state.values.addState || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Identifier"
+                      name="addIdentifier"
+                      error={this.hasError("addIdentifier")}
+                      helperText={
+                        this.hasError("addIdentifier")
+                          ? this.state.errors.addIdentifier[0]
+                          : null
+                      }
+                      value={this.state.values.addIdentifier || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Abbreviation"
+                      name="addAbbreviation"
+                      error={this.hasError("addAbbreviation")}
+                      helperText={
+                        this.hasError("addAbbreviation")
+                          ? this.state.errors.addAbbreviation[0]
+                          : null
+                      }
+                      value={this.state.values.addAbbreviation || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={this.state.addIsActive}
+                          onChange={this.handleCheckBox}
+                          name="addIsActive"
+                          color="primary"
+                          disabled={this.state.stateInUse ? true : false}
+                        />
+                      }
+                      label="Active"
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="State Name*"
-                    name="addState"
-                    error={this.hasError("addState")}
-                    helperText={
-                      this.hasError("addState")
-                        ? this.state.errors.addState[0]
-                        : null
-                    }
-                    value={this.state.values.addState || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Identifier"
-                    name="addIdentifier"
-                    error={this.hasError("addIdentifier")}
-                    helperText={
-                      this.hasError("addIdentifier")
-                        ? this.state.errors.addIdentifier[0]
-                        : null
-                    }
-                    value={this.state.values.addIdentifier || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Abbreviation"
-                    name="addAbbreviation"
-                    error={this.hasError("addAbbreviation")}
-                    helperText={
-                      this.hasError("addAbbreviation")
-                        ? this.state.errors.addAbbreviation[0]
-                        : null
-                    }
-                    value={this.state.values.addAbbreviation || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={this.state.addIsActive}
-                        onChange={this.handleCheckBox}
-                        name="addIsActive"
-                        color="primary"
-                        disabled={this.state.stateInUse ? true : false}
-                      />
-                    }
-                    label="Active"
-                  />
-                </Grid>
-              </Grid>
-            </CardContent>
-            <Divider />
-            <CardActions style={{ padding: "15px", }}>
-              <Button type="submit">Save</Button>
-              <Button
-                color="secondary"
-                clicked={this.cancelForm}
-                component={Link}
-                to="/states"
-              >
-                Cancel
-              </Button>
-            </CardActions>
-          </form>
-        </Card>
+              </CardContent>
+              <Divider />
+              <CardActions style={{ padding: "15px" }}>
+                <Button type="submit">Save</Button>
+                <Button
+                  color="secondary"
+                  clicked={this.cancelForm}
+                  component={Link}
+                  to="/states"
+                >
+                  Cancel
+                </Button>
+              </CardActions>
+            </form>
+          </Card>
+        ) : (
+          <Spinner />
+        )}
       </Layout>
     );
   }
