@@ -66,13 +66,11 @@ export class Vos extends React.Component {
       filterDistrict: "",
       filterVillage: "",
       filterVo: "",
-      Result: [],
       data: [],
       selectedid: 0,
       open: false,
       columnsvalue: [],
       DeleteData: false,
-      properties: props,
       getState: [],
       getDistrict: [],
       getVillage: [],
@@ -80,6 +78,7 @@ export class Vos extends React.Component {
       singleDelete: "",
       multipleDelete: "",
       loggedInUserRole: auth.getUserInfo().role.name,
+      isLoader: true,
     };
   }
 
@@ -95,7 +94,7 @@ export class Vos extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
-        this.setState({ data: res.data });
+        this.setState({ data: res.data, isLoader: false });
       });
 
     //api call for states filter
@@ -231,12 +230,14 @@ export class Vos extends React.Component {
       filterVillage: "",
       filterVo: "",
       isCancel: true,
+      isLoader: true,
     });
 
     this.componentDidMount();
   };
 
   handleSearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.filterVo) {
       searchData += "name_contains=" + this.state.filterVo;
@@ -276,7 +277,7 @@ export class Vos extends React.Component {
         process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
       )
       .then((res) => {
-        this.setState({ data: res.data });
+        this.setState({ data: res.data, isLoader: false });
       })
       .catch((error) => {
         console.log(error);
@@ -336,8 +337,7 @@ export class Vos extends React.Component {
           <div className="App">
             <h5 className={classes.menuName}>MASTERS</h5>
             <div className={style.headerWrap}>
-              <h2 className={style.title}>
-                Manage Village Organizations</h2>
+              <h2 className={style.title}>Manage Village Organizations</h2>
               <div className={classes.buttonRow}>
                 <Button
                   variant="contained"
@@ -380,7 +380,10 @@ export class Vos extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
+            <div
+              className={classes.row}
+              style={{ flexWrap: "wrap", height: "auto" }}
+            >
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -419,7 +422,6 @@ export class Vos extends React.Component {
                         <Input
                           {...params}
                           fullWidth
-                          // margin="dense"
                           label="Select State"
                           name="addState"
                           variant="outlined"
@@ -440,7 +442,6 @@ export class Vos extends React.Component {
                       onChange={(event, value) => {
                         this.handleDistrictChange(event, value);
                       }}
-                      // defaultValue={[]}
                       value={
                         filterDistrict
                           ? this.state.isCancel === true
@@ -468,7 +469,6 @@ export class Vos extends React.Component {
                     <Autocomplete
                       id="combo-box-demo"
                       options={villagesFilter}
-                      // name="filterVillage"
                       getOptionLabel={(option) => option.name}
                       onChange={(event, value) => {
                         this.handleVillageChange(event, value);
@@ -494,17 +494,16 @@ export class Vos extends React.Component {
                 </div>
               </div>
               <Button
-                style={{ marginRight: "5px", marginBottom: "8px", }}
+                style={{ marginRight: "5px", marginBottom: "8px" }}
                 variant="contained"
                 onClick={this.handleSearch.bind(this)}
               >
                 Search
               </Button>
               <Button
-                style={{ marginBottom: "8px", }}
+                style={{ marginBottom: "8px" }}
                 color="secondary"
                 variant="contained"
-                // clicked={this.cancelForm}
                 onClick={this.cancelForm.bind(this)}
               >
                 Reset
@@ -527,6 +526,7 @@ export class Vos extends React.Component {
                 columnsvalue={columnsvalue}
                 selectableRows
                 pagination
+                progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (

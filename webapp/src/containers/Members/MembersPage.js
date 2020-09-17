@@ -21,6 +21,7 @@ import Autotext from "../../components/Autotext/Autotext";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
+import Spinner from "../../components/Spinner/Spinner";
 
 class ActivityPage extends Component {
   constructor(props) {
@@ -99,11 +100,13 @@ class ActivityPage extends Component {
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
       ],
+      isLoader: "",
     };
   }
 
   async componentDidMount() {
     if (this.state.editPage[0]) {
+      this.setState({ isLoader: true });
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
@@ -132,12 +135,14 @@ class ActivityPage extends Component {
               addEmail: res.data.email,
               addShg: res.data.individual.shg,
             },
+            isLoader: false,
           });
           if (res.data.pg) {
             let pgValue = this.state.values;
             pgValue["addPg"] = res.data.pg.id;
             this.setState({
               values: pgValue,
+              isLoader: false,
             });
           }
 
@@ -154,6 +159,7 @@ class ActivityPage extends Component {
             this.setState({
               isShareholder: true,
               values: tempValues,
+              isLoader: false,
             });
           }
         })
@@ -609,483 +615,489 @@ class ActivityPage extends Component {
             : ADD_MEMBERS_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: "45rem" }}>
-          <form
-            autoComplete="off"
-            noValidate
-            onSubmit={this.handleSubmit}
-            method="post"
-          >
-            <CardHeader
-              title={this.state.editPage[0] ? "Edit Member" : "Add Member"}
-              subheader={
-                this.state.editPage[0]
-                  ? "You can edit member data here!"
-                  : "You can add new member data here!"
-              }
-            />
-            <Divider />
-            <CardContent>
-              <Grid container spacing={3}>
-                <Grid item md={12} xs={12}>
-                  {this.state.formSubmitted === false ? (
-                    <Snackbar severity="error" Showbutton={false}>
-                      {this.state.errorCode}
-                    </Snackbar>
-                  ) : null}
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="First Name*"
-                    name="firstName"
-                    error={this.hasError("firstName")}
-                    helperText={
-                      this.hasError("firstName")
-                        ? this.state.errors.firstName[0]
-                        : null
-                    }
-                    value={this.state.values.firstName || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Last Name*"
-                    name="lastName"
-                    error={this.hasError("lastName")}
-                    helperText={
-                      this.hasError("lastName")
-                        ? this.state.errors.lastName[0]
-                        : null
-                    }
-                    value={this.state.values.lastName || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Husband Name"
-                    name="husbandName"
-                    helperText={
-                      this.hasError("husbandName")
-                        ? this.state.errors.husbandName[0]
-                        : null
-                    }
-                    value={this.state.values.husbandName || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Input
-                    fullWidth
-                    label="Address*"
-                    name="address"
-                    error={this.hasError("address")}
-                    helperText={
-                      this.hasError("address")
-                        ? this.state.errors.address[0]
-                        : null
-                    }
-                    value={this.state.values.address || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Autotext
-                    id="combo-box-demo"
-                    options={stateFilter}
-                    variant="outlined"
-                    label="Select State*"
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, value) => {
-                      this.handleStateChange(value);
-                    }}
-                    defaultValue={[]}
-                    value={
-                      addState
-                        ? stateFilter[
-                            stateFilter.findIndex(function (item, i) {
-                              return item.id === addState;
+        {!this.state.isLoader ? (
+          <Card style={{ maxWidth: "45rem" }}>
+            <form
+              autoComplete="off"
+              noValidate
+              onSubmit={this.handleSubmit}
+              method="post"
+            >
+              <CardHeader
+                title={this.state.editPage[0] ? "Edit Member" : "Add Member"}
+                subheader={
+                  this.state.editPage[0]
+                    ? "You can edit member data here!"
+                    : "You can add new member data here!"
+                }
+              />
+              <Divider />
+              <CardContent>
+                <Grid container spacing={3}>
+                  <Grid item md={12} xs={12}>
+                    {this.state.formSubmitted === false ? (
+                      <Snackbar severity="error" Showbutton={false}>
+                        {this.state.errorCode}
+                      </Snackbar>
+                    ) : null}
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="First Name*"
+                      name="firstName"
+                      error={this.hasError("firstName")}
+                      helperText={
+                        this.hasError("firstName")
+                          ? this.state.errors.firstName[0]
+                          : null
+                      }
+                      value={this.state.values.firstName || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Last Name*"
+                      name="lastName"
+                      error={this.hasError("lastName")}
+                      helperText={
+                        this.hasError("lastName")
+                          ? this.state.errors.lastName[0]
+                          : null
+                      }
+                      value={this.state.values.lastName || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Husband Name"
+                      name="husbandName"
+                      helperText={
+                        this.hasError("husbandName")
+                          ? this.state.errors.husbandName[0]
+                          : null
+                      }
+                      value={this.state.values.husbandName || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Input
+                      fullWidth
+                      label="Address*"
+                      name="address"
+                      error={this.hasError("address")}
+                      helperText={
+                        this.hasError("address")
+                          ? this.state.errors.address[0]
+                          : null
+                      }
+                      value={this.state.values.address || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Autotext
+                      id="combo-box-demo"
+                      options={stateFilter}
+                      variant="outlined"
+                      label="Select State*"
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handleStateChange(value);
+                      }}
+                      defaultValue={[]}
+                      value={
+                        addState
+                          ? stateFilter[
+                              stateFilter.findIndex(function (item, i) {
+                                return item.id === addState;
+                              })
+                            ] || null
+                          : null
+                      }
+                      error={this.hasError("addState")}
+                      helperText={
+                        this.hasError("addState")
+                          ? this.state.errors.addState[0]
+                          : null
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          fullWidth
+                          label="Select State*"
+                          name="addState"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Autotext
+                      id="combo-box-demo"
+                      options={districtFilter}
+                      variant="outlined"
+                      label="Select District*"
+                      name="addDistrict"
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handleDistrictChange(value);
+                      }}
+                      defaultValue={[]}
+                      value={
+                        addDistrict
+                          ? districtFilter[
+                              districtFilter.findIndex(function (item, i) {
+                                return item.id === addDistrict;
+                              })
+                            ] || null
+                          : null
+                      }
+                      error={this.hasError("addDistrict")}
+                      helperText={
+                        this.hasError("addDistrict")
+                          ? this.state.errors.addDistrict[0]
+                          : this.state.stateSelected
+                          ? null
+                          : "Please select the state first"
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          {...params}
+                          fullWidth
+                          label="Select District*"
+                          name="addDistrict"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Block"
+                      name="addBlock"
+                      error={this.hasError("addBlock")}
+                      helperText={
+                        this.hasError("addBlock")
+                          ? this.state.errors.addBlock[0]
+                          : null
+                      }
+                      value={this.state.values.addBlock || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Gaon Panchayat"
+                      name="addGp"
+                      error={this.hasError("addGp")}
+                      helperText={
+                        this.hasError("addGp")
+                          ? this.state.errors.addGp[0]
+                          : null
+                      }
+                      value={this.state.values.addGp || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Autotext
+                      id="combo-box-demo"
+                      options={villageFilter}
+                      variant="outlined"
+                      label="Select Village*"
+                      name="addVillage"
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handleVillageChange(event, value);
+                      }}
+                      defaultValue={[]}
+                      value={
+                        addVillage
+                          ? villageFilter[
+                              villageFilter.findIndex(function (item, i) {
+                                return item.id === addVillage;
+                              })
+                            ] || null
+                          : null
+                      }
+                      error={this.hasError("addVillage")}
+                      helperText={
+                        this.hasError("addVillage")
+                          ? this.state.errors.addVillage[0]
+                          : this.state.districtSelected
+                          ? null
+                          : "Please select the district first"
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          {...params}
+                          fullWidth
+                          label="Select Village"
+                          name="addVillage"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Pincode"
+                      name="addPincode"
+                      error={this.hasError("addPincode")}
+                      helperText={
+                        this.hasError("addPincode")
+                          ? this.state.errors.addPincode[0]
+                          : null
+                      }
+                      value={this.state.values.addPincode || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Phone Number*"
+                      type="tel"
+                      name="addPhone"
+                      error={this.hasError("addPhone")}
+                      helperText={
+                        this.hasError("addPhone")
+                          ? this.state.errors["addPhone"].map((error) => {
+                              return error + " ";
                             })
-                          ] || null
-                        : null
-                    }
-                    error={this.hasError("addState")}
-                    helperText={
-                      this.hasError("addState")
-                        ? this.state.errors.addState[0]
-                        : null
-                    }
-                    renderInput={(params) => (
-                      <Input
-                        fullWidth
-                        label="Select State*"
-                        name="addState"
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Autotext
-                    id="combo-box-demo"
-                    options={districtFilter}
-                    variant="outlined"
-                    label="Select District*"
-                    name="addDistrict"
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, value) => {
-                      this.handleDistrictChange(value);
-                    }}
-                    defaultValue={[]}
-                    value={
-                      addDistrict
-                        ? districtFilter[
-                            districtFilter.findIndex(function (item, i) {
-                              return item.id === addDistrict;
-                            })
-                          ] || null
-                        : null
-                    }
-                    error={this.hasError("addDistrict")}
-                    helperText={
-                      this.hasError("addDistrict")
-                        ? this.state.errors.addDistrict[0]
-                        : this.state.stateSelected
-                        ? null
-                        : "Please select the state first"
-                    }
-                    renderInput={(params) => (
-                      <Input
-                        {...params}
-                        fullWidth
-                        label="Select District*"
-                        name="addDistrict"
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Block"
-                    name="addBlock"
-                    error={this.hasError("addBlock")}
-                    helperText={
-                      this.hasError("addBlock")
-                        ? this.state.errors.addBlock[0]
-                        : null
-                    }
-                    value={this.state.values.addBlock || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Gaon Panchayat"
-                    name="addGp"
-                    error={this.hasError("addGp")}
-                    helperText={
-                      this.hasError("addGp") ? this.state.errors.addGp[0] : null
-                    }
-                    value={this.state.values.addGp || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Autotext
-                    id="combo-box-demo"
-                    options={villageFilter}
-                    variant="outlined"
-                    label="Select Village*"
-                    name="addVillage"
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, value) => {
-                      this.handleVillageChange(event, value);
-                    }}
-                    defaultValue={[]}
-                    value={
-                      addVillage
-                        ? villageFilter[
-                            villageFilter.findIndex(function (item, i) {
-                              return item.id === addVillage;
-                            })
-                          ] || null
-                        : null
-                    }
-                    error={this.hasError("addVillage")}
-                    helperText={
-                      this.hasError("addVillage")
-                        ? this.state.errors.addVillage[0]
-                        : this.state.districtSelected
-                        ? null
-                        : "Please select the district first"
-                    }
-                    renderInput={(params) => (
-                      <Input
-                        {...params}
-                        fullWidth
-                        label="Select Village"
-                        name="addVillage"
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Pincode"
-                    name="addPincode"
-                    error={this.hasError("addPincode")}
-                    helperText={
-                      this.hasError("addPincode")
-                        ? this.state.errors.addPincode[0]
-                        : null
-                    }
-                    value={this.state.values.addPincode || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Phone Number*"
-                    type="tel"
-                    name="addPhone"
-                    error={this.hasError("addPhone")}
-                    helperText={
-                      this.hasError("addPhone")
-                        ? this.state.errors["addPhone"].map((error) => {
-                            return error + " ";
-                          })
-                        : null
-                    }
-                    value={this.state.values.addPhone || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Email"
-                    type="email"
-                    name="addEmail"
-                    value={this.state.values.addEmail || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Autotext
-                    id="combo-box-demo"
-                    options={shgFilters}
-                    variant="outlined"
-                    label="Select SHG*"
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, value) => {
-                      this.handleShgChange(event, value);
-                    }}
-                    value={
-                      this.state.loggedInUserRole ===
-                      "CSP (Community Service Provider)"
-                        ? addShg
+                          : null
+                      }
+                      value={this.state.values.addPhone || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Email"
+                      type="email"
+                      name="addEmail"
+                      value={this.state.values.addEmail || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Autotext
+                      id="combo-box-demo"
+                      options={shgFilters}
+                      variant="outlined"
+                      label="Select SHG*"
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handleShgChange(event, value);
+                      }}
+                      value={
+                        this.state.loggedInUserRole ===
+                        "CSP (Community Service Provider)"
+                          ? addShg
+                            ? this.state.isCancel === true
+                              ? null
+                              : shgFilters[
+                                  shgFilters.findIndex(function (item, i) {
+                                    return item.contact === addShg;
+                                  })
+                                ] || null
+                            : null
+                          : addShg
                           ? this.state.isCancel === true
                             ? null
                             : shgFilters[
                                 shgFilters.findIndex(function (item, i) {
-                                  return item.contact === addShg;
+                                  return item.id === addShg;
                                 })
                               ] || null
                           : null
-                        : addShg
-                        ? this.state.isCancel === true
-                          ? null
-                          : shgFilters[
-                              shgFilters.findIndex(function (item, i) {
-                                return item.id === addShg;
+                      }
+                      error={this.hasError("addShg")}
+                      helperText={
+                        this.hasError("addShg")
+                          ? this.state.errors.addShg[0]
+                          : null
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          fullWidth
+                          label="Select SHG"
+                          name="addShg"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Autotext
+                      id="combo-box-demo"
+                      options={pgFilter}
+                      variant="outlined"
+                      label="Select PG"
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handlePgChange(value);
+                      }}
+                      defaultValue={[]}
+                      value={
+                        addPg
+                          ? pgFilter[
+                              pgFilter.findIndex(function (item, i) {
+                                return item.id === addPg;
                               })
                             ] || null
-                        : null
-                    }
-                    error={this.hasError("addShg")}
-                    helperText={
-                      this.hasError("addShg")
-                        ? this.state.errors.addShg[0]
-                        : null
-                    }
-                    renderInput={(params) => (
-                      <Input
-                        fullWidth
-                        label="Select SHG"
-                        name="addShg"
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Autotext
-                    id="combo-box-demo"
-                    options={pgFilter}
-                    variant="outlined"
-                    label="Select PG"
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, value) => {
-                      this.handlePgChange(value);
-                    }}
-                    defaultValue={[]}
-                    value={
-                      addPg
-                        ? pgFilter[
-                            pgFilter.findIndex(function (item, i) {
-                              return item.id === addPg;
-                            })
-                          ] || null
-                        : null
-                    }
-                    renderInput={(params) => (
-                      <Input
-                        fullWidth
-                        label="Select PG"
-                        name="addPg"
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                </Grid>
-
-                <Grid item xs={12}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={this.state.isShareholder}
-                        onChange={this.handleOnCheck}
-                        name="isShareholder"
-                        color="secondary"
-                      />
-                    }
-                    label="Is Shareholder"
-                  />
-                </Grid>
-                <Divider />
-                {this.state.isShareholder ? (
-                  <Grid
-                    container
-                    spacing={3}
-                    style={{ width: "100%", margin: "0px" }}
-                  >
-                    <Grid item md={6} xs={12}>
-                      <Input
-                        fullWidth
-                        label="Number of Shares*"
-                        name="noOfShares"
-                        error={this.hasError("noOfShares")}
-                        helperText={
-                          this.hasError("noOfShares")
-                            ? this.state.errors.noOfShares[0]
-                            : null
-                        }
-                        value={this.state.values.noOfShares || ""}
-                        onChange={this.handleChange}
-                        variant="outlined"
-                      />
-                    </Grid>
-                    <Grid item md={6} xs={12}>
-                      <Input
-                        fullWidth
-                        label="Share Amount*"
-                        name="shareAmt"
-                        error={this.hasError("shareAmt")}
-                        helperText={
-                          this.hasError("shareAmt")
-                            ? this.state.errors.shareAmt[0]
-                            : null
-                        }
-                        value={this.state.values.shareAmt || ""}
-                        onChange={this.handleChange}
-                        variant="outlined"
-                      />
-                    </Grid>
-                    <Grid item md={6} xs={12}>
-                      <Input
-                        fullWidth
-                        label="Share Certificate Number"
-                        name="certificateNo"
-                        value={this.state.values.certificateNo || ""}
-                        onChange={this.handleChange}
-                        variant="outlined"
-                      />
-                    </Grid>
-                    <Grid item md={6} xs={12}>
-                      <Datepicker
-                        label="Date*"
-                        name="selectedDate"
-                        value={this.state.values.selectedDate || ""}
-                        format={"dd MMM yyyy"}
-                        error={this.hasError("selectedDate")}
-                        helperText={
-                          this.hasError("selectedDate")
-                            ? this.state.errors.selectedDate[0]
-                            : null
-                        }
-                        onChange={(value) =>
-                          this.setState({
-                            values: {
-                              ...this.state.values,
-                              selectedDate: value,
-                            },
-                          })
-                        }
-                      />
-                    </Grid>
-                    <Grid item md={6} xs={12}>
-                      <Input
-                        fullWidth
-                        label="Nominee*"
-                        name="nominee"
-                        error={this.hasError("nominee")}
-                        helperText={
-                          this.hasError("nominee")
-                            ? this.state.errors.nominee[0]
-                            : null
-                        }
-                        value={this.state.values.nominee || ""}
-                        onChange={this.handleChange}
-                        variant="outlined"
-                      />
-                    </Grid>
+                          : null
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          fullWidth
+                          label="Select PG"
+                          name="addPg"
+                          variant="outlined"
+                        />
+                      )}
+                    />
                   </Grid>
-                ) : null}
-              </Grid>
-            </CardContent>
-            <Divider />
-            <CardActions style={{ padding: "15px" }}>
-              <Button type="submit">Save</Button>
-              <Button
-                color="secondary"
-                clicked={this.cancelForm}
-                component={Link}
-                to="/members"
-              >
-                cancel
-              </Button>
-            </CardActions>
-          </form>
-        </Card>
+
+                  <Grid item xs={12}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={this.state.isShareholder}
+                          onChange={this.handleOnCheck}
+                          name="isShareholder"
+                          color="secondary"
+                        />
+                      }
+                      label="Is Shareholder"
+                    />
+                  </Grid>
+                  <Divider />
+                  {this.state.isShareholder ? (
+                    <Grid
+                      container
+                      spacing={3}
+                      style={{ width: "100%", margin: "0px" }}
+                    >
+                      <Grid item md={6} xs={12}>
+                        <Input
+                          fullWidth
+                          label="Number of Shares*"
+                          name="noOfShares"
+                          error={this.hasError("noOfShares")}
+                          helperText={
+                            this.hasError("noOfShares")
+                              ? this.state.errors.noOfShares[0]
+                              : null
+                          }
+                          value={this.state.values.noOfShares || ""}
+                          onChange={this.handleChange}
+                          variant="outlined"
+                        />
+                      </Grid>
+                      <Grid item md={6} xs={12}>
+                        <Input
+                          fullWidth
+                          label="Share Amount*"
+                          name="shareAmt"
+                          error={this.hasError("shareAmt")}
+                          helperText={
+                            this.hasError("shareAmt")
+                              ? this.state.errors.shareAmt[0]
+                              : null
+                          }
+                          value={this.state.values.shareAmt || ""}
+                          onChange={this.handleChange}
+                          variant="outlined"
+                        />
+                      </Grid>
+                      <Grid item md={6} xs={12}>
+                        <Input
+                          fullWidth
+                          label="Share Certificate Number"
+                          name="certificateNo"
+                          value={this.state.values.certificateNo || ""}
+                          onChange={this.handleChange}
+                          variant="outlined"
+                        />
+                      </Grid>
+                      <Grid item md={6} xs={12}>
+                        <Datepicker
+                          label="Date*"
+                          name="selectedDate"
+                          value={this.state.values.selectedDate || ""}
+                          format={"dd MMM yyyy"}
+                          error={this.hasError("selectedDate")}
+                          helperText={
+                            this.hasError("selectedDate")
+                              ? this.state.errors.selectedDate[0]
+                              : null
+                          }
+                          onChange={(value) =>
+                            this.setState({
+                              values: {
+                                ...this.state.values,
+                                selectedDate: value,
+                              },
+                            })
+                          }
+                        />
+                      </Grid>
+                      <Grid item md={6} xs={12}>
+                        <Input
+                          fullWidth
+                          label="Nominee*"
+                          name="nominee"
+                          error={this.hasError("nominee")}
+                          helperText={
+                            this.hasError("nominee")
+                              ? this.state.errors.nominee[0]
+                              : null
+                          }
+                          value={this.state.values.nominee || ""}
+                          onChange={this.handleChange}
+                          variant="outlined"
+                        />
+                      </Grid>
+                    </Grid>
+                  ) : null}
+                </Grid>
+              </CardContent>
+              <Divider />
+              <CardActions style={{ padding: "15px" }}>
+                <Button type="submit">Save</Button>
+                <Button
+                  color="secondary"
+                  clicked={this.cancelForm}
+                  component={Link}
+                  to="/members"
+                >
+                  cancel
+                </Button>
+              </CardActions>
+            </form>
+          </Card>
+        ) : (
+          <Spinner />
+        )}
       </Layout>
     );
   }

@@ -17,6 +17,7 @@ import AssignmentIndIcon from "@material-ui/icons/AssignmentInd";
 import PrintIcon from "@material-ui/icons/Print";
 import auth from "../../components/Auth/Auth";
 import VisibilityIcon from "@material-ui/icons/Visibility";
+import Spinner from "../Spinner/Spinner.js";
 
 const useStyles = makeStyles((theme) => ({
   editIcon: {
@@ -118,6 +119,7 @@ const Table = (props) => {
     setisDeleteShowing(!isDeleteShowing);
     props.editData(DataID, selectedId);
   };
+
   const handleViewEvent = () => {
     setisDeleteShowing(!isDeleteShowing);
     props.viewData(DataID, selectedId);
@@ -203,11 +205,13 @@ const Table = (props) => {
           <div>
             <div
               style={{ display: "inline-flex" }}
-              onClick={(cell.activitytype.name !== "Loan application collection" &&
+              onClick={
+                cell.activitytype.name !== "Loan application collection" &&
                 cell.activitytype.name !== "Collection of principal amount" &&
                 cell.activitytype.name !== "Interest collection" &&
-                cell.loan_application_task === null) ?
-                (event) => editData(cell.id) : null
+                cell.loan_application_task === null
+                  ? (event) => editData(cell.id)
+                  : null
               }
               id={cell.id}
             >
@@ -215,17 +219,24 @@ const Table = (props) => {
                 <IconButton
                   aria-label="task"
                   value={cell[valueformodal]}
-                  disabled={(cell.activitytype.name !== "Loan application collection" &&
-                    cell.activitytype.name !== "Collection of principal amount" &&
+                  disabled={
+                    cell.activitytype.name !== "Loan application collection" &&
+                    cell.activitytype.name !==
+                      "Collection of principal amount" &&
                     cell.activitytype.name !== "Interest collection" &&
-                    cell.loan_application_task === null) ? false : true}
+                    cell.loan_application_task === null
+                      ? false
+                      : true
+                  }
                 >
-                  {(cell.activitytype.name !== "Loan application collection" &&
-                    cell.activitytype.name !== "Collection of principal amount" &&
-                    cell.activitytype.name !== "Interest collection" &&
-                    cell.loan_application_task === null) ?
-                    <EditIcon className={classes.editIcon} /> :
-                    <EditIcon className={classes.VisibilityIcon} />}
+                  {cell.activitytype.name !== "Loan application collection" &&
+                  cell.activitytype.name !== "Collection of principal amount" &&
+                  cell.activitytype.name !== "Interest collection" &&
+                  cell.loan_application_task === null ? (
+                    <EditIcon className={classes.editIcon} />
+                  ) : (
+                    <EditIcon className={classes.VisibilityIcon} />
+                  )}
                 </IconButton>
               </Tooltip>
             </div>
@@ -495,12 +506,10 @@ const Table = (props) => {
   if (props.column.length > 0) {
     columns = makeColumns(props.column);
   }
-  // let valuesSelected = [];
-  // for (let values in selected) {
-  //   valuesSelected.push(selected[values]['is_active'])
-  // }
-  // var count = {};
-  // valuesSelected.forEach(function (i) { count[i] = (count[i] || 0) + 1; });
+
+  if (props.progressComponent === true) {
+    return <Spinner />;
+  }
 
   return (
     <>
@@ -522,6 +531,7 @@ const Table = (props) => {
             title={props.title}
             columns={props.column}
             pagination={props.pagination}
+            progressComponent
             selectableRowsComponent={Checkbox}
             contextActions={contextActions}
             actions={handleEditEvent}

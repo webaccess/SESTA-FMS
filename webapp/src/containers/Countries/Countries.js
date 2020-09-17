@@ -63,8 +63,6 @@ export class Countries extends React.Component {
       data: [],
       selectedid: 0,
       open: false,
-      isSetActive: false,
-      isSetInActive: false,
       isActiveAllShowing: false,
       columnsvalue: [],
       DeleteData: false,
@@ -73,8 +71,8 @@ export class Countries extends React.Component {
       dataCellId: [],
       singleDelete: "",
       multipleDelete: "",
-      active: {},
       allIsActive: [],
+      isLoader: true,
     };
   }
 
@@ -85,7 +83,7 @@ export class Countries extends React.Component {
           "crm-plugin/countries/?_sort=name:ASC"
       )
       .then((res) => {
-        this.setState({ data: res.data });
+        this.setState({ data: res.data, isLoader: false });
       });
   }
 
@@ -107,6 +105,7 @@ export class Countries extends React.Component {
   }
 
   handleSearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.values.filterCountry) {
       searchData += "name_contains=" + this.state.values.filterCountry;
@@ -119,7 +118,7 @@ export class Countries extends React.Component {
           "&&_sort=name:ASC"
       )
       .then((res) => {
-        this.setState({ data: this.getData(res.data) });
+        this.setState({ data: this.getData(res.data), isLoader: false });
       })
       .catch((err) => {
         console.log(err);
@@ -137,6 +136,7 @@ export class Countries extends React.Component {
       formSubmitted: "",
       stateSelected: false,
       isCancel: true,
+      isLoader: true,
     });
     this.componentDidMount();
   };
@@ -375,6 +375,7 @@ export class Countries extends React.Component {
                 columnsvalue={columnsvalue}
                 selectableRows
                 pagination
+                progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
                 ActiveMessage={
                   "Are you Sure you want to Deactivate selected Country"

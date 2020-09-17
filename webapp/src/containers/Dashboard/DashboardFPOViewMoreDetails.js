@@ -44,6 +44,7 @@ class DashboardFPOViewMoreDetails extends Component {
       filterEndDate: "",
       isCancel: false,
       loanData: [],
+      isLoader: true,
     };
   }
 
@@ -86,6 +87,7 @@ class DashboardFPOViewMoreDetails extends Component {
     );
     this.setState({
       loanData: loansDetails,
+      isLoader: false,
     });
   };
 
@@ -116,6 +118,7 @@ class DashboardFPOViewMoreDetails extends Component {
   }
 
   handleSearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.memberName) {
       searchData += searchData ? "&&" : "";
@@ -149,6 +152,7 @@ class DashboardFPOViewMoreDetails extends Component {
       filterEndDate: "",
       memberName: "",
       isCancel: true,
+      isLoader: true,
     });
     this.componentDidMount();
   };
@@ -198,16 +202,17 @@ class DashboardFPOViewMoreDetails extends Component {
         <Grid>
           <Grid>
             <div className={style.headerWrap}>
-              <h2 className={style.title}>
-                Loans
-              </h2>
+              <h2 className={style.title}>Loans</h2>
               <div className={classes.buttonRow}>
                 <Button color="primary" component={Link} to="/">
                   Back
                 </Button>
               </div>
             </div>
-            <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
+            <div
+              className={classes.row}
+              style={{ flexWrap: "wrap", height: "auto" }}
+            >
               <div className={classes.searchInput}>
                 <div className={classes.Districts}>
                   <Grid item md={12} xs={12}>
@@ -255,11 +260,16 @@ class DashboardFPOViewMoreDetails extends Component {
                 </div>
               </div>
               <Button
-                style={{ marginRight: "5px", marginBottom: "8px", }}
-                onClick={this.handleSearch.bind(this)}>Search</Button>
+                style={{ marginRight: "5px", marginBottom: "8px" }}
+                onClick={this.handleSearch.bind(this)}
+              >
+                Search
+              </Button>
               <Button
-                style={{ marginRight: "5px", marginBottom: "8px", }}
-                color="secondary" clicked={this.cancelForm}>
+                style={{ marginRight: "5px", marginBottom: "8px" }}
+                color="secondary"
+                clicked={this.cancelForm}
+              >
                 reset
               </Button>
             </div>
@@ -276,6 +286,7 @@ class DashboardFPOViewMoreDetails extends Component {
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 pagination
+                progressComponent={this.state.isLoader}
               />
             ) : null}
           </Grid>

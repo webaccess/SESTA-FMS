@@ -11,6 +11,7 @@ import { LOAN_EMI_BREADCRUMBS } from "./config";
 import style from "./Loans.module.css";
 import Button from "../../components/UI/Button/Button";
 import { Link } from "react-router-dom";
+import Spinner from "../../components/Spinner/Spinner";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -52,7 +53,7 @@ const useStyles = (theme) => ({
   loaneeName: {
     margin: "10px 0",
     display: "inline-flex",
-  }
+  },
 });
 
 class LoanEmiPage extends Component {
@@ -61,6 +62,7 @@ class LoanEmiPage extends Component {
     this.state = {
       data: [],
       loanEmiData: [],
+      isLoader: true,
     };
   }
 
@@ -71,12 +73,12 @@ class LoanEmiPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "loan-application-installments/?loan_application.id=" +
-        memberData.id +
-        "&&_sort=payment_date:ASC"
+          "loan-application-installments/?loan_application.id=" +
+          memberData.id +
+          "&&_sort=payment_date:ASC"
       )
       .then((res) => {
-        this.setState({ loanEmiData: res.data });
+        this.setState({ loanEmiData: res.data, isLoader: false });
       });
   }
 
@@ -92,8 +94,8 @@ class LoanEmiPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/individuals/" +
-        memberData.contact.individual
+          "crm-plugin/individuals/" +
+          memberData.contact.individual
       )
       .then((res) => {
         let shgName = res.data.shg.name;
@@ -101,8 +103,8 @@ class LoanEmiPage extends Component {
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/?organization.id=" +
-            res.data.shg.organization
+              "crm-plugin/contact/?organization.id=" +
+              res.data.shg.organization
           )
           .then((response) => {
             let villageName = response.data[0].villages[0].name;
@@ -120,6 +122,7 @@ class LoanEmiPage extends Component {
                   ? Moment(loanEndsOn).format("DD MMM YYYY")
                   : "-",
               },
+              isLoader: false,
             });
           });
       });
@@ -286,146 +289,189 @@ class LoanEmiPage extends Component {
 
     return (
       <Layout breadcrumbs={LOAN_EMI_BREADCRUMBS}>
-        <Grid>
-          <div className="App">
-            <h5 className={style.loan}>LOANS</h5>
-            <div className={classes.emiViewWrap}>
-              <h2 className={classes.loaneeName} style={{paddingRight: "4rem",}}>{data.loanee}</h2>
-              <div className={classes.dataRow} style={{paddingRight: "4rem",}}>
-                <p>
-                  <span className={style.filterLabel}>SHG GROUP</span>
-                  <span className={style.filterValue}>{data.shg}</span>
-                </p>
-              </div>
+        {!this.state.isLoader ? (
+          <Grid>
+            <div className="App">
+              <h5 className={style.loan}>LOANS</h5>
+              <div className={classes.emiViewWrap}>
+                <h2
+                  className={classes.loaneeName}
+                  style={{ paddingRight: "4rem" }}
+                >
+                  {data.loanee}
+                </h2>
+                <div
+                  className={classes.dataRow}
+                  style={{ paddingRight: "4rem" }}
+                >
+                  <p>
+                    <span className={style.filterLabel}>SHG GROUP</span>
+                    <span className={style.filterValue}>{data.shg}</span>
+                  </p>
+                </div>
 
-              <div className={classes.dataRow}>
-                <p>
-                <span className={style.filterLabel}>VILLAGE</span>
-                  <span className={style.filterValue}>{data.village}</span>
-                </p>
+                <div className={classes.dataRow}>
+                  <p>
+                    <span className={style.filterLabel}>VILLAGE</span>
+                    <span className={style.filterValue}>{data.village}</span>
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-          <Grid item md={12} xs={12}>
-            {emiEditPage === true ? (
-              <Snackbar severity="success">
-                Loan EMI Updated successfully.
-              </Snackbar>
-            ) : null}
-          </Grid>
-          <Card className={classes.mainContent}>
-            <Grid
-              container
-              spacing={3}
-              style={{ padding: "20px 0px", alignItems: "center" }}
-            >
-              <Grid spacing={1} xs={1}>
-                <MoneyIcon className={classes.Icon} />
-              </Grid>
-              <Grid spacing={1} xs={11}>
-                <Grid container spacing={3}>
-                  <Grid spacing={2} xs={2}>
-                    <b>
-                      <div className={classes.member}>
-                        PURPOSE
-                        <br />
-                        <span className={classes.fieldValues}>
-                          {data.purpose}
-                        </span>
-                      </div>
-                    </b>
-                  </Grid>
-                  <Grid spacing={2} xs={2}>
-                    <b>
-                      <div className={classes.member}
-                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
-                        AMOUNT <br />
-                        <span className={classes.fieldValues}>
-                          ₹{data.amount}
-                        </span>
-                      </div>
-                    </b>
-                  </Grid>
-                  <Grid spacing={2} xs={2}>
-                    <b>
-                      <div className={classes.member}
-                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
-                        PENDING AMOUNT <br />
-                        <span className={classes.fieldValues}>
-                          {pendingAmount}
-                        </span>
-                      </div>
-                    </b>
-                  </Grid>
-                  <Grid spacing={2} xs={2}>
-                    <b>
-                      <div className={classes.member}
-                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
-                        EMI <br />
-                        <span className={classes.fieldValues}>{data.emi}</span>
-                      </div>
-                    </b>
-                  </Grid>
-                  <Grid spacing={2} xs={2}>
-                    <b>
-                      <div className={classes.member}
-                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
-                        DURATION <br />
-                        <span className={classes.fieldValues}>
-                          {data.duration}
-                        </span>
-                      </div>
-                    </b>
-                  </Grid>
-                  <Grid spacing={2} xs={2}>
-                    <b>
-                      <div className={classes.member}
-                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
-                        LOAN ENDS ON <br />
-                        <span className={classes.fieldValues}>
-                          {data.loanEndsOn}
-                        </span>
-                      </div>
-                    </b>
+            <Grid item md={12} xs={12}>
+              {emiEditPage === true ? (
+                <Snackbar severity="success">
+                  Loan EMI Updated successfully.
+                </Snackbar>
+              ) : null}
+            </Grid>
+            <Card className={classes.mainContent}>
+              <Grid
+                container
+                spacing={3}
+                style={{ padding: "20px 0px", alignItems: "center" }}
+              >
+                <Grid spacing={1} xs={1}>
+                  <MoneyIcon className={classes.Icon} />
+                </Grid>
+                <Grid spacing={1} xs={11}>
+                  <Grid container spacing={3}>
+                    <Grid spacing={2} xs={2}>
+                      <b>
+                        <div className={classes.member}>
+                          PURPOSE
+                          <br />
+                          <span className={classes.fieldValues}>
+                            {data.purpose}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
+                    <Grid spacing={2} xs={2}>
+                      <b>
+                        <div
+                          className={classes.member}
+                          style={{
+                            borderLeft: "1px solid #c1c1c1",
+                            paddingLeft: "10px",
+                          }}
+                        >
+                          AMOUNT <br />
+                          <span className={classes.fieldValues}>
+                            ₹{data.amount}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
+                    <Grid spacing={2} xs={2}>
+                      <b>
+                        <div
+                          className={classes.member}
+                          style={{
+                            borderLeft: "1px solid #c1c1c1",
+                            paddingLeft: "10px",
+                          }}
+                        >
+                          PENDING AMOUNT <br />
+                          <span className={classes.fieldValues}>
+                            {pendingAmount}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
+                    <Grid spacing={2} xs={2}>
+                      <b>
+                        <div
+                          className={classes.member}
+                          style={{
+                            borderLeft: "1px solid #c1c1c1",
+                            paddingLeft: "10px",
+                          }}
+                        >
+                          EMI <br />
+                          <span className={classes.fieldValues}>
+                            {data.emi}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
+                    <Grid spacing={2} xs={2}>
+                      <b>
+                        <div
+                          className={classes.member}
+                          style={{
+                            borderLeft: "1px solid #c1c1c1",
+                            paddingLeft: "10px",
+                          }}
+                        >
+                          DURATION <br />
+                          <span className={classes.fieldValues}>
+                            {data.duration}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
+                    <Grid spacing={2} xs={2}>
+                      <b>
+                        <div
+                          className={classes.member}
+                          style={{
+                            borderLeft: "1px solid #c1c1c1",
+                            paddingLeft: "10px",
+                          }}
+                        >
+                          LOAN ENDS ON <br />
+                          <span className={classes.fieldValues}>
+                            {data.loanEndsOn}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
-            </Grid>
-          </Card>
+            </Card>
 
-          {loanEmiData ? (
-            <Table
-              title={"Loan EMI"}
-              data={loanEmiData}
-              showSearch={false}
-              filterData={false}
-              filterBy={[
-                "payment_date",
-                "expected_principal",
-                "expected_interest",
-                "actual_payment_date",
-                "actual_principal",
-                "actual_interest",
-                "fine",
-                "totalPaid",
-                "outstanding",
-              ]}
-              // filters={filters}
-              column={Usercolumns}
-              editData={this.editData}
-              rowsSelected={this.rowsSelect}
-              columnsvalue={columnsvalue}
-              pagination
-            />
-          ) : (
+            {loanEmiData ? (
+              <Table
+                title={"Loan EMI"}
+                data={loanEmiData}
+                showSearch={false}
+                filterData={false}
+                filterBy={[
+                  "payment_date",
+                  "expected_principal",
+                  "expected_interest",
+                  "actual_payment_date",
+                  "actual_principal",
+                  "actual_interest",
+                  "fine",
+                  "totalPaid",
+                  "outstanding",
+                ]}
+                // filters={filters}
+                column={Usercolumns}
+                editData={this.editData}
+                rowsSelected={this.rowsSelect}
+                columnsvalue={columnsvalue}
+                pagination
+                progressComponent={this.state.isLoader}
+              />
+            ) : (
               <h1>Loading...</h1>
             )}
-            <div className={style.footerLoanBtn} style={{ padding: "15px 0px" }}>
-            <Button color="primary" component={Link} to="/loans">
-              Done
+            <div
+              className={style.footerLoanBtn}
+              style={{ padding: "15px 0px" }}
+            >
+              <Button color="primary" component={Link} to="/loans">
+                Done
               </Button>
-          </div>
-        </Grid>
+            </div>
+          </Grid>
+        ) : (
+          <Spinner />
+        )}
       </Layout>
     );
   }

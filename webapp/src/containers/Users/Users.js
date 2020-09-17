@@ -68,6 +68,7 @@ export class Users extends React.Component {
       multipleDelete: "",
       getRoles: [],
       loggedInUserRole: auth.getUserInfo().role.name,
+      isLoader: true,
     };
   }
 
@@ -83,7 +84,7 @@ export class Users extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
-        this.setState({ data: res.data });
+        this.setState({ data: res.data, isLoader: false });
       })
       .catch((error) => {
         console.log(error);
@@ -184,6 +185,7 @@ export class Users extends React.Component {
   };
 
   handleSearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.values.addUser) {
       searchData += "username_contains=" + this.state.values.addUser;
@@ -205,7 +207,7 @@ export class Users extends React.Component {
         process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
       )
       .then((res) => {
-        this.setState({ data: res.data });
+        this.setState({ data: res.data, isLoader: false });
       })
       .catch((error) => {
         console.log(error);
@@ -217,6 +219,7 @@ export class Users extends React.Component {
       values: {},
       formSubmitted: "",
       isCancel: true,
+      isLoader: true,
     });
     this.componentDidMount();
     //routing code #route to users page
@@ -257,8 +260,7 @@ export class Users extends React.Component {
           <div className="App">
             <h5 className={style.menuName}>USERS</h5>
             <div className={style.headerWrap}>
-              <h2 className={style.title}>
-                Manage Users</h2>
+              <h2 className={style.title}>Manage Users</h2>
               <div className={classes.buttonRow}>
                 <Button variant="contained" component={Link} to="/users/add">
                   Add New User
@@ -339,10 +341,17 @@ export class Users extends React.Component {
                   </Grid>
                 </div>
               </div>
-              <Button onClick={this.handleSearch.bind(this)}
-                style={{ marginRight: "5px", marginBottom: "8px", }}>Search</Button>
-              <Button color="secondary" clicked={this.cancelForm}
-                style={{ marginBottom: "8px", }}>
+              <Button
+                onClick={this.handleSearch.bind(this)}
+                style={{ marginRight: "5px", marginBottom: "8px" }}
+              >
+                Search
+              </Button>
+              <Button
+                color="secondary"
+                clicked={this.cancelForm}
+                style={{ marginBottom: "8px" }}
+              >
                 reset
               </Button>
             </div>
@@ -360,6 +369,7 @@ export class Users extends React.Component {
                 DeleteAll={this.DeleteAll}
                 columnsvalue={columnsvalue}
                 pagination
+                progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (

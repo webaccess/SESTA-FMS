@@ -15,6 +15,7 @@ import MoneyIcon from "@material-ui/icons/Money";
 import Moment from "moment";
 import { Link } from "react-router-dom";
 import style from "./Dashboard.module.css";
+import Spinner from "../../components/Spinner/Spinner";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -88,6 +89,7 @@ class DashboardForFPO extends Component {
       loansAllDetails: [],
       purposesValues: [],
       purposes: [],
+      isLoader: true,
     };
   }
 
@@ -201,6 +203,7 @@ class DashboardForFPO extends Component {
             loanDistributedAmounts[0] + loanDistributedAmounts[1],
           loansTableData: loansDetails.slice(0, 5),
           loansAllDetails: loansDetails,
+          isLoader: false,
         });
       })
       .catch((error) => {});
@@ -350,7 +353,10 @@ class DashboardForFPO extends Component {
               <h3 className={classes.fpoHead3}>LOAN APPLICATIONS </h3>
               <div style={{ display: "inline-flex" }}>
                 <div
-                  style={{ borderRight: "1px solid #fff", padding: "0px 15px" }}
+                  style={{
+                    borderRight: "1px solid #fff",
+                    padding: "0px 15px",
+                  }}
                 >
                   <h5 style={{ display: "block", margin: "0px" }}>APPROVED</h5>
                   <span className={classes.fieldValues}>
@@ -409,9 +415,9 @@ class DashboardForFPO extends Component {
                     filterData={false}
                     filterBy={["memberName", "loanAmount", "loanDate"]}
                     column={Usercolumns}
-                    // editData={this.editData}
                     rowsSelected={this.rowsSelect}
                     columnsvalue={columnsvalue}
+                    progressComponent={this.state.isLoader}
                   />
                 ) : (
                   <h1>Loading...</h1>

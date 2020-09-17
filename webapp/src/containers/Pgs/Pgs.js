@@ -72,6 +72,7 @@ export class Pgs extends React.Component {
       errorCode: "",
       successCode: "",
       isPgPresent: false,
+      isLoader: true,
     };
     this.snackbar = React.createRef();
   }
@@ -81,7 +82,7 @@ export class Pgs extends React.Component {
         process.env.REACT_APP_SERVER_URL + "crm-plugin/tags/?_sort=name:ASC"
       )
       .then((res) => {
-        this.setState({ data: res.data });
+        this.setState({ data: res.data, isLoader: false });
       })
       .catch((error) => {
         console.log(error);
@@ -139,6 +140,7 @@ export class Pgs extends React.Component {
       formSubmitted: "",
       stateSelected: false,
       isCancel: true,
+      isLoader: true,
     });
     this.componentDidMount();
   };
@@ -233,6 +235,7 @@ export class Pgs extends React.Component {
   };
 
   handleSearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.values.filterPg) {
       searchData += "name_contains=" + this.state.values.filterPg;
@@ -245,7 +248,7 @@ export class Pgs extends React.Component {
           "&&_sort=name:ASC"
       )
       .then((res) => {
-        this.setState({ data: res.data });
+        this.setState({ data: res.data, isLoader: false });
       })
       .catch((err) => {
         console.log(err);
@@ -401,6 +404,7 @@ export class Pgs extends React.Component {
                 columnsvalue={columnsvalue}
                 selectableRows
                 pagination
+                progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (
