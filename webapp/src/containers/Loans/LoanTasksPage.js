@@ -221,40 +221,55 @@ class LoanTasksPage extends Component {
     }
     let columnsvalue = selectors[0];
 
-    let taskEditPage = false;
-    if (
-      this.props.location.state &&
-      this.props.location.state.loanEditTaskPage
-    ) {
+    let taskEditPage = false, taskAddPage = false;
+    if (this.props.location.state &&
+      this.props.location.state.loanEditTaskPage &&
+      this.props.history.action === "PUSH") {
       taskEditPage = true;
     }
-    if (this.props.history.action === "POP") {
-      taskEditPage = false;
+    if (this.props.location.state &&
+      this.props.location.state.loanTaskAddPage === true &&
+      this.props.history.action == "PUSH") {
+      taskAddPage = true;
     }
+    let loanTaskAdd = {
+      pathname: "/loan/task/add/",
+      state: { loanAppData: loanAppData },
+    };
 
     return (
       <Layout breadcrumbs={LOAN_TASK_BREADCRUMBS}>
         <Grid>
           <div className="App">
             <h5 className={style.loan}>LOANS</h5>
-
             <div className={classes.emiViewWrap}>
               <h2 className={classes.loaneeName} style={{paddingRight: "4rem",}}>{data.loanee}</h2>
               <div className={classes.dataRow} style={{paddingRight: "4rem",}}>
                 <p>
-                  SHG GROUP <b>{data.shg}</b>
+                <span className={style.filterLabel}>
+                SHG GROUP</span>
+                  <span className={style.filterValue}>{data.shg}</span>
                 </p>
               </div>
 
               <div className={classes.dataRow}>
                 <p>
-                  VILLAGE <b>{data.village}</b>{" "}
+                <span className={style.filterLabel}>
+                VILLAGE</span>
+                  <span className={style.filterValue}>{data.village}</span>
                 </p>
               </div>
             </div>
           </div>
           <Grid item md={12} xs={12}>
             {taskEditPage === true ? (
+              <Snackbar severity="success">
+                Loan Task Updated successfully.
+              </Snackbar>
+            ) : null}
+          </Grid>
+          <Grid item md={12} xs={12}>
+            {taskAddPage ? (
               <Snackbar severity="success">
                 Loan Task Updated successfully.
               </Snackbar>
@@ -346,10 +361,14 @@ class LoanTasksPage extends Component {
               </Grid>
             </Grid>
           </Card>
-
+          <div className={style.loanAddTask} align="right">
+            <Button color="primary" component={Link} to={loanTaskAdd}>
+              Add Task
+              </Button>
+          </div>
           {loantasks ? (
             <Table
-              title={"UpdateLoanTask"}
+              title={"Loan Task"}
               showSearch={false}
               filterData={false}
               filterBy={["name", "date", "status", "comments"]}
@@ -364,7 +383,7 @@ class LoanTasksPage extends Component {
           ) : (
             <h1>Loading...</h1>
           )}
-        <div style={{ padding: "15px" }}>
+          <div className={style.footerLoanBtn}>
             <Button color="primary" component={Link} to="/loans">
               Done
               </Button>

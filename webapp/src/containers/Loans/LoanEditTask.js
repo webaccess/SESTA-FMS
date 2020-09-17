@@ -262,7 +262,7 @@ class LoanEditTask extends Component {
           EDIT_LOAN_TASK_BREADCRUMBS
         }
       >
-        <Card>
+        <Card style={{ maxWidth: "45rem" }}>
           <form
             autoComplete="off"
             noValidate
@@ -352,7 +352,7 @@ class LoanEditTask extends Component {
             </CardContent>
             <Divider />
 
-            <CardActions>
+            <CardActions style={{ padding: "15px" }}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"

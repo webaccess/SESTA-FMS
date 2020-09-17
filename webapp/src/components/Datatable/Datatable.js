@@ -144,7 +144,7 @@ const Table = (props) => {
   if (
     dtPageTitle !== "FPO Loans" &&
     dtPageTitle !== "Loans" &&
-    dtPageTitle !== "ViewLoanEMI" &&
+    dtPageTitle !== "Loan EMI Detail" &&
     dtPageTitle !== "EMI Due" &&
     dtPageTitle !== "Recent Activities" &&
     dtPageTitle !== "CSP Report"
@@ -182,7 +182,7 @@ const Table = (props) => {
       },
     ];
   }
-  if (dtPageTitle === "UpdateLoanTask") {
+  if (dtPageTitle === "Loan Task") {
     column = [
       {
         cell: (cell) => (
@@ -258,7 +258,7 @@ const Table = (props) => {
       },
     ];
   }
-  if (dtPageTitle === "LoanEMI") {
+  if (dtPageTitle === "Loan EMI") {
     column = [
       {
         cell: (cell) => (
