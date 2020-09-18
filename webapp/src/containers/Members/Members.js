@@ -135,25 +135,53 @@ export class Members extends React.Component {
   }
 
   getMembers = () => {
-    let newDataArray = [];
-    let url = "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC";
+    let url =
+      "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true";
     if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
-      url += "&creator_id=" + auth.getUserInfo().contact.id;
-    }
-    serviceProvider
-      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
-      .then((res) => {
-        res.data.map((e, i) => {
-          if (e.user === null) {
-            newDataArray.push(e); // add only those contacts having contact type=individual & users===null
-          }
-        });
-        this.setState({ data: newDataArray, isLoader: false });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((res) => {
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/contact/" +
+                res.data.vo.id
+            )
+            .then((resp) => {
+              let shgList = [];
+              resp.data.org_vos.map((shg, i) => {
+                shgList.push(shg.contact);
+              });
+              let newUrl =
+                "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true&&";
+              shgList.map((shgId) => {
+                newUrl += "individual.shg_in=" + shgId + "&&";
+              });
 
+              serviceProvider
+                .serviceProviderForGetRequest(
+                  process.env.REACT_APP_SERVER_URL + newUrl
+                )
+                .then((memResp) => {
+                  this.setState({ data: memResp.data, isLoader: false });
+                });
+            });
+        })
+        .catch((error) => {});
+    } else {
+      serviceProvider
+        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .then((res) => {
+          this.setState({ data: res.data, isLoader: false });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
     //api call for states filter
     serviceProvider
       .serviceProviderForGetRequest(
@@ -281,28 +309,56 @@ export class Members extends React.Component {
         searchData += "individual.shg=" + this.state.filterShg.id;
       }
     }
-
+    this.getMembers();
     //api call after search filter
-    let newDataArray = [];
-    let url = "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC";
+    let url =
+      "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true";
     if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
-      url += "&creator_id=" + auth.getUserInfo().contact.id;
-    }
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
-      )
-      .then((res) => {
-        res.data.map((e, i) => {
-          if (e.user === null) {
-            newDataArray.push(e);
-          }
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((res) => {
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/contact/" +
+                res.data.vo.id
+            )
+            .then((resp) => {
+              let shgList = [];
+              resp.data.org_vos.map((shg, i) => {
+                shgList.push(shg.contact);
+              });
+              let newUrl =
+                "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true&&";
+              shgList.map((shgId, index) => {
+                newUrl += "individual.shg_in=" + shgId + "&&";
+              });
+              serviceProvider
+                .serviceProviderForGetRequest(
+                  process.env.REACT_APP_SERVER_URL + newUrl + searchData
+                )
+                .then((memResp) => {
+                  this.setState({ data: memResp.data, isLoader: false });
+                });
+            });
+        })
+        .catch((error) => {});
+    } else {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
+        )
+        .then((res) => {
+          this.setState({ data: res.data, isLoader: false });
+        })
+        .catch((error) => {
+          console.log(error);
         });
-        this.setState({ data: newDataArray, isLoader: false });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    }
   }
 
   editData = (cellId) => {
@@ -510,6 +566,12 @@ export class Members extends React.Component {
         name: "State",
         sortable: true,
         cell: (row) => (row.state ? row.state.name : "-"),
+      },
+      {
+        name: "Certificate No.",
+        sortable: true,
+        cell: (row) =>
+          row.shareinformation ? row.shareinformation.certificate_no : "-",
       },
       {
         name: "District",

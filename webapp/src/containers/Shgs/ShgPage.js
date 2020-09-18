@@ -51,12 +51,6 @@ class ShgPage extends Component {
         addVillage: {
           required: { value: "true", message: "Village is required" },
         },
-        addVo: {
-          required: {
-            value: "true",
-            message: "Village Organization is required",
-          },
-        },
       },
       bankValidations: {
         addAccountName: {
@@ -99,20 +93,25 @@ class ShgPage extends Component {
         .then((res) => {
           this.handleStateChange(res.data.state);
           this.handleDistrictChange(res.data.district);
-          this.handleVoChange("", res.data.organization.vos[0]);
-
           this.setState({
             values: {
               addShg: res.data.name,
               addAddress: res.data.address_1,
               addPointOfContact: res.data.organization.person_incharge,
-              addVo: res.data.organization.vos[0].id,
               addState: res.data.state.id,
               addDistrict: res.data.district.id,
               addVillage: res.data.villages[0].id,
             },
             isLoader: false,
           });
+          // if vo is present
+          if (res.data.organization.vos.length > 0) {
+            this.handleVoChange("", res.data.organization.vos[0]);
+            let tempVo = this.state.values;
+            tempVo["addVo"] = res.data.organization.vos[0].id;
+            this.setState({ values: tempVo });
+          }
+
           // if "add bankdetails" is checked
           if (res.data.organization.bankdetail) {
             this.setState({ bankInfoId: res.data.organization.bankdetail });
@@ -699,7 +698,7 @@ class ShgPage extends Component {
                       id="combo-box-demo"
                       options={voFilters}
                       variant="outlined"
-                      label="Select VO*"
+                      label="Select VO"
                       getOptionLabel={(option) => option.name}
                       onChange={(event, value) => {
                         this.handleVoChange(event, value);
@@ -713,12 +712,6 @@ class ShgPage extends Component {
                                   return item.id === addVo;
                                 })
                               ] || null
-                          : null
-                      }
-                      error={this.hasError("addVo")}
-                      helperText={
-                        this.hasError("addVo")
-                          ? this.state.errors.addVo[0]
                           : null
                       }
                       renderInput={(params) => (

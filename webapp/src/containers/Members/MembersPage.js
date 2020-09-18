@@ -85,9 +85,6 @@ class ActivityPage extends Component {
         shareAmt: {
           required: { value: "true", message: "Share Amount is required" },
         },
-        nominee: {
-          required: { value: "true", message: "Nominee is required" },
-        },
         selectedDate: {
           required: {
             value: "true",
@@ -263,7 +260,6 @@ class ActivityPage extends Component {
     if (this.state.isShareholder) {
       Object.assign(allValiations, validationsShareholder);
     } else {
-      delete allValiations["nominee"];
       delete allValiations["shareAmt"];
       delete allValiations["noOfShares"];
       delete allValiations["selectedDate"];
@@ -1064,14 +1060,8 @@ class ActivityPage extends Component {
                       <Grid item md={6} xs={12}>
                         <Input
                           fullWidth
-                          label="Nominee*"
+                          label="Nominee"
                           name="nominee"
-                          error={this.hasError("nominee")}
-                          helperText={
-                            this.hasError("nominee")
-                              ? this.state.errors.nominee[0]
-                              : null
-                          }
                           value={this.state.values.nominee || ""}
                           onChange={this.handleChange}
                           variant="outlined"

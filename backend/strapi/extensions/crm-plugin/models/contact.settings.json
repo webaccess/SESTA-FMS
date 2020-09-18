@@ -88,8 +88,8 @@
       "type": "string"
     },
     "shareinformation": {
-      "model": "shareinformation",
-      "via": "contact"
+      "via": "contact",
+      "model": "shareinformation"
     },
     "user": {
       "plugin": "users-permissions",
