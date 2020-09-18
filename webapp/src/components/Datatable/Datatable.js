@@ -330,7 +330,7 @@ const Table = (props) => {
           <div>
             <div
               onClick={
-                cell.status === "Approved"
+                cell.status === "Approved" || cell.status === "InProgress" || cell.status === "Completed"
                   ? (event) => viewLoanEmi(cell.id, cell[valueformodal])
                   : null
               }
@@ -339,7 +339,7 @@ const Table = (props) => {
               <Tooltip title="View EMI">
                 <IconButton
                   aria-label="task"
-                  disabled={cell.status === "Approved" ? false : true}
+                  disabled={cell.status === "Approved" || cell.status === "InProgress" || cell.status === "Completed"? false : true}
                 >
                   <VisibilityIcon className={classes.VisibilityIcon} />
                 </IconButton>
@@ -362,7 +362,7 @@ const Table = (props) => {
             </div>
             <div
               onClick={
-                cell.status === "Approved"
+                cell.status === "Approved" || cell.status === "InProgress" || cell.status === "Completed"
                   ? (event) => viewEmi(cell.id, cell[valueformodal])
                   : null
               }
@@ -373,7 +373,7 @@ const Table = (props) => {
                 <Tooltip title="EMI">
                   <IconButton
                     aria-label="activity"
-                    disabled={cell.status === "Approved" ? false : true}
+                    disabled={cell.status === "Approved" || cell.status === "InProgress" || cell.status === "Completed" ? false : true}
                   >
                     <AssignmentIndIcon
                       className={classes.AssignmentTurnedInIcon}
@@ -386,7 +386,7 @@ const Table = (props) => {
             </div>
             <div
               onClick={
-                cell.status === "Approved"
+                cell.status === "Approved" || cell.status === "InProgress" || cell.status === "Completed"
                   ? (event) => viewTask(cell.id, cell[valueformodal])
                   : null
               }
@@ -397,7 +397,7 @@ const Table = (props) => {
                 <Tooltip title="Task">
                   <IconButton
                     aria-label="task"
-                    disabled={cell.status === "Approved" ? false : true}
+                    disabled={cell.status === "Approved" || cell.status === "InProgress" || cell.status === "Completed" ? false : true}
                   >
                     <AssignmentTurnedInIcon
                       className={classes.AssignmentTurnedInIcon}
