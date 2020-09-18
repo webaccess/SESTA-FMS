@@ -135,8 +135,7 @@ export class Members extends React.Component {
   }
 
   getMembers = () => {
-    let url =
-      "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true";
+    let url = "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC";
     if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
       serviceProvider
         .serviceProviderForGetRequest(
@@ -157,7 +156,7 @@ export class Members extends React.Component {
                 shgList.push(shg.contact);
               });
               let newUrl =
-                "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true&&";
+                "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&";
               shgList.map((shgId) => {
                 newUrl += "individual.shg_in=" + shgId + "&&";
               });
@@ -167,7 +166,10 @@ export class Members extends React.Component {
                   process.env.REACT_APP_SERVER_URL + newUrl
                 )
                 .then((memResp) => {
-                  this.setState({ data: memResp.data, isLoader: false });
+                  this.getStateData(memResp.data);
+                  this.getDistrictData(memResp.data);
+                  this.getVillageData(memResp.data);
+                  //this.setState({ data: memResp.data, isLoader: false });
                 });
             });
         })
@@ -176,7 +178,11 @@ export class Members extends React.Component {
       serviceProvider
         .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
         .then((res) => {
-          this.setState({ data: res.data, isLoader: false });
+          this.getStateData(res.data);
+          this.getDistrictData(res.data);
+          this.getVillageData(res.data);
+
+          //this.setState({ data: res.data, isLoader: false });
         })
         .catch((error) => {
           console.log(error);
@@ -194,6 +200,49 @@ export class Members extends React.Component {
         console.log(error);
       });
   };
+
+  async getStateData(data) {
+    for (let i in data) {
+      await serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/states/" +
+            data[i].addresses[0].state
+        )
+        .then((res) => {
+          data[i].addresses.splice(1, 0, { state: res.data });
+        });
+    }
+  }
+
+  async getDistrictData(data) {
+    for (let i in data) {
+      await serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/districts/" +
+            data[i].addresses[0].district
+        )
+        .then((res) => {
+          data[i].addresses.splice(2, 0, { district: res.data });
+        });
+    }
+  }
+
+  async getVillageData(data) {
+    for (let i in data) {
+      await serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/villages/" +
+            data[i].addresses[0].village
+        )
+        .then((res) => {
+          data[i].addresses.splice(3, 0, { village: res.data });
+        });
+    }
+    this.setState({ data: data, isLoader: false });
+  }
 
   handleStateChange = async (event, value) => {
     if (value !== null) {
@@ -291,15 +340,15 @@ export class Members extends React.Component {
     let searchData = "";
     if (this.state.filterState) {
       searchData += searchData ? "&&" : "";
-      searchData += "state=" + this.state.filterState.id;
+      searchData += "addresses.state=" + this.state.filterState.id;
     }
     if (this.state.filterDistrict) {
       searchData += searchData ? "&&" : "";
-      searchData += "district=" + this.state.filterDistrict.id;
+      searchData += "addresses.district=" + this.state.filterDistrict.id;
     }
     if (this.state.filterVillage) {
       searchData += searchData ? "&&" : "";
-      searchData += "villages=" + this.state.filterVillage.id;
+      searchData += "addresses.village=" + this.state.filterVillage.id;
     }
     if (this.state.filterShg) {
       searchData += searchData ? "&&" : "";
@@ -309,7 +358,6 @@ export class Members extends React.Component {
         searchData += "individual.shg=" + this.state.filterShg.id;
       }
     }
-    this.getMembers();
     //api call after search filter
     let url =
       "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true";
@@ -342,7 +390,11 @@ export class Members extends React.Component {
                   process.env.REACT_APP_SERVER_URL + newUrl + searchData
                 )
                 .then((memResp) => {
-                  this.setState({ data: memResp.data, isLoader: false });
+                  this.getStateData(memResp.data);
+                  this.getDistrictData(memResp.data);
+                  this.getVillageData(memResp.data);
+
+                  //this.setState({ data: memResp.data, isLoader: false });
                 });
             });
         })
@@ -353,7 +405,11 @@ export class Members extends React.Component {
           process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
         )
         .then((res) => {
-          this.setState({ data: res.data, isLoader: false });
+          this.getStateData(res.data);
+          this.getDistrictData(res.data);
+          this.getVillageData(res.data);
+
+          //this.setState({ data: res.data, isLoader: false });
         })
         .catch((error) => {
           console.log(error);
@@ -564,8 +620,8 @@ export class Members extends React.Component {
       },
       {
         name: "State",
+        selector: "addresses[1].state.name",
         sortable: true,
-        cell: (row) => (row.state ? row.state.name : "-"),
       },
       {
         name: "Certificate No.",
@@ -575,13 +631,13 @@ export class Members extends React.Component {
       },
       {
         name: "District",
+        selector: "addresses[2].district.name",
         sortable: true,
-        cell: (row) => (row.district ? row.district.name : "-"),
       },
       {
         name: "Village",
+        selector: "addresses[3].village.name",
         sortable: true,
-        cell: (row) => (row.villages[0] ? row.villages[0].name : "-"),
       },
       {
         name: "SHG Name",
@@ -601,7 +657,6 @@ export class Members extends React.Component {
       selectors.push(Usercolumns[i]["selector"]);
     }
     let columnsvalue = selectors[0];
-
     return (
       <Layout>
         <Grid>
@@ -652,7 +707,7 @@ export class Members extends React.Component {
             ) : null}
             {this.state.multipleDelete === true ? (
               <Snackbar severity="success" Showbutton={false}>
-                Other members deleted successfully.
+                Members deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.multipleDelete === false ? (

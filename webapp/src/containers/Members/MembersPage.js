@@ -49,9 +49,7 @@ class ActivityPage extends Component {
         lastName: {
           required: { value: "true", message: "Last name is required" },
         },
-        address: {
-          required: { value: "true", message: "Address is required" },
-        },
+
         addState: {
           required: { value: "true", message: "State is required" },
         },
@@ -111,8 +109,8 @@ class ActivityPage extends Component {
             this.state.editPage[1]
         )
         .then((res) => {
-          this.handleStateChange(res.data.state);
-          this.handleDistrictChange(res.data.district);
+          this.handleStateChange(res.data.addresses[0].state);
+          this.handleDistrictChange(res.data.addresses[0].district);
           this.handleShgChange("", res.data.individual.shg);
           this.handlePgChange(res.data.pg);
 
@@ -121,13 +119,14 @@ class ActivityPage extends Component {
               firstName: res.data.individual.first_name,
               lastName: res.data.individual.last_name,
               husbandName: res.data.individual.partner_name,
-              address: res.data.address_1,
-              addBlock: res.data.block,
-              addGp: res.data.gp,
-              addState: res.data.state.id,
-              addDistrict: res.data.district.id,
-              addVillage: res.data.villages[0].id,
-              addPincode: res.data.pincode,
+              addId: res.data.addresses[0].id,
+              address: res.data.addresses[0].address_line_1,
+              addDistrict: res.data.addresses[0].district,
+              addState: res.data.addresses[0].state,
+              addBlock: res.data.addresses[0].block,
+              addGp: res.data.addresses[0].gp,
+              addVillage: res.data.addresses[0].village,
+              addPincode: res.data.addresses[0].pincode,
               addPhone: res.data.phone,
               addEmail: res.data.email,
               addShg: res.data.individual.shg,
@@ -282,25 +281,26 @@ class ActivityPage extends Component {
 
   handleStateChange(value) {
     if (value !== null) {
-      this.setState({
-        values: { ...this.state.values, addState: value.id },
-      });
-      if (value.is_active == true) {
-        let stateId = value.id;
-        serviceProvider
-          .serviceProviderForGetRequest(
-            process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/districts/?is_active=true&&state.id=" +
-              stateId
-          )
-          .then((res) => {
-            this.setState({ getDistrict: res.data });
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-        this.setState({ stateSelected: true });
+      let newVal = value;
+      if (typeof value === "object") {
+        newVal = value.id;
       }
+      this.setState({
+        values: { ...this.state.values, addState: newVal },
+      });
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/districts/?is_active=true&&state.id=" +
+            newVal
+        )
+        .then((res) => {
+          this.setState({ getDistrict: res.data });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      this.setState({ stateSelected: true });
     } else {
       this.setState({
         values: {
@@ -318,15 +318,18 @@ class ActivityPage extends Component {
 
   handleDistrictChange(value) {
     if (value !== null) {
+      let newVal = value;
+      if (typeof value === "object") {
+        newVal = value.id;
+      }
       this.setState({
-        values: { ...this.state.values, addDistrict: value.id },
+        values: { ...this.state.values, addDistrict: newVal },
       });
-      let districtId = value.id;
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/villages/?is_active=true&&district.id=" +
-            districtId
+            newVal
         )
         .then((res) => {
           this.setState({ getVillage: res.data });
@@ -350,8 +353,12 @@ class ActivityPage extends Component {
 
   handleVillageChange(event, value) {
     if (value !== null) {
+      let newVal = value;
+      if (typeof value === "object") {
+        newVal = value.id;
+      }
       this.setState({
-        values: { ...this.state.values, addVillage: value.id },
+        values: { ...this.state.values, addVillage: newVal },
       });
     } else {
       this.setState({
@@ -414,38 +421,42 @@ class ActivityPage extends Component {
     let fName = this.state.values.firstName;
     let lName = this.state.values.lastName;
     let hName = this.state.values.husbandName;
+    let phoneNo = this.state.values.addPhone;
+    let emailAdd = this.state.values.addEmail;
+    let block = this.state.values.addBlock;
+    let gp = this.state.values.addGp;
+    let pincodeNo = this.state.values.addPincode;
+    let addressId = this.state.values.addId;
     let address = this.state.values.address;
     let stateId = this.state.values.addState;
     let districtId = this.state.values.addDistrict;
-    let block = this.state.values.addBlock;
-    let gp = this.state.values.addGp;
-    let phoneNo = this.state.values.addPhone;
-    let emailAdd = this.state.values.addEmail;
-    let pincodeNo = this.state.values.addPincode;
     let villageId = this.state.values.addVillage;
     let shgId = this.state.values.addShg;
     let pgId = this.state.values.addPg;
 
-    let postData = {
-      name: fName + " " + lName,
-      phone: phoneNo,
-      email: emailAdd,
-      address_1: address,
+    let postAddressData = {
+      block: block,
+      gp: gp,
       pincode: pincodeNo,
-      contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
-        "Individual"
-      ][0],
+      address_line_1: address,
       district: {
         id: districtId,
       },
       state: {
         id: stateId,
       },
-      villages: {
+      village: {
         id: villageId,
       },
-      block: block,
-      gp: gp,
+    };
+    let postData = {
+      name: fName + " " + lName,
+      phone: phoneNo,
+      email: emailAdd,
+      contact_type: JSON.parse(process.env.REACT_APP_CONTACT_TYPE)[
+        "Individual"
+      ][0],
+      addresses: [postAddressData],
       pg: pgId,
       first_name: fName,
       last_name: lName,
@@ -455,6 +466,10 @@ class ActivityPage extends Component {
 
     if (this.state.editPage[0]) {
       // edit present member (update API)
+      Object.assign(postAddressData, {
+        id: addressId,
+      });
+
       serviceProvider
         .serviceProviderForPutRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
@@ -498,6 +513,7 @@ class ActivityPage extends Component {
           if (this.state.isShareholder) {
             this.saveShareInfo(res.data);
           }
+
           this.setState({
             formSubmitted: true,
           });
@@ -580,6 +596,33 @@ class ActivityPage extends Component {
           console.log(error);
         });
     }
+  };
+
+  saveaddressInfo = async (data) => {
+    let block = this.state.values.addBlock;
+    let gp = this.state.values.addGp;
+    let pincodeNo = this.state.values.addPincode;
+    let address = this.state.values.address;
+    let stateId = this.state.values.addState;
+    let districtId = this.state.values.addDistrict;
+    let villageId = this.state.values.addVillage;
+
+    let postAddressData = {
+      contact: data.id,
+      block: block,
+      gp: gp,
+      pincode: pincodeNo,
+      address_1: address,
+      district: {
+        id: districtId,
+      },
+      state: {
+        id: stateId,
+      },
+      villages: {
+        id: villageId,
+      },
+    };
   };
 
   cancelForm = () => {
@@ -687,7 +730,7 @@ class ActivityPage extends Component {
                   <Grid item xs={12}>
                     <Input
                       fullWidth
-                      label="Address*"
+                      label="Address"
                       name="address"
                       error={this.hasError("address")}
                       helperText={

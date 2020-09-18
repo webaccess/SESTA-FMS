@@ -65,6 +65,7 @@ class LoanApprovalPage extends Component {
       loanStatusList: constants.LOAN_STATUS,
       values: {},
       data: {},
+      newData: {},
       selectedFile: null,
       fileDataArray: [],
       fileName: "",
@@ -102,6 +103,22 @@ class LoanApprovalPage extends Component {
       });
   }
 
+  async getVillage(data) {
+    await serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/villages/" + data.village
+      )
+      .then((res) => {
+        this.setState({
+          newData: { ...this.state.newData, village: res.data.name },
+        });
+        this.setState({ data: this.state.newData });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
   getAllDetails = (data) => {
     let document;
     let purpose = data.purpose;
@@ -125,6 +142,7 @@ class LoanApprovalPage extends Component {
       .then((res) => {
         let loaneeName = res.data.first_name + " " + res.data.last_name;
         let shgName = res.data.shg.name;
+
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
@@ -133,9 +151,9 @@ class LoanApprovalPage extends Component {
           )
           .then((response) => {
             let voName = response.data[0].organization.vos[0].name;
-            let villageName = response.data[0].villages[0].name;
+            let villageName = response.data[0].addresses[0].village;
             this.setState({
-              data: {
+              newData: {
                 loanee: loaneeName,
                 shg: shgName,
                 village: villageName,
@@ -150,6 +168,7 @@ class LoanApprovalPage extends Component {
               uploadedFile: data.document[0],
               isLoader: false,
             });
+            this.getVillage(this.state.newData);
           })
           .catch();
       })

@@ -27,39 +27,12 @@
     "email_other": {
       "type": "email"
     },
-    "address_1": {
-      "type": "text"
-    },
-    "address_2": {
-      "type": "text"
-    },
     "city": {
-      "type": "string"
-    },
-    "pincode": {
       "type": "string"
     },
     "contact_type": {
       "type": "string",
       "required": true
-    },
-    "country": {
-      "plugin": "crm-plugin",
-      "model": "country"
-    },
-    "villages": {
-      "plugin": "crm-plugin",
-      "collection": "village",
-      "via": "contacts",
-      "dominant": true
-    },
-    "state": {
-      "plugin": "crm-plugin",
-      "model": "state"
-    },
-    "district": {
-      "plugin": "crm-plugin",
-      "model": "district"
     },
     "individual": {
       "plugin": "crm-plugin",
@@ -80,12 +53,6 @@
       "plugin": "crm-plugin",
       "collection": "activitytype",
       "via": "contact"
-    },
-    "block": {
-      "type": "string"
-    },
-    "gp": {
-      "type": "string"
     },
     "shareinformation": {
       "via": "contact",
@@ -122,6 +89,11 @@
     "creator_id": {
       "plugin": "crm-plugin",
       "model": "contact"
+    },
+    "addresses": {
+      "plugin": "crm-plugin",
+      "collection": "address",
+      "via": "contact"
     },
     "pg": {
       "plugin": "crm-plugin",

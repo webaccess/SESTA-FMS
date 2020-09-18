@@ -110,7 +110,7 @@ const useStyles = (theme) => ({
     marginTop: "10px",
     display: "flex",
     flexWrap: "wrap",
-  }
+  },
 });
 
 class LoansApplyPage extends Component {
@@ -138,8 +138,8 @@ class LoansApplyPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/contact/?contact_type=organization&id=" +
-        shgid
+          "crm-plugin/contact/?contact_type=organization&id=" +
+          shgid
       )
       .then((res) => {
         // get VO assigned to selected SHG member
@@ -286,7 +286,7 @@ class LoansApplyPage extends Component {
             res.data.id,
             updateAppNo
           )
-          .then((loanapp_res) => { });
+          .then((loanapp_res) => {});
 
         this.props.history.push({
           pathname: "/loans",
@@ -355,10 +355,10 @@ class LoansApplyPage extends Component {
             serviceProvider
               .serviceProviderForPostRequest(
                 process.env.REACT_APP_SERVER_URL +
-                "crm-plugin/activityassignees",
+                  "crm-plugin/activityassignees",
                 activityassignee
               )
-              .then((assigneeResp) => { });
+              .then((assigneeResp) => {});
           });
       });
   }
@@ -447,44 +447,43 @@ class LoansApplyPage extends Component {
                 <IconButton
                   className={style.loanIconBtn}
                   disableRipple
-                  aria-label="view">
+                  aria-label="view"
+                >
                   <PersonIcon className={classes.Icon} />
                   <b>
                     <div className={classes.member}>
                       LOANEE
                       <br />
-                      <span className={classes.fieldValues}>
-                        {data.name}
-                      </span>
+                      <span className={classes.fieldValues}>{data.name}</span>
                     </div>
                   </b>
                 </IconButton>
                 <IconButton
                   className={style.loanIconBtn}
                   disableRipple
-                  aria-label="view">
+                  aria-label="view"
+                >
                   <PeopleIcon className={classes.Icon} />
                   <b>
                     <div className={classes.member}>
                       SHG GROUP
                       <br />
-                      <span className={classes.fieldValues}>
-                      {shgName}
-                      </span>
+                      <span className={classes.fieldValues}>{shgName}</span>
                     </div>
                   </b>
                 </IconButton>
                 <IconButton
                   className={style.loanIconBtn}
                   disableRipple
-                  aria-label="view">
+                  aria-label="view"
+                >
                   <HomeIcon className={classes.Icon} />
                   <b>
                     <div className={classes.member}>
                       VILLAGE
                       <br />
                       <span className={classes.fieldValues}>
-                        {data.villages[0].name}
+                        {data.addresses[2].village.name}
                       </span>
                     </div>
                   </b>
@@ -492,22 +491,24 @@ class LoansApplyPage extends Component {
                 <IconButton
                   className={style.loanIconBtn}
                   disableRipple
-                  aria-label="view">
+                  aria-label="view"
+                >
                   <NaturePeopleIcon className={classes.Icon} />
                   <b>
                     <div className={classes.member}>
                       VILLAGE ORGANIZATION
                       <br />
-                      <span className={classes.fieldValues}>
-                        {shgUnderVo}
-                      </span>
+                      <span className={classes.fieldValues}>{shgUnderVo}</span>
                     </div>
                   </b>
                 </IconButton>
               </Grid>
 
               <Divider />
-              <Grid className={classes.purposeCard} style={{maxWidth: "660px",}}>
+              <Grid
+                className={classes.purposeCard}
+                style={{ maxWidth: "660px" }}
+              >
                 <Grid item xs={12}>
                   <Autocomplete
                     id="combo-box-demo"
@@ -520,10 +521,10 @@ class LoansApplyPage extends Component {
                     value={
                       handlePurposeChange
                         ? loan_model[
-                        loan_model.findIndex(function (item, i) {
-                          return item.id == handlePurposeChange.id;
-                        })
-                        ]
+                            loan_model.findIndex(function (item, i) {
+                              return item.id == handlePurposeChange.id;
+                            })
+                          ]
                         : loan_model[0]
                     }
                     renderInput={(params) => (
@@ -541,63 +542,106 @@ class LoansApplyPage extends Component {
 
               <Divider />
 
-              <Grid container className={classes.purposeCard} style={{maxWidth: "700px",}}>
-              <Grid item md={6} xs={12} spacing={2} className={style.productLeftPanel}>
-                <div className={style.panelWrap}>
-                  <div className={style.panelHeader}>
-                    <span className={style.panelHeaderTitle}>Product Details</span>
-                  </div>
-                  <div className={style.panelContent} style={{padding: "15px"}}>
-                    <div className={style.normalProductValue}>
-                      Loan Amount
-                      <br />
-                      <span className={style.boldProductValue}> Rs. {loan_amnt} </span>
+              <Grid
+                container
+                className={classes.purposeCard}
+                style={{ maxWidth: "700px" }}
+              >
+                <Grid
+                  item
+                  md={6}
+                  xs={12}
+                  spacing={2}
+                  className={style.productLeftPanel}
+                >
+                  <div className={style.panelWrap}>
+                    <div className={style.panelHeader}>
+                      <span className={style.panelHeaderTitle}>
+                        Product Details
+                      </span>
                     </div>
-                    <div className={style.normalProductValue}>
-                      Duration
-                      <br />
-                      <span className={style.boldProductValue}> {duration} Months </span>
+                    <div
+                      className={style.panelContent}
+                      style={{ padding: "15px" }}
+                    >
+                      <div className={style.normalProductValue}>
+                        Loan Amount
+                        <br />
+                        <span className={style.boldProductValue}>
+                          {" "}
+                          Rs. {loan_amnt}{" "}
+                        </span>
+                      </div>
+                      <div className={style.normalProductValue}>
+                        Duration
+                        <br />
+                        <span className={style.boldProductValue}>
+                          {" "}
+                          {duration} Months{" "}
+                        </span>
+                      </div>
+                      <div className={style.normalProductValue}>
+                        Area/Size/Specifications
+                        <br />
+                        <span className={style.boldProductValue}>
+                          {" "}
+                          {specification}
+                        </span>
+                      </div>
                     </div>
-                    <div className={style.normalProductValue}>
-                      Area/Size/Specifications
-                      <br />
-                      <span className={style.boldProductValue}> {specification}</span>
+                  </div>
+                </Grid>
+                <Grid
+                  item
+                  md={6}
+                  xs={12}
+                  spacing={2}
+                  className={style.productRightPanel}
+                >
+                  <div className={style.panelWrap}>
+                    <div className={style.panelHeader}>
+                      <span className={style.panelHeaderTitle}>
+                        EMI Installment{" "}
+                      </span>
+                      <span className={style.panelSubHeaderTitle}>
+                        Amount in rupees
+                      </span>
+                    </div>
+                    <div className={style.panelContent}>
+                      <table className={style.productAmoutTable}>
+                        <tr style={{ backgroundColor: "#dddddd" }}>
+                          <th className={style.boldProductCell}>Due Date</th>
+                          <th className={style.boldProductCell}>Principle</th>
+                          <th className={style.boldProductCell}>Interest</th>
+                        </tr>
+                        {this.state.loan_installments
+                          ? this.state.loan_installments.map((row) => (
+                              <tr>
+                                <td className={style.normalProductCell}>
+                                  {row.due_date}
+                                </td>
+                                <td className={style.normalProductCell}>
+                                  {row.principal}
+                                </td>
+                                <td className={style.normalProductCell}>
+                                  {row.interest}
+                                </td>
+                              </tr>
+                            ))
+                          : null}
+                      </table>
                     </div>
                   </div>
-                </div>
-              </Grid>
-              <Grid item md={6} xs={12} spacing={2} className={style.productRightPanel}>
-                <div className={style.panelWrap}>
-                  <div className={style.panelHeader}>
-                  <span className={style.panelHeaderTitle}>EMI Installment </span>
-                  <span className={style.panelSubHeaderTitle}>Amount in rupees</span>
-                  </div>
-                  <div className={style.panelContent}>
-                    <table className={style.productAmoutTable}>
-                      <tr style={{ backgroundColor: "#dddddd" }}>
-                        <th className={style.boldProductCell}>Due Date</th>
-                        <th className={style.boldProductCell}>Principle</th>
-                        <th className={style.boldProductCell}>Interest</th>
-                      </tr>
-                      {this.state.loan_installments
-                        ? this.state.loan_installments.map((row) => (
-                            <tr>
-                              <td className={style.normalProductCell}>{row.due_date}</td>
-                              <td className={style.normalProductCell}>{row.principal}</td>
-                              <td className={style.normalProductCell}>{row.interest}</td>
-                            </tr>
-                          ))
-                        : null}
-                    </table>
-                  </div>
-                </div>
-              </Grid>
+                </Grid>
               </Grid>
               <Divider />
-              <Grid style={{padding:"15px"}}>
+              <Grid style={{ padding: "15px" }}>
                 <Button
-                  style={{marginRight:"8px"}}
-                  onClick={this.SaveData.bind(this)}>Save</Button>
+                  style={{ marginRight: "8px" }}
+                  onClick={this.SaveData.bind(this)}
+                >
+                  Save
+                </Button>
                 <Button
                   color="secondary"
                   clicked={this.cancelForm}

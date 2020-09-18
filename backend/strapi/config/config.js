@@ -51,6 +51,27 @@ bookshelf.model("roleModule", {
   tableName: "modules_roles__roles_modules",
 });
 
+bookshelf.model("country", {
+  requireFetch: false,
+  tableName: "countries",
+});
+
+bookshelf.model("state", {
+  requireFetch: false,
+  tableName: "states",
+  district() {
+    return this.hasMany("district", "state", "id");
+  },
+});
+
+bookshelf.model("district", {
+  requireFetch: false,
+  tableName: "districts",
+  state() {
+    return this.belongsTo("state", "state", "id");
+  },
+});
+
 bookshelf.model("activitytype", {
   tableName: "activitytypes",
   requireFetch: false,
@@ -102,10 +123,41 @@ bookshelf.model("contact", {
   individual() {
     return this.hasOne("individual", "contact", "id");
   },
+  organization() {
+    return this.hasOne("organization", "contact", "id");
+  },
+  address() {
+    return this.hasMany("address", "contact", "id");
+  },
+
+  shareinformation() {
+    return this.belongsTo("shareinformation", "shareinformation", "id");
+  },
 });
 
 bookshelf.model("user", {
   tableName: "users-permissions_user",
+  requireFetch: false,
+});
+bookshelf.model("village", {
+  tableName: "villages",
+  requireFetch: false,
+});
+
+bookshelf.model("contacts_org_vos", {
+  tableName: "contacts_org_vos__organizations_vos",
+  requireFetch: false,
+});
+bookshelf.model("address", {
+  tableName: "addresses",
+  requireFetch: false,
+  contact() {
+    return this.belongsTo("contact", "contact", "id");
+  },
+});
+
+bookshelf.model("shareinformation", {
+  tableName: "shareinformations",
   requireFetch: false,
 });
 

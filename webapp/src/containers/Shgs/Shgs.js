@@ -59,6 +59,7 @@ export class Shgs extends React.Component {
       filterVillage: "",
       filterShg: "",
       filterVo: "",
+      newData: [],
       data: [],
       selectedid: 0,
       open: false,
@@ -87,7 +88,9 @@ export class Shgs extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
-        this.setState({ data: res.data, isLoader: false });
+        this.getStateData(res.data);
+        this.getDistrictData(res.data);
+        this.getVillageData(res.data);
       });
 
     //api call for states filter
@@ -113,6 +116,49 @@ export class Shgs extends React.Component {
       .catch((error) => {
         console.log(error);
       });
+  }
+
+  async getStateData(data) {
+    for (let i in data) {
+      await serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/states/" +
+            data[i].addresses[0].state
+        )
+        .then((res) => {
+          data[i].addresses.splice(1, 0, { state: res.data });
+        });
+    }
+  }
+
+  async getDistrictData(data) {
+    for (let i in data) {
+      await serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/districts/" +
+            data[i].addresses[0].district
+        )
+        .then((res) => {
+          data[i].addresses.splice(2, 0, { district: res.data });
+        });
+    }
+  }
+
+  async getVillageData(data) {
+    for (let i in data) {
+      await serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/villages/" +
+            data[i].addresses[0].village
+        )
+        .then((res) => {
+          data[i].addresses.splice(3, 0, { village: res.data });
+        });
+    }
+    this.setState({ data: data, isLoader: false });
   }
 
   handleStateChange = async (event, value) => {
@@ -276,13 +322,14 @@ export class Shgs extends React.Component {
         "organization.vos[0].name_contains=" + this.state.filterVo + "&&";
     }
     if (this.state.filterState) {
-      searchData += "state.id=" + this.state.filterState.id + "&&";
+      searchData += "addresses.state.id=" + this.state.filterState.id + "&&";
     }
     if (this.state.filterDistrict) {
-      searchData += "district.id=" + this.state.filterDistrict.id + "&&";
+      searchData +=
+        "addresses.district.id=" + this.state.filterDistrict.id + "&&";
     }
     if (this.state.filterVillage) {
-      searchData += "villages.id=" + this.state.filterVillage.id;
+      searchData += "addresses.village.id=" + this.state.filterVillage.id;
     }
 
     //api call after search filter
@@ -299,7 +346,10 @@ export class Shgs extends React.Component {
         process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
       )
       .then((res) => {
-        this.setState({ data: res.data, isLoader: false });
+        //this.setState({ newData: res.data });
+        this.getStateData(res.data);
+        this.getDistrictData(res.data);
+        this.getVillageData(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -316,18 +366,18 @@ export class Shgs extends React.Component {
       },
       {
         name: "State",
+        selector: "addresses[1].state.name",
         sortable: true,
-        cell: (row) => (row.state ? row.state.name : "-"),
       },
       {
         name: "District",
+        selector: "addresses[2].district.name",
         sortable: true,
-        cell: (row) => (row.district ? row.district.name : "-"),
       },
       {
         name: "Village",
+        selector: "addresses[3].village.name",
         sortable: true,
-        cell: (row) => (row.villages[0] ? row.villages[0].name : "-"),
       },
       {
         name: "Village Organization",

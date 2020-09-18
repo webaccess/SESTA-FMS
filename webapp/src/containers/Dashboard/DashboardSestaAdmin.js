@@ -80,19 +80,14 @@ class DashboardForFPO extends Component {
   async componentDidMount() {
     /** get members */
     let newDataArray = [];
-    let url = "crm-plugin/contact/?contact_type=individual";
+    let url = "crm-plugin/contact/?contact_type=individual&&user_null=true";
 
     serviceProvider
       .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
         if (res.data.length > 0) {
-          res.data.map((e, i) => {
-            if (e.user === null) {
-              newDataArray.push(e); // add only those contacts having contact type=individual & users===null
-            }
-          });
           this.setState({
-            memberData: newDataArray.length,
+            memberData: res.data.length,
             isMemLoading: false,
           });
         } else {

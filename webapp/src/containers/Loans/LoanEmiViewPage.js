@@ -61,6 +61,7 @@ class LoanEmiViewPage extends Component {
     super(props);
     this.state = {
       data: [],
+      newData: [],
       loanEmiData: [],
       isLoader: true,
     };
@@ -79,6 +80,22 @@ class LoanEmiViewPage extends Component {
       )
       .then((res) => {
         this.setState({ loanEmiData: res.data, isLoader: false });
+      });
+  }
+
+  async getVillage(data) {
+    await serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/villages/" + data.village
+      )
+      .then((res) => {
+        this.setState({
+          newData: { ...this.state.newData, village: res.data.name },
+        });
+        this.setState({ data: this.state.newData });
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }
 
@@ -107,9 +124,9 @@ class LoanEmiViewPage extends Component {
               res.data.shg.organization
           )
           .then((response) => {
-            let villageName = response.data[0].villages[0].name;
+            let villageName = response.data[0].addresses[0].village;
             this.setState({
-              data: {
+              newData: {
                 loanee: loaneeName,
                 shg: shgName,
                 village: villageName,
@@ -124,6 +141,7 @@ class LoanEmiViewPage extends Component {
               },
               isLoader: false,
             });
+            this.getVillage(this.state.newData);
           });
       });
   };

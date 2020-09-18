@@ -106,7 +106,6 @@ class LoanpurposePage extends Component {
         addFPO: [],
         addEMI: [],
         task: [],
-        addVillage: [],
       },
       formSubmitted: "",
       stateSelected: false,

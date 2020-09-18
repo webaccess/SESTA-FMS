@@ -244,11 +244,11 @@ export class Vos extends React.Component {
     }
     if (this.state.filterState) {
       searchData += searchData ? "&&" : "";
-      searchData += "state=" + this.state.filterState.id;
+      searchData += "addresses.state=" + this.state.filterState.id;
     }
     if (this.state.filterDistrict) {
       searchData += searchData ? "&&" : "";
-      searchData += "district=" + this.state.filterDistrict.id;
+      searchData += "addresses.district=" + this.state.filterDistrict.id;
     }
 
     if (this.state.filterVillage) {
@@ -260,7 +260,7 @@ export class Vos extends React.Component {
       } else {
         searchData += searchData ? "&&" : "";
       }
-      searchData += "villages=" + this.state.filterVillage.id;
+      searchData += "addresses.village=" + this.state.filterVillage.id;
     }
 
     //api call after search filter

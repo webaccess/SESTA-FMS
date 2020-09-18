@@ -62,6 +62,7 @@ class LoanTasksPage extends Component {
     super(props);
     this.state = {
       data: [],
+      newData: [],
       loantasks: [],
       isLoader: true,
     };
@@ -80,6 +81,22 @@ class LoanTasksPage extends Component {
       )
       .then((res) => {
         this.setState({ loantasks: res.data, isLoader: false });
+      });
+  }
+
+  async getVillage(data) {
+    await serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/villages/" + data.village
+      )
+      .then((res) => {
+        this.setState({
+          newData: { ...this.state.newData, village: res.data.name },
+        });
+        this.setState({ data: this.state.newData });
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }
 
@@ -108,9 +125,9 @@ class LoanTasksPage extends Component {
               res.data.shg.organization
           )
           .then((response) => {
-            let villageName = response.data[0].villages[0].name;
+            let villageName = response.data[0].addresses[0].village;
             this.setState({
-              data: {
+              newData: {
                 loanee: loaneeName,
                 shg: shgName,
                 village: villageName,
@@ -126,6 +143,7 @@ class LoanTasksPage extends Component {
                   : "-",
               },
             });
+            this.getVillage(this.state.newData);
           });
       });
   };

@@ -252,8 +252,8 @@ export class Villages extends React.Component {
     let IsActive = this.state.IsActive;
     let villageInUse = false;
     this.state.contacts.find((cd) => {
-      if (cd.villages.length > 0) {
-        if (cd.villages[0].id === parseInt(setActiveId)) {
+      if (cd.addresses.length > 0) {
+        if (cd.addresses[0].village === parseInt(setActiveId)) {
           this.setState({ villageInUse: true });
           villageInUse = true;
         }
