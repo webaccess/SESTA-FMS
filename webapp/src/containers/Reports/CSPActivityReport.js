@@ -44,6 +44,7 @@ export class CSPSummaryReport extends React.Component {
       cspList: [],
       activitiesData: [],
       filename: [],
+      isLoader: true,
     };
   }
 
@@ -70,7 +71,7 @@ export class CSPSummaryReport extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/activities/?_sort=start_datetime:desc"
+          "crm-plugin/activities/?_sort=start_datetime:desc"
       )
       .then((activityRes) => {
         activityRes.data.map((activity) => {
@@ -80,7 +81,7 @@ export class CSPSummaryReport extends React.Component {
             activityArr.push(activity);
           }
         });
-        this.setState({ activitiesData: activityArr });
+        this.setState({ activitiesData: activityArr, isLoader: false });
       })
       .catch((error) => {
         console.log(error);
@@ -118,6 +119,7 @@ export class CSPSummaryReport extends React.Component {
   }
 
   handleSearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.filterCspName) {
       searchData += searchData ? "&&" : "";
@@ -138,9 +140,9 @@ export class CSPSummaryReport extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/activities?" +
-        searchData +
-        "&&_sort=start_datetime:desc"
+          "crm-plugin/activities?" +
+          searchData +
+          "&&_sort=start_datetime:desc"
       )
       .then((activityRes) => {
         activityRes.data.map((activity) => {
@@ -150,7 +152,7 @@ export class CSPSummaryReport extends React.Component {
             activityArr.push(activity);
           }
         });
-        this.setState({ activitiesData: activityArr });
+        this.setState({ activitiesData: activityArr, isLoader: false });
       })
       .catch((error) => {
         console.log(error);
@@ -179,6 +181,7 @@ export class CSPSummaryReport extends React.Component {
       filterStartDate: "",
       filterEndDate: "",
       isCancel: true,
+      isLoader: true,
     });
     this.componentDidMount();
   };
@@ -190,11 +193,17 @@ export class CSPSummaryReport extends React.Component {
     let csvActivityData = [];
     let splitTitle;
 
-    activitiesData.map(activity => {
-
+    activitiesData.map((activity) => {
       // Get Member name from activity only related to loans
-      if (activity.activitytype.name == "Loan application collection" || activity.activitytype.name == "Collection of principal amount" || activity.activitytype.name == "Interest collection" || activity.loan_application_task != null) {
-        splitTitle = ~activity.title.indexOf(":") ? activity.title.split(":") : "-";
+      if (
+        activity.activitytype.name == "Loan application collection" ||
+        activity.activitytype.name == "Collection of principal amount" ||
+        activity.activitytype.name == "Interest collection" ||
+        activity.loan_application_task != null
+      ) {
+        splitTitle = ~activity.title.indexOf(":")
+          ? activity.title.split(":")
+          : "-";
         activity.memberName = splitTitle[0];
       } else {
         activity.memberName = "-";
@@ -281,7 +290,10 @@ export class CSPSummaryReport extends React.Component {
             <div>
               <h3>CSP Activity Report</h3>
             </div>
-            <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
+            <div
+              className={classes.row}
+              style={{ flexWrap: "wrap", height: "auto" }}
+            >
               <div className={classes.searchInput}>
                 <div className={classes.Districts}>
                   <Grid item md={12} xs={12}>
@@ -367,10 +379,11 @@ export class CSPSummaryReport extends React.Component {
                   rowsSelected={this.rowsSelect}
                   columnsvalue={columnsvalue}
                   pagination
+                  progressComponent={this.state.isLoader}
                 />
               ) : (
-                  <h1>Loading...</h1>
-                )}
+                <h1>Loading...</h1>
+              )}
             </div>
             <br />
             <Button>

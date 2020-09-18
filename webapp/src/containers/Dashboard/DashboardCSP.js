@@ -63,6 +63,8 @@ class DashboardCSP extends Component {
       activitiesData: [],
       activitytypeData: [],
       remuneration: "",
+      isLoader: true,
+      isLoaderAct: true,
     };
   }
 
@@ -74,7 +76,7 @@ class DashboardCSP extends Component {
           "loan-application-installments?_sort=id:asc"
       )
       .then((res) => {
-        this.setState({ loanInstallmentData: res.data });
+        this.setState({ loanInstallmentData: res.data, isLoader: false });
       });
 
     serviceProvider
@@ -99,7 +101,7 @@ class DashboardCSP extends Component {
               filteredArray.push(e);
             });
         });
-        this.setState({ activitiesData: filteredArray });
+        this.setState({ activitiesData: filteredArray, isLoaderAct: false });
       })
       .catch((error) => {
         console.log(error);
@@ -386,6 +388,7 @@ class DashboardCSP extends Component {
                   editData={this.editData}
                   rowsSelected={this.rowsSelect}
                   columnsvalue={columnsvalue}
+                  progressComponent={this.state.isLoader}
                 />
               ) : (
                 <h1>Loading...</h1>
@@ -412,9 +415,9 @@ class DashboardCSP extends Component {
                     "activitytype.remuneration",
                   ]}
                   column={Usercolumns1}
-                  editData={this.editData}
                   rowsSelected={this.rowsSelect}
                   columnsvalue={columnsvalue1}
+                  progressComponent={this.state.isLoaderAct}
                 />
               ) : (
                 <h1>Loading...</h1>

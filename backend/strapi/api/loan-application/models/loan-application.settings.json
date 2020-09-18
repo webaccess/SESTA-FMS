@@ -27,7 +27,9 @@
         "UnderReview",
         "Approved",
         "Denied",
-        "Cancelled"
+        "Cancelled",
+        "InProgress",
+        "Completed"
       ],
       "required": true
     },
@@ -49,8 +51,8 @@
       "model": "contact"
     },
     "loan_model": {
-      "via": "loan_applications",
-      "model": "loan-model"
+      "model": "loan-model",
+      "via": "loan_applications"
     },
     "document": {
       "collection": "file",

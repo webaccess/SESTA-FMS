@@ -240,7 +240,8 @@ class LoansApplyPage extends Component {
           }
         } else if (
           loanapp.status == "Denied" ||
-          loanapp.status == "Cancelled"
+          loanapp.status == "Cancelled" ||
+          loanapp.status == "Completed"
         ) {
           if (!loanApplied && !activeLoanPresent && !loanAlreadyApplied) {
             this.saveApplyLoan(

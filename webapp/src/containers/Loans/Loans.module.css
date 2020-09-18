@@ -143,3 +143,27 @@ tr {
     margin: 0px !important;
   }
 }
+
+.footerLoanBtn{
+  padding: 15px 0px;
+}
+
+:global(.MuiBreadcrumbs-ol) {
+  margin-bottom: 15px !important;
+}
+
+.filterLabel {
+  font-size: 13px !important;
+  display: inline-flex;
+  padding-right: 7px;
+  font-weight: 500;
+}
+
+.filterValue {
+  font-size: 15px !important;
+  display: inline-flex;
+  font-weight: 600;
+}
+.loanAddTask{
+  padding: 15px 0px 0px;
+}

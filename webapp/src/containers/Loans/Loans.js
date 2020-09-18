@@ -13,6 +13,7 @@ import Moment from "moment";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import { Link } from "react-router-dom";
 import Auth from "../../components/Auth/Auth.js";
+import * as constants from "../../constants/Constants";
 
 const useStyles = (theme) => ({
   root: {},
@@ -58,7 +59,7 @@ const useStyles = (theme) => ({
 
 const conditionalRowStyles = [
   {
-    when: (row) => row.status == "Approved",
+    when: (row) => row.status == "Approved" || row.status == "InProgress",
     style: {
       backgroundColor: "#c9e7b1",
       color: "black",
@@ -97,18 +98,14 @@ export class Loans extends React.Component {
     this.state = {
       data: [],
       getShg: [],
-      getStatus: [
-        { id: 1, name: "UnderReview" },
-        { id: 2, name: "Approved" },
-        { id: 3, name: "Denied" },
-        { id: 4, name: "Cancelled" },
-      ],
+      getStatus: constants.LOAN_STATUS,
       loanStatus: [],
       isCancel: false,
       values: {},
       filterStatus: "",
       filterShg: "",
       loggedInUserRole: auth.getUserInfo().role.name,
+      isLoader: true,
     };
   }
 
@@ -196,7 +193,7 @@ export class Loans extends React.Component {
 
       if (
         loandata.loan_app_installments.length > 0 &&
-        loandata.status == "Approved"
+        loandata.status == "Approved" || loandata.status == "InProgress"|| loandata.status == "Completed"
       ) {
         let loanDueId = loandata.loan_app_installments.length - 1;
         let loanDueData = loandata.loan_app_installments[loanDueId];
@@ -237,7 +234,7 @@ export class Loans extends React.Component {
         loandata.outstandingAmount = outstandingAmount.toLocaleString();
       }
     });
-    this.setState({ data: data });
+    this.setState({ data: data, isLoader: false });
   };
 
   handleSearch() {
@@ -248,22 +245,28 @@ export class Loans extends React.Component {
     }
     if (this.state.filterStatus) {
       searchData += searchData ? "&&" : "";
-      searchData += "status=" + this.state.filterStatus.name;
+      searchData += "status=" + this.state.filterStatus.id;
     }
     this.searchData(searchData);
     if (this.state.filterShg) {
+      let shgId;
+      if(auth.getUserInfo().role.name === "CSP (Community Service Provider)") {
+        shgId = this.state.filterShg.contact;
+      } else {
+        shgId = this.state.filterShg.id;
+      }
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/individuals/?shg.id=" +
-            this.state.filterShg.id
+            shgId
         )
         .then((res) => {
           if (res.data.length > 0) {
             res.data.map((shgcontact) => {
               if (
                 shgcontact.shg.id &&
-                this.state.filterShg.id === shgcontact.shg.id
+                shgId === shgcontact.shg.id
               ) {
                 searchData += searchData ? "&&" : "";
                 searchData += "contact.id=" + shgcontact.contact.id;
@@ -284,22 +287,30 @@ export class Loans extends React.Component {
 
   searchData(searchData) {
     let url = "loan-applications/";
-    if (
-      // this.state.loggedInUserRole === "FPO Admin" ||
-      this.state.loggedInUserRole === "CSP (Community Service Provider)"
-    ) {
+    if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
       url += "?creator_id=" + auth.getUserInfo().contact.id;
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
+        )
+        .then((res) => {
+          this.getFormattedData(res.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + url + "?" + searchData
+        )
+        .then((res) => {
+          this.getFormattedData(res.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + url + "?" + searchData
-      )
-      .then((res) => {
-        this.getFormattedData(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   }
 
   cancelForm = () => {
@@ -309,6 +320,7 @@ export class Loans extends React.Component {
       formSubmitted: "",
       filterShg: "",
       isCancel: true,
+      isLoader: true,
     });
     this.componentDidMount();
     //routing code #route to loan_application_list page
@@ -391,9 +403,7 @@ export class Loans extends React.Component {
       .serviceProviderForGetRequestDownloadPDFFile(
         process.env.REACT_APP_SERVER_URL + "loan-applications-print/" + cellid
       )
-      .then((res) => {
-        console.log("done here");
-      })
+      .then((res) => {})
       .catch((error) => {
         console.log(error);
       });
@@ -407,6 +417,14 @@ export class Loans extends React.Component {
     let statusFilter = this.state.getStatus;
     let filterStatus = this.state.filterStatus;
     let filters = this.state.values;
+    data.map(stdata=>{
+      statusFilter.map(status=>{
+        if(stdata.status === status.id ) {
+          stdata.loanStatus = status.name;
+        }
+      })
+    })
+    console.log('loanndata ',data);
     const Usercolumns = [
       {
         name: "Member Name",
@@ -431,7 +449,7 @@ export class Loans extends React.Component {
       },
       {
         name: "Status",
-        selector: "status",
+        selector: "loanStatus",
         sortable: true,
       },
       {
@@ -497,7 +515,10 @@ export class Loans extends React.Component {
             <Snackbar severity="success">Changes saved successfully</Snackbar>
           ) : null}
 
-          <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
+          <div
+            className={classes.row}
+            style={{ flexWrap: "wrap", height: "auto" }}
+          >
             <div className={classes.searchInput}>
               <div className={style.Districts}>
                 <Grid item md={12} xs={12}>
@@ -574,10 +595,17 @@ export class Loans extends React.Component {
                 </Grid>
               </div>
             </div>
-            <Button onClick={this.handleSearch.bind(this)} 
-              style={{ marginRight: "5px", marginBottom: "8px", }}>Search</Button>
-            <Button color="secondary" clicked={this.cancelForm}
-              style={{ marginBottom: "8px", }}>
+            <Button
+              onClick={this.handleSearch.bind(this)}
+              style={{ marginRight: "5px", marginBottom: "8px" }}
+            >
+              Search
+            </Button>
+            <Button
+              color="secondary"
+              clicked={this.cancelForm}
+              style={{ marginBottom: "8px" }}
+            >
               reset
             </Button>
           </div>
@@ -612,6 +640,7 @@ export class Loans extends React.Component {
               columnsvalue={columnsvalue}
               conditionalRowStyles={conditionalRowStyles}
               pagination
+              progressComponent={this.state.isLoader}
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (

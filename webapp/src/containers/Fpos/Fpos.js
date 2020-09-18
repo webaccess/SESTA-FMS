@@ -74,6 +74,7 @@ export class Fpos extends React.Component {
       isCancel: false,
       singleDelete: "",
       multipleDelete: "",
+      isLoader: true,
     };
   }
 
@@ -84,7 +85,7 @@ export class Fpos extends React.Component {
           "crm-plugin/contact/?contact_type=organization&organization.sub_type=FPO&_sort=name:ASC"
       )
       .then((res) => {
-        this.setState({ data: res.data });
+        this.setState({ data: res.data, isLoader: false });
       });
 
     //api call for states filter
@@ -197,6 +198,7 @@ export class Fpos extends React.Component {
       }
     }
   };
+
   cancelForm = () => {
     this.setState({
       filterState: "",
@@ -204,12 +206,14 @@ export class Fpos extends React.Component {
       filterVillage: "",
       filterFpo: "",
       isCancel: true,
+      isLoader: true,
     });
 
     this.componentDidMount();
   };
 
   handleSearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.filterState) {
       searchData += "addresses.state.id=" + this.state.filterState.id + "&&";
@@ -228,7 +232,7 @@ export class Fpos extends React.Component {
           searchData
       )
       .then((res) => {
-        this.setState({ data: res.data });
+        this.setState({ data: res.data, isLoader: false });
       })
       .catch((err) => {
         console.log(err);
@@ -318,7 +322,10 @@ export class Fpos extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
+            <div
+              className={classes.row}
+              style={{ flexWrap: "wrap", height: "auto" }}
+            >
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -399,14 +406,14 @@ export class Fpos extends React.Component {
                 </div>
               </div>
               <Button
-                style={{ marginRight: "5px", marginBottom: "8px", }}
+                style={{ marginRight: "5px", marginBottom: "8px" }}
                 variant="contained"
                 onClick={this.handleSearch.bind(this)}
               >
                 Search
               </Button>
               <Button
-                style={{ marginBottom: "8px", }}
+                style={{ marginBottom: "8px" }}
                 color="secondary"
                 variant="contained"
                 // clicked={this.cancelForm}
@@ -432,8 +439,9 @@ export class Fpos extends React.Component {
                 columnsvalue={columnsvalue}
                 selectableRows
                 pagination
+                progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
-                style = {{}}
+                style={{}}
               />
             ) : (
               <h1>Loading...</h1>

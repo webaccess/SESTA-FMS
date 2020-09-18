@@ -25,6 +25,7 @@ import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 import style from "./Activity.module.css";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
 import CancelIcon from "@material-ui/icons/Cancel";
+import Spinner from "../../components/Spinner/Spinner";
 
 class ActivityPage extends Component {
   constructor(props) {
@@ -67,6 +68,7 @@ class ActivityPage extends Component {
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
       ],
+      isLoader: "",
     };
   }
 
@@ -77,6 +79,7 @@ class ActivityPage extends Component {
 
   async componentDidMount() {
     if (this.state.editPage[0]) {
+      this.setState({ isLoader: true });
       let document;
       serviceProvider
         .serviceProviderForGetRequest(
@@ -100,6 +103,7 @@ class ActivityPage extends Component {
             },
             fileName: document,
             uploadedFile: res.data[0].document[0],
+            isLoader: false,
           });
         })
         .catch((error) => {
@@ -379,163 +383,167 @@ class ActivityPage extends Component {
             : ADD_ACTIVITY_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: "45rem" }}>
-          <CardHeader
-            title={this.state.editPage[0] ? "Edit Activity" : "Add Activity"}
-            subheader={
-              this.state.editPage[0]
-                ? "You can edit activity data here!"
-                : "You can add new activity data here!"
-            }
-          />
-          <Divider />
-          <CardContent>
-            <Grid container spacing={3}>
-              <Grid item md={12} xs={12}>
-                {this.state.formSubmitted === false ? (
-                  <Snackbar severity="error" Showbutton={false}>
-                    {this.state.errorCode}
-                  </Snackbar>
-                ) : null}
-              </Grid>
-              <Grid item md={6} xs={12}>
-                <Autotext
-                  id="combo-box-demo"
-                  options={activitytypeFilter}
-                  variant="outlined"
-                  label="Select Activity Type*"
-                  getOptionLabel={(option) => option.name}
-                  onChange={(event, value) => {
-                    this.handleAutocompleteChange(event, value);
-                  }}
-                  defaultValue={[]}
-                  value={
-                    addActivitytype
-                      ? activitytypeFilter[
-                          activitytypeFilter.findIndex(function (item, i) {
-                            return item.id === addActivitytype;
-                          })
-                        ] || null
-                      : null
-                  }
-                  error={this.hasError("addActivitytype")}
-                  helperText={
-                    this.hasError("addActivitytype")
-                      ? this.state.errors.addActivitytype[0]
-                      : null
-                  }
-                  renderInput={(params) => (
-                    <Input
-                      fullWidth
-                      label="Select Activity Type*"
-                      name="addActivitytype"
-                      variant="outlined"
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item md={6} xs={12}>
-                <Input
-                  fullWidth
-                  label="Description*"
-                  name="addTitle"
-                  error={this.hasError("addTitle")}
-                  helperText={
-                    this.hasError("addTitle")
-                      ? this.state.errors.addTitle[0]
-                      : null
-                  }
-                  value={this.state.values.addTitle || ""}
-                  onChange={this.handleChange}
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item md={3} xs={12}>
-                <Datepicker
-                  label="Date*"
-                  name="addStartDate"
-                  error={this.hasError("addStartDate")}
-                  helperText={
-                    this.hasError("addStartDate")
-                      ? this.state.errors.addStartDate[0]
-                      : null
-                  }
-                  value={this.state.values.addStartDate || null}
-                  format={"dd MMM yyyy"}
-                  onChange={(value) =>
-                    this.setState({
-                      values: { ...this.state.values, addStartDate: value },
-                    })
-                  }
-                />
-              </Grid>
-              <Grid item md={9} xs={12}>
-                <TextField
-                  id="outlined-multiline-static"
-                  fullWidth
-                  label="Status / Comments"
-                  rows={10}
-                  name="addDescription"
-                  value={this.state.values.addDescription || ""}
-                  onChange={this.handleChange}
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item md={12}>
-                <label htmlFor="upload-file">
-                  <input
-                    style={{ display: "none" }}
-                    required
-                    type="file"
-                    name="upload-file"
-                    id="upload-file"
-                    onChange={this.onChangeHandler}
+        {!this.state.isLoader ? (
+          <Card style={{ maxWidth: "45rem" }}>
+            <CardHeader
+              title={this.state.editPage[0] ? "Edit Activity" : "Add Activity"}
+              subheader={
+                this.state.editPage[0]
+                  ? "You can edit activity data here!"
+                  : "You can add new activity data here!"
+              }
+            />
+            <Divider />
+            <CardContent>
+              <Grid container spacing={3}>
+                <Grid item md={12} xs={12}>
+                  {this.state.formSubmitted === false ? (
+                    <Snackbar severity="error" Showbutton={false}>
+                      {this.state.errorCode}
+                    </Snackbar>
+                  ) : null}
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Autotext
+                    id="combo-box-demo"
+                    options={activitytypeFilter}
+                    variant="outlined"
+                    label="Select Activity Type*"
+                    getOptionLabel={(option) => option.name}
+                    onChange={(event, value) => {
+                      this.handleAutocompleteChange(event, value);
+                    }}
+                    defaultValue={[]}
+                    value={
+                      addActivitytype
+                        ? activitytypeFilter[
+                            activitytypeFilter.findIndex(function (item, i) {
+                              return item.id === addActivitytype;
+                            })
+                          ] || null
+                        : null
+                    }
+                    error={this.hasError("addActivitytype")}
+                    helperText={
+                      this.hasError("addActivitytype")
+                        ? this.state.errors.addActivitytype[0]
+                        : null
+                    }
+                    renderInput={(params) => (
+                      <Input
+                        fullWidth
+                        label="Select Activity Type*"
+                        name="addActivitytype"
+                        variant="outlined"
+                      />
+                    )}
                   />
-                  <Fab
-                    color="primary"
-                    size="medium"
-                    component="span"
-                    aria-label="add"
-                    variant="extended"
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Description*"
+                    name="addTitle"
+                    error={this.hasError("addTitle")}
+                    helperText={
+                      this.hasError("addTitle")
+                        ? this.state.errors.addTitle[0]
+                        : null
+                    }
+                    value={this.state.values.addTitle || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={3} xs={12}>
+                  <Datepicker
+                    label="Date*"
+                    name="addStartDate"
+                    error={this.hasError("addStartDate")}
+                    helperText={
+                      this.hasError("addStartDate")
+                        ? this.state.errors.addStartDate[0]
+                        : null
+                    }
+                    value={this.state.values.addStartDate || null}
+                    format={"dd MMM yyyy"}
+                    onChange={(value) =>
+                      this.setState({
+                        values: { ...this.state.values, addStartDate: value },
+                      })
+                    }
+                  />
+                </Grid>
+                <Grid item md={9} xs={12}>
+                  <TextField
+                    id="outlined-multiline-static"
+                    fullWidth
+                    label="Status / Comments"
+                    rows={10}
+                    name="addDescription"
+                    value={this.state.values.addDescription || ""}
+                    onChange={this.handleChange}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={12}>
+                  <label htmlFor="upload-file">
+                    <input
+                      style={{ display: "none" }}
+                      required
+                      type="file"
+                      name="upload-file"
+                      id="upload-file"
+                      onChange={this.onChangeHandler}
+                    />
+                    <Fab
+                      color="primary"
+                      size="medium"
+                      component="span"
+                      aria-label="add"
+                      variant="extended"
+                    >
+                      <FileCopyIcon /> Upload Activity Document
+                    </Fab>
+                  </label>{" "}
+                  <IconButton
+                    aria-label="cancel"
+                    color="secondary"
+                    style={{ paddingLeft: "2px" }}
                   >
-                    <FileCopyIcon /> Upload Activity Document
-                  </Fab>
-                </label>{" "}
-                <IconButton
-                  aria-label="cancel"
-                  color="secondary"
-                  style={{ paddingLeft: "2px" }}
-                >
-                  <CancelIcon onClick={this.cancelFile} />
-                </IconButton>
-                &nbsp;&nbsp;&nbsp;
-                {this.state.fileName !== "" ? (
-                  <label style={{ color: "green", fontSize: "11px" }}>
-                    Selected File: {this.state.fileName}
-                  </label>
-                ) : (
-                  <label style={{ color: "red", fontSize: "11px" }}>
-                    No File Selected!
-                  </label>
-                )}
+                    <CancelIcon onClick={this.cancelFile} />
+                  </IconButton>
+                  &nbsp;&nbsp;&nbsp;
+                  {this.state.fileName !== "" ? (
+                    <label style={{ color: "green", fontSize: "11px" }}>
+                      Selected File: {this.state.fileName}
+                    </label>
+                  ) : (
+                    <label style={{ color: "red", fontSize: "11px" }}>
+                      No File Selected!
+                    </label>
+                  )}
+                </Grid>
               </Grid>
-            </Grid>
-          </CardContent>
-          <Divider />
-          <CardActions style={{ padding: "15px" }}>
-            <Button type="submit" onClick={this.onSave.bind(this)}>
-              Save
-            </Button>
-            <Button
-              color="secondary"
-              clicked={this.cancelForm}
-              component={Link}
-              to="/Activities"
-            >
-              cancel
-            </Button>
-          </CardActions>
-        </Card>
+            </CardContent>
+            <Divider />
+            <CardActions style={{ padding: "15px" }}>
+              <Button type="submit" onClick={this.onSave.bind(this)}>
+                Save
+              </Button>
+              <Button
+                color="secondary"
+                clicked={this.cancelForm}
+                component={Link}
+                to="/Activities"
+              >
+                cancel
+              </Button>
+            </CardActions>
+          </Card>
+        ) : (
+          <Spinner />
+        )}
       </Layout>
     );
   }

@@ -1,7 +1,175 @@
 {
   "loantask": [
     {
+      "activitytype": "Cowdung compost",
+      "loan_model": "Horticulture"
+    },
+    {
+      "activitytype": "Fencing",
+      "loan_model": "Horticulture"
+    },
+    {
+      "activitytype": "Intercroping",
+      "loan_model": "Horticulture"
+    },
+    {
+      "activitytype": "Turmeric and ginger",
+      "loan_model": "Horticulture"
+    },
+    {
+      "activitytype": "Vegetable in trellis",
+      "loan_model": "Horticulture"
+    },
+    {
+      "activitytype": "Grafts of crop 1",
+      "loan_model": "Horticulture"
+    },
+    {
+      "activitytype": "Grafts of crop 2",
+      "loan_model": "Horticulture"
+    },
+    {
+      "activitytype": "STY construction",
+      "loan_model": "Pig Sty"
+    },
+    {
+      "activitytype": "Piglet purchase",
+      "loan_model": "Pig Sty"
+    },
+    {
       "activitytype": "Vet care support : Vaccination",
+      "loan_model": "Pig Sty"
+    },
+    {
+      "activitytype": "Feed management",
+      "loan_model": "Pig Sty"
+    },
+    {
+      "activitytype": "Clearing of bushes,layout",
+      "loan_model": "Pond excavation/rennovation"
+    },
+    {
+      "activitytype": "Excavation of mix medium hard soil",
+      "loan_model": "Pond excavation/rennovation"
+    },
+    {
+      "activitytype": "Pre peparation of pond",
+      "loan_model": "Fish Rearing"
+    },
+    {
+      "activitytype": "Liming",
+      "loan_model": "Fish Rearing"
+    },
+    {
+      "activitytype": "Cowdung",
+      "loan_model": "Fish Rearing"
+    },
+    {
+      "activitytype": "Bleaching",
+      "loan_model": "Fish Rearing"
+    },
+    {
+      "activitytype": "Manure",
+      "loan_model": "Fish Rearing"
+    },
+    {
+      "activitytype": "Stocking of fingerlings",
+      "loan_model": "Fish Rearing"
+    },
+    {
+      "activitytype": "Feed management",
+      "loan_model": "Fish Rearing"
+    },
+    {
+      "activitytype": "Harvesting",
+      "loan_model": "Fish Rearing"
+    },
+    {
+      "activitytype": "1 HP motor",
+      "loan_model": "Motor pump"
+    },
+    {
+      "activitytype": "Honda 5HP",
+      "loan_model": "Pumpset"
+    },
+    {
+      "activitytype": "Land preparation",
+      "loan_model": "Turmeric"
+    },
+    {
+      "activitytype": "Trichoderma application",
+      "loan_model": "Turmeric"
+    },
+    {
+      "activitytype": "Planting materials",
+      "loan_model": "Turmeric"
+    },
+    {
+      "activitytype": "Manure",
+      "loan_model": "Turmeric"
+    },
+    {
+      "activitytype": "Fencing",
+      "loan_model": "Turmeric"
+    },
+    {
+      "activitytype": "Land preparation",
+      "loan_model": "Ginger"
+    },
+    {
+      "activitytype": "Trichoderma application",
+      "loan_model": "Ginger"
+    },
+    {
+      "activitytype": "Planting materials",
+      "loan_model": "Ginger"
+    },
+    {
+      "activitytype": "Manure",
+      "loan_model": "Ginger"
+    },
+    {
+      "activitytype": "Fencing",
+      "loan_model": "Ginger"
+    },
+    {
+      "activitytype": "Land preparation",
+      "loan_model": "Maize"
+    },
+    {
+      "activitytype": "Trichoderma application",
+      "loan_model": "Maize"
+    },
+    {
+      "activitytype": "Planting materials",
+      "loan_model": "Maize"
+    },
+    {
+      "activitytype": "Manure",
+      "loan_model": "Maize"
+    },
+    {
+      "activitytype": "Irrigationand fencing",
+      "loan_model": "Maize"
+    },
+    {
+      "activitytype": "Purchase of Does",
+      "loan_model": "Goatery"
+    },
+    {
+      "activitytype": "Sty Construction",
+      "loan_model": "Goatery"
+    },
+    {
+      "activitytype": "Misc medicine",
+      "loan_model": "Goatery"
+    },
+    {
+      "activitytype": "Vet care support : Vaccination",
+      "loan_model": "Goatery"
+    },
+    {
+      "activitytype": "Deworming",
       "loan_model": "Goatery"
     }
   ]

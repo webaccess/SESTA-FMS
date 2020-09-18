@@ -57,6 +57,7 @@ export class Activity extends React.Component {
       values: {},
       data: [],
       getActivitytype: [],
+      isLoader: true,
     };
   }
 
@@ -65,18 +66,18 @@ export class Activity extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/activities/?_sort=start_datetime:desc"
+          "crm-plugin/activities/?_sort=start_datetime:desc"
       )
       .then((res) => {
         res.data.map((e, i) => {
-          e.activityassignees.map((item) => { });
+          e.activityassignees.map((item) => {});
           e.activityassignees
             .filter((item) => item.contact === auth.getUserInfo().contact.id)
             .map((filteredData) => {
               filteredArray.push(e);
             });
         });
-        this.setState({ data: filteredArray });
+        this.setState({ data: filteredArray, isLoader: false });
       })
       .catch((error) => {
         console.log(error);
@@ -85,7 +86,7 @@ export class Activity extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/activitytypes/?is_active=true&&_sort=name:asc"
+          "crm-plugin/activitytypes/?is_active=true&&_sort=name:asc"
       )
       .then((res) => {
         this.setState({ getActivitytype: res.data });
@@ -157,6 +158,7 @@ export class Activity extends React.Component {
   };
 
   handleSearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.values.FilterActivity) {
       searchData += "title_contains=" + this.state.values.FilterActivity + "&&";
@@ -167,21 +169,21 @@ export class Activity extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/activities/?" +
-        searchData +
-        "&&_sort=start_datetime:desc"
+          "crm-plugin/activities/?" +
+          searchData +
+          "&&_sort=start_datetime:desc"
       )
       .then((res) => {
         let filteredArray = [];
         res.data.map((e, i) => {
-          e.activityassignees.map((item) => { });
+          e.activityassignees.map((item) => {});
           e.activityassignees
             .filter((item) => item.contact === auth.getUserInfo().contact.id)
             .map((filteredData) => {
               filteredArray.push(e);
             });
         });
-        this.setState({ data: filteredArray });
+        this.setState({ data: filteredArray, isLoader: false });
       })
       .catch((err) => {
         console.log(err);
@@ -192,6 +194,7 @@ export class Activity extends React.Component {
     this.setState({
       filterActivitytype: null,
       values: {},
+      isLoader: true,
     });
     this.componentDidMount();
   };
@@ -214,9 +217,9 @@ export class Activity extends React.Component {
         selector: "start_datetime",
         format: (row) =>
           `${
-          row.start_datetime != null
-            ? new Date(row.start_datetime).toLocaleString()
-            : ""
+            row.start_datetime != null
+              ? new Date(row.start_datetime).toLocaleString()
+              : ""
           }`,
         sortable: true,
         cell: (row) =>
@@ -261,12 +264,12 @@ export class Activity extends React.Component {
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
-              this.state.singleDelete !== "" &&
-              this.state.singleDelete ? (
-                <Snackbar severity="success" Showbutton={false}>
-                  Activity {this.state.singleDelete} deleted successfully!
-                </Snackbar>
-              ) : null}
+            this.state.singleDelete !== "" &&
+            this.state.singleDelete ? (
+              <Snackbar severity="success" Showbutton={false}>
+                Activity {this.state.singleDelete} deleted successfully!
+              </Snackbar>
+            ) : null}
             {this.state.singleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
@@ -282,7 +285,10 @@ export class Activity extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
+            <div
+              className={classes.row}
+              style={{ flexWrap: "wrap", height: "auto" }}
+            >
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -314,13 +320,13 @@ export class Activity extends React.Component {
                           ? this.state.isCancel === true
                             ? null
                             : ActivityTypeFilter[
-                            ActivityTypeFilter.findIndex(function (
-                              item,
-                              i
-                            ) {
-                              return item.id === filterActivitytype;
-                            })
-                            ] || null
+                                ActivityTypeFilter.findIndex(function (
+                                  item,
+                                  i
+                                ) {
+                                  return item.id === filterActivitytype;
+                                })
+                              ] || null
                           : null
                       }
                       renderInput={(params) => (
@@ -337,11 +343,16 @@ export class Activity extends React.Component {
                 </div>
               </div>
               <Button
-				style={{ marginRight: "5px", marginBottom: "8px", }}
-				onClick={this.handleSearch.bind(this)}>Search</Button>
+                style={{ marginRight: "5px", marginBottom: "8px" }}
+                onClick={this.handleSearch.bind(this)}
+              >
+                Search
+              </Button>
               <Button
-				style={{ marginBottom: "8px", }}
-				color="secondary" clicked={this.cancelForm}>
+                style={{ marginBottom: "8px" }}
+                color="secondary"
+                clicked={this.cancelForm}
+              >
                 reset
               </Button>
             </div>
@@ -359,11 +370,12 @@ export class Activity extends React.Component {
                 columnsvalue={columnsvalue}
                 pagination
                 selectableRows
+                progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (
-                <h1>Loading...</h1>
-              )}
+              <h1>Loading...</h1>
+            )}
           </div>
         </Grid>
       </Layout>

@@ -23,6 +23,7 @@ import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import IconButton from "@material-ui/core/IconButton";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import Spinner from "../../components/Spinner/Spinner";
 
 class UsersPage extends Component {
   constructor(props) {
@@ -55,9 +56,6 @@ class UsersPage extends Component {
             message: "Please enter valid phone number",
           },
         },
-        // username: {
-        //   required: { value: "true", message: "Username is required" },
-        // },
         password: {
           required: { value: "true", message: "Password is required" },
         },
@@ -73,6 +71,7 @@ class UsersPage extends Component {
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
       ],
+      isLoader: "",
     };
   }
 
@@ -117,6 +116,7 @@ class UsersPage extends Component {
 
   getDetails = () => {
     if (this.state.editPage[0]) {
+      this.setState({ isLoader: true });
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL + "users/" + this.state.editPage[1]
@@ -143,6 +143,7 @@ class UsersPage extends Component {
                   role: res.data.role,
                 },
                 editContactId: res.data.contact.id,
+                isLoader: false,
               });
               let tempValues = this.state.values;
               if (res.data.role.name === "FPO Admin") {
@@ -153,6 +154,7 @@ class UsersPage extends Component {
               }
               this.setState({
                 values: tempValues,
+                isLoader: false,
               });
             })
             .catch((error) => {});
@@ -508,100 +510,101 @@ class UsersPage extends Component {
             : ADD_USERS_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: "45rem" }}>
-          <form
-            autoComplete="off"
-            noValidate
-            onSubmit={this.handleSubmit}
-            method="post"
-          >
-            <CardHeader
-              title={this.state.editPage[0] ? "Edit user" : "Add user"}
-              subheader={
-                this.state.editPage[0]
-                  ? "You can edit user data here!"
-                  : "You can add new user data here!"
-              }
-            />
-            <Divider />
-            <CardContent>
-              <Grid container spacing={3}>
-                <Grid item md={12} xs={12}>
-                  {this.state.formSubmitted === false ? (
-                    <Snackbar severity="error" Showbutton={false}>
-                      {this.state.errorCode}
-                    </Snackbar>
-                  ) : null}
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="First Name*"
-                    name="firstName"
-                    error={this.hasError("firstName")}
-                    helperText={
-                      this.hasError("firstName")
-                        ? this.state.errors.firstName[0]
-                        : null
-                    }
-                    value={this.state.values.firstName || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Last Name*"
-                    name="lastName"
-                    error={this.hasError("lastName")}
-                    helperText={
-                      this.hasError("lastName")
-                        ? this.state.errors.lastName[0]
-                        : null
-                    }
-                    value={this.state.values.lastName || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Email"
-                    type="email"
-                    name="addEmail"
-                    error={this.hasError("addEmail")}
-                    helperText={
-                      this.hasError("addEmail")
-                        ? this.state.errors["addEmail"].map((error) => {
-                            return error + " ";
-                          })
-                        : null
-                    }
-                    value={this.state.values.addEmail || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Phone Number*"
-                    type="tel"
-                    name="addPhone"
-                    error={this.hasError("addPhone")}
-                    helperText={
-                      this.hasError("addPhone")
-                        ? this.state.errors.addPhone[0]
-                        : null
-                    }
-                    value={this.state.values.addPhone || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                {/* <Grid item md={6} xs={12}>
+        {!this.state.isLoader ? (
+          <Card style={{ maxWidth: "45rem" }}>
+            <form
+              autoComplete="off"
+              noValidate
+              onSubmit={this.handleSubmit}
+              method="post"
+            >
+              <CardHeader
+                title={this.state.editPage[0] ? "Edit user" : "Add user"}
+                subheader={
+                  this.state.editPage[0]
+                    ? "You can edit user data here!"
+                    : "You can add new user data here!"
+                }
+              />
+              <Divider />
+              <CardContent>
+                <Grid container spacing={3}>
+                  <Grid item md={12} xs={12}>
+                    {this.state.formSubmitted === false ? (
+                      <Snackbar severity="error" Showbutton={false}>
+                        {this.state.errorCode}
+                      </Snackbar>
+                    ) : null}
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="First Name*"
+                      name="firstName"
+                      error={this.hasError("firstName")}
+                      helperText={
+                        this.hasError("firstName")
+                          ? this.state.errors.firstName[0]
+                          : null
+                      }
+                      value={this.state.values.firstName || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Last Name*"
+                      name="lastName"
+                      error={this.hasError("lastName")}
+                      helperText={
+                        this.hasError("lastName")
+                          ? this.state.errors.lastName[0]
+                          : null
+                      }
+                      value={this.state.values.lastName || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Email"
+                      type="email"
+                      name="addEmail"
+                      error={this.hasError("addEmail")}
+                      helperText={
+                        this.hasError("addEmail")
+                          ? this.state.errors["addEmail"].map((error) => {
+                              return error + " ";
+                            })
+                          : null
+                      }
+                      value={this.state.values.addEmail || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Phone Number*"
+                      type="tel"
+                      name="addPhone"
+                      error={this.hasError("addPhone")}
+                      helperText={
+                        this.hasError("addPhone")
+                          ? this.state.errors.addPhone[0]
+                          : null
+                      }
+                      value={this.state.values.addPhone || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  {/* <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
                     label="Username*"
@@ -617,143 +620,148 @@ class UsersPage extends Component {
                     variant="outlined"
                   />
                 </Grid> */}
-                <Grid item md={6} xs={12}>
-                  <Input
-                    variant="outlined"
-                    id="standard-adornment-password"
-                    name="password"
-                    label="Password*"
-                    error={this.hasError("password")}
-                    helperText={
-                      this.hasError("password")
-                        ? this.state.errors.password[0]
-                        : null
-                    }
-                    type={this.state.values.showPassword ? "text" : "password"}
-                    value={this.state.values.password || ""}
-                    onChange={this.handleChange}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={this.handleClickShowPassword}
-                            onMouseDown={this.handleMouseDownPassword}
-                          >
-                            {this.state.values.showPassword ? (
-                              <Visibility />
-                            ) : (
-                              <VisibilityOff />
-                            )}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  {/* </FormControl> */}
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Autocomplete
-                    id="select-role"
-                    name="role"
-                    value={role}
-                    options={roleFilter}
-                    variant="outlined"
-                    getOptionLabel={(option) => option.name}
-                    placeholder="Select Role*"
-                    onChange={this.handleRoleChange}
-                    renderInput={(params) => (
-                      <Input
-                        {...params}
-                        fullWidth
-                        label="Select Role*"
-                        name="role"
-                        variant="outlined"
-                        error={this.hasError("role")}
-                        helperText={
-                          this.hasError("role")
-                            ? this.state.errors.role[0]
-                            : null
-                        }
-                      />
-                    )}
-                  />
-                </Grid>
-                {((loggedInUserRole === "Sesta Admin" ||
-                  loggedInUserRole === "Superadmin") &&
-                  roleName === "FPO Admin") ||
-                ((loggedInUserRole === "Sesta Admin" ||
-                  loggedInUserRole === "Superadmin") &&
-                  roleName === "CSP (Community Service Provider)") ||
-                (loggedInUserRole === "FPO Admin" &&
-                  roleName === "CSP (Community Service Provider)") ? (
                   <Grid item md={6} xs={12}>
-                    <Autotext
-                      id="select-field"
-                      options={roleWiseData}
+                    <Input
                       variant="outlined"
-                      label={
-                        roleName === "CSP (Community Service Provider)"
-                          ? "Select Village Organization*"
-                          : roleName === "FPO Admin"
-                          ? "Select FPO*"
-                          : null
-                      }
-                      name="selectField"
-                      getOptionLabel={(option) => option.name}
-                      onChange={(event, value) => {
-                        this.handleFieldChange(event, value);
-                      }}
-                      defaultValue={[]}
-                      value={
-                        selectField
-                          ? roleWiseData[
-                              roleWiseData.findIndex(function (item, i) {
-                                return item.id === selectField;
-                              })
-                            ] || null
-                          : null
-                      }
-                      error={this.hasError("selectField")}
+                      id="standard-adornment-password"
+                      name="password"
+                      label="Password*"
+                      error={this.hasError("password")}
                       helperText={
-                        this.hasError("selectField")
-                          ? this.state.errors.selectField[0]
+                        this.hasError("password")
+                          ? this.state.errors.password[0]
                           : null
                       }
+                      type={
+                        this.state.values.showPassword ? "text" : "password"
+                      }
+                      value={this.state.values.password || ""}
+                      onChange={this.handleChange}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={this.handleClickShowPassword}
+                              onMouseDown={this.handleMouseDownPassword}
+                            >
+                              {this.state.values.showPassword ? (
+                                <Visibility />
+                              ) : (
+                                <VisibilityOff />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                    {/* </FormControl> */}
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Autocomplete
+                      id="select-role"
+                      name="role"
+                      value={role}
+                      options={roleFilter}
+                      variant="outlined"
+                      getOptionLabel={(option) => option.name}
+                      placeholder="Select Role*"
+                      onChange={this.handleRoleChange}
                       renderInput={(params) => (
                         <Input
                           {...params}
                           fullWidth
-                          label={
-                            roleName === "CSP (Community Service Provider)"
-                              ? "Select Village Organization*"
-                              : roleName === "FPO Admin"
-                              ? "Select FPO*"
+                          label="Select Role*"
+                          name="role"
+                          variant="outlined"
+                          error={this.hasError("role")}
+                          helperText={
+                            this.hasError("role")
+                              ? this.state.errors.role[0]
                               : null
                           }
-                          name="selectField"
-                          variant="outlined"
                         />
                       )}
                     />
                   </Grid>
-                ) : null}
-              </Grid>
-            </CardContent>
-            <Divider />
-            <CardActions style={{ padding: "15px" }}>
-              <Button type="submit">Save</Button>
-              <Button
-                color="secondary"
-                clicked={this.cancelForm}
-                component={Link}
-                to="/users"
-              >
-                Cancel
-              </Button>
-            </CardActions>
-          </form>
-        </Card>
+                  {((loggedInUserRole === "Sesta Admin" ||
+                    loggedInUserRole === "Superadmin") &&
+                    roleName === "FPO Admin") ||
+                  ((loggedInUserRole === "Sesta Admin" ||
+                    loggedInUserRole === "Superadmin") &&
+                    roleName === "CSP (Community Service Provider)") ||
+                  (loggedInUserRole === "FPO Admin" &&
+                    roleName === "CSP (Community Service Provider)") ? (
+                    <Grid item md={6} xs={12}>
+                      <Autotext
+                        id="select-field"
+                        options={roleWiseData}
+                        variant="outlined"
+                        label={
+                          roleName === "CSP (Community Service Provider)"
+                            ? "Select Village Organization*"
+                            : roleName === "FPO Admin"
+                            ? "Select FPO*"
+                            : null
+                        }
+                        name="selectField"
+                        getOptionLabel={(option) => option.name}
+                        onChange={(event, value) => {
+                          this.handleFieldChange(event, value);
+                        }}
+                        defaultValue={[]}
+                        value={
+                          selectField
+                            ? roleWiseData[
+                                roleWiseData.findIndex(function (item, i) {
+                                  return item.id === selectField;
+                                })
+                              ] || null
+                            : null
+                        }
+                        error={this.hasError("selectField")}
+                        helperText={
+                          this.hasError("selectField")
+                            ? this.state.errors.selectField[0]
+                            : null
+                        }
+                        renderInput={(params) => (
+                          <Input
+                            {...params}
+                            fullWidth
+                            label={
+                              roleName === "CSP (Community Service Provider)"
+                                ? "Select Village Organization*"
+                                : roleName === "FPO Admin"
+                                ? "Select FPO*"
+                                : null
+                            }
+                            name="selectField"
+                            variant="outlined"
+                          />
+                        )}
+                      />
+                    </Grid>
+                  ) : null}
+                </Grid>
+              </CardContent>
+              <Divider />
+              <CardActions style={{ padding: "15px" }}>
+                <Button type="submit">Save</Button>
+                <Button
+                  color="secondary"
+                  clicked={this.cancelForm}
+                  component={Link}
+                  to="/users"
+                >
+                  Cancel
+                </Button>
+              </CardActions>
+            </form>
+          </Card>
+        ) : (
+          <Spinner />
+        )}
       </Layout>
     );
   }

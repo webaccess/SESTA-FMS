@@ -69,7 +69,6 @@ export class Villages extends React.Component {
       filterDistrict: "",
       filterVillage: "",
       Result: [],
-      TestData: [],
       data: [],
       contacts: [],
       selectedid: 0,
@@ -88,6 +87,7 @@ export class Villages extends React.Component {
       villageInUse: "",
       active: {},
       allIsActive: [],
+      isLoader: true,
     };
   }
   async componentDidMount() {
@@ -96,7 +96,7 @@ export class Villages extends React.Component {
         process.env.REACT_APP_SERVER_URL + "crm-plugin/villages/?_sort=name:ASC"
       )
       .then((res) => {
-        this.setState({ data: this.getData(res.data) });
+        this.setState({ data: this.getData(res.data), isLoader: false });
       });
 
     //api call for states filter
@@ -236,10 +236,6 @@ export class Villages extends React.Component {
     }
   };
 
-  clearSelected = (selected) => {
-    let clearselected = "";
-  };
-
   confirmActive = (event) => {
     this.setState({ isActiveAllShowing: true });
     this.setState({ setActiveId: event.target.id });
@@ -322,6 +318,7 @@ export class Villages extends React.Component {
       formSubmitted: "",
       stateSelected: false,
       isCancel: true,
+      isLoader: true,
     });
     this.componentDidMount();
   };
@@ -333,6 +330,7 @@ export class Villages extends React.Component {
   };
 
   handleSearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.filterState) {
       searchData += "state.id=" + this.state.filterState.id + "&&";
@@ -351,7 +349,7 @@ export class Villages extends React.Component {
           "&&_sort=name:ASC"
       )
       .then((res) => {
-        this.setState({ data: this.getData(res.data) });
+        this.setState({ data: this.getData(res.data), isLoader: false });
       })
       .catch((err) => {
         console.log(err);
@@ -596,6 +594,7 @@ export class Villages extends React.Component {
                 columnsvalue={columnsvalue}
                 selectableRows
                 pagination
+                progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (

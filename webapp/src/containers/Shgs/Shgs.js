@@ -59,14 +59,12 @@ export class Shgs extends React.Component {
       filterVillage: "",
       filterShg: "",
       filterVo: "",
-      Result: [],
       newData: [],
       data: [],
       selectedid: 0,
       open: false,
       columnsvalue: [],
       DeleteData: false,
-      properties: props,
       getState: [],
       getDistrict: [],
       getVillage: [],
@@ -74,6 +72,7 @@ export class Shgs extends React.Component {
       singleDelete: "",
       multipleDelete: "",
       loggedInUserRole: auth.getUserInfo().role.name,
+      isLoader: true,
     };
   }
 
@@ -89,10 +88,10 @@ export class Shgs extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
-        this.setState({ newData: res.data });
-        this.getStateData(this.state.newData);
-        this.getDistrictData(this.state.newData);
-        this.getVillageData(this.state.newData);
+        this.getStateData(res.data);
+        this.getDistrictData(res.data);
+        this.getVillageData(res.data);
+        this.setState({ data: res.data, isLoader: false });
       });
 
     //api call for states filter
@@ -307,13 +306,14 @@ export class Shgs extends React.Component {
       filterVillage: "",
       filterVo: "",
       filterShg: "",
-
+      isLoader: true,
       isCancel: true,
     });
     this.componentDidMount();
   };
 
   handleSearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.filterShg) {
       searchData += "name_contains=" + this.state.filterShg + "&&";
@@ -347,10 +347,11 @@ export class Shgs extends React.Component {
         process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
       )
       .then((res) => {
-        this.setState({ newData: res.data });
-        this.getStateData(this.state.newData);
-        this.getDistrictData(this.state.newData);
-        this.getVillageData(this.state.newData);
+        //this.setState({ newData: res.data });
+        this.getStateData(res.data);
+        this.getDistrictData(res.data);
+        this.getVillageData(res.data);
+        this.setState({ data: res.data, isLoader: false });
       })
       .catch((err) => {
         console.log(err);
@@ -635,6 +636,7 @@ export class Shgs extends React.Component {
               columnsvalue={columnsvalue}
               selectableRows
               pagination
+              progressComponent={this.state.isLoader}
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (

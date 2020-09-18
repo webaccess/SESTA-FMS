@@ -574,6 +574,21 @@ const modules = {
       "CSP (Community Service Provider)",
     ],
   },
+  "Add Loan Task": {
+    is_active: true,
+    icon_class: "",
+    url: "/loan/task/add/",
+    slug: "add_loan_task",
+    displayNavigation: false,
+    module: "", //slug
+    order: 21,
+    roles: [
+      "FPO Admin",
+      "Sesta Admin",
+      "Superadmin",
+      "CSP (Community Service Provider)",
+    ],
+  },
   "Edit Loan Task": {
     is_active: true,
     icon_class: "",

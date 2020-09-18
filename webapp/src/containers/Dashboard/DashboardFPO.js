@@ -15,6 +15,7 @@ import MoneyIcon from "@material-ui/icons/Money";
 import Moment from "moment";
 import { Link } from "react-router-dom";
 import style from "./Dashboard.module.css";
+import Spinner from "../../components/Spinner/Spinner";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -77,17 +78,23 @@ class DashboardForFPO extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      memberData: 0,
-      shgData: 0,
-      voData: 0,
-      approvedLoans: 0,
-      pendingLoans: 0,
+      memberData: "",
+      shgData: "",
+      voData: "",
+      approvedLoans: "",
+      pendingLoans: "",
       loanDistributedAmounts: [],
       totalLoanDistributed: 0,
       loansTableData: [],
       loansAllDetails: [],
       purposesValues: [],
       purposes: [],
+      isLoader: true,
+      isMemLoading: true,
+      isVoLoading: true,
+      isShgLoading: true,
+      isLoanLoading: true,
+      isLoanAmtLoading: true,
     };
   }
 
@@ -99,12 +106,19 @@ class DashboardForFPO extends Component {
     serviceProvider
       .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
-        res.data.map((e, i) => {
-          if (e.user === null) {
-            newDataArray.push(e); // add only those contacts having contact type=individual & users===null
-          }
-        });
-        this.setState({ memberData: newDataArray.length });
+        if (res.data.length > 0) {
+          res.data.map((e, i) => {
+            if (e.user === null) {
+              newDataArray.push(e); // add only those contacts having contact type=individual & users===null
+            }
+          });
+          this.setState({
+            memberData: newDataArray.length,
+            isMemLoading: false,
+          });
+        } else {
+          this.setState({ memberData: 0, isMemLoading: false });
+        }
       })
       .catch((error) => {});
 
@@ -116,7 +130,11 @@ class DashboardForFPO extends Component {
     serviceProvider
       .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + shgUrl)
       .then((res) => {
-        this.setState({ shgData: res.data.length });
+        if (res.data.length > 0) {
+          this.setState({ shgData: res.data.length, isShgLoading: false });
+        } else {
+          this.setState({ shgData: 0, isShgLoading: false });
+        }
       })
       .catch((error) => {});
 
@@ -128,7 +146,11 @@ class DashboardForFPO extends Component {
     serviceProvider
       .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + voUrl)
       .then((res) => {
-        this.setState({ voData: res.data.length });
+        if (res.data.length > 0) {
+          this.setState({ voData: res.data.length, isVoLoading: false });
+        } else {
+          this.setState({ voData: 0, isVoLoading: false });
+        }
       });
 
     let loanAppUrl = "loan-applications/";
@@ -139,7 +161,14 @@ class DashboardForFPO extends Component {
         process.env.REACT_APP_SERVER_URL + loanAppUrl + "?status=UnderReview"
       )
       .then((res) => {
-        this.setState({ pendingLoans: res.data.length });
+        if (res.data.length > 0) {
+          this.setState({
+            pendingLoans: res.data.length,
+            isLoanLoading: false,
+          });
+        } else {
+          this.setState({ pendingLoans: 0, isLoanLoading: false });
+        }
       })
       .catch((error) => {});
 
@@ -156,6 +185,14 @@ class DashboardForFPO extends Component {
         process.env.REACT_APP_SERVER_URL + loanAppUrl + "?status=Approved"
       )
       .then((res) => {
+        if (res.data.length > 0) {
+          this.setState({
+            approvedLoans: res.data.length,
+            isLoanLoading: false,
+          });
+        } else {
+          this.setState({ approvedLoans: 0, isLoanLoading: false });
+        }
         res.data.map((e, i) => {
           let emiPaid = 0;
 
@@ -188,6 +225,9 @@ class DashboardForFPO extends Component {
           loanDistributedVal,
           actualPrincipalPaid + actualInterestPaid + actualFinePaid
         );
+        if (loanDistributedAmounts.length > 0) {
+          this.setState({ isLoanAmtLoading: false });
+        }
         // sort loanDetails with latest date first
         loansDetails.sort(
           (a, b) =>
@@ -195,12 +235,13 @@ class DashboardForFPO extends Component {
             new Date(...a.loanDate.split("/").reverse())
         );
         this.setState({
-          approvedLoans: res.data.length,
+          // approvedLoans: res.data.length,
           loanDistributedAmounts: loanDistributedAmounts,
           totalLoanDistributed:
             loanDistributedAmounts[0] + loanDistributedAmounts[1],
           loansTableData: loansDetails.slice(0, 5),
           loansAllDetails: loansDetails,
+          isLoader: false,
         });
       })
       .catch((error) => {});
@@ -297,9 +338,13 @@ class DashboardForFPO extends Component {
             <div className={classes.oddBlock}>
               <PersonIcon className={classes.Icon} />
               <h3 className={classes.fpoHead3}>MEMBERS </h3>
-              <h2 className={classes.labelValues}>
-                {this.state.memberData.toLocaleString()}
-              </h2>
+              {!this.state.isMemLoading ? (
+                <h2 className={classes.labelValues}>
+                  {this.state.memberData.toLocaleString()}
+                </h2>
+              ) : (
+                <Spinner />
+              )}
             </div>
           </Grid>
 
@@ -314,9 +359,13 @@ class DashboardForFPO extends Component {
             <div className={classes.evenBlock}>
               <PeopleIcon className={classes.Icon} />
               <h3 className={classes.fpoHead3}>SELF HELP GROUPS </h3>
-              <h2 className={classes.labelValues}>
-                {this.state.shgData.toLocaleString()}
-              </h2>
+              {!this.state.isShgLoading ? (
+                <h2 className={classes.labelValues}>
+                  {this.state.shgData.toLocaleString()}
+                </h2>
+              ) : (
+                <Spinner />
+              )}
             </div>
           </Grid>
 
@@ -331,9 +380,13 @@ class DashboardForFPO extends Component {
             <div className={classes.oddBlock}>
               <NaturePeopleIcon className={classes.Icon} />
               <h3 className={classes.fpoHead3}> VILLAGE ORGANIZATIONS </h3>
-              <h2 className={classes.labelValues}>
-                {this.state.voData.toLocaleString()}
-              </h2>
+              {!this.state.isVoLoading ? (
+                <h2 className={classes.labelValues}>
+                  {this.state.voData.toLocaleString()}
+                </h2>
+              ) : (
+                <Spinner />
+              )}
             </div>
           </Grid>
 
@@ -348,22 +401,31 @@ class DashboardForFPO extends Component {
             <div className={classes.evenBlock}>
               <MoneyIcon className={classes.Icon} />
               <h3 className={classes.fpoHead3}>LOAN APPLICATIONS </h3>
-              <div style={{ display: "inline-flex" }}>
-                <div
-                  style={{ borderRight: "1px solid #fff", padding: "0px 15px" }}
-                >
-                  <h5 style={{ display: "block", margin: "0px" }}>APPROVED</h5>
-                  <span className={classes.fieldValues}>
-                    {this.state.approvedLoans}
-                  </span>
+              {!this.state.isLoanLoading ? (
+                <div style={{ display: "inline-flex" }}>
+                  <div
+                    style={{
+                      borderRight: "1px solid #fff",
+                      padding: "0px 15px",
+                    }}
+                  >
+                    <h5 style={{ display: "block", margin: "0px" }}>
+                      APPROVED
+                    </h5>
+                    <span className={classes.fieldValues}>
+                      {this.state.approvedLoans}
+                    </span>
+                  </div>
+                  <div style={{ padding: "0px 15px" }}>
+                    <h5 style={{ display: "block", margin: "0px" }}>PENDING</h5>
+                    <span className={classes.fieldValues}>
+                      {this.state.pendingLoans}
+                    </span>
+                  </div>
                 </div>
-                <div style={{ padding: "0px 15px" }}>
-                  <h5 style={{ display: "block", margin: "0px" }}>PENDING</h5>
-                  <span className={classes.fieldValues}>
-                    {this.state.pendingLoans}
-                  </span>
-                </div>
-              </div>
+              ) : (
+                <Spinner />
+              )}
             </div>
           </Grid>
         </Grid>
@@ -409,9 +471,9 @@ class DashboardForFPO extends Component {
                     filterData={false}
                     filterBy={["memberName", "loanAmount", "loanDate"]}
                     column={Usercolumns}
-                    // editData={this.editData}
                     rowsSelected={this.rowsSelect}
                     columnsvalue={columnsvalue}
+                    progressComponent={this.state.isLoader}
                   />
                 ) : (
                   <h1>Loading...</h1>

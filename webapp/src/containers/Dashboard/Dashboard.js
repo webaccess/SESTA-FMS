@@ -24,9 +24,7 @@ class Dashboard extends Component {
           DASHBOARD
         </h3>
 
-        {userInfo.role.name === "FPO Admin" ? (
-          <DashboardFPO></DashboardFPO>
-        ) : null}
+        {userInfo.role.name === "FPO Admin" ? <DashboardFPO /> : null}
 
         {userInfo.role.name === "Sesta Admin" ||
         userInfo.role.name === "Superadmin" ? (

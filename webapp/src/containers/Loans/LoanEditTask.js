@@ -20,6 +20,7 @@ import Moment from "moment";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
 import auth from "../../components/Auth/Auth.js";
+import Spinner from "../../components/Spinner/Spinner";
 
 class LoanEditTask extends Component {
   constructor(props) {
@@ -42,6 +43,7 @@ class LoanEditTask extends Component {
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
       ],
+      isLoader: true,
     };
   }
 
@@ -59,6 +61,7 @@ class LoanEditTask extends Component {
             editDate: res.data.date,
             comments: res.data.comments,
           },
+          isLoader: false,
         });
       })
       .catch((error) => {
@@ -265,102 +268,106 @@ class LoanEditTask extends Component {
 
     return (
       <Layout breadcrumbs={EDIT_LOAN_TASK_BREADCRUMBS}>
-        <Card>
-          <form
-            autoComplete="off"
-            noValidate
-            onSubmit={this.handleSubmit}
-            method="post"
-          >
-            <CardHeader
-              title={"Edit Loan task"}
-              subheader={"You can edit loan task here!"}
-            />
-            <Divider />
+        {!this.state.isLoader ? (
+          <Card style={{ maxWidth: "45rem" }}>
+            <form
+              autoComplete="off"
+              noValidate
+              onSubmit={this.handleSubmit}
+              method="post"
+            >
+              <CardHeader
+                title={"Edit Loan task"}
+                subheader={"You can edit loan task here!"}
+              />
+              <Divider />
 
-            <CardContent>
-              <Grid container spacing={3}>
-                <Grid item md={6} xs={12}>
-                  <Autotext
-                    id="combo-box-demo"
-                    options={loanTaskStatus}
-                    variant="outlined"
-                    label="Select Status*"
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, value) => {
-                      this.handleStatusChange(value);
-                    }}
-                    value={
-                      statusValue
-                        ? this.state.loanTaskStatus[
-                            this.state.loanTaskStatus.findIndex(function (
-                              item,
-                              i
-                            ) {
-                              return item.id === statusValue;
-                            })
-                          ] || null
-                        : null
-                    }
-                    error={this.hasError("editStatus")}
-                    helperText={
-                      this.hasError("editStatus")
-                        ? this.state.errors.editStatus[0]
-                        : null
-                    }
-                    renderInput={(params) => (
-                      <Input
-                        fullWidth
-                        label="Select Status*"
-                        name="editStatus"
-                        variant="outlined"
-                      />
-                    )}
-                  />
+              <CardContent>
+                <Grid container spacing={3}>
+                  <Grid item md={6} xs={12}>
+                    <Autotext
+                      id="combo-box-demo"
+                      options={loanTaskStatus}
+                      variant="outlined"
+                      label="Select Status*"
+                      getOptionLabel={(option) => option.name}
+                      onChange={(event, value) => {
+                        this.handleStatusChange(value);
+                      }}
+                      value={
+                        statusValue
+                          ? this.state.loanTaskStatus[
+                              this.state.loanTaskStatus.findIndex(function (
+                                item,
+                                i
+                              ) {
+                                return item.id === statusValue;
+                              })
+                            ] || null
+                          : null
+                      }
+                      error={this.hasError("editStatus")}
+                      helperText={
+                        this.hasError("editStatus")
+                          ? this.state.errors.editStatus[0]
+                          : null
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          fullWidth
+                          label="Select Status*"
+                          name="editStatus"
+                          variant="outlined"
+                        />
+                      )}
+                    />
+                  </Grid>
+
+                  <Grid item md={6} xs={12}>
+                    <Datepicker
+                      label="Date*"
+                      name="editDate"
+                      error={this.hasError("editDate")}
+                      helperText={
+                        this.hasError("editDate")
+                          ? this.state.errors.editDate[0]
+                          : null
+                      }
+                      value={this.state.values.editDate || ""}
+                      format={"dd MMM yyyy"}
+                      onChange={(value) =>
+                        this.setState({
+                          values: { ...this.state.values, editDate: value },
+                        })
+                      }
+                    />
+                  </Grid>
+
+                  <Grid item md={9} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Comments"
+                      name="comments"
+                      value={this.state.values.comments || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
                 </Grid>
+              </CardContent>
+              <Divider />
 
-                <Grid item md={6} xs={12}>
-                  <Datepicker
-                    label="Date*"
-                    name="editDate"
-                    error={this.hasError("editDate")}
-                    helperText={
-                      this.hasError("editDate")
-                        ? this.state.errors.editDate[0]
-                        : null
-                    }
-                    value={this.state.values.editDate || ""}
-                    format={"dd MMM yyyy"}
-                    onChange={(value) =>
-                      this.setState({
-                        values: { ...this.state.values, editDate: value },
-                      })
-                    }
-                  />
-                </Grid>
-
-                <Grid item md={9} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Comments"
-                    name="comments"
-                    value={this.state.values.comments || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-              </Grid>
-            </CardContent>
-            <Divider />
-
-            <CardActions>
-              <Button type="submit">Save</Button>
-              <Button color="secondary" clicked={this.cancelForm}>
-                cancel
-              </Button>
-            </CardActions>
-          </form>
-        </Card>
+              <CardActions style={{ padding: "15px" }}>
+                <Button type="submit">Save</Button>
+                <Button color="secondary" clicked={this.cancelForm}>
+                  cancel
+                </Button>
+              </CardActions>
+            </form>
+          </Card>
+        ) : (
+          <Spinner />
+        )}
       </Layout>
     );
   }
