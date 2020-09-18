@@ -6,7 +6,7 @@ const Spinner = (props) => {
   return (
     <div className={styles.CenterItems}>
       <div className={styles.LoadingPadding}>
-        <CircularProgress />
+        <CircularProgress className={styles.progressLoader} />
       </div>
       <Typography variant="h5">Loading...</Typography>
     </div>

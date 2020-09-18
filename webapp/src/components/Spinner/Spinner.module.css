@@ -1,11 +1,21 @@
 .CenterItems {
   display: flex;
   align-items: center;
-  align-content: center;
+  justify-content: center;
   height: 100%;
   flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 100%;
+  background-color: rgba(250, 250, 250, 0.5);
 }
 
 .LoadingPadding {
-  padding-top: 100px;
+  padding-bottom: 30px;
+}
+.progressLoader{
+  height:80px !important;
+  width:80px !important;
 }
