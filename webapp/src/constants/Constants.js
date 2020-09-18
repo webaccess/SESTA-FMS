@@ -1,8 +1,10 @@
 export const LOAN_STATUS = [
-  { id: "UnderReview", name: "Under Review" },
   { id: "Approved", name: "Approved" },
-  { id: "Denied", name: "Denied" },
   { id: "Cancelled", name: "Cancelled" },
+  { id: "Completed", name: "Completed" },
+  { id: "Denied", name: "Denied" },
+  { id: "InProgress", name: "In Progress" },
+  { id: "UnderReview", name: "Under Review" },
 ];
 export const LOAN_TASK_STATUS = [
   { id: "Completed", name: "Completed" },

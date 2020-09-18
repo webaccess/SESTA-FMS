@@ -583,7 +583,7 @@ class LoanApprovalPage extends Component {
                   <Grid item md={7} xs={12}>
                     <Input
                       fullWidth
-                      label="Comment"
+                      label="Comment*"
                       name="comment"
                       error={this.hasError("comment")}
                       helperText={

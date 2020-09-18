@@ -135,7 +135,6 @@ class LoanEditEmiPage extends Component {
       actual_interest: actual_interest,
       fine: fine,
     };
-
     serviceProvider
       .serviceProviderForPutRequest(
         process.env.REACT_APP_SERVER_URL + "loan-application-installments",
@@ -169,11 +168,11 @@ class LoanEditEmiPage extends Component {
                     serviceProvider
                       .serviceProviderForPutRequest(
                         process.env.REACT_APP_SERVER_URL +
-                          "crm-plugin/activities",
+                        "crm-plugin/activities",
                         fdata.id,
                         fdata
                       )
-                      .then((activityRes) => {});
+                      .then(() => {});
                   }
                 }
               });
@@ -185,6 +184,26 @@ class LoanEditEmiPage extends Component {
                 this.addActivity();
               }
             });
+          let loanApp = this.props.location.state.loanAppData;
+          let loanAppId = loanApp.id;
+          let loanStatus;
+          let lastEmi = loanApp.loan_app_installments.length - 1;
+          if (loanApp.loan_app_installments[lastEmi].id == loanEmiData.id && loanApp.loan_app_installments[lastEmi].actual_principal != null) {
+            loanStatus = {
+              status: "Completed"
+            }
+          } else {
+            loanStatus = {
+              status: "InProgress"
+            }
+          }
+
+          serviceProvider
+            .serviceProviderForPutRequest(process.env.REACT_APP_SERVER_URL + "loan-applications", loanAppId, loanStatus)
+            .then(() => { })
+            .catch(error => {
+              console.log('loanApp', error);
+            })
         }
         let app_id = res.data.loan_application["id"];
         this.props.history.push("/loans/emi/" + app_id, {
@@ -268,7 +287,7 @@ class LoanEditEmiPage extends Component {
                     "crm-plugin/activityassignees",
                   activityassignee
                 )
-                .then((assigneeResp) => {});
+                .then(() => {});
             });
         });
       });
