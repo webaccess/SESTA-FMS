@@ -730,7 +730,7 @@ class ActivityPage extends Component {
                   <Grid item xs={12}>
                     <Input
                       fullWidth
-                      label="Address*"
+                      label="Address"
                       name="address"
                       error={this.hasError("address")}
                       helperText={

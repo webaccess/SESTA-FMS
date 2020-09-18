@@ -91,7 +91,6 @@ export class Shgs extends React.Component {
         this.getStateData(res.data);
         this.getDistrictData(res.data);
         this.getVillageData(res.data);
-        this.setState({ data: res.data, isLoader: false });
       });
 
     //api call for states filter
@@ -128,7 +127,7 @@ export class Shgs extends React.Component {
             data[i].addresses[0].state
         )
         .then((res) => {
-          data[i].addresses.push({ state: res.data }); // add corresponding district to record
+          data[i].addresses.splice(1, 0, { state: res.data });
         });
     }
   }
@@ -142,7 +141,7 @@ export class Shgs extends React.Component {
             data[i].addresses[0].district
         )
         .then((res) => {
-          data[i].addresses.push({ district: res.data }); // add corresponding district to record
+          data[i].addresses.splice(2, 0, { district: res.data });
         });
     }
   }
@@ -156,10 +155,10 @@ export class Shgs extends React.Component {
             data[i].addresses[0].village
         )
         .then((res) => {
-          data[i].addresses.push({ village: res.data }); // add corresponding village to record
+          data[i].addresses.splice(3, 0, { village: res.data });
         });
     }
-    this.setState({ data: data });
+    this.setState({ data: data, isLoader: false });
   }
 
   handleStateChange = async (event, value) => {
@@ -351,7 +350,6 @@ export class Shgs extends React.Component {
         this.getStateData(res.data);
         this.getDistrictData(res.data);
         this.getVillageData(res.data);
-        this.setState({ data: res.data, isLoader: false });
       })
       .catch((err) => {
         console.log(err);

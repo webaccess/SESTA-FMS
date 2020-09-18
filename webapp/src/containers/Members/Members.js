@@ -135,8 +135,7 @@ export class Members extends React.Component {
   }
 
   getMembers = () => {
-    let url =
-      "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true";
+    let url = "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC";
     if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
       serviceProvider
         .serviceProviderForGetRequest(
@@ -157,7 +156,7 @@ export class Members extends React.Component {
                 shgList.push(shg.contact);
               });
               let newUrl =
-                "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true&&";
+                "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&";
               shgList.map((shgId) => {
                 newUrl += "individual.shg_in=" + shgId + "&&";
               });
@@ -170,7 +169,7 @@ export class Members extends React.Component {
                   this.getStateData(memResp.data);
                   this.getDistrictData(memResp.data);
                   this.getVillageData(memResp.data);
-                  this.setState({ data: memResp.data, isLoader: false });
+                  //this.setState({ data: memResp.data, isLoader: false });
                 });
             });
         })
@@ -183,7 +182,7 @@ export class Members extends React.Component {
           this.getDistrictData(res.data);
           this.getVillageData(res.data);
 
-          this.setState({ data: res.data, isLoader: false });
+          //this.setState({ data: res.data, isLoader: false });
         })
         .catch((error) => {
           console.log(error);
@@ -211,7 +210,7 @@ export class Members extends React.Component {
             data[i].addresses[0].state
         )
         .then((res) => {
-          data[i].addresses.push({ state: res.data }); // add corresponding district to record
+          data[i].addresses.splice(1, 0, { state: res.data });
         });
     }
   }
@@ -225,7 +224,7 @@ export class Members extends React.Component {
             data[i].addresses[0].district
         )
         .then((res) => {
-          data[i].addresses.push({ district: res.data }); // add corresponding district to record
+          data[i].addresses.splice(2, 0, { district: res.data });
         });
     }
   }
@@ -239,10 +238,10 @@ export class Members extends React.Component {
             data[i].addresses[0].village
         )
         .then((res) => {
-          data[i].addresses.push({ village: res.data }); // add corresponding village to record
+          data[i].addresses.splice(3, 0, { village: res.data });
         });
     }
-    this.setState({ data: data });
+    this.setState({ data: data, isLoader: false });
   }
 
   handleStateChange = async (event, value) => {
@@ -395,7 +394,7 @@ export class Members extends React.Component {
                   this.getDistrictData(memResp.data);
                   this.getVillageData(memResp.data);
 
-                  this.setState({ data: memResp.data, isLoader: false });
+                  //this.setState({ data: memResp.data, isLoader: false });
                 });
             });
         })
@@ -410,7 +409,7 @@ export class Members extends React.Component {
           this.getDistrictData(res.data);
           this.getVillageData(res.data);
 
-          this.setState({ data: res.data, isLoader: false });
+          //this.setState({ data: res.data, isLoader: false });
         })
         .catch((error) => {
           console.log(error);

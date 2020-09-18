@@ -4,8 +4,8 @@ const knex = require("knex")({
     host: "127.0.0.1",
     port: "5432",
     user: "postgres",
-    password: "postgres",
-    database: "testsesta",
+    password: "root",
+    database: "sesta",
     // host: "${process.env.DATABASE_HOST || '127.0.0.1'}",
     // port: "${process.env.DATABASE_PORT || 5432}",
     // user: "${process.env.DATABASE_USERNAME || ''}",
@@ -123,10 +123,41 @@ bookshelf.model("contact", {
   individual() {
     return this.hasOne("individual", "contact", "id");
   },
+  organization() {
+    return this.hasOne("organization", "contact", "id");
+  },
+  address() {
+    return this.hasMany("address", "contact", "id");
+  },
+
+  shareinformation() {
+    return this.belongsTo("shareinformation", "shareinformation", "id");
+  },
 });
 
 bookshelf.model("user", {
   tableName: "users-permissions_user",
+  requireFetch: false,
+});
+bookshelf.model("village", {
+  tableName: "villages",
+  requireFetch: false,
+});
+
+bookshelf.model("contacts_org_vos", {
+  tableName: "contacts_org_vos__organizations_vos",
+  requireFetch: false,
+});
+bookshelf.model("address", {
+  tableName: "addresses",
+  requireFetch: false,
+  contact() {
+    return this.belongsTo("contact", "contact", "id");
+  },
+});
+
+bookshelf.model("shareinformation", {
+  tableName: "shareinformations",
   requireFetch: false,
 });
 
