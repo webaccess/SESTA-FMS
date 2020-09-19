@@ -127,7 +127,9 @@ export class Shgs extends React.Component {
             data[i].addresses[0].state
         )
         .then((res) => {
-          data[i].addresses.splice(1, 0, { state: res.data });
+          Object.assign(data[i], {
+            addState: res.data,
+          });
         });
     }
   }
@@ -141,7 +143,9 @@ export class Shgs extends React.Component {
             data[i].addresses[0].district
         )
         .then((res) => {
-          data[i].addresses.splice(2, 0, { district: res.data });
+          Object.assign(data[i], {
+            addDistrict: res.data,
+          });
         });
     }
   }
@@ -155,7 +159,9 @@ export class Shgs extends React.Component {
             data[i].addresses[0].village
         )
         .then((res) => {
-          data[i].addresses.splice(3, 0, { village: res.data });
+          Object.assign(data[i], {
+            addVillage: res.data,
+          });
         });
     }
     this.setState({ data: data, isLoader: false });
@@ -366,24 +372,27 @@ export class Shgs extends React.Component {
       },
       {
         name: "State",
-        selector: "addresses[1].state.name",
+        selector: "data.addState.name",
         sortable: true,
+        cell: (row) => (!this.state.isLoader ? row.addState.name : "-"),
       },
       {
         name: "District",
-        selector: "addresses[2].district.name",
+        selector: "data.addDistrict.name",
         sortable: true,
+        cell: (row) => (!this.state.isLoader ? row.addDistrict.name : "-"),
       },
       {
         name: "Village",
-        selector: "addresses[3].village.name",
+        selector: "data.addVillage.name",
         sortable: true,
+        cell: (row) => (!this.state.isLoader ? row.addVillage.name : "-"),
       },
       {
         name: "Village Organization",
         sortable: true,
         cell: (row) =>
-          row.organization.vos[0] ? row.organization.vos[0].name : "-",
+          row.organization.vos.length > 0 ? row.organization.vos[0].name : "-",
       },
     ];
 
