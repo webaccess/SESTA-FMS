@@ -85,17 +85,18 @@ export class Vos extends React.Component {
   async componentDidMount() {
     let url =
       "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC";
-    if (
-      this.state.loggedInUserRole === "FPO Admin" ||
-      this.state.loggedInUserRole === "CSP (Community Service Provider)"
-    ) {
-      url += "&&creator_id=" + auth.getUserInfo().contact.id;
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      this.getVo("load", "");
+    } else {
+      serviceProvider
+        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .then((res) => {
+          this.setState({ data: res.data, isLoader: false });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
-    serviceProvider
-      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
-      .then((res) => {
-        this.setState({ data: res.data, isLoader: false });
-      });
 
     //api call for states filter
     serviceProvider
@@ -121,6 +122,33 @@ export class Vos extends React.Component {
         console.log(error);
       });
   }
+
+  getVo = (param, searchData) => {
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/individuals/" +
+          auth.getUserInfo().contact.individual
+      )
+      .then((res) => {
+        let voUrl =
+          "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC&&organization.fpo=" +
+          res.data.fpo.id;
+        if (param === "search") {
+          voUrl += "&&" + searchData;
+        }
+        serviceProvider
+          .serviceProviderForGetRequest(
+            process.env.REACT_APP_SERVER_URL + voUrl
+          )
+          .then((res) => {
+            this.setState({ data: res.data, isLoader: false });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      });
+  };
 
   handleStateChange = async (event, value, method) => {
     if (value !== null) {
@@ -266,22 +294,20 @@ export class Vos extends React.Component {
     //api call after search filter
     let url =
       "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC";
-    if (
-      this.state.loggedInUserRole === "FPO Admin" ||
-      this.state.loggedInUserRole === "CSP (Community Service Provider)"
-    ) {
-      url += "&&creator_id=" + auth.getUserInfo().contact.id;
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      this.getVo("search", searchData);
+    } else {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
+        )
+        .then((res) => {
+          this.setState({ data: res.data, isLoader: false });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
-      )
-      .then((res) => {
-        this.setState({ data: res.data, isLoader: false });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   }
 
   render() {

@@ -100,20 +100,15 @@ class DashboardForFPO extends Component {
 
   async componentDidMount() {
     /** get members */
-    let newDataArray = [];
-    let url = "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC";
+    let url =
+      "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true";
 
     serviceProvider
       .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
         if (res.data.length > 0) {
-          res.data.map((e, i) => {
-            if (e.user === null) {
-              newDataArray.push(e); // add only those contacts having contact type=individual & users===null
-            }
-          });
           this.setState({
-            memberData: newDataArray.length,
+            memberData: res.data.length,
             isMemLoading: false,
           });
         } else {
@@ -123,38 +118,60 @@ class DashboardForFPO extends Component {
       .catch((error) => {});
 
     /** get SHGs */
-    let shgUrl =
-      "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG&&_sort=name:ASC&&creator_id=" +
-      auth.getUserInfo().contact.id;
-
     serviceProvider
-      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + shgUrl)
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/individuals/" +
+          auth.getUserInfo().contact.individual
+      )
       .then((res) => {
-        if (res.data.length > 0) {
-          this.setState({ shgData: res.data.length, isShgLoading: false });
-        } else {
-          this.setState({ shgData: 0, isShgLoading: false });
-        }
-      })
-      .catch((error) => {});
+        serviceProvider
+          .serviceProviderForGetRequest(
+            process.env.REACT_APP_SERVER_URL +
+              "crm-plugin/contact/shgs/?id=" +
+              res.data.fpo.id
+          )
+          .then((shgRes) => {
+            if (shgRes.data.length > 0) {
+              this.setState({
+                shgData: shgRes.data.length,
+                isShgLoading: false,
+              });
+            } else {
+              this.setState({ shgData: 0, isShgLoading: false });
+            }
+          });
+      });
 
     /** get VOs */
-    let voUrl =
-      "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC&&creator_id=" +
-      auth.getUserInfo().contact.id;
-
     serviceProvider
-      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + voUrl)
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/individuals/" +
+          auth.getUserInfo().contact.individual
+      )
       .then((res) => {
-        if (res.data.length > 0) {
-          this.setState({ voData: res.data.length, isVoLoading: false });
-        } else {
-          this.setState({ voData: 0, isVoLoading: false });
-        }
+        let voUrl =
+          "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC&&organization.fpo=" +
+          res.data.fpo.id;
+
+        serviceProvider
+          .serviceProviderForGetRequest(
+            process.env.REACT_APP_SERVER_URL + voUrl
+          )
+          .then((res) => {
+            if (res.data.length > 0) {
+              this.setState({ voData: res.data.length, isVoLoading: false });
+            } else {
+              this.setState({ voData: 0, isVoLoading: false });
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       });
 
     let loanAppUrl = "loan-applications/";
-
     /** get pending loan applications */
     serviceProvider
       .serviceProviderForGetRequest(

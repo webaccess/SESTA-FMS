@@ -193,14 +193,23 @@ class ActivityPage extends Component {
     let url =
       "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC";
     if (this.state.loggedInUserRole === "FPO Admin") {
-      url += "&creator_id=" + auth.getUserInfo().contact.id;
       serviceProvider
-        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
+        )
         .then((res) => {
-          this.setState({ getShgs: res.data });
-        })
-        .catch((error) => {
-          console.log(error);
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/contact/shgs/?id=" +
+                res.data.fpo.id
+            )
+            .then((shgRes) => {
+              this.setState({ getShgs: shgRes.data });
+            })
+            .catch((error) => {});
         });
     } else if (
       this.state.loggedInUserRole === "CSP (Community Service Provider)"
@@ -928,6 +937,7 @@ class ActivityPage extends Component {
                   <Grid item md={6} xs={12}>
                     <Autotext
                       id="combo-box-demo"
+                      name="addShg"
                       options={shgFilters}
                       variant="outlined"
                       label="Select SHG*"

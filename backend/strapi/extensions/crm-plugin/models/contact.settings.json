@@ -68,19 +68,14 @@
       "model": "loan-application"
     },
     "organization": {
+      "via": "contact",
       "plugin": "crm-plugin",
-      "model": "organization",
-      "via": "contact"
+      "model": "organization"
     },
     "org_vos": {
+      "via": "vos",
       "plugin": "crm-plugin",
-      "collection": "organization",
-      "via": "vos"
-    },
-    "org_fpo": {
-      "plugin": "crm-plugin",
-      "model": "organization",
-      "via": "fpo"
+      "collection": "organization"
     },
     "loan_applications": {
       "via": "contact",

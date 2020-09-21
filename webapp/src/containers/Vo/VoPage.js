@@ -21,6 +21,7 @@ import {
 } from "./config";
 import { Link } from "react-router-dom";
 import Spinner from "../../components/Spinner/Spinner";
+import Autotext from "../../components/Autotext/Autotext.js";
 
 class VoPage extends Component {
   constructor(props) {
@@ -31,13 +32,15 @@ class VoPage extends Component {
         addVo: {
           required: {
             value: "true",
-            message: " Village Organization Name is required",
+            message: "Village Organization Name is required",
           },
         },
-        addVoAddress: {},
-        addPerson: {},
-        addBlock: {},
-        addGp: {},
+        addFPO: {
+          required: {
+            value: "true",
+            message: "FPO is required",
+          },
+        },
       },
       errors: {},
       serverErrors: {},
@@ -48,6 +51,9 @@ class VoPage extends Component {
         this.props.match.params.id,
       ],
       isLoader: "",
+      loggedInUserRole: auth.getUserInfo().role.name,
+      assignedFPO: "",
+      getFPO: [],
     };
   }
 
@@ -69,6 +75,7 @@ class VoPage extends Component {
               addPerson: res.data.organization.person_incharge,
               addBlock: res.data.addresses[0].block,
               addGp: res.data.addresses[0].gp,
+              addFPO: res.data.organization.fpo,
             },
             isLoader: false,
           });
@@ -78,6 +85,31 @@ class VoPage extends Component {
         });
       this.stateIds = this.state.values.addState;
     }
+
+    // get all FPO
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/contact/?contact_type=organization&organization.sub_type=FPO&&_sort=name:ASC"
+      )
+      .then((res) => {
+        this.setState({ getFPO: res.data });
+      })
+      .catch((error) => {});
+
+    /** get FPO assigned to logged in FPO admn user */
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((indRes) => {
+          this.setState({ assignedFPO: indRes.data.fpo.id });
+        })
+        .catch((error) => {});
+    }
   }
 
   handleChange = ({ target }) => {
@@ -86,13 +118,27 @@ class VoPage extends Component {
     });
   };
 
+  handleFpoChange(event, value) {
+    if (value !== null) {
+      this.setState({
+        values: { ...this.state.values, addFPO: value.id },
+      });
+    } else {
+      this.setState({
+        values: {
+          ...this.state.values,
+          addFPO: "",
+        },
+      });
+    }
+  }
+
   validate = () => {
     const values = this.state.values;
     const validations = this.state.validations;
     map(validations, (validation, key) => {
       let value = values[key] ? values[key] : "";
       const errors = validateInput(value, validation);
-
       let errorset = this.state.errors;
       if (errors.length > 0) errorset[key] = errors;
       else delete errorset[key];
@@ -113,7 +159,7 @@ class VoPage extends Component {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
-    if (Object.keys(this.state.errors).length > 0) return;
+
     let voName = this.state.values.addVo;
     let addressId = this.state.values.addId;
     let voAddress = this.state.values.addVoAddress;
@@ -135,6 +181,23 @@ class VoPage extends Component {
         "Organization"
       ][0],
     };
+    /** save fpo selected from the drop down if roles are sesta admin & superadmin
+     * save FPO belongs to logged in user if role is FPO admin
+     */
+    if (
+      this.state.loggedInUserRole === "Sesta Admin" ||
+      this.state.loggedInUserRole === "Superadmin"
+    ) {
+      Object.assign(postData, {
+        fpo: this.state.values.addFPO,
+      });
+    } else {
+      Object.assign(postData, {
+        fpo: this.state.assignedFPO,
+      });
+    }
+    if (Object.keys(this.state.errors).length > 0) return;
+
     if (this.state.editPage[0]) {
       // for edit Vo page
 
@@ -192,6 +255,8 @@ class VoPage extends Component {
   };
 
   render() {
+    let fpoFilters = this.state.getFPO;
+    let addFPO = this.state.values.addFPO;
     return (
       <Layout
         breadcrumbs={
@@ -310,6 +375,47 @@ class VoPage extends Component {
                       variant="outlined"
                     />
                   </Grid>
+                  {this.state.loggedInUserRole === "Sesta Admin" ||
+                  this.state.loggedInUserRole === "Superadmin" ? (
+                    <Grid item md={6} xs={12}>
+                      <Autotext
+                        id="combo-box-demo"
+                        options={fpoFilters}
+                        name="addFPO"
+                        variant="outlined"
+                        label="Select FPO*"
+                        getOptionLabel={(option) => option.name}
+                        onChange={(event, value) => {
+                          this.handleFpoChange(event, value);
+                        }}
+                        value={
+                          addFPO
+                            ? this.state.isCancel === true
+                              ? null
+                              : fpoFilters[
+                                  fpoFilters.findIndex(function (item, i) {
+                                    return item.id === addFPO;
+                                  })
+                                ] || null
+                            : null
+                        }
+                        error={this.hasError("addFPO")}
+                        helperText={
+                          this.hasError("addFPO")
+                            ? this.state.errors.addFPO[0]
+                            : null
+                        }
+                        renderInput={(params) => (
+                          <Input
+                            fullWidth
+                            label="Select FPO*"
+                            name="addFPO"
+                            variant="outlined"
+                          />
+                        )}
+                      />
+                    </Grid>
+                  ) : null}
                 </Grid>
               </CardContent>
               <Divider />

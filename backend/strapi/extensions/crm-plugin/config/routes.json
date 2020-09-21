@@ -1,6 +1,11 @@
 {
   "routes": [
-  {
+    {
+      "method": "GET",
+      "path": "/contact/shgs",
+      "handler": "contact.getShg"
+    },
+    {
       "method": "GET",
       "path": "/activities",
       "handler": "activity.find"
