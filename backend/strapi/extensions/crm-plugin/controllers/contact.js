@@ -9,11 +9,7 @@
  *
  * @description: Contact stores contact details like address, email, phone, etc of an individual or an organization or of a user in the system.
  */
-const {
-  convertRestQueryParams,
-  buildQuery,
-  sanitizeEntity,
-} = require("strapi-utils"); // removes private fields and its relations from model
+const { sanitizeEntity } = require("strapi-utils"); // removes private fields and its relations from model
 const vm = require("vm");
 module.exports = {
   /**
