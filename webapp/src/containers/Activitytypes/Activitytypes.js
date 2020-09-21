@@ -77,6 +77,10 @@ export class Activitytypes extends React.Component {
       allIsActive: [],
       isActTypePresent: false,
       isLoader: true,
+      activities: [],
+      acttypeInUseSingleDelete : "",
+      acttypeInUseDeleteAll : "",
+      deleteActtypeName : ""
     };
   }
 
@@ -92,6 +96,15 @@ export class Activitytypes extends React.Component {
       .catch((error) => {
         console.log(error);
       });
+
+      serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/activities/?_sort=start_datetime:desc"
+      )
+      .then((activityRes) => {
+        this.setState({activities: activityRes.data});
+      })
   }
 
   activityFilter(event, value, target) {
@@ -159,6 +172,16 @@ export class Activitytypes extends React.Component {
   DeleteData = (cellid, selectedId) => {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
+      let acttypeInUseSingleDelete = false;
+      this.state.activities.find((act) => {
+        if (act.activitytype !== null) {
+          if (act.activitytype.id === parseInt(cellid)) {
+            this.setState({ acttypeInUseSingleDelete: true, deleteActtypeName: act.activitytype.name });
+            acttypeInUseSingleDelete = true;
+          }
+        }
+      });
+      if (!acttypeInUseSingleDelete) {
       serviceProvider
         .serviceProviderForDeleteRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
@@ -173,20 +196,40 @@ export class Activitytypes extends React.Component {
           this.setState({ singleDelete: false });
           console.log(error);
         });
+      }
     }
   };
 
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-      for (let i in selectedId) {
+
+      let acttypeInUseDeleteAll = false;
+      let acttypeInUse = [];
+      this.state.activities.map((act) => {
+        if (act.activitytype !== null) {
+          for (let i in selectedId) {
+            if (parseInt(selectedId[i]) === act.activitytype.id) {
+              acttypeInUse.push(selectedId[i])
+              acttypeInUseDeleteAll = true;
+              this.setState({ acttypeInUseDeleteAll: true });
+            }
+            acttypeInUse = [...new Set(acttypeInUse)]
+          }
+        }
+      });
+      var deleteActtype = selectedId.filter(function (obj) {
+        return acttypeInUse.indexOf(obj) == -1;
+      });
+
+      for (let i in deleteActtype) {
         serviceProvider
           .serviceProviderForDeleteRequest(
             process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
-            selectedId[i]
+            deleteActtype[i]
           )
           .then((res) => {
-            this.setState({ multipleDelete: true });
+            this.setState({ acttypeInUseDeleteAll: true });
             this.componentDidMount();
           })
           .catch((error) => {
@@ -378,6 +421,16 @@ export class Activitytypes extends React.Component {
             {this.state.multipleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
+              </Snackbar>
+            ) : null}
+            {this.state.acttypeInUseSingleDelete === true ? (
+              <Snackbar severity="info" Showbutton={false}>
+                Loan Purpose {this.state.deleteActtypeName} is in use, it can not be Deleted.
+              </Snackbar>
+            ) : null}
+            {this.state.acttypeInUseDeleteAll === true ? (
+              <Snackbar severity="info" Showbutton={false}>
+                Some Loan purpose is in use hence it can not be Deleted.
               </Snackbar>
             ) : null}
             <div

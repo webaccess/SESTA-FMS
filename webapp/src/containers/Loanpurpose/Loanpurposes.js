@@ -71,6 +71,10 @@ export class Loanpurposes extends React.Component {
       singleDelete: "",
       multipleDelete: "",
       isLoader: true,
+      loanApp: [],
+      purposeInUseSingleDelete : "",
+      purposeInUseDeleteAll : "",
+      deletePurposeName : ""
     };
 
     let history = props;
@@ -87,6 +91,19 @@ export class Loanpurposes extends React.Component {
       .catch((error) => {
         console.log(error);
       });
+
+      serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "loan-applications/?_sort=id:ASC"
+      )
+      .then((res) => {
+        this.setState({ loanApp: res.data });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
   }
 
   handleChange = (event, value) => {
@@ -101,25 +118,36 @@ export class Loanpurposes extends React.Component {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
-      serviceProvider
-        .serviceProviderForDeleteRequest(
-          process.env.REACT_APP_SERVER_URL + "loan-models",
-          cellid
-        )
-        .then((res) => {
-          if (res.data.emidetails) {
-            this.deleteEmiDet(res.data.emidetails);
+      let purposeInUseSingleDelete = false;
+      this.state.loanApp.find((loandata) => {
+        if (loandata.loan_model !== null) {
+          if (loandata.loan_model.id === parseInt(cellid)) {
+            this.setState({ purposeInUseSingleDelete: true, deletePurposeName: loandata.purpose });
+            purposeInUseSingleDelete = true;
           }
-          if (res.data.loantasks) {
-            this.deleteTaskDet(res.data.loantasks[0].id);
-          }
-          this.setState({ singleDelete: res.data.name });
-          this.componentDidMount();
-        })
-        .catch((error) => {
-          this.setState({ singleDelete: false });
-          console.log(error.response);
-        });
+        }
+      });
+      if (!purposeInUseSingleDelete) {
+        serviceProvider
+          .serviceProviderForDeleteRequest(
+            process.env.REACT_APP_SERVER_URL + "loan-models",
+            cellid
+          )
+          .then((res) => {
+            if (res.data.emidetails) {
+              this.deleteEmiDet(res.data.emidetails);
+            }
+            if (res.data.loantasks) {
+              this.deleteTaskDet(res.data.loantasks[0].id);
+            }
+            this.setState({ purposeInUseSingleDelete: res.data.name });
+            this.componentDidMount();
+          })
+          .catch((error) => {
+            this.setState({ singleDelete: false });
+            console.log(error.response);
+          });
+      }
     }
   };
 
@@ -153,11 +181,28 @@ export class Loanpurposes extends React.Component {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
-      for (let i in selectedId) {
+      let purposeInUseDeleteAll = false;
+      let purposeInUse = [];
+      this.state.loanApp.map((loandata) => {
+        if (loandata.loan_model !== null) {
+          for (let i in selectedId) {
+            if (parseInt(selectedId[i]) === loandata.loan_model.id) {
+              purposeInUse.push(selectedId[i])
+              purposeInUseDeleteAll = true;
+            }
+            purposeInUse = [...new Set(purposeInUse)]
+          }
+        }
+      });
+      var deletePurpose = selectedId.filter(function (obj) {
+        return purposeInUse.indexOf(obj) == -1;
+      });
+
+      for (let i in deletePurpose) {
         serviceProvider
           .serviceProviderForDeleteRequest(
             process.env.REACT_APP_SERVER_URL + "loan-models",
-            selectedId[i]
+            deletePurpose[i]
           )
           .then((res) => {
             if (res.data.emidetails) {
@@ -166,7 +211,7 @@ export class Loanpurposes extends React.Component {
             if (res.data.loantasks) {
               this.deleteTaskDet(res.data.loantasks[0].id);
             }
-            this.setState({ multipleDelete: true });
+            this.setState({ purposeInUseDeleteAll: true });
             this.componentDidMount();
           })
           .catch((error) => {
@@ -286,6 +331,16 @@ export class Loanpurposes extends React.Component {
             {this.state.multipleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
+              </Snackbar>
+            ) : null}
+            {this.state.purposeInUseSingleDelete === true ? (
+              <Snackbar severity="info" Showbutton={false}>
+                Loan Purpose {this.state.deletePurposeName} is in use, it can not be Deleted.
+              </Snackbar>
+            ) : null}
+            {this.state.purposeInUseDeleteAll === true ? (
+              <Snackbar severity="info" Showbutton={false}>
+                Some Loan purpose is in use hence it can not be Deleted.
               </Snackbar>
             ) : null}
             <div
