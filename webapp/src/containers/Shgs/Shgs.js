@@ -88,9 +88,7 @@ export class Shgs extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
-        this.getStateData(res.data);
-        this.getDistrictData(res.data);
-        this.getVillageData(res.data);
+        this.setState({ data: res.data, isLoader: false });
       });
 
     //api call for states filter
@@ -118,70 +116,20 @@ export class Shgs extends React.Component {
       });
   }
 
-  async getStateData(data) {
-    for (let i in data) {
-      await serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/states/" +
-            data[i].addresses[0].state
-        )
-        .then((res) => {
-          Object.assign(data[i], {
-            addState: res.data,
-          });
-        });
-    }
-  }
-
-  async getDistrictData(data) {
-    for (let i in data) {
-      await serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/" +
-            data[i].addresses[0].district
-        )
-        .then((res) => {
-          Object.assign(data[i], {
-            addDistrict: res.data,
-          });
-        });
-    }
-  }
-
-  async getVillageData(data) {
-    for (let i in data) {
-      await serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/villages/" +
-            data[i].addresses[0].village
-        )
-        .then((res) => {
-          Object.assign(data[i], {
-            addVillage: res.data,
-          });
-        });
-    }
-    this.setState({ data: data, isLoader: false });
-  }
-
   handleStateChange = async (event, value) => {
     if (value !== null) {
-      this.setState({ filterState: value });
       this.setState({
+        filterState: value,
         isCancel: false,
         filterDistrict: "",
         filterVillage: "",
       });
 
-      let stateId = value.id;
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId
+            value.id
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
@@ -206,8 +154,11 @@ export class Shgs extends React.Component {
 
   handleDistrictChange(event, value) {
     if (value !== null) {
-      this.setState({ filterDistrict: value });
-      this.setState({ filterVillage: "" });
+      this.setState({
+        filterDistrict: value,
+        isCancel: false,
+        filterVillage: "",
+      });
       let distId = value.id;
       serviceProvider
         .serviceProviderForGetRequest(
@@ -352,10 +303,7 @@ export class Shgs extends React.Component {
         process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
       )
       .then((res) => {
-        //this.setState({ newData: res.data });
-        this.getStateData(res.data);
-        this.getDistrictData(res.data);
-        this.getVillageData(res.data);
+        this.setState({ data: res.data, isLoader: false });
       })
       .catch((err) => {
         console.log(err);
@@ -372,21 +320,21 @@ export class Shgs extends React.Component {
       },
       {
         name: "State",
-        selector: "data.addState.name",
+        selector: "stateName",
         sortable: true,
-        cell: (row) => (!this.state.isLoader ? row.addState.name : "-"),
+        cell: (row) => (row.stateName ? row.stateName : "-"),
       },
       {
         name: "District",
-        selector: "data.addDistrict.name",
+        selector: "districtName",
         sortable: true,
-        cell: (row) => (!this.state.isLoader ? row.addDistrict.name : "-"),
+        cell: (row) => (row.districtName ? row.districtName : "-"),
       },
       {
         name: "Village",
-        selector: "data.addVillage.name",
+        selector: "villageName",
         sortable: true,
-        cell: (row) => (!this.state.isLoader ? row.addVillage.name : "-"),
+        cell: (row) => (row.villageName ? row.villageName : "-"),
       },
       {
         name: "Village Organization",
