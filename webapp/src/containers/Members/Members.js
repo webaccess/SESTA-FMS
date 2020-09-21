@@ -84,7 +84,7 @@ export class Members extends React.Component {
   }
 
   async componentDidMount() {
-    this.getMembers();
+    this.getMembers("load", "");
 
     // get all SHGs
     let url =
@@ -134,8 +134,9 @@ export class Members extends React.Component {
     }
   }
 
-  getMembers = () => {
-    let url = "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC";
+  getMembers = (param, searchData) => {
+    let url =
+      "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true";
     if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
       serviceProvider
         .serviceProviderForGetRequest(
@@ -156,38 +157,37 @@ export class Members extends React.Component {
                 shgList.push(shg.contact);
               });
               let newUrl =
-                "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&";
+                "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true&&";
               shgList.map((shgId) => {
                 newUrl += "individual.shg_in=" + shgId + "&&";
               });
-
+              if (param === "search") {
+                newUrl += searchData;
+              }
               serviceProvider
                 .serviceProviderForGetRequest(
                   process.env.REACT_APP_SERVER_URL + newUrl
                 )
                 .then((memResp) => {
-                  this.getStateData(memResp.data);
-                  this.getDistrictData(memResp.data);
-                  this.getVillageData(memResp.data);
-                  //this.setState({ data: memResp.data, isLoader: false });
+                  this.setState({ data: memResp.data, isLoader: false });
                 });
             });
         })
         .catch((error) => {});
     } else {
+      if (param === "search") {
+        url += "&&" + searchData;
+      }
       serviceProvider
         .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
         .then((res) => {
-          this.getStateData(res.data);
-          this.getDistrictData(res.data);
-          this.getVillageData(res.data);
-
-          //this.setState({ data: res.data, isLoader: false });
+          this.setState({ data: res.data, isLoader: false });
         })
         .catch((error) => {
           console.log(error);
         });
     }
+
     //api call for states filter
     serviceProvider
       .serviceProviderForGetRequest(
@@ -201,69 +201,18 @@ export class Members extends React.Component {
       });
   };
 
-  async getStateData(data) {
-    for (let i in data) {
-      await serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/states/" +
-            data[i].addresses[0].state
-        )
-        .then((res) => {
-          Object.assign(data[i], {
-            addState: res.data,
-          });
-        });
-    }
-  }
-
-  async getDistrictData(data) {
-    for (let i in data) {
-      await serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/" +
-            data[i].addresses[0].district
-        )
-        .then((res) => {
-          Object.assign(data[i], {
-            addDistrict: res.data,
-          });
-        });
-    }
-  }
-
-  async getVillageData(data) {
-    for (let i in data) {
-      await serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/villages/" +
-            data[i].addresses[0].village
-        )
-        .then((res) => {
-          Object.assign(data[i], {
-            addVillage: res.data,
-          });
-        });
-    }
-    this.setState({ data: data, isLoader: false });
-  }
-
   handleStateChange = async (event, value) => {
     if (value !== null) {
-      this.setState({ filterState: value });
-
       this.setState({
+        filterState: value,
         isCancel: false,
         filterDistrict: "",
       });
-      let stateId = value.id;
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId
+            value.id
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
@@ -282,8 +231,8 @@ export class Members extends React.Component {
 
   handleDistrictChange(event, value) {
     if (value !== null) {
-      this.setState({ filterDistrict: value });
       this.setState({
+        filterDistrict: value,
         isCancel: false,
         filterVillage: "",
       });
@@ -364,63 +313,8 @@ export class Members extends React.Component {
         searchData += "individual.shg=" + this.state.filterShg.id;
       }
     }
-    //api call after search filter
-    let url =
-      "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true";
-    if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/individuals/" +
-            auth.getUserInfo().contact.individual
-        )
-        .then((res) => {
-          serviceProvider
-            .serviceProviderForGetRequest(
-              process.env.REACT_APP_SERVER_URL +
-                "crm-plugin/contact/" +
-                res.data.vo.id
-            )
-            .then((resp) => {
-              let shgList = [];
-              resp.data.org_vos.map((shg, i) => {
-                shgList.push(shg.contact);
-              });
-              let newUrl =
-                "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true&&";
-              shgList.map((shgId, index) => {
-                newUrl += "individual.shg_in=" + shgId + "&&";
-              });
-              serviceProvider
-                .serviceProviderForGetRequest(
-                  process.env.REACT_APP_SERVER_URL + newUrl + searchData
-                )
-                .then((memResp) => {
-                  this.getStateData(memResp.data);
-                  this.getDistrictData(memResp.data);
-                  this.getVillageData(memResp.data);
 
-                  //this.setState({ data: memResp.data, isLoader: false });
-                });
-            });
-        })
-        .catch((error) => {});
-    } else {
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
-        )
-        .then((res) => {
-          this.getStateData(res.data);
-          this.getDistrictData(res.data);
-          this.getVillageData(res.data);
-
-          //this.setState({ data: res.data, isLoader: false });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
+    this.getMembers("search", searchData);
   }
 
   editData = (cellId) => {
@@ -603,21 +497,6 @@ export class Members extends React.Component {
     });
 
     let data = this.state.data;
-    data.map((memdata) => {
-      this.state.getShg.map((shg) => {
-        if (
-          this.state.loggedInUserRole === "CSP (Community Service Provider)"
-        ) {
-          if (memdata.individual.shg === shg.contact) {
-            memdata.shgName = shg.name;
-          }
-        } else {
-          if (memdata.individual.shg === shg.id) {
-            memdata.shgName = shg.name;
-          }
-        }
-      });
-    });
     const Usercolumns = [
       {
         name: "Name",
@@ -626,9 +505,9 @@ export class Members extends React.Component {
       },
       {
         name: "State",
-        selector: "data.addState.name",
+        selector: "stateName",
         sortable: true,
-        cell: (row) => (!this.state.isLoader ? row.addState.name : "-"),
+        cell: (row) => (row.stateName ? row.stateName : "-"),
       },
       {
         name: "Certificate No.",
@@ -643,15 +522,15 @@ export class Members extends React.Component {
       },
       {
         name: "District",
-        selector: "data.addDistrict.name",
+        selector: "districtName",
         sortable: true,
-        cell: (row) => (!this.state.isLoader ? row.addDistrict.name : "-"),
+        cell: (row) => (row.districtName ? row.districtName : "-"),
       },
       {
         name: "Village",
-        selector: "data.addVillage.name",
+        selector: "villageName",
         sortable: true,
-        cell: (row) => (!this.state.isLoader ? row.addVillage.name : "-"),
+        cell: (row) => (row.villageName ? row.villageName : "-"),
       },
       {
         name: "SHG Name",

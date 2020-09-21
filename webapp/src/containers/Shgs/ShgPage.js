@@ -91,8 +91,8 @@ class ShgPage extends Component {
             this.state.editPage[1]
         )
         .then((res) => {
-          this.handleStateChange(res.data.addresses[0].state);
-          this.handleDistrictChange(res.data.addresses[0].district);
+          this.handleStateChange({ id: res.data.addresses[0].state });
+          this.handleDistrictChange({ id: res.data.addresses[0].district });
           this.setState({
             values: {
               addShg: res.data.name,
@@ -186,18 +186,14 @@ class ShgPage extends Component {
 
   handleStateChange(value) {
     if (value !== null) {
-      let newVal = value;
-      if (typeof value === "object") {
-        newVal = value.id;
-      }
       this.setState({
-        values: { ...this.state.values, addState: newVal },
+        values: { ...this.state.values, addState: value.id },
       });
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/districts/?is_active=true&&state.id=" +
-            newVal
+            value.id
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
@@ -223,18 +219,14 @@ class ShgPage extends Component {
 
   handleDistrictChange(value) {
     if (value !== null) {
-      let newVal = value;
-      if (typeof value === "object") {
-        newVal = value.id;
-      }
       this.setState({
-        values: { ...this.state.values, addDistrict: newVal },
+        values: { ...this.state.values, addDistrict: value.id },
       });
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/villages/?is_active=true&&district.id=" +
-            newVal
+            value.id
         )
         .then((res) => {
           this.setState({ getVillage: res.data });
@@ -259,12 +251,8 @@ class ShgPage extends Component {
 
   handleVillageChange(event, value) {
     if (value !== null) {
-      let newVal = value;
-      if (typeof value === "object") {
-        newVal = value.id;
-      }
       this.setState({
-        values: { ...this.state.values, addVillage: newVal },
+        values: { ...this.state.values, addVillage: value.id },
       });
     } else {
       this.setState({

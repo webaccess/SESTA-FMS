@@ -483,7 +483,7 @@ class LoansApplyPage extends Component {
                       VILLAGE
                       <br />
                       <span className={classes.fieldValues}>
-                        {data.addresses[2].village.name}
+                        {data.villageName}
                       </span>
                     </div>
                   </b>
