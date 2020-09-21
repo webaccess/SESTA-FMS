@@ -69,7 +69,7 @@ class VillagePage extends Component {
             this.state.editPage[1]
         )
         .then((res) => {
-          // this.handleStateChange(res.data[0].state);
+          this.handleStateChange("", { id: res.data[0].state.id });
 
           this.setState({
             values: {
@@ -145,18 +145,14 @@ class VillagePage extends Component {
 
   handleStateChange(event, value) {
     if (value !== null) {
-      let newVal = value;
-      if (typeof value === "object") {
-        newVal = value.id;
-      }
       this.setState({
-        values: { ...this.state.values, addState: newVal },
+        values: { ...this.state.values, addState: value.id },
       });
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/districts/?is_active=true&&state.id=" +
-            newVal
+            value.id
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
@@ -180,12 +176,8 @@ class VillagePage extends Component {
 
   handleDistrictChange(event, value) {
     if (value !== null) {
-      let newVal = value;
-      if (typeof value === "object") {
-        newVal = value.id;
-      }
       this.setState({
-        values: { ...this.state.values, addDistrict: newVal },
+        values: { ...this.state.values, addDistrict: value.id },
       });
     } else {
       this.setState({
