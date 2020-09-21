@@ -90,8 +90,6 @@ class FpoPage extends Component {
               addBlock: res.data.addresses[0].block,
               addEmail: res.data.email,
               addPhone: res.data.phone,
-              addState: res.data.state.id,
-              addDistrict: res.data.district.id,
             },
             isLoader: false,
           });
