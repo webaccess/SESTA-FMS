@@ -242,6 +242,7 @@ export class Villages extends React.Component {
           for (let i in selectedId) {
             if (parseInt(selectedId[i]) === cd.addresses[0].village) {
               villgInUse.push(selectedId[i])
+              this.setState({ villageInUseDeleteAll: true });
             }
             villgInUse = [...new Set(villgInUse)]
           }
@@ -258,7 +259,7 @@ export class Villages extends React.Component {
             deleteVillg[i]
           )
           .then((res) => {
-            this.setState({ villageInUseDeleteAll: true });
+            this.setState({ multipleDelete: true });
             this.componentDidMount();
           })
           .catch((error) => {
@@ -501,7 +502,7 @@ export class Villages extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            {this.state.multipleDelete === true ? (
+            {this.state.multipleDelete === true && this.state.villageInUseDeleteAll !== true? (
               <Snackbar severity="success" Showbutton={false}>
                 Villages deleted successfully!
               </Snackbar>

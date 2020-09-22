@@ -181,14 +181,13 @@ export class Loanpurposes extends React.Component {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
-      let purposeInUseDeleteAll = false;
       let purposeInUse = [];
       this.state.loanApp.map((loandata) => {
         if (loandata.loan_model !== null) {
           for (let i in selectedId) {
             if (parseInt(selectedId[i]) === loandata.loan_model.id) {
               purposeInUse.push(selectedId[i])
-              purposeInUseDeleteAll = true;
+              this.setState({ purposeInUseDeleteAll: true });
             }
             purposeInUse = [...new Set(purposeInUse)]
           }
@@ -211,7 +210,7 @@ export class Loanpurposes extends React.Component {
             if (res.data.loantasks) {
               this.deleteTaskDet(res.data.loantasks[0].id);
             }
-            this.setState({ purposeInUseDeleteAll: true });
+            this.setState({ multipleDelete: true });
             this.componentDidMount();
           })
           .catch((error) => {
@@ -323,7 +322,7 @@ export class Loanpurposes extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            {this.state.multipleDelete === true ? (
+            {this.state.multipleDelete === true && this.state.purposeInUseDeleteAll !== true? (
               <Snackbar severity="success" Showbutton={false}>
                 Loan Purposes deleted successfully!
               </Snackbar>

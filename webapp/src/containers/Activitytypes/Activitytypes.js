@@ -204,14 +204,12 @@ export class Activitytypes extends React.Component {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
-      let acttypeInUseDeleteAll = false;
       let acttypeInUse = [];
       this.state.activities.map((act) => {
         if (act.activitytype !== null) {
           for (let i in selectedId) {
             if (parseInt(selectedId[i]) === act.activitytype.id) {
               acttypeInUse.push(selectedId[i])
-              acttypeInUseDeleteAll = true;
               this.setState({ acttypeInUseDeleteAll: true });
             }
             acttypeInUse = [...new Set(acttypeInUse)]
@@ -229,7 +227,7 @@ export class Activitytypes extends React.Component {
             deleteActtype[i]
           )
           .then((res) => {
-            this.setState({ acttypeInUseDeleteAll: true });
+            this.setState({ multipleDelete: true });
             this.componentDidMount();
           })
           .catch((error) => {
@@ -408,7 +406,7 @@ export class Activitytypes extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            {this.state.multipleDelete === true ? (
+            {this.state.multipleDelete === true && this.state.acttypeInUseDeleteAll !== true? (
               <Snackbar severity="success" Showbutton={false}>
                 Activity types deleted successfully!
               </Snackbar>

@@ -280,14 +280,13 @@ export class Shgs extends React.Component {
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-      let shgInUseDeleteAll = false;
       let shgInUse = [];
       this.state.individualContact.map((cd) => {
         if (cd.individual.shg !== null) {
           for (let i in selectedId) {
             if (parseInt(selectedId[i]) === cd.individual.shg) {
               shgInUse.push(selectedId[i])
-              shgInUseDeleteAll = true;
+              this.setState({ shgInUseDeleteAll: true });
             }
             shgInUse = [...new Set(shgInUse)]
           }
@@ -307,7 +306,7 @@ export class Shgs extends React.Component {
             if (res.data.organization.bankdetail) {
               this.deleteBankDetails(res.data.organization.bankdetail);
             }
-            this.setState({ shgInUseDeleteAll: true });
+            this.setState({ multipleDelete: true });
             this.componentDidMount();
           })
           .catch((error) => {
@@ -511,7 +510,7 @@ export class Shgs extends React.Component {
               An error occured - Please try again!
             </Snackbar>
           ) : null}
-          {this.state.multipleDelete === true ? (
+          {this.state.multipleDelete === true && this.state.shgInUseDeleteAll !== true? (
             <Snackbar severity="success" Showbutton={false}>
               SHGs deleted successfully!
             </Snackbar>

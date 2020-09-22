@@ -146,7 +146,7 @@ class ShgPage extends Component {
     // get all states
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true"
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true&&_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ getState: res.data });
@@ -205,7 +205,7 @@ class ShgPage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/?is_active=true&&state.id=" +
+            "crm-plugin/districts/?is_active=true&&_sort=name:ASC&&state.id=" +
             value.id
         )
         .then((res) => {
@@ -238,7 +238,7 @@ class ShgPage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/villages/?is_active=true&&district.id=" +
+            "crm-plugin/villages/?is_active=true&&_sort=name:ASC&&district.id=" +
             value.id
         )
         .then((res) => {
