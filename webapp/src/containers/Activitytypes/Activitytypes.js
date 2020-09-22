@@ -267,7 +267,7 @@ export class Activitytypes extends React.Component {
       )
       .then((typeRes) => {
         if (typeRes.data.length > 0) {
-          this.setState({ isActTypePresent: true });
+          this.setState({ isActTypePresent: true,deleteActtypeName: typeRes.data[0].activitytype.name });
         } else {
           this.setState({ isActTypePresent: false });
           serviceProvider
@@ -413,7 +413,7 @@ export class Activitytypes extends React.Component {
             ) : null}
             {this.state.isActTypePresent === true ? (
               <Snackbar severity="error" Showbutton={false}>
-                Activity type is in use, it can not be Deactivated!!
+                Activity type {this.state.deleteActtypeName} is in use, it can not be Deactivated!!
               </Snackbar>
             ) : null}
             {this.state.multipleDelete === false ? (
@@ -423,12 +423,12 @@ export class Activitytypes extends React.Component {
             ) : null}
             {this.state.acttypeInUseSingleDelete === true ? (
               <Snackbar severity="info" Showbutton={false}>
-                Loan Purpose {this.state.deleteActtypeName} is in use, it can not be Deleted.
+                Activity type {this.state.deleteActtypeName} is in use, it can not be Deleted.
               </Snackbar>
             ) : null}
             {this.state.acttypeInUseDeleteAll === true ? (
               <Snackbar severity="info" Showbutton={false}>
-                Some Loan purpose is in use hence it can not be Deleted.
+                Some Activity types are in use hence it can not be Deleted.
               </Snackbar>
             ) : null}
             <div

@@ -380,7 +380,7 @@ export class Loanpurposes extends React.Component {
             {data ? (
               <Table
                 title={"Loan Purposes"}
-                filterData={true}
+                filterData={false}
                 showSearch={false}
                 Searchplaceholder={"Search by loan purpose"}
                 filterBy={["product_name", "duration", "emi", "FPO"]}

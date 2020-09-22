@@ -248,8 +248,12 @@ export class States extends React.Component {
       if (cd.addresses.length > 0) {
         if (cd.addresses[0].state != null) {
           if (cd.addresses[0].state === parseInt(setActiveId)) {
-            this.setState({ stateInUse: true });
-            stateInUse = true;
+            this.state.data.map(stdata => {
+              if (parseInt(setActiveId) === stdata.id) {
+                this.setState({ stateInUse: true, deleteStateName: stdata.name });
+                stateInUse = true;
+              }
+            })
           }
         }
       }
@@ -391,7 +395,7 @@ export class States extends React.Component {
             ) : null}
             {this.state.stateInUse === true ? (
               <Snackbar severity="error" Showbutton={false}>
-                State is in use, it can not be Deactivated!!
+                State {this.state.deleteStateName} is in use, it can not be Deactivated!!
               </Snackbar>
             ) : null}
             {this.state.stateInUseSingleDelete === true ? (

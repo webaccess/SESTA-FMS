@@ -131,7 +131,6 @@ export class Vos extends React.Component {
         process.env.REACT_APP_SERVER_URL + "crm-plugin/contact"
       )
       .then((res) => {
-        console.log('conatcr data',res.data);
         this.setState({ contacts: res.data });
       })
       .catch((error) => {

@@ -291,8 +291,12 @@ export class Villages extends React.Component {
     this.state.contacts.find((cd) => {
       if (cd.addresses.length > 0) {
         if (cd.addresses[0].village === parseInt(setActiveId)) {
-          this.setState({ villageInUse: true });
-          villageInUse = true;
+          this.state.data.map(villgdata => {
+            if (parseInt(setActiveId) === villgdata.id) {
+              this.setState({ villageInUse: true, deleteVillageName: villgdata.name });
+              villageInUse = true;
+            }
+          })
         }
       }
     });
@@ -514,7 +518,7 @@ export class Villages extends React.Component {
             ) : null}
             {this.state.villageInUse === true ? (
               <Snackbar severity="error" Showbutton={false}>
-                Village is in use, it can not be Deactivated!!
+                Village {this.state.deleteVillageName} is in use, it can not be Deactivated!!
               </Snackbar>
             ) : null}
             {this.state.villageInUseSingleDelete === true ? (

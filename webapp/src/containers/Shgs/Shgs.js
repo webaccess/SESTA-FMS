@@ -244,23 +244,23 @@ export class Shgs extends React.Component {
         }
       });
 
-      if(!shgInUseSingleDelete){
-      serviceProvider
-        .serviceProviderForDeleteRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
-          cellid
-        )
-        .then((res) => {
-          if (res.data.organization.bankdetail) {
-            this.deleteBankDetails(res.data.organization.bankdetail);
-          }
-          this.setState({ singleDelete: res.data.name });
-          this.componentDidMount();
-        })
-        .catch((error) => {
-          this.setState({ singleDelete: false });
-          console.log(error);
-        });
+      if (!shgInUseSingleDelete) {
+        serviceProvider
+          .serviceProviderForDeleteRequest(
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+            cellid
+          )
+          .then((res) => {
+            if (res.data.organization.bankdetail) {
+              this.deleteBankDetails(res.data.organization.bankdetail);
+            }
+            this.setState({ singleDelete: res.data.name });
+            this.componentDidMount();
+          })
+          .catch((error) => {
+            this.setState({ singleDelete: false });
+            console.log(error);
+          });
       }
     }
   };
