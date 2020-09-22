@@ -4,11 +4,7 @@ import * as serviceProvider from "../../api/Axios";
 import auth from "../../components/Auth/Auth";
 import { withStyles } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
-import {
-  AddCircleOutlined,
-  RemoveCircleOutlined,
-  PhotoSizeSelectLargeOutlined,
-} from "@material-ui/icons";
+import { AddCircleOutlined, RemoveCircleOutlined } from "@material-ui/icons";
 import Button from "../../components/UI/Button/Button";
 import Autotext from "../../components/Autotext/Autotext.js";
 import Autocomplete from "@material-ui/lab/Autocomplete";
