@@ -2,6 +2,11 @@
   "routes": [
     {
       "method": "GET",
+      "path": "/contact/shgs",
+      "handler": "contact.getShg"
+    },
+    {
+      "method": "GET",
       "path": "/contact",
       "handler": "contact.find"
     },

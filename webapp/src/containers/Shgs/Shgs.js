@@ -83,17 +83,23 @@ export class Shgs extends React.Component {
   async componentDidMount() {
     let url =
       "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG&&_sort=name:ASC";
-    if (
-      this.state.loggedInUserRole === "FPO Admin" ||
-      this.state.loggedInUserRole === "CSP (Community Service Provider)"
-    ) {
-      url += "&&creator_id=" + auth.getUserInfo().contact.id;
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((res) => {
+          this.getShg(res, "laod", "");
+        });
+    } else {
+      serviceProvider
+        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .then((res) => {
+          this.setState({ data: res.data, isLoader: false });
+        });
     }
-    serviceProvider
-      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
-      .then((res) => {
-        this.setState({ data: res.data, isLoader: false });
-      });
 
     //api call for states filter
     serviceProvider
@@ -127,6 +133,18 @@ export class Shgs extends React.Component {
         this.setState({ individualContact: res.data });
       });
   }
+
+  getShg = (res, param, searchData) => {
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/contact/shgs/?id=" +
+          res.data.fpo.id
+      )
+      .then((shgRes) => {
+        this.setState({ data: shgRes.data, isLoader: false });
+      });
+  };
 
   handleStateChange = async (event, value) => {
     if (value !== null) {
@@ -337,22 +355,54 @@ export class Shgs extends React.Component {
     //api call after search filter
     let url =
       "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG&&_sort=name:ASC";
-    if (
-      this.state.loggedInUserRole === "FPO Admin" ||
-      this.state.loggedInUserRole === "CSP (Community Service Provider)"
-    ) {
-      url += "&&creator_id=" + auth.getUserInfo().contact.id;
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((res) => {
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC&&organization.fpo=" +
+                res.data.fpo.id
+            )
+            .then((voRes) => {
+              let voList = [];
+              voRes.data.map((e) => {
+                voList.push(e.id);
+              });
+              let newUrl =
+                "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG&&_sort=name:ASC&&";
+              voList.map((voId) => {
+                newUrl += "organization.vos.id_in=" + voId + "&&";
+              });
+              serviceProvider
+                .serviceProviderForGetRequest(
+                  process.env.REACT_APP_SERVER_URL + newUrl + "&&" + searchData
+                )
+                .then((response) => {
+                  this.setState({ data: response.data, isLoader: false });
+                });
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
+        )
+        .then((res) => {
+          this.setState({ data: res.data, isLoader: false });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
-      )
-      .then((res) => {
-        this.setState({ data: res.data, isLoader: false });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
   }
 
   render() {

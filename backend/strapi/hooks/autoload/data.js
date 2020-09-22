@@ -37,31 +37,6 @@ const roles = {
     grantAllPermissions: false
   },*/
 
-  "SHG Member": {
-    content: {
-      description: "SHG Member user",
-      type: "",
-    },
-    controllers: [
-      // {
-      //   name: "user",
-      //   action: ["update"],
-      // },
-      {
-        name: "module",
-        action: ["find", "count", "findone"],
-      },
-      // {
-      //   name: "bankdetail",
-      //   action: ["find", "count", "findone", "create", "update", "delete"],
-      // },
-      // {
-      //   name: "shareinformation",
-      //   action: ["find", "count", "findone", "create", "update", "delete"],
-      // },
-    ],
-    grantAllPermissions: false,
-  },
   "FPO Admin": {
     content: {
       description: "FPO admin user",

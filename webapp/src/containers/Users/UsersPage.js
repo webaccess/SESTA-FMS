@@ -229,6 +229,25 @@ class UsersPage extends Component {
           "crm-plugin/contact/?contact_type=organization&organization.sub_type=VO&_sort=name:ASC";
         if (this.state.loggedInUserRole === "FPO Admin") {
           apiUrl += "&&creator_id=" + auth.getUserInfo().contact.id;
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/individuals/" +
+                auth.getUserInfo().contact.individual
+            )
+            .then((res) => {
+              let voUrl =
+                "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC&&organization.fpo=" +
+                res.data.fpo.id;
+
+              serviceProvider
+                .serviceProviderForGetRequest(
+                  process.env.REACT_APP_SERVER_URL + voUrl
+                )
+                .then((voRes) => {
+                  this.setState({ roleWiseData: voRes.data });
+                });
+            });
         }
       } else if (value.name === "FPO Admin") {
         apiUrl =
