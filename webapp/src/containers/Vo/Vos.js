@@ -79,6 +79,10 @@ export class Vos extends React.Component {
       multipleDelete: "",
       loggedInUserRole: auth.getUserInfo().role.name,
       isLoader: true,
+      contacts: [],
+      voInUseSingleDelete : "",
+      voInUseDeleteAll : "",
+      deleteVOName : ""
     };
   }
 
@@ -117,6 +121,17 @@ export class Vos extends React.Component {
       )
       .then((res) => {
         this.setState({ getVillage: res.data });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+      serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact"
+      )
+      .then((res) => {
+        this.setState({ contacts: res.data });
       })
       .catch((error) => {
         console.log(error);
@@ -214,6 +229,17 @@ export class Vos extends React.Component {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
+      let voInUseSingleDelete = false;
+      this.state.contacts.find((cdata) => {
+        if (cdata.org_vos.length > 0) {
+          if (cdata.id === parseInt(cellid)) {
+            this.setState({ voInUseSingleDelete: true, deleteVOName: cdata.name });
+            voInUseSingleDelete = true;
+          }
+        }
+      });
+      if (!voInUseSingleDelete) {
+
       serviceProvider
         .serviceProviderForDeleteRequest(
           process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
@@ -227,17 +253,34 @@ export class Vos extends React.Component {
           this.setState({ singleDelete: false });
           console.log(error.response);
         });
+      }
     }
   };
 
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-      for (let i in selectedId) {
+
+      let voInUse = [];
+      this.state.contacts.map((cdata) => {
+        if (cdata.org_vos.length > 0) {
+          for (let i in selectedId) {
+            if (parseInt(selectedId[i]) === cdata.id) {
+              voInUse.push(selectedId[i])
+              this.setState({ voInUseDeleteAll: true });
+            }
+            voInUse = [...new Set(voInUse)]
+          }
+        }
+      });
+      var deleteVO = selectedId.filter(function (obj) {
+        return voInUse.indexOf(obj) == -1;
+      });
+      for (let i in deleteVO) {
         serviceProvider
           .serviceProviderForDeleteRequest(
             process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
-            selectedId[i]
+            deleteVO[i]
           )
           .then((res) => {
             this.setState({ multipleDelete: true });
@@ -396,7 +439,7 @@ export class Vos extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            {this.state.multipleDelete === true ? (
+            {this.state.multipleDelete === true && this.state.voInUseDeleteAll !== true? (
               <Snackbar severity="success" Showbutton={false}>
                 Village organizations deleted successfully!
               </Snackbar>
@@ -404,6 +447,16 @@ export class Vos extends React.Component {
             {this.state.multipleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
+              </Snackbar>
+            ) : null}
+            {this.state.voInUseSingleDelete === true ? (
+              <Snackbar severity="info" Showbutton={false}>
+                Village Organization {this.state.deleteVOName} is in use, it can not be Deleted.
+              </Snackbar>
+            ) : null}
+            {this.state.voInUseDeleteAll === true ? (
+              <Snackbar severity="info" Showbutton={false}>
+                Some Village Organization is in use hence it can not be Deleted.
               </Snackbar>
             ) : null}
             <div

@@ -82,9 +82,12 @@ export class Villages extends React.Component {
       getVillage: [],
       isCancel: false,
       dataCellId: [],
+      deleteVillageName: "",
       singleDelete: "",
       multipleDelete: "",
       villageInUse: "",
+      villageInUseSingleDelete: "",
+      villageInUseDeleteAll: "",
       active: {},
       allIsActive: [],
       isLoader: true,
@@ -196,21 +199,36 @@ export class Villages extends React.Component {
   DeleteData = (cellid, selectedId) => {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
+      let villageInUseSingleDelete = false;
+      this.state.contacts.find((cd) => {
+        if (cd.addresses.length > 0) {
+          if (cd.addresses[0].village === parseInt(cellid)) {
+            this.state.data.map(villgdata => {
+              if (cellid === villgdata.id) {
+                this.setState({ villageInUseSingleDelete: true, deleteVillageName: villgdata.name });
+                villageInUseSingleDelete = true;
+              }
+            })
+          }
+        }
+      });
 
-      serviceProvider
-        .serviceProviderForDeleteRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/villages",
-          cellid
-        )
-        .then((res) => {
-          this.setState({ singleDelete: res.data.name });
-          this.setState({ dataCellId: "" });
-          this.componentDidMount();
-        })
-        .catch((error) => {
-          this.setState({ singleDelete: false });
-          console.log(error);
-        });
+      if (!villageInUseSingleDelete) {
+        serviceProvider
+          .serviceProviderForDeleteRequest(
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/villages",
+            cellid
+          )
+          .then((res) => {
+            this.setState({ singleDelete: res.data.name });
+            this.setState({ dataCellId: "" });
+            this.componentDidMount();
+          })
+          .catch((error) => {
+            this.setState({ singleDelete: false });
+            console.log(error);
+          });
+      }
     }
   };
 
@@ -218,11 +236,27 @@ export class Villages extends React.Component {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
-      for (let i in selectedId) {
+      let villgInUse = [];
+      this.state.contacts.map((cd) => {
+        if (cd.addresses.length > 0 && cd.addresses[0].village != null) {
+          for (let i in selectedId) {
+            if (parseInt(selectedId[i]) === cd.addresses[0].village) {
+              villgInUse.push(selectedId[i])
+              this.setState({ villageInUseDeleteAll: true });
+            }
+            villgInUse = [...new Set(villgInUse)]
+          }
+        }
+      });
+
+      var deleteVillg = selectedId.filter(function (obj) {
+        return villgInUse.indexOf(obj) == -1;
+      });
+      for (let i in deleteVillg) {
         serviceProvider
           .serviceProviderForDeleteRequest(
             process.env.REACT_APP_SERVER_URL + "crm-plugin/villages",
-            selectedId[i]
+            deleteVillg[i]
           )
           .then((res) => {
             this.setState({ multipleDelete: true });
@@ -237,6 +271,9 @@ export class Villages extends React.Component {
   };
 
   confirmActive = (event) => {
+    if (this.state.villageInUse === true) {
+      this.setState({ villageInUse: "" });
+    }
     this.setState({ isActiveAllShowing: true });
     this.setState({ setActiveId: event.target.id });
     this.setState({ IsActive: event.target.checked });
@@ -254,8 +291,12 @@ export class Villages extends React.Component {
     this.state.contacts.find((cd) => {
       if (cd.addresses.length > 0) {
         if (cd.addresses[0].village === parseInt(setActiveId)) {
-          this.setState({ villageInUse: true });
-          villageInUse = true;
+          this.state.data.map(villgdata => {
+            if (parseInt(setActiveId) === villgdata.id) {
+              this.setState({ villageInUse: true, deleteVillageName: villgdata.name });
+              villageInUse = true;
+            }
+          })
         }
       }
     });
@@ -465,7 +506,7 @@ export class Villages extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            {this.state.multipleDelete === true ? (
+            {this.state.multipleDelete === true && this.state.villageInUseDeleteAll !== true? (
               <Snackbar severity="success" Showbutton={false}>
                 Villages deleted successfully!
               </Snackbar>
@@ -477,7 +518,17 @@ export class Villages extends React.Component {
             ) : null}
             {this.state.villageInUse === true ? (
               <Snackbar severity="error" Showbutton={false}>
-                Village is in use, it can not be Deactivated!!
+                Village {this.state.deleteVillageName} is in use, it can not be Deactivated!!
+              </Snackbar>
+            ) : null}
+            {this.state.villageInUseSingleDelete === true ? (
+              <Snackbar severity="info" Showbutton={false}>
+                Village {this.state.deleteVillageName} is in use, it can not be Deleted.
+              </Snackbar>
+            ) : null}
+            {this.state.villageInUseDeleteAll === true ? (
+              <Snackbar severity="info" Showbutton={false}>
+                Some Village is in use hence it can not be Deleted.
               </Snackbar>
             ) : null}
             <div

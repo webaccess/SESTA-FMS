@@ -136,6 +136,9 @@ class VoPage extends Component {
   validate = () => {
     const values = this.state.values;
     const validations = this.state.validations;
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      delete validations["addFPO"];
+    }
     map(validations, (validation, key) => {
       let value = values[key] ? values[key] : "";
       const errors = validateInput(value, validation);

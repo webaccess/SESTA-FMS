@@ -87,7 +87,7 @@ class VillagePage extends Component {
           serviceProvider
             .serviceProviderForGetRequest(
               process.env.REACT_APP_SERVER_URL +
-                "crm-plugin/districts/?is_active=true&&state.id=" +
+                "crm-plugin/districts/?is_active=true&&_sort=name:ASC&&state.id=" +
                 stateId
             )
             .then((res) => {
@@ -115,7 +115,7 @@ class VillagePage extends Component {
     }
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true"
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true&&_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ getState: res.data });
@@ -152,7 +152,7 @@ class VillagePage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/?is_active=true&&state.id=" +
+            "crm-plugin/districts/?is_active=true&&_sort=name:ASC&&state.id=" +
             value.id
         )
         .then((res) => {

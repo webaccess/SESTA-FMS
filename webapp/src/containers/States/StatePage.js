@@ -51,8 +51,8 @@ class StatePage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/states/?id=" +
-            this.state.editPage[1]
+          "crm-plugin/states/?id=" +
+          this.state.editPage[1]
         )
         .then((res) => {
           this.setState({
@@ -72,13 +72,16 @@ class StatePage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/?state=" +
-            this.state.editPage[1]
+          "crm-plugin/contact"
         )
         .then((res) => {
-          if (res.data.length > 0) {
-            this.setState({ stateInUse: true });
-          }
+          res.data.map(cdata => {
+            if (cdata.addresses.length > 0 && cdata.addresses[0].state !== null) {
+              if (cdata.addresses[0].state === parseInt(this.state.editPage[1])) {
+                this.setState({ stateInUse: true });
+              }
+            }
+          })
         });
     }
   }

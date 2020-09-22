@@ -68,6 +68,9 @@ export class States extends React.Component {
       contacts: [],
       isActiveAllShowing: false,
       stateInUse: "",
+      deleteStateName: "",
+      stateInUseSingleDelete: "",
+      stateInUseDeleteAll: "",
       columnsvalue: [],
       DeleteData: false,
       isCancel: false,
@@ -156,34 +159,63 @@ export class States extends React.Component {
   DeleteData = (cellid, selectedId) => {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-      serviceProvider
-        .serviceProviderForDeleteRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/states",
-          cellid
-        )
-        .then((res) => {
-          this.setState({ singleDelete: res.data.name });
-          this.setState({ dataCellId: "" });
-          this.componentDidMount();
-        })
-        .catch((error) => {
-          this.setState({ singleDelete: false });
-          console.log(error);
-        });
+      let stateInUseSingleDelete = false;
+      this.state.contacts.find((cd) => {
+        if (cd.addresses.length > 0) {
+          if (cd.addresses[0].state === parseInt(cellid)) {
+            this.state.data.map(stdata => {
+              if (cellid === stdata.id) {
+                this.setState({ stateInUseSingleDelete: true, deleteStateName: stdata.name });
+                stateInUseSingleDelete = true;
+              }
+            })
+          }
+        }
+      });
+      if (!stateInUseSingleDelete) {
+        serviceProvider
+          .serviceProviderForDeleteRequest(
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/states",
+            cellid
+          )
+          .then((res) => {
+            this.setState({ singleDelete: res.data.name });
+            this.setState({ dataCellId: "" });
+            this.componentDidMount();
+          })
+          .catch((error) => {
+            this.setState({ singleDelete: false });
+            console.log(error);
+          });
+      }
     }
   };
 
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-      for (let i in selectedId) {
+      let stInUse = [];
+      this.state.contacts.map((cd) => {
+        if (cd.addresses.length > 0 && cd.addresses[0].state != null) {
+          for (let i in selectedId) {
+            if (parseInt(selectedId[i]) === cd.addresses[0].state) {
+              stInUse.push(selectedId[i])
+            }
+            stInUse = [...new Set(stInUse)]
+          }
+        }
+      });
+      var deleteState = selectedId.filter(function (obj) {
+        return stInUse.indexOf(obj) == -1;
+      });
+      for (let i in deleteState) {
         serviceProvider
           .serviceProviderForDeleteRequest(
             process.env.REACT_APP_SERVER_URL + "crm-plugin/states",
-            selectedId[i]
+            deleteState[i]
           )
           .then((res) => {
-            this.setState({ multipleDelete: true });
+            this.setState({ stateInUseDeleteAll: true });
             this.componentDidMount();
           })
           .catch((error) => {
@@ -213,10 +245,16 @@ export class States extends React.Component {
     let IsActive = this.state.IsActive;
     let stateInUse = false;
     this.state.contacts.find((cd) => {
-      if (cd.state != null) {
-        if (cd.state.id === parseInt(setActiveId)) {
-          this.setState({ stateInUse: true });
-          stateInUse = true;
+      if (cd.addresses.length > 0) {
+        if (cd.addresses[0].state != null) {
+          if (cd.addresses[0].state === parseInt(setActiveId)) {
+            this.state.data.map(stdata => {
+              if (parseInt(setActiveId) === stdata.id) {
+                this.setState({ stateInUse: true, deleteStateName: stdata.name });
+                stateInUse = true;
+              }
+            })
+          }
         }
       }
     });
@@ -357,7 +395,17 @@ export class States extends React.Component {
             ) : null}
             {this.state.stateInUse === true ? (
               <Snackbar severity="error" Showbutton={false}>
-                State is in use, it can not be Deactivated!!
+                State {this.state.deleteStateName} is in use, it can not be Deactivated!!
+              </Snackbar>
+            ) : null}
+            {this.state.stateInUseSingleDelete === true ? (
+              <Snackbar severity="info" Showbutton={false}>
+                State {this.state.deleteStateName} is in use, it can not be Deleted.
+              </Snackbar>
+            ) : null}
+            {this.state.stateInUseDeleteAll === true ? (
+              <Snackbar severity="info" Showbutton={false}>
+                Some State is in use hence it can not be Deleted.
               </Snackbar>
             ) : null}
             <div

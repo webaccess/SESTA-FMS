@@ -71,8 +71,12 @@ export class Shgs extends React.Component {
       isCancel: false,
       singleDelete: "",
       multipleDelete: "",
+      deleteShgName: "",
+      shgInUseSingleDelete: "",
+      shgInUseDeleteAll: "",
       loggedInUserRole: auth.getUserInfo().role.name,
       isLoader: true,
+      individualContact: [],
     };
   }
 
@@ -119,6 +123,14 @@ export class Shgs extends React.Component {
       })
       .catch((error) => {
         console.log(error);
+      });
+
+      serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/?_sort=id:ASC&&contact_type=individual"
+      )
+      .then((res) => {
+        this.setState({ individualContact: res.data });
       });
   }
 
@@ -218,22 +230,38 @@ export class Shgs extends React.Component {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
 
-      serviceProvider
-        .serviceProviderForDeleteRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
-          cellid
-        )
-        .then((res) => {
-          if (res.data.organization.bankdetail) {
-            this.deleteBankDetails(res.data.organization.bankdetail);
+      let shgInUseSingleDelete = false;
+      this.state.individualContact.find((cd) => {
+        if (cd.individual.shg !== null) {
+          if (cd.individual.shg === parseInt(cellid)) {
+            this.state.data.map(shgdata => {
+              if (cellid === shgdata.id) {
+                this.setState({ shgInUseSingleDelete: true, deleteShgName: shgdata.name });
+                shgInUseSingleDelete = true;
+              }
+            })
           }
-          this.setState({ singleDelete: res.data.name });
-          this.componentDidMount();
-        })
-        .catch((error) => {
-          this.setState({ singleDelete: false });
-          console.log(error);
-        });
+        }
+      });
+
+      if (!shgInUseSingleDelete) {
+        serviceProvider
+          .serviceProviderForDeleteRequest(
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+            cellid
+          )
+          .then((res) => {
+            if (res.data.organization.bankdetail) {
+              this.deleteBankDetails(res.data.organization.bankdetail);
+            }
+            this.setState({ singleDelete: res.data.name });
+            this.componentDidMount();
+          })
+          .catch((error) => {
+            this.setState({ singleDelete: false });
+            console.log(error);
+          });
+      }
     }
   };
 
@@ -252,11 +280,27 @@ export class Shgs extends React.Component {
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-      for (let i in selectedId) {
+      let shgInUse = [];
+      this.state.individualContact.map((cd) => {
+        if (cd.individual.shg !== null) {
+          for (let i in selectedId) {
+            if (parseInt(selectedId[i]) === cd.individual.shg) {
+              shgInUse.push(selectedId[i])
+              this.setState({ shgInUseDeleteAll: true });
+            }
+            shgInUse = [...new Set(shgInUse)]
+          }
+        }
+      });
+      var deleteVillg = selectedId.filter(function (obj) {
+        return shgInUse.indexOf(obj) == -1;
+      });
+
+      for (let i in deleteVillg) {
         serviceProvider
           .serviceProviderForDeleteRequest(
             process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
-            selectedId[i]
+            deleteVillg[i]
           )
           .then((res) => {
             if (res.data.organization.bankdetail) {
@@ -466,7 +510,7 @@ export class Shgs extends React.Component {
               An error occured - Please try again!
             </Snackbar>
           ) : null}
-          {this.state.multipleDelete === true ? (
+          {this.state.multipleDelete === true && this.state.shgInUseDeleteAll !== true? (
             <Snackbar severity="success" Showbutton={false}>
               SHGs deleted successfully!
             </Snackbar>
@@ -476,6 +520,16 @@ export class Shgs extends React.Component {
               An error occured - Please try again!
             </Snackbar>
           ) : null}
+          {this.state.shgInUseSingleDelete === true ? (
+              <Snackbar severity="info" Showbutton={false}>
+                SHG {this.state.deleteShgName} is in use, it can not be Deleted.
+              </Snackbar>
+            ) : null}
+            {this.state.shgInUseDeleteAll === true ? (
+              <Snackbar severity="info" Showbutton={false}>
+                Some Village is in use hence it can not be Deleted.
+              </Snackbar>
+            ) : null}
           <div
             className={classes.row}
             style={{ flexWrap: "wrap", height: "auto" }}
