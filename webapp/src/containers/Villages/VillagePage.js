@@ -62,8 +62,8 @@ class VillagePage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/villages/?id=" +
-          this.state.editPage[1]
+            "crm-plugin/villages/?id=" +
+            this.state.editPage[1]
         )
         .then((res) => {
           this.setState({
@@ -81,8 +81,8 @@ class VillagePage extends Component {
           serviceProvider
             .serviceProviderForGetRequest(
               process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/districts/?is_active=true&&state.id=" +
-              stateId
+                "crm-plugin/districts/?is_active=true&&state.id=" +
+                stateId
             )
             .then((res) => {
               this.setState({ getDistrict: res.data });
@@ -98,14 +98,14 @@ class VillagePage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?villages=" +
-          this.state.editPage[1]
+            "crm-plugin/contact/?villages=" +
+            this.state.editPage[1]
         )
         .then((res) => {
           if (res.data.length > 0) {
             this.setState({ villageInUse: true });
           }
-        })
+        });
     }
     serviceProvider
       .serviceProviderForGetRequest(
@@ -147,8 +147,8 @@ class VillagePage extends Component {
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId
+              "crm-plugin/districts/?is_active=true&&state.id=" +
+              stateId
           )
           .then((res) => {
             this.setState({ getDistrict: res.data });
@@ -165,7 +165,7 @@ class VillagePage extends Component {
           addState: "",
           addDistrict: "",
         },
-        getDistrict: []
+        getDistrict: [],
       });
       this.setState({ stateSelected: false });
     }
@@ -248,15 +248,21 @@ class VillagePage extends Component {
         .catch((error) => {
           this.setState({ formSubmitted: false });
           if (error.response !== undefined) {
-            this.setState({
-              errorCode:
-                error.response.data.statusCode +
-                " Error- " +
-                error.response.data.error +
-                " Message- " +
-                error.response.data.message +
-                " Please try again!",
-            });
+            if (error.response.data.error == "Bad Request")
+              this.setState({
+                errorCode:
+                  "Error while trying to save village. Please try again!",
+              });
+            else
+              this.setState({
+                errorCode:
+                  error.response.data.statusCode +
+                  " Error- " +
+                  error.response.data.error +
+                  " Message- " +
+                  error.response.data.message +
+                  " Please try again!",
+              });
           } else {
             this.setState({ errorCode: "Network Error - Please try again!" });
           }
@@ -277,15 +283,21 @@ class VillagePage extends Component {
         .catch((error) => {
           this.setState({ formSubmitted: false });
           if (error.response !== undefined) {
-            this.setState({
-              errorCode:
-                error.response.data.statusCode +
-                " Error- " +
-                error.response.data.error +
-                " Message- " +
-                error.response.data.message +
-                " Please try again!",
-            });
+            if (error.response.data.error == "Bad Request")
+              this.setState({
+                errorCode:
+                  "Error while trying to save village. Please try again!",
+              });
+            else
+              this.setState({
+                errorCode:
+                  error.response.data.statusCode +
+                  " Error- " +
+                  error.response.data.error +
+                  " Message- " +
+                  error.response.data.message +
+                  " Please try again!",
+              });
           } else {
             this.setState({ errorCode: "Network Error - Please try again!" });
           }
@@ -314,7 +326,7 @@ class VillagePage extends Component {
             : ADD_VILLAGE_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: '45rem' }}>
+        <Card style={{ maxWidth: "45rem" }}>
           <form
             autoComplete="off"
             noValidate
@@ -402,10 +414,10 @@ class VillagePage extends Component {
                     value={
                       addState
                         ? stateFilter[
-                        stateFilter.findIndex(function (item, i) {
-                          return item.id === addState;
-                        })
-                        ] || null
+                            stateFilter.findIndex(function (item, i) {
+                              return item.id === addState;
+                            })
+                          ] || null
                         : null
                     }
                     error={this.hasError("addState")}
@@ -439,10 +451,10 @@ class VillagePage extends Component {
                     value={
                       addDistrict
                         ? districtFilter[
-                        districtFilter.findIndex(function (item, i) {
-                          return item.id === addDistrict;
-                        })
-                        ] || null
+                            districtFilter.findIndex(function (item, i) {
+                              return item.id === addDistrict;
+                            })
+                          ] || null
                         : null
                     }
                     error={this.hasError("addDistrict")}
@@ -450,8 +462,8 @@ class VillagePage extends Component {
                       this.hasError("addDistrict")
                         ? this.state.errors.addDistrict[0]
                         : this.state.stateSelected
-                          ? null
-                          : "Please select the state first"
+                        ? null
+                        : "Please select the state first"
                     }
                     renderInput={(params) => (
                       <Input
@@ -481,7 +493,7 @@ class VillagePage extends Component {
               </Grid>
             </CardContent>
             <Divider />
-            <CardActions style={{ padding: "15px", }}>
+            <CardActions style={{ padding: "15px" }}>
               <Button type="submit">Save</Button>
               <Button
                 color="secondary"
