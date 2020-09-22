@@ -100,20 +100,12 @@ class DashboardForFPO extends Component {
 
   async componentDidMount() {
     /** get members */
-    let url =
-      "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true";
-
     serviceProvider
-      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/members/count"
+      )
       .then((res) => {
-        if (res.data.length > 0) {
-          this.setState({
-            memberData: res.data.length,
-            isMemLoading: false,
-          });
-        } else {
-          this.setState({ memberData: 0, isMemLoading: false });
-        }
+        this.setState({ memberData: res.data, isMemLoading: false });
       })
       .catch((error) => {});
 
@@ -128,18 +120,11 @@ class DashboardForFPO extends Component {
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/contact/shgs/?id=" +
+              "crm-plugin/contact/shg/count/?id=" +
               res.data.fpo.id
           )
           .then((shgRes) => {
-            if (shgRes.data.length > 0) {
-              this.setState({
-                shgData: shgRes.data.length,
-                isShgLoading: false,
-              });
-            } else {
-              this.setState({ shgData: 0, isShgLoading: false });
-            }
+            this.setState({ shgData: shgRes.data, isShgLoading: false });
           });
       });
 
@@ -151,20 +136,14 @@ class DashboardForFPO extends Component {
           auth.getUserInfo().contact.individual
       )
       .then((res) => {
-        let voUrl =
-          "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC&&organization.fpo=" +
-          res.data.fpo.id;
+        let voUrl = "crm-plugin/contact/vo/count/?id=" + res.data.fpo.id;
 
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL + voUrl
           )
           .then((res) => {
-            if (res.data.length > 0) {
-              this.setState({ voData: res.data.length, isVoLoading: false });
-            } else {
-              this.setState({ voData: 0, isVoLoading: false });
-            }
+            this.setState({ voData: res.data, isVoLoading: false });
           })
           .catch((error) => {
             console.log(error);
@@ -175,89 +154,37 @@ class DashboardForFPO extends Component {
     /** get pending loan applications */
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + loanAppUrl + "?status=UnderReview"
+        process.env.REACT_APP_SERVER_URL +
+          "loan-applications/loans/count/?status=UnderReview"
       )
       .then((res) => {
-        if (res.data.length > 0) {
-          this.setState({
-            pendingLoans: res.data.length,
-            isLoanLoading: false,
-          });
-        } else {
-          this.setState({ pendingLoans: 0, isLoanLoading: false });
-        }
+        this.setState({ pendingLoans: res.data, isLoanLoading: false });
+      })
+      .catch((error) => {});
+
+    /** get approved loan applications */
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "loan-applications/loans/count/?status=Approved"
+      )
+      .then((res) => {
+        this.setState({ approvedLoans: res.data, isLoanLoading: false });
       })
       .catch((error) => {});
 
     /** approved loans, loan distributed amount, loan table data */
-    let loanDistributedAmounts = [];
-    let loanDistributedVal = 0;
-    let actualPrincipalPaid = 0;
-    let actualInterestPaid = 0;
-    let actualFinePaid = 0;
-    let outstandingAmount = 0;
-    let loansDetails = [];
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + loanAppUrl + "?status=Approved"
+        process.env.REACT_APP_SERVER_URL +
+          "loan-applications/loans/details/?status=Approved"
       )
       .then((res) => {
-        if (res.data.length > 0) {
-          this.setState({
-            approvedLoans: res.data.length,
-            isLoanLoading: false,
-          });
-        } else {
-          this.setState({ approvedLoans: 0, isLoanLoading: false });
-        }
-        res.data.map((e, i) => {
-          let emiPaid = 0;
-
-          /** loan amount distributed*/
-          loanDistributedVal += e.loan_model.loan_amount;
-          e.loan_app_installments.map((emi, index) => {
-            if (emi.actual_principal) {
-              actualPrincipalPaid += emi.actual_principal;
-            }
-            if (emi.actual_interest) {
-              actualInterestPaid += emi.actual_interest;
-            }
-            if (emi.fine) {
-              actualFinePaid += emi.fine;
-            }
-            let totalPaid = emi.actual_principal + emi.actual_interest;
-            emiPaid += totalPaid;
-          });
-          /** Loans table */
-          outstandingAmount = e.loan_model.loan_amount - emiPaid;
-          loansDetails.push({
-            memberName: e.contact.name,
-            loanAmount: e.loan_model.loan_amount,
-            outstandingAmount: outstandingAmount,
-            loanDate: e.application_date,
-          });
-        });
-
-        loanDistributedAmounts.push(
-          loanDistributedVal,
-          actualPrincipalPaid + actualInterestPaid + actualFinePaid
-        );
-        if (loanDistributedAmounts.length > 0) {
-          this.setState({ isLoanAmtLoading: false });
-        }
-        // sort loanDetails with latest date first
-        loansDetails.sort(
-          (a, b) =>
-            new Date(...b.loanDate.split("/").reverse()) -
-            new Date(...a.loanDate.split("/").reverse())
-        );
         this.setState({
-          // approvedLoans: res.data.length,
-          loanDistributedAmounts: loanDistributedAmounts,
-          totalLoanDistributed:
-            loanDistributedAmounts[0] + loanDistributedAmounts[1],
-          loansTableData: loansDetails.slice(0, 5),
-          loansAllDetails: loansDetails,
+          loanDistributedAmounts: res.data.loanDistributedAmounts,
+          totalLoanDistributed: res.data.totalLoanDistributed,
+          loansTableData: res.data.loansTableData,
+          loansAllDetails: res.data.loansAllDetails,
           isLoader: false,
         });
       })
@@ -266,25 +193,13 @@ class DashboardForFPO extends Component {
     /** loans by purpose */
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + loanAppUrl
+        process.env.REACT_APP_SERVER_URL + "loan-applications/loans/details/"
       )
       .then((res) => {
-        let purposeList = [];
-        let purposes = [];
-        let purposesValues = [];
-        res.data.map((loan, index) => {
-          purposeList.push(loan.loan_model.product_name);
+        this.setState({
+          purposes: res.data.purposes,
+          purposesValues: res.data.purposesValues,
         });
-
-        var map = purposeList.reduce(function (prev, cur) {
-          prev[cur] = (prev[cur] || 0) + 1;
-          return prev;
-        }, {});
-        Object.keys(map).map((key, i) => {
-          purposes.push(key.toUpperCase());
-          purposesValues.push(map[key]);
-        });
-        this.setState({ purposes: purposes, purposesValues: purposesValues });
       })
       .catch((error) => {});
   }

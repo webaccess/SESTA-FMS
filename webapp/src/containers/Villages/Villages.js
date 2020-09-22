@@ -13,6 +13,7 @@ import Input from "../../components/UI/Input/Input";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Modal from "../../components/UI/Modal/Modal.js";
 import Switch from "../../components/UI/Switch/Switch";
+import * as constants from "../../constants/Constants";
 
 const useStyles = (theme) => ({
   root: {},
@@ -65,9 +66,7 @@ export class Villages extends React.Component {
     super(props);
     this.state = {
       values: {},
-      filterState: "",
       filterDistrict: "",
-      filterVillage: "",
       Result: [],
       data: [],
       contacts: [],
@@ -77,9 +76,7 @@ export class Villages extends React.Component {
       columnsvalue: [],
       DeleteData: false,
       properties: props,
-      getState: [],
       getDistrict: [],
-      getVillage: [],
       isCancel: false,
       dataCellId: [],
       deleteVillageName: "",
@@ -91,6 +88,7 @@ export class Villages extends React.Component {
       active: {},
       allIsActive: [],
       isLoader: true,
+      stateId: constants.STATE_ID,
     };
   }
   async componentDidMount() {
@@ -102,13 +100,15 @@ export class Villages extends React.Component {
         this.setState({ data: this.getData(res.data), isLoader: false });
       });
 
-    //api call for states filter
+    //api call for districts filter
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true"
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/districts/?_sort=name:ASC&&is_active=true&&state.id=" +
+          this.state.stateId
       )
       .then((res) => {
-        this.setState({ getState: res.data });
+        this.setState({ getDistrict: res.data });
       })
       .catch((error) => {
         console.log(error);
@@ -134,62 +134,14 @@ export class Villages extends React.Component {
     return result;
   }
 
-  handleStateChange = async (event, value) => {
-    if (value !== null) {
-      this.setState({ filterState: value });
-
-      this.setState({
-        isCancel: false,
-        filterDistrict: "",
-      });
-      let stateId = value.id;
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId
-        )
-        .then((res) => {
-          this.setState({ getDistrict: res.data });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else {
-      this.setState({
-        filterState: "",
-        filterDistrict: "",
-        filterVillage: "",
-      });
-    }
-  };
-
   handleDistrictChange(event, value) {
     if (value !== null) {
       this.setState({ filterDistrict: value });
-      let distId = value.id;
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/districts/" + distId
-        )
-        .then((res) => {
-          this.setState({ getVillage: res.data.villages });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
     } else {
       this.setState({
         filterDistrict: "",
-        filterVillage: "",
       });
     }
-  }
-
-  handleVillageChange(event, value, target) {
-    this.setState({
-      values: { ...this.state.values, [event.target.name]: event.target.value },
-    });
   }
 
   editData = (cellid) => {
@@ -203,12 +155,15 @@ export class Villages extends React.Component {
       this.state.contacts.find((cd) => {
         if (cd.addresses.length > 0) {
           if (cd.addresses[0].village === parseInt(cellid)) {
-            this.state.data.map(villgdata => {
+            this.state.data.map((villgdata) => {
               if (cellid === villgdata.id) {
-                this.setState({ villageInUseSingleDelete: true, deleteVillageName: villgdata.name });
+                this.setState({
+                  villageInUseSingleDelete: true,
+                  deleteVillageName: villgdata.name,
+                });
                 villageInUseSingleDelete = true;
               }
-            })
+            });
           }
         }
       });
@@ -241,10 +196,10 @@ export class Villages extends React.Component {
         if (cd.addresses.length > 0 && cd.addresses[0].village != null) {
           for (let i in selectedId) {
             if (parseInt(selectedId[i]) === cd.addresses[0].village) {
-              villgInUse.push(selectedId[i])
+              villgInUse.push(selectedId[i]);
               this.setState({ villageInUseDeleteAll: true });
             }
-            villgInUse = [...new Set(villgInUse)]
+            villgInUse = [...new Set(villgInUse)];
           }
         }
       });
@@ -291,12 +246,15 @@ export class Villages extends React.Component {
     this.state.contacts.find((cd) => {
       if (cd.addresses.length > 0) {
         if (cd.addresses[0].village === parseInt(setActiveId)) {
-          this.state.data.map(villgdata => {
+          this.state.data.map((villgdata) => {
             if (parseInt(setActiveId) === villgdata.id) {
-              this.setState({ villageInUse: true, deleteVillageName: villgdata.name });
+              this.setState({
+                villageInUse: true,
+                deleteVillageName: villgdata.name,
+              });
               villageInUse = true;
             }
-          })
+          });
         }
       }
     });
@@ -352,9 +310,7 @@ export class Villages extends React.Component {
 
   cancelForm = () => {
     this.setState({
-      filterState: "",
       filterDistrict: "",
-      filterVillage: "",
       values: {},
       formSubmitted: "",
       stateSelected: false,
@@ -373,14 +329,8 @@ export class Villages extends React.Component {
   handleSearch() {
     this.setState({ isLoader: true });
     let searchData = "";
-    if (this.state.filterState) {
-      searchData += "state.id=" + this.state.filterState.id + "&&";
-    }
     if (this.state.filterDistrict) {
       searchData += "district.id=" + this.state.filterDistrict.id + "&&";
-    }
-    if (this.state.values.addVillage) {
-      searchData += "name_contains=" + this.state.values.addVillage;
     }
     serviceProvider
       .serviceProviderForGetRequest(
@@ -404,16 +354,13 @@ export class Villages extends React.Component {
         name: "Village",
         selector: "name",
         sortable: true,
-      },
-      {
-        name: "State",
-        selector: "state.name",
-        sortable: true,
+        cell: (row) => (row.name ? row.name : "-"),
       },
       {
         name: "District",
         selector: "district.name",
         sortable: true,
+        cell: (row) => (row.district.name ? row.district.name : "-"),
       },
       {
         name: "Active",
@@ -440,19 +387,9 @@ export class Villages extends React.Component {
     let columnsvalue = selectors[0];
     const { classes } = this.props;
     let statesFilter = this.state.getState;
-    let filterState = this.state.filterState;
     let districtsFilter = this.state.getDistrict;
     let filterDistrict = this.state.filterDistrict;
     let filters = this.state.values;
-
-    let addStates = [];
-    map(filterState, (state, key) => {
-      addStates.push(
-        statesFilter.findIndex(function (item, i) {
-          return item.id === state;
-        })
-      );
-    });
     let addDistricts = [];
     map(filterDistrict, (district, key) => {
       addDistricts.push(
@@ -506,7 +443,8 @@ export class Villages extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            {this.state.multipleDelete === true && this.state.villageInUseDeleteAll !== true? (
+            {this.state.multipleDelete === true &&
+            this.state.villageInUseDeleteAll !== true ? (
               <Snackbar severity="success" Showbutton={false}>
                 Villages deleted successfully!
               </Snackbar>
@@ -518,12 +456,14 @@ export class Villages extends React.Component {
             ) : null}
             {this.state.villageInUse === true ? (
               <Snackbar severity="error" Showbutton={false}>
-                Village {this.state.deleteVillageName} is in use, it can not be Deactivated!!
+                Village {this.state.deleteVillageName} is in use, it can not be
+                Deactivated!!
               </Snackbar>
             ) : null}
             {this.state.villageInUseSingleDelete === true ? (
               <Snackbar severity="info" Showbutton={false}>
-                Village {this.state.deleteVillageName} is in use, it can not be Deleted.
+                Village {this.state.deleteVillageName} is in use, it can not be
+                Deleted.
               </Snackbar>
             ) : null}
             {this.state.villageInUseDeleteAll === true ? (
@@ -547,36 +487,6 @@ export class Villages extends React.Component {
                         this.handleVillageChange(event, value);
                       }}
                       value={this.state.values.addVillage || ""}
-                    />
-                  </Grid>
-                </div>
-              </div>
-              <div className={classes.searchInput}>
-                <div className={style.Districts}>
-                  <Grid item md={12} xs={12}>
-                    <Autocomplete
-                      id="combo-box-demo"
-                      options={statesFilter}
-                      getOptionLabel={(option) => option.name}
-                      onChange={(event, value) => {
-                        this.handleStateChange(event, value);
-                      }}
-                      value={
-                        filterState
-                          ? this.state.isCancel === true
-                            ? null
-                            : filterState
-                          : null
-                      }
-                      renderInput={(params) => (
-                        <Input
-                          {...params}
-                          fullWidth
-                          label="Select State"
-                          name="addState"
-                          variant="outlined"
-                        />
-                      )}
                     />
                   </Grid>
                 </div>

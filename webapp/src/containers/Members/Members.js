@@ -12,6 +12,7 @@ import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autocomplete from "../../components/Autocomplete/Autocomplete";
 import { map } from "lodash";
+import * as constants from "../../constants/Constants";
 
 const useStyles = (theme) => ({
   root: {},
@@ -61,11 +62,9 @@ export class Members extends React.Component {
     this.state = {
       values: {},
       data: [],
-      getState: [],
       getDistrict: [],
       getVillage: [],
       getShg: [],
-      filterState: "",
       filterDistrict: "",
       filterVillage: "",
       filterShg: "",
@@ -80,6 +79,7 @@ export class Members extends React.Component {
       confirmDelete: true,
       singleDeleteName: "",
       isLoader: true,
+      stateId: constants.STATE_ID,
     };
   }
 
@@ -197,45 +197,19 @@ export class Members extends React.Component {
         });
     }
 
-    //api call for states filter
+    //api call for districts filter
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true"
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/districts/?_sort=name:ASC&&is_active=true&&state.id=" +
+          this.state.stateId
       )
       .then((res) => {
-        this.setState({ getState: res.data });
+        this.setState({ getDistrict: res.data });
       })
       .catch((error) => {
         console.log(error);
       });
-  };
-
-  handleStateChange = async (event, value) => {
-    if (value !== null) {
-      this.setState({
-        filterState: value,
-        isCancel: false,
-        filterDistrict: "",
-      });
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/?is_active=true&&state.id=" +
-            value.id
-        )
-        .then((res) => {
-          this.setState({ getDistrict: res.data });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else {
-      this.setState({
-        filterState: "",
-        filterDistrict: "",
-        filterVillage: "",
-      });
-    }
   };
 
   handleDistrictChange(event, value) {
@@ -249,7 +223,7 @@ export class Members extends React.Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/villages/?is_active=true&&district.id=" +
+            "crm-plugin/villages/?_sort=name:ASC&&is_active=true&&district.id=" +
             distId
         )
         .then((res) => {
@@ -262,7 +236,9 @@ export class Members extends React.Component {
       this.setState({
         filterDistrict: "",
         filterVillage: "",
+        getVillage: [],
       });
+      this.componentDidMount();
     }
   }
 
@@ -276,15 +252,18 @@ export class Members extends React.Component {
     }
   }
 
-  handleVillageChange = async (event, value) => {
+  handleVillageChange(event, value) {
     if (value !== null) {
-      this.setState({ filterVillage: value, isCancel: false });
+      this.setState({ filterVillage: value });
+      this.setState({
+        isCancel: false,
+      });
     } else {
       this.setState({
         filterVillage: "",
       });
     }
-  };
+  }
 
   cancelForm = () => {
     this.setState({
@@ -302,10 +281,6 @@ export class Members extends React.Component {
   handleSearch() {
     this.setState({ isLoader: true });
     let searchData = "";
-    if (this.state.filterState) {
-      searchData += searchData ? "&&" : "";
-      searchData += "addresses.state=" + this.state.filterState.id;
-    }
     if (this.state.filterDistrict) {
       searchData += searchData ? "&&" : "";
       searchData += "addresses.district=" + this.state.filterDistrict.id;
@@ -470,8 +445,6 @@ export class Members extends React.Component {
 
   render() {
     const { classes } = this.props;
-    let statesFilter = this.state.getState;
-    let filterState = this.state.filterState;
     let districtsFilter = this.state.getDistrict;
     let filterDistrict = this.state.filterDistrict;
     let villagesFilter = this.state.getVillage;
@@ -479,15 +452,6 @@ export class Members extends React.Component {
     let shgFilter = this.state.getShg;
     let filterShg = this.state.filterShg;
     let filters = this.state.values;
-
-    let addStates = [];
-    map(filterState, (state, key) => {
-      addStates.push(
-        statesFilter.findIndex(function (item, i) {
-          return item.id === state;
-        })
-      );
-    });
     let addDistricts = [];
     map(filterDistrict, (district, key) => {
       addDistricts.push(
@@ -511,12 +475,6 @@ export class Members extends React.Component {
         name: "Name",
         selector: "name",
         sortable: true,
-      },
-      {
-        name: "State",
-        selector: "stateName",
-        sortable: true,
-        cell: (row) => (row.stateName ? row.stateName : "-"),
       },
       {
         name: "Certificate No.",
@@ -622,36 +580,6 @@ export class Members extends React.Component {
               className={classes.row}
               style={{ flexWrap: "wrap", height: "auto" }}
             >
-              <div className={classes.searchInput}>
-                <div className={style.Districts}>
-                  <Grid item md={12} xs={12}>
-                    <Autocomplete
-                      id="combo-box-demo"
-                      options={statesFilter}
-                      getOptionLabel={(option) => option.name}
-                      onChange={(event, value) => {
-                        this.handleStateChange(event, value);
-                      }}
-                      value={
-                        filterState
-                          ? this.state.isCancel === true
-                            ? null
-                            : filterState
-                          : null
-                      }
-                      renderInput={(params) => (
-                        <Input
-                          {...params}
-                          fullWidth
-                          label="Select State"
-                          name="addState"
-                          variant="outlined"
-                        />
-                      )}
-                    />
-                  </Grid>
-                </div>
-              </div>
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>

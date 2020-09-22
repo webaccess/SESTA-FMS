@@ -2,6 +2,22 @@
   "routes": [
     {
       "method": "GET",
+      "path": "/loan-applications/loans/details",
+      "handler": "loan-application.getLoanDetails",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/loan-applications/loans/count",
+      "handler": "loan-application.getLoansCount",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
       "path": "/loan-applications",
       "handler": "loan-application.find",
       "config": {

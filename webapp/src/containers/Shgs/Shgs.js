@@ -12,6 +12,7 @@ import Input from "../../components/UI/Input/Input";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Layout from "../../hoc/Layout/Layout";
 import style from "./Shgs.module.css";
+import * as constants from "../../constants/Constants";
 
 const useStyles = (theme) => ({
   root: {},
@@ -54,7 +55,6 @@ export class Shgs extends React.Component {
     super(props);
 
     this.state = {
-      filterState: "",
       filterDistrict: "",
       filterVillage: "",
       filterShg: "",
@@ -65,7 +65,6 @@ export class Shgs extends React.Component {
       open: false,
       columnsvalue: [],
       DeleteData: false,
-      getState: [],
       getDistrict: [],
       getVillage: [],
       isCancel: false,
@@ -77,6 +76,7 @@ export class Shgs extends React.Component {
       loggedInUserRole: auth.getUserInfo().role.name,
       isLoader: true,
       individualContact: [],
+      stateId: constants.STATE_ID,
     };
   }
 
@@ -101,33 +101,24 @@ export class Shgs extends React.Component {
         });
     }
 
-    //api call for states filter
+    //api call for districts filter
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true"
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/districts/?_sort=name:ASC&&is_active=true&&state.id=" +
+          this.state.stateId
       )
       .then((res) => {
-        this.setState({ getState: res.data });
+        this.setState({ getDistrict: res.data });
       })
       .catch((error) => {
         console.log(error);
       });
 
-    //api call for village filter
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/villages/"
-      )
-      .then((res) => {
-        this.setState({ getVillage: res.data });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
-      serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/?_sort=id:ASC&&contact_type=individual"
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/contact/?_sort=id:ASC&&contact_type=individual"
       )
       .then((res) => {
         this.setState({ individualContact: res.data });
@@ -146,38 +137,6 @@ export class Shgs extends React.Component {
       });
   };
 
-  handleStateChange = async (event, value) => {
-    if (value !== null) {
-      this.setState({
-        filterState: value,
-        isCancel: false,
-        filterDistrict: "",
-        filterVillage: "",
-      });
-
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/?is_active=true&&state.id=" +
-            value.id
-        )
-        .then((res) => {
-          this.setState({ getDistrict: res.data });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else {
-      this.setState({
-        filterState: "",
-        filterDistrict: "",
-        filterVillage: "",
-        getVillage: "",
-      });
-      this.componentDidMount();
-    }
-  };
-
   handleChange(event) {
     this.setState({ [event.target.name]: event.target.value });
   }
@@ -192,10 +151,12 @@ export class Shgs extends React.Component {
       let distId = value.id;
       serviceProvider
         .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/districts/" + distId
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/villages/?_sort=name:ASC&&is_active=true&&district.id=" +
+            distId
         )
         .then((res) => {
-          this.setState({ getVillage: res.data.villages });
+          this.setState({ getVillage: res.data });
         })
         .catch((error) => {
           console.log(error);
@@ -204,6 +165,7 @@ export class Shgs extends React.Component {
       this.setState({
         filterDistrict: "",
         filterVillage: "",
+        getVillage: [],
       });
       this.componentDidMount();
     }
@@ -234,12 +196,15 @@ export class Shgs extends React.Component {
       this.state.individualContact.find((cd) => {
         if (cd.individual.shg !== null) {
           if (cd.individual.shg === parseInt(cellid)) {
-            this.state.data.map(shgdata => {
+            this.state.data.map((shgdata) => {
               if (cellid === shgdata.id) {
-                this.setState({ shgInUseSingleDelete: true, deleteShgName: shgdata.name });
+                this.setState({
+                  shgInUseSingleDelete: true,
+                  deleteShgName: shgdata.name,
+                });
                 shgInUseSingleDelete = true;
               }
-            })
+            });
           }
         }
       });
@@ -285,10 +250,10 @@ export class Shgs extends React.Component {
         if (cd.individual.shg !== null) {
           for (let i in selectedId) {
             if (parseInt(selectedId[i]) === cd.individual.shg) {
-              shgInUse.push(selectedId[i])
+              shgInUse.push(selectedId[i]);
               this.setState({ shgInUseDeleteAll: true });
             }
-            shgInUse = [...new Set(shgInUse)]
+            shgInUse = [...new Set(shgInUse)];
           }
         }
       });
@@ -339,9 +304,6 @@ export class Shgs extends React.Component {
     if (this.state.filterVo) {
       searchData +=
         "organization.vos[0].name_contains=" + this.state.filterVo + "&&";
-    }
-    if (this.state.filterState) {
-      searchData += "addresses.state.id=" + this.state.filterState.id + "&&";
     }
     if (this.state.filterDistrict) {
       searchData +=
@@ -411,12 +373,6 @@ export class Shgs extends React.Component {
         name: "Name of the Group",
         selector: "name",
         sortable: true,
-      },
-      {
-        name: "State",
-        selector: "stateName",
-        sortable: true,
-        cell: (row) => (row.stateName ? row.stateName : "-"),
       },
       {
         name: "District",
@@ -510,7 +466,8 @@ export class Shgs extends React.Component {
               An error occured - Please try again!
             </Snackbar>
           ) : null}
-          {this.state.multipleDelete === true && this.state.shgInUseDeleteAll !== true? (
+          {this.state.multipleDelete === true &&
+          this.state.shgInUseDeleteAll !== true ? (
             <Snackbar severity="success" Showbutton={false}>
               SHGs deleted successfully!
             </Snackbar>
@@ -521,15 +478,15 @@ export class Shgs extends React.Component {
             </Snackbar>
           ) : null}
           {this.state.shgInUseSingleDelete === true ? (
-              <Snackbar severity="info" Showbutton={false}>
-                SHG {this.state.deleteShgName} is in use, it can not be Deleted.
-              </Snackbar>
-            ) : null}
-            {this.state.shgInUseDeleteAll === true ? (
-              <Snackbar severity="info" Showbutton={false}>
-                Some Village is in use hence it can not be Deleted.
-              </Snackbar>
-            ) : null}
+            <Snackbar severity="info" Showbutton={false}>
+              SHG {this.state.deleteShgName} is in use, it can not be Deleted.
+            </Snackbar>
+          ) : null}
+          {this.state.shgInUseDeleteAll === true ? (
+            <Snackbar severity="info" Showbutton={false}>
+              Some Village is in use hence it can not be Deleted.
+            </Snackbar>
+          ) : null}
           <div
             className={classes.row}
             style={{ flexWrap: "wrap", height: "auto" }}
@@ -565,36 +522,6 @@ export class Shgs extends React.Component {
                 </Grid>
               </div>
             </div> */}
-            <div className={classes.searchInput}>
-              <div className={style.Districts}>
-                <Grid item md={12} xs={12}>
-                  <Autocomplete
-                    id="combo-box-demo"
-                    options={statesFilter}
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, value) => {
-                      this.handleStateChange(event, value);
-                    }}
-                    value={
-                      filterState
-                        ? this.state.isCancel === true
-                          ? null
-                          : filterState
-                        : null
-                    }
-                    renderInput={(params) => (
-                      <Input
-                        {...params}
-                        fullWidth
-                        label="Select State"
-                        name="addState"
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                </Grid>
-              </div>
-            </div>
             <div className={classes.searchInput}>
               <div className={style.Districts}>
                 <Grid item md={12} xs={12}>
