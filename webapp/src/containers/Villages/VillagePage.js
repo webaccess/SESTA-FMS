@@ -148,6 +148,7 @@ class VillagePage extends Component {
       this.setState({
         values: { ...this.state.values, addState: value.id },
       });
+
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
@@ -251,15 +252,21 @@ class VillagePage extends Component {
         .catch((error) => {
           this.setState({ formSubmitted: false });
           if (error.response !== undefined) {
-            this.setState({
-              errorCode:
-                error.response.data.statusCode +
-                " Error- " +
-                error.response.data.error +
-                " Message- " +
-                error.response.data.message +
-                " Please try again!",
-            });
+            if (error.response.data.error == "Bad Request")
+              this.setState({
+                errorCode:
+                  "Error while trying to save village. Please try again!",
+              });
+            else
+              this.setState({
+                errorCode:
+                  error.response.data.statusCode +
+                  " Error- " +
+                  error.response.data.error +
+                  " Message- " +
+                  error.response.data.message +
+                  " Please try again!",
+              });
           } else {
             this.setState({ errorCode: "Network Error - Please try again!" });
           }
@@ -280,15 +287,21 @@ class VillagePage extends Component {
         .catch((error) => {
           this.setState({ formSubmitted: false });
           if (error.response !== undefined) {
-            this.setState({
-              errorCode:
-                error.response.data.statusCode +
-                " Error- " +
-                error.response.data.error +
-                " Message- " +
-                error.response.data.message +
-                " Please try again!",
-            });
+            if (error.response.data.error == "Bad Request")
+              this.setState({
+                errorCode:
+                  "Error while trying to save village. Please try again!",
+              });
+            else
+              this.setState({
+                errorCode:
+                  error.response.data.statusCode +
+                  " Error- " +
+                  error.response.data.error +
+                  " Message- " +
+                  error.response.data.message +
+                  " Please try again!",
+              });
           } else {
             this.setState({ errorCode: "Network Error - Please try again!" });
           }
