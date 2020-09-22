@@ -2,192 +2,423 @@
   "activitytypes": [
     {
       "name": "Loan application collection",
-      "is_active": true,
       "remuneration": 10,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": true,
+      "is_active": true
     },
     {
       "name": "Indent form filled up & deposit at FPO",
-      "is_active": true,
       "remuneration": 40,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Agriculture input generation",
-      "is_active": true,
       "remuneration": 20,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Data collection of SRI method/meeting",
-      "is_active": true,
       "remuneration": 5,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Training on SRI method : Seed sorting & seed treatment",
-      "is_active": true,
       "remuneration": 5,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Nursery preparation",
-      "is_active": true,
       "remuneration": 5,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Transplantation",
-      "is_active": true,
       "remuneration": 10,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
+    },
+    {
+      "name": "IPDM & Nutrient Management",
+      "remuneration": 10,
+      "notation": "Flat",
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Weeding",
-      "is_active": true,
       "remuneration": 5,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
+    },
+    {
+      "name": "SRI Yield data collection",
+      "remuneration": 40,
+      "notation": "Flat",
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Nursery Training : Structure making",
-      "is_active": true,
       "remuneration": 50,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Cutting/Grafting, Lyrering",
-      "is_active": true,
       "remuneration": 10,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Seed procurement and Delivery at farmer",
-      "is_active": true,
       "remuneration": 5,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Seedling procurement and Delivery at farmer",
-      "is_active": true,
       "remuneration": 0.5,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Agriculture Yield/production data collection",
-      "is_active": true,
       "remuneration": 0.1,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Vet care support : Vaccination",
-      "is_active": true,
       "remuneration": 5,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": true,
+      "is_active": true
     },
     {
       "name": "Bird Vaccination",
-      "is_active": true,
       "remuneration": 2,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Shed structure",
-      "is_active": true,
       "remuneration": 10,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Deworming",
-      "is_active": true,
       "remuneration": 5,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": true,
+      "is_active": true
     },
     {
       "name": "Disease Management",
-      "is_active": true,
       "remuneration": 5,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Monthly review meeting",
-      "is_active": true,
       "remuneration": 100,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Family based livelihhod planning",
-      "is_active": true,
       "remuneration": 100,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Insurance for livestock",
-      "is_active": true,
       "remuneration": 50,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Activity follow up (monthly)",
-      "is_active": true,
       "remuneration": 20,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Nutrition Management",
-      "is_active": true,
       "remuneration": 5,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Collection of principal amount",
-      "is_active": true,
       "remuneration": 2,
       "notation": "Percentage",
-      "autocreated": true
+      "autocreated": true,
+      "is_active": true
     },
     {
       "name": "Body weight calculation ( 2 months)",
-      "is_active": true,
       "remuneration": 2,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
     },
     {
       "name": "Interest collection",
-      "is_active": true,
       "remuneration": 5,
       "notation": "Percentage",
-      "autocreated": true
+      "autocreated": true,
+      "is_active": true
     },
     {
       "name": "VO meeting",
-      "is_active": true,
       "remuneration": 40,
       "notation": "Flat",
-      "autocreated": true
+      "autocreated": false,
+      "is_active": true
+    },
+    {
+      "name": "Grafts of crop 1",
+      "remuneration": 10,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Grafts of crop 2",
+      "remuneration": 10,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Cowdung compost",
+      "remuneration": 2,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Fencing",
+      "remuneration": 5,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Intercroping",
+      "remuneration": 10,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Turmeric and ginger",
+      "remuneration": 10,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Vegetable in trellis",
+      "remuneration": 10,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "STY construction",
+      "remuneration": 30,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Piglet purchase",
+      "remuneration": 15,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Clearing of bushes,layout",
+      "remuneration": 5,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Excavation of mix medium hard soil",
+      "remuneration": 5,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Pre peparation of pond",
+      "remuneration": 5,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Liming",
+      "remuneration": 5,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Cowdung",
+      "remuneration": 5,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Bleaching",
+      "remuneration": 5,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Manure",
+      "remuneration": 2,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Stocking of fingerlings",
+      "remuneration": 5,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Feed management",
+      "remuneration": 10,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Harvesting",
+      "remuneration": 5,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "1 HP motor",
+      "remuneration": 30,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Honda 5HP",
+      "remuneration": 30,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Land preparation",
+      "remuneration": 5,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Trichoderma application",
+      "remuneration": 5,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Planting materials",
+      "remuneration": 5,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Irrigationand fencing",
+      "remuneration": 10,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Purchase of Does",
+      "remuneration": 10,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Sty Construction",
+      "remuneration": 30,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Misc medicine",
+      "remuneration": 10,
+      "notation": "Flat",
+      "autocreated": true,
+      "is_active": true
+    },
+    {
+      "name": "Input distributed Seeds",
+      "remuneration": 0.1,
+      "notation": "Flat",
+      "autocreated": false,
+      "is_active": true
+    },
+    {
+      "name": "Input distributed Seedling",
+      "remuneration": 0.5,
+      "notation": "Flat",
+      "autocreated": false,
+      "is_active": true
+    },
+    {
+      "name": "Training",
+      "remuneration": 5,
+      "notation": "Flat",
+      "autocreated": false,
+      "is_active": true
     }
   ]
 }

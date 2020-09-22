@@ -67,19 +67,16 @@ export class Activitytypes extends React.Component {
       data: [],
       selectedid: 0,
       open: false,
-      isSetActive: false,
-      isSetInActive: false,
       isActiveAllShowing: false,
       columnsvalue: [],
       DeleteData: false,
-      properties: props,
       isCancel: false,
       dataCellId: [],
       singleDelete: "",
       multipleDelete: "",
-      active: {},
       allIsActive: [],
       isActTypePresent: false,
+      isLoader: true,
     };
   }
 
@@ -90,7 +87,7 @@ export class Activitytypes extends React.Component {
           "crm-plugin/activitytypes/?_sort=name:ASC"
       )
       .then((res) => {
-        this.setState({ data: res.data });
+        this.setState({ data: res.data, isLoader: false });
       })
       .catch((error) => {
         console.log(error);
@@ -123,6 +120,7 @@ export class Activitytypes extends React.Component {
   };
 
   handleSearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.values.filterActivitytype) {
       searchData += "name_contains=" + this.state.values.filterActivitytype;
@@ -135,10 +133,10 @@ export class Activitytypes extends React.Component {
           "&&_sort=name:ASC"
       )
       .then((res) => {
-        this.setState({ data: this.getData(res.data) });
+        this.setState({ data: this.getData(res.data), isLoader: false });
       })
       .catch((err) => {
-        console.log("err", err);
+        console.log(err);
       });
   }
 
@@ -153,6 +151,7 @@ export class Activitytypes extends React.Component {
       formSubmitted: "",
       stateSelected: false,
       isCancel: true,
+      isLoader: true,
     });
     this.componentDidMount();
   };
@@ -436,6 +435,7 @@ export class Activitytypes extends React.Component {
                 columnsvalue={columnsvalue}
                 selectableRows
                 pagination
+                progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
             ) : (
@@ -456,8 +456,8 @@ export class Activitytypes extends React.Component {
               }}
             >
               {this.state.IsActive
-                ? " Do you want to activate selected activity type ?"
-                : " Do you want to deactivate selected activity type ?"}
+                ? "Do you want to activate selected activity type ?"
+                : "Do you want to deactivate selected activity type ?"}
             </Modal>
           </div>
         </Grid>

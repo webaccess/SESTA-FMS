@@ -12,24 +12,17 @@ const { sanitizeEntity } = require("strapi-utils"); // removes private fields an
 
 module.exports = {
   printPDF: async (ctx) => {
-    console.log("id", ctx.params.id);
     let idVal = ctx.params.id;
     try {
-      console.log("services", strapi.services);
       const application = await strapi.controllers[
         "loan-application"
       ].pdfGenFindOne(ctx);
-      // await strapi.services["loan-application"].findOne({
-      //   id: idVal,
-      // });
-      console.log("application", application);
       var content = fs.readFileSync(
         path.resolve(__dirname, "../../../assets/files/Loan-Application.html"),
         "utf-8"
       );
 
       let shg_name = application.shg.name ? application.shg.name : "";
-      // let shg_name = application.shg.name ? application.shg.name : "";
       let shg_bank = application.shg.bankdetail
         ? application.shg.bankdetail.bank_name
         : "";
@@ -64,7 +57,6 @@ module.exports = {
       let loant_amt = application.loan_model.loan_amount
         .toFixed(2)
         .replace(/(\d)(?=(\d{2})+\d\.)/g, "$1,");
-
       let fpo_name = application.fpo.organization.name
         ? application.fpo.organization.name
         : "";
@@ -74,26 +66,26 @@ module.exports = {
           vo_name = application.shg.organization.vos[0].name;
       }
       let shg_village = "__________";
-      if (application.shg.villages) {
-        if (application.shg.villages.length > 0)
-          shg_village = application.shg.villages[0].name;
+      if (application.shg_village) {
+        //if (application.shg_village.length > 0)
+        shg_village = application.shg_village.name;
       }
       let fpo_addr = "";
-      let address_1 = application.fpo.address_1
-        ? application.fpo.address_1
+      let address_1 = application.fpo_add.address_line_1
+        ? application.fpo_add.address_line_1
         : "";
-      let address_2 = application.fpo.address_2
-        ? "," + application.fpo.address_2
+      let address_2 = application.fpo_add.address_line_2
+        ? "," + application.fpo_add.address_line_2
         : "";
-      let city = application.fpo.city ? "," + application.fpo.city : "";
-      let district_name = application.fpo.district.name
-        ? "," + application.fpo.district.name
+      let city = application.fpo_add.city ? "," + application.fpo_add.city : "";
+      let district_name = application.fpo_add.district
+        ? "," + application.fpo_district.name
         : "";
-      let state_name = application.fpo.state.name
-        ? "," + application.fpo.state.name
+      let state_name = application.fpo_add.state
+        ? "," + application.fpo_state.name
         : "";
-      let pincode = application.fpo.pincode
-        ? "," + application.fpo.pincode
+      let pincode = application.fpo_add.pincode
+        ? "," + application.fpo_add.pincode
         : "";
       fpo_addr =
         address_1 + address_2 + city + district_name + state_name + pincode;
@@ -151,7 +143,6 @@ module.exports = {
         id: entity["individual"].shg.id,
       });
       entity["shg"] = shg;
-      console.log("shg", shg);
 
       if (entity["shg"]["organization"]["bankdetail"]) {
         entity["shg"]["bankdetail"] = await strapi.query("bankdetail").findOne({
@@ -166,12 +157,28 @@ module.exports = {
           id: entity["shg"]["organization"]["id"],
         });
 
-      // }
-      console.log("final shg", entity["shg"]);
+      if (entity.shg.addresses.length > 0) {
+        entity.shg_village = await strapi
+          .query("village", "crm-plugin")
+          .findOne({
+            id: entity.shg.addresses[0].village,
+          });
+      }
       if (entity.loan_model.fpo) {
         entity.fpo = await strapi.query("contact", "crm-plugin").findOne({
           id: entity.loan_model.fpo,
         });
+      }
+      if (entity.fpo.addresses.length > 0) {
+        entity.fpo_add = entity.fpo.addresses[0];
+        entity.fpo_state = await strapi.query("state", "crm-plugin").findOne({
+          id: entity.fpo_add.state,
+        });
+        entity.fpo_district = await strapi
+          .query("district", "crm-plugin")
+          .findOne({
+            id: entity.fpo_add.district,
+          });
       }
     }
     // }

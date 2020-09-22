@@ -37,31 +37,6 @@ const roles = {
     grantAllPermissions: false
   },*/
 
-  "SHG Member": {
-    content: {
-      description: "SHG Member user",
-      type: "",
-    },
-    controllers: [
-      // {
-      //   name: "user",
-      //   action: ["update"],
-      // },
-      {
-        name: "module",
-        action: ["find", "count", "findone"],
-      },
-      // {
-      //   name: "bankdetail",
-      //   action: ["find", "count", "findone", "create", "update", "delete"],
-      // },
-      // {
-      //   name: "shareinformation",
-      //   action: ["find", "count", "findone", "create", "update", "delete"],
-      // },
-    ],
-    grantAllPermissions: false,
-  },
   "FPO Admin": {
     content: {
       description: "FPO admin user",
@@ -564,6 +539,21 @@ const modules = {
     icon_class: "",
     url: "/loans/update/:id",
     slug: "update_loan_task",
+    displayNavigation: false,
+    module: "", //slug
+    order: 21,
+    roles: [
+      "FPO Admin",
+      "Sesta Admin",
+      "Superadmin",
+      "CSP (Community Service Provider)",
+    ],
+  },
+  "Add Loan Task": {
+    is_active: true,
+    icon_class: "",
+    url: "/loan/task/add/",
+    slug: "add_loan_task",
     displayNavigation: false,
     module: "", //slug
     order: 21,

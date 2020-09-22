@@ -76,6 +76,7 @@ export class States extends React.Component {
       multipleDelete: "",
       active: {},
       allIsActive: [],
+      isLoader: true,
     };
     this.snackbar = React.createRef();
   }
@@ -86,7 +87,7 @@ export class States extends React.Component {
         process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?_sort=name:ASC"
       )
       .then((res) => {
-        this.setState({ data: res.data });
+        this.setState({ data: res.data, isLoader: false });
       });
 
     serviceProvider
@@ -116,6 +117,7 @@ export class States extends React.Component {
   }
 
   handleSearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.values.FilterState) {
       searchData += "name_contains=" + this.state.values.FilterState;
@@ -123,12 +125,12 @@ export class States extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/states/?" +
-        searchData +
-        "&&_sort=name:ASC"
+          "crm-plugin/states/?" +
+          searchData +
+          "&&_sort=name:ASC"
       )
       .then((res) => {
-        this.setState({ data: this.getData(res.data) });
+        this.setState({ data: this.getData(res.data), isLoader: false });
       })
       .catch((err) => {
         console.log(err);
@@ -146,6 +148,7 @@ export class States extends React.Component {
       formSubmitted: "",
       stateSelected: false,
       isCancel: true,
+      isLoader: true,
     });
     this.componentDidMount();
   };
@@ -191,66 +194,6 @@ export class States extends React.Component {
     }
   };
 
-  ActiveAll = (selectedId, selected) => {
-    if (selectedId.length !== 0) {
-      let numberOfIsActive = [];
-      for (let i in selected) {
-        numberOfIsActive.push(selected[i]["is_active"]);
-      }
-      this.setState({ allIsActive: numberOfIsActive });
-      let IsActive = "";
-      numberOfIsActive.forEach((element, index) => {
-        if (numberOfIsActive[index] === true) {
-          IsActive = false;
-        } else {
-          IsActive = true;
-        }
-
-        let setActiveId = selectedId[index];
-        serviceProvider
-          .serviceProviderForPutRequest(
-            process.env.REACT_APP_SERVER_URL + "crm-plugin/states",
-            setActiveId,
-            {
-              is_active: IsActive,
-            }
-          )
-          .then((res) => {
-            this.setState({ formSubmitted: true });
-            this.componentDidMount({ updateData: true });
-            this.props.history.push({
-              pathname: "/states",
-              updateData: true,
-            });
-            this.clearSelected(selected);
-          })
-          .catch((error) => {
-            this.setState({ formSubmitted: false });
-            if (error.response !== undefined) {
-              this.setState({
-                errorCode:
-                  error.response.data.statusCode +
-                  " Error- " +
-                  error.response.data.error +
-                  " Message- " +
-                  error.response.data.message +
-                  " Please try again!",
-              });
-            } else {
-              this.setState({
-                errorCode: "Network Error - Please try again!",
-              });
-            }
-            console.log(error);
-          });
-      });
-    }
-  };
-
-  clearSelected = (selected) => {
-    let clearselected = "";
-  };
-
   confirmActive = (event) => {
     if (this.state.stateInUse === true) {
       this.setState({ stateInUse: "" });
@@ -269,14 +212,14 @@ export class States extends React.Component {
     let setActiveId = this.state.setActiveId;
     let IsActive = this.state.IsActive;
     let stateInUse = false;
-    this.state.contacts.find(cd => {
+    this.state.contacts.find((cd) => {
       if (cd.state != null) {
         if (cd.state.id === parseInt(setActiveId)) {
-          this.setState({ stateInUse: true })
+          this.setState({ stateInUse: true });
           stateInUse = true;
         }
       }
-    })
+    });
     if (!stateInUse) {
       serviceProvider
         .serviceProviderForPutRequest(
@@ -291,7 +234,10 @@ export class States extends React.Component {
           this.setState({ open: true });
           this.componentDidMount({ updateData: true });
           this.props.history.push({ pathname: "/states", updateData: true });
-          if (this.props.location.updateData && this.snackbar.current !== null) {
+          if (
+            this.props.location.updateData &&
+            this.snackbar.current !== null
+          ) {
             this.snackbar.current.handleClick();
           }
         })
@@ -364,8 +310,7 @@ export class States extends React.Component {
           <div className="App">
             <h5 className={classes.menuName}>MASTERS</h5>
             <div className={style.headerWrap}>
-              <h2 className={style.title}>
-                Manage States</h2>
+              <h2 className={style.title}>Manage States</h2>
               <div className={classes.buttonRow}>
                 <Button variant="contained" component={Link} to="/states/add">
                   Add State
@@ -389,12 +334,12 @@ export class States extends React.Component {
               </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
-              this.state.singleDelete !== "" &&
-              this.state.singleDelete ? (
-                <Snackbar severity="success" Showbutton={false}>
-                  State {this.state.singleDelete} deleted successfully!
-                </Snackbar>
-              ) : null}
+            this.state.singleDelete !== "" &&
+            this.state.singleDelete ? (
+              <Snackbar severity="success" Showbutton={false}>
+                State {this.state.singleDelete} deleted successfully!
+              </Snackbar>
+            ) : null}
             {this.state.singleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
@@ -415,7 +360,10 @@ export class States extends React.Component {
                 State is in use, it can not be Deactivated!!
               </Snackbar>
             ) : null}
-            <div className={classes.row} style={{ flexWrap: "wrap", height: "auto", }}>
+            <div
+              className={classes.row}
+              style={{ flexWrap: "wrap", height: "auto" }}
+            >
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -433,13 +381,18 @@ export class States extends React.Component {
                 </div>
               </div>
               <Button
-                style={{ marginRight: "5px", marginBottom: "8px", }}
-                onClick={this.handleSearch.bind(this)}>Search</Button>
+                style={{ marginRight: "5px", marginBottom: "8px" }}
+                onClick={this.handleSearch.bind(this)}
+              >
+                Search
+              </Button>
               <Button
-                style={{ marginBottom: "8px", }}
-                color="secondary" clicked={this.cancelForm}>
+                style={{ marginBottom: "8px" }}
+                color="secondary"
+                clicked={this.cancelForm}
+              >
                 Reset
-                </Button>
+              </Button>
             </div>
             {data ? (
               <Table
@@ -454,22 +407,21 @@ export class States extends React.Component {
                 column={Usercolumns}
                 editData={this.editData}
                 DeleteData={this.DeleteData}
-                clearSelected={this.clearSelected}
                 DeleteAll={this.DeleteAll}
                 handleActive={this.handleActive}
-                ActiveAll={this.ActiveAll}
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 selectableRows
                 pagination
+                progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
                 ActiveMessage={
                   "Are you Sure you want to Deactivate selected State"
                 }
               />
             ) : (
-                <h1>Loading...</h1>
-              )}
+              <h1>Loading...</h1>
+            )}
             <Modal
               className="modal"
               show={this.state.isActiveAllShowing}
@@ -485,8 +437,8 @@ export class States extends React.Component {
               }}
             >
               {this.state.IsActive
-                ? " Do you want to set selected Active ?"
-                : "Do you want to Deactivate selected State.?"}
+                ? "Do you want to activate selected state ?"
+                : "Do you want to deactivate selected state ?"}
             </Modal>
           </div>
         </Grid>

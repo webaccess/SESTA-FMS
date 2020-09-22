@@ -71,29 +71,42 @@ export class Members extends React.Component {
       filterShg: "",
       isCancel: false,
       DeleteData: false,
-      dataCellId: [],
+      datacellId: [],
       singleDelete: "",
       multipleDelete: "",
       loggedInUserRole: auth.getUserInfo().role.name,
       bankDetailsFound: true,
+      confirmSingleDelete: true,
+      confirmDelete: true,
+      singleDeleteName: "",
+      isLoader: true,
     };
   }
 
   async componentDidMount() {
-    this.getMembers();
+    this.getMembers("load", "");
 
     // get all SHGs
     let url =
       "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC";
     if (this.state.loggedInUserRole === "FPO Admin") {
-      url += "&creator_id=" + auth.getUserInfo().contact.id;
       serviceProvider
-        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
+        )
         .then((res) => {
-          this.setState({ getShg: res.data });
-        })
-        .catch((error) => {
-          console.log(error);
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/contact/shgs/?id=" +
+                res.data.fpo.id
+            )
+            .then((shgRes) => {
+              this.setState({ getShg: shgRes.data });
+            })
+            .catch((error) => {});
         });
     } else if (
       this.state.loggedInUserRole === "CSP (Community Service Provider)"
@@ -130,25 +143,59 @@ export class Members extends React.Component {
     }
   }
 
-  getMembers = () => {
-    let newDataArray = [];
-    let url = "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC";
+  getMembers = (param, searchData) => {
+    let url =
+      "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true";
     if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
-      url += "&creator_id=" + auth.getUserInfo().contact.id;
-    }
-    serviceProvider
-      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
-      .then((res) => {
-        res.data.map((e, i) => {
-          if (e.user === null) {
-            newDataArray.push(e); // add only those contacts having contact type=individual & users===null
-          }
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((res) => {
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/contact/" +
+                res.data.vo.id
+            )
+            .then((resp) => {
+              let shgList = [];
+              resp.data.org_vos.map((shg, i) => {
+                shgList.push(shg.contact);
+              });
+              let newUrl =
+                "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true&&";
+              shgList.map((shgId) => {
+                newUrl += "individual.shg_in=" + shgId + "&&";
+              });
+              if (param === "search") {
+                newUrl += searchData;
+              }
+              serviceProvider
+                .serviceProviderForGetRequest(
+                  process.env.REACT_APP_SERVER_URL + newUrl
+                )
+                .then((memResp) => {
+                  this.setState({ data: memResp.data, isLoader: false });
+                });
+            });
+        })
+        .catch((error) => {});
+    } else {
+      if (param === "search") {
+        url += "&&" + searchData;
+      }
+      serviceProvider
+        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .then((res) => {
+          this.setState({ data: res.data, isLoader: false });
+        })
+        .catch((error) => {
+          console.log(error);
         });
-        this.setState({ data: newDataArray });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    }
 
     //api call for states filter
     serviceProvider
@@ -165,18 +212,16 @@ export class Members extends React.Component {
 
   handleStateChange = async (event, value) => {
     if (value !== null) {
-      this.setState({ filterState: value });
-
       this.setState({
+        filterState: value,
         isCancel: false,
         filterDistrict: "",
       });
-      let stateId = value.id;
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId
+            value.id
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
@@ -195,8 +240,8 @@ export class Members extends React.Component {
 
   handleDistrictChange(event, value) {
     if (value !== null) {
-      this.setState({ filterDistrict: value });
       this.setState({
+        filterDistrict: value,
         isCancel: false,
         filterVillage: "",
       });
@@ -248,24 +293,26 @@ export class Members extends React.Component {
       filterVillage: "",
       filterShg: "",
       isCancel: true,
+      isLoader: true,
     });
 
     this.componentDidMount();
   };
 
   handleSearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.filterState) {
       searchData += searchData ? "&&" : "";
-      searchData += "state=" + this.state.filterState.id;
+      searchData += "addresses.state=" + this.state.filterState.id;
     }
     if (this.state.filterDistrict) {
       searchData += searchData ? "&&" : "";
-      searchData += "district=" + this.state.filterDistrict.id;
+      searchData += "addresses.district=" + this.state.filterDistrict.id;
     }
     if (this.state.filterVillage) {
       searchData += searchData ? "&&" : "";
-      searchData += "villages=" + this.state.filterVillage.id;
+      searchData += "addresses.village=" + this.state.filterVillage.id;
     }
     if (this.state.filterShg) {
       searchData += searchData ? "&&" : "";
@@ -276,54 +323,56 @@ export class Members extends React.Component {
       }
     }
 
-    //api call after search filter
-    let newDataArray = [];
-    let url = "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC";
-    if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
-      url += "&creator_id=" + auth.getUserInfo().contact.id;
-    }
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
-      )
-      .then((res) => {
-        res.data.map((e, i) => {
-          if (e.user === null) {
-            newDataArray.push(e);
-          }
-        });
-        this.setState({ data: newDataArray });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    this.getMembers("search", searchData);
   }
 
-  editData = (cellid) => {
-    this.props.history.push("/members/edit/" + cellid);
+  editData = (cellId) => {
+    this.props.history.push("/members/edit/" + cellId);
   };
 
-  DeleteData = async (cellid, selectedId) => {
-    if (cellid.length !== null && selectedId < 1) {
-      this.setState({ singleDelete: "", multipleDelete: "" });
+  DeleteData = async (cellId, selectedId) => {
+    if (cellId.length !== null && selectedId < 1) {
+      this.setState({
+        singleDelete: "",
+        multipleDelete: "",
+      });
+      if (this.state.confirmSingleDelete === false) {
+        this.setState({ confirmSingleDelete: true });
+      }
 
       serviceProvider
-        .serviceProviderForDeleteRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
-          cellid
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "loan-applications/?contact.id=" +
+            cellId
         )
-        .then((res) => {
-          if (res.data.shareinformation) {
-            this.deleteShareInfo(res.data.shareinformation.id);
+        .then((loanRes) => {
+          if (loanRes.data.length > 0) {
+            this.setState({
+              confirmSingleDelete: false,
+              singleDeleteName: loanRes.data[0].contact.name,
+            });
+          } else {
+            serviceProvider
+              .serviceProviderForDeleteRequest(
+                process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+                cellId
+              )
+              .then((res) => {
+                if (res.data.shareinformation) {
+                  this.deleteShareInfo(res.data.shareinformation.id);
+                }
+                this.setState({ singleDelete: res.data.name });
+                this.setState({ datacellId: "" });
+                this.componentDidMount();
+              })
+              .catch((error) => {
+                this.setState({ singleDelete: false });
+                console.log(error);
+              });
           }
-          this.setState({ singleDelete: res.data.name });
-          this.setState({ dataCellId: "" });
-          this.componentDidMount();
         })
-        .catch((error) => {
-          this.setState({ singleDelete: false });
-          console.log(error);
-        });
+        .catch((error) => {});
     }
   };
 
@@ -342,32 +391,48 @@ export class Members extends React.Component {
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-
       for (let i in selectedId) {
         serviceProvider
-          .serviceProviderForDeleteRequest(
-            process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
-            selectedId[i]
+          .serviceProviderForGetRequest(
+            process.env.REACT_APP_SERVER_URL +
+              "loan-applications/?contact.id=" +
+              selectedId[i]
           )
-          .then((res) => {
-            if (res.data.shareinformation) {
-              this.deleteShareInfo(res.data.shareinformation.id);
+          .then((loanRes) => {
+            if (loanRes.data.length > 0) {
+              this.setState({
+                confirmDelete: false,
+              });
+            } else {
+              serviceProvider
+                .serviceProviderForDeleteRequest(
+                  process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+                  selectedId[i]
+                )
+                .then((res) => {
+                  if (res.data.shareinformation) {
+                    this.deleteShareInfo(res.data.shareinformation.id);
+                  }
+                  this.setState({
+                    multipleDelete: true,
+                  });
+                  this.componentDidMount();
+                })
+                .catch((error) => {
+                  this.setState({ multipleDelete: false });
+                  console.log(error);
+                });
             }
-            this.setState({ multipleDelete: true });
-            this.componentDidMount();
           })
-          .catch((error) => {
-            this.setState({ multipleDelete: false });
-            console.log(error);
-          });
+          .catch((error) => {});
       }
     }
   };
 
-  viewData = (cellid) => {
+  viewData = (cellId) => {
     let memberData;
     this.state.data.map((memData) => {
-      if (cellid == memData.id) {
+      if (cellId == memData.id) {
         memberData = memData;
       }
     });
@@ -392,7 +457,7 @@ export class Members extends React.Component {
             let bankData = res.data;
             this.setState({ bankDetailsFound: true });
             if (bankData.length > 0) {
-              this.props.history.push("/loans/apply/" + cellid, memberData);
+              this.props.history.push("/loans/apply/" + cellId, memberData);
             } else {
               this.setState({ bankDetailsFound: false });
             }
@@ -441,21 +506,6 @@ export class Members extends React.Component {
     });
 
     let data = this.state.data;
-    data.map((memdata) => {
-      this.state.getShg.map((shg) => {
-        if (
-          this.state.loggedInUserRole === "CSP (Community Service Provider)"
-        ) {
-          if (memdata.individual.shg === shg.contact) {
-            memdata.shgName = shg.name;
-          }
-        } else {
-          if (memdata.individual.shg === shg.id) {
-            memdata.shgName = shg.name;
-          }
-        }
-      });
-    });
     const Usercolumns = [
       {
         name: "Name",
@@ -464,23 +514,38 @@ export class Members extends React.Component {
       },
       {
         name: "State",
+        selector: "stateName",
         sortable: true,
-        cell: (row) => (row.state ? row.state.name : "-"),
+        cell: (row) => (row.stateName ? row.stateName : "-"),
+      },
+      {
+        name: "Certificate No.",
+        sortable: true,
+        cell: (row) =>
+          row.shareinformation
+            ? row.shareinformation.certificate_no ||
+              row.shareinformation.certificate_no !== null
+              ? row.shareinformation.certificate_no
+              : "-"
+            : "-",
       },
       {
         name: "District",
+        selector: "districtName",
         sortable: true,
-        cell: (row) => (row.district ? row.district.name : "-"),
+        cell: (row) => (row.districtName ? row.districtName : "-"),
       },
       {
         name: "Village",
+        selector: "villageName",
         sortable: true,
-        cell: (row) => (row.villages[0] ? row.villages[0].name : "-"),
+        cell: (row) => (row.villageName ? row.villageName : "-"),
       },
       {
         name: "SHG Name",
         selector: "shgName",
         sortable: true,
+        cell: (row) => (row.shgName ? row.shgName : "-"),
       },
       {
         name: "Phone",
@@ -495,7 +560,6 @@ export class Members extends React.Component {
       selectors.push(Usercolumns[i]["selector"]);
     }
     let columnsvalue = selectors[0];
-
     return (
       <Layout>
         <Grid>
@@ -512,6 +576,17 @@ export class Members extends React.Component {
             {!this.state.bankDetailsFound ? (
               <Snackbar severity="info">
                 No bank details found for SHG of this member
+              </Snackbar>
+            ) : null}
+            {!this.state.confirmDelete ? (
+              <Snackbar severity="info">
+                Loan exists for some of the members hence can not be deleted.
+              </Snackbar>
+            ) : null}
+            {!this.state.confirmSingleDelete ? (
+              <Snackbar severity="info">
+                Loan exists for the member {this.state.singleDeleteName}, it can
+                not be deleted.
               </Snackbar>
             ) : null}
             {this.props.location.addData ? (
@@ -709,6 +784,7 @@ export class Members extends React.Component {
                   columnsvalue={columnsvalue}
                   selectableRows
                   pagination
+                  progressComponent={this.state.isLoader}
                   DeleteMessage={"Are you Sure you want to Delete"}
                 />
               ) : (

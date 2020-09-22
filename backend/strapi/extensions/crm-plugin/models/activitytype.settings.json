@@ -29,9 +29,9 @@
       "required": true
     },
     "contact": {
+      "via": "activitytypes",
       "plugin": "crm-plugin",
       "collection": "contact",
-      "via": "activitytypes",
       "dominant": true
     },
     "autocreated": {

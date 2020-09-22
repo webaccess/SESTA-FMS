@@ -59,14 +59,12 @@ export class Shgs extends React.Component {
       filterVillage: "",
       filterShg: "",
       filterVo: "",
-      Result: [],
-      TestData: [],
+      newData: [],
       data: [],
       selectedid: 0,
       open: false,
       columnsvalue: [],
       DeleteData: false,
-      properties: props,
       getState: [],
       getDistrict: [],
       getVillage: [],
@@ -74,23 +72,30 @@ export class Shgs extends React.Component {
       singleDelete: "",
       multipleDelete: "",
       loggedInUserRole: auth.getUserInfo().role.name,
+      isLoader: true,
     };
   }
 
   async componentDidMount() {
     let url =
       "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG&&_sort=name:ASC";
-    if (
-      this.state.loggedInUserRole === "FPO Admin" ||
-      this.state.loggedInUserRole === "CSP (Community Service Provider)"
-    ) {
-      url += "&&creator_id=" + auth.getUserInfo().contact.id;
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((res) => {
+          this.getShg(res, "laod", "");
+        });
+    } else {
+      serviceProvider
+        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .then((res) => {
+          this.setState({ data: res.data, isLoader: false });
+        });
     }
-    serviceProvider
-      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
-      .then((res) => {
-        this.setState({ data: res.data });
-      });
 
     //api call for states filter
     serviceProvider
@@ -117,21 +122,32 @@ export class Shgs extends React.Component {
       });
   }
 
+  getShg = (res, param, searchData) => {
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/contact/shgs/?id=" +
+          res.data.fpo.id
+      )
+      .then((shgRes) => {
+        this.setState({ data: shgRes.data, isLoader: false });
+      });
+  };
+
   handleStateChange = async (event, value) => {
     if (value !== null) {
-      this.setState({ filterState: value });
       this.setState({
+        filterState: value,
         isCancel: false,
         filterDistrict: "",
         filterVillage: "",
       });
 
-      let stateId = value.id;
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId
+            value.id
         )
         .then((res) => {
           this.setState({ getDistrict: res.data });
@@ -156,8 +172,11 @@ export class Shgs extends React.Component {
 
   handleDistrictChange(event, value) {
     if (value !== null) {
-      this.setState({ filterDistrict: value });
-      this.setState({ filterVillage: "" });
+      this.setState({
+        filterDistrict: value,
+        isCancel: false,
+        filterVillage: "",
+      });
       let distId = value.id;
       serviceProvider
         .serviceProviderForGetRequest(
@@ -261,13 +280,14 @@ export class Shgs extends React.Component {
       filterVillage: "",
       filterVo: "",
       filterShg: "",
-
+      isLoader: true,
       isCancel: true,
     });
     this.componentDidMount();
   };
 
   handleSearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.filterShg) {
       searchData += "name_contains=" + this.state.filterShg + "&&";
@@ -277,34 +297,67 @@ export class Shgs extends React.Component {
         "organization.vos[0].name_contains=" + this.state.filterVo + "&&";
     }
     if (this.state.filterState) {
-      searchData += "state.id=" + this.state.filterState.id + "&&";
+      searchData += "addresses.state.id=" + this.state.filterState.id + "&&";
     }
     if (this.state.filterDistrict) {
-      searchData += "district.id=" + this.state.filterDistrict.id + "&&";
+      searchData +=
+        "addresses.district.id=" + this.state.filterDistrict.id + "&&";
     }
     if (this.state.filterVillage) {
-      searchData += "villages.id=" + this.state.filterVillage.id;
+      searchData += "addresses.village.id=" + this.state.filterVillage.id;
     }
 
     //api call after search filter
     let url =
       "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG&&_sort=name:ASC";
-    if (
-      this.state.loggedInUserRole === "FPO Admin" ||
-      this.state.loggedInUserRole === "CSP (Community Service Provider)"
-    ) {
-      url += "&&creator_id=" + auth.getUserInfo().contact.id;
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((res) => {
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC&&organization.fpo=" +
+                res.data.fpo.id
+            )
+            .then((voRes) => {
+              let voList = [];
+              voRes.data.map((e) => {
+                voList.push(e.id);
+              });
+              let newUrl =
+                "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG&&_sort=name:ASC&&";
+              voList.map((voId) => {
+                newUrl += "organization.vos.id_in=" + voId + "&&";
+              });
+              serviceProvider
+                .serviceProviderForGetRequest(
+                  process.env.REACT_APP_SERVER_URL + newUrl + "&&" + searchData
+                )
+                .then((response) => {
+                  this.setState({ data: response.data, isLoader: false });
+                });
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
+        )
+        .then((res) => {
+          this.setState({ data: res.data, isLoader: false });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
-      )
-      .then((res) => {
-        this.setState({ data: res.data });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
   }
 
   render() {
@@ -317,24 +370,27 @@ export class Shgs extends React.Component {
       },
       {
         name: "State",
+        selector: "stateName",
         sortable: true,
-        cell: (row) => (row.state ? row.state.name : "-"),
+        cell: (row) => (row.stateName ? row.stateName : "-"),
       },
       {
         name: "District",
+        selector: "districtName",
         sortable: true,
-        cell: (row) => (row.district ? row.district.name : "-"),
+        cell: (row) => (row.districtName ? row.districtName : "-"),
       },
       {
         name: "Village",
+        selector: "villageName",
         sortable: true,
-        cell: (row) => (row.villages[0] ? row.villages[0].name : "-"),
+        cell: (row) => (row.villageName ? row.villageName : "-"),
       },
       {
         name: "Village Organization",
         sortable: true,
         cell: (row) =>
-          row.organization.vos[0] ? row.organization.vos[0].name : "-",
+          row.organization.vos.length > 0 ? row.organization.vos[0].name : "-",
       },
     ];
 
@@ -381,8 +437,7 @@ export class Shgs extends React.Component {
         <div className="App">
           <h5 className={classes.menuName}>MASTERS</h5>
           <div className={style.headerWrap}>
-            <h2 className={style.title}>
-              Manage Self Help Group</h2>
+            <h2 className={style.title}>Manage Self Help Group</h2>
             <div className={style.addButton}>
               <Button
                 color="primary"
@@ -421,7 +476,10 @@ export class Shgs extends React.Component {
               An error occured - Please try again!
             </Snackbar>
           ) : null}
-          <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
+          <div
+            className={classes.row}
+            style={{ flexWrap: "wrap", height: "auto" }}
+          >
             <div className={classes.searchInput}>
               <div className={style.Districts}>
                 <Grid item md={12} xs={12}>
@@ -548,11 +606,16 @@ export class Shgs extends React.Component {
             </div>
             <br></br>
             <Button
-                style={{ marginRight: "5px", marginBottom: "8px", }}
-                onClick={this.handleSearch.bind(this)}>Search</Button>
+              style={{ marginRight: "5px", marginBottom: "8px" }}
+              onClick={this.handleSearch.bind(this)}
+            >
+              Search
+            </Button>
             <Button
-                style={{marginBottom: "8px", }}
-                color="secondary" clicked={this.cancelForm}>
+              style={{ marginBottom: "8px" }}
+              color="secondary"
+              clicked={this.cancelForm}
+            >
               reset
             </Button>
           </div>
@@ -578,6 +641,7 @@ export class Shgs extends React.Component {
               columnsvalue={columnsvalue}
               selectableRows
               pagination
+              progressComponent={this.state.isLoader}
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (

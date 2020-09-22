@@ -97,6 +97,15 @@
           "principal": 906,
           "interest": 9
         }
+      ],
+      "loantasks": [
+        "Cowdung compost",
+        "Fencing",
+        "Intercroping",
+        "Turmeric and ginger",
+        "Vegetable in trellis",
+        "Grafts of crop 1",
+        "Grafts of crop 2"
       ]
     },
     {
@@ -166,6 +175,13 @@
           "principal": 878,
           "interest": 9
         }
+      ],
+      "loantasks": [
+        "Land preparation",
+        "Trichoderma application",
+        "Planting materials",
+        "Manure",
+        "Fencing"
       ]
     },
     {
@@ -235,6 +251,12 @@
           "principal": 878,
           "interest": 9
         }
+      ],
+      "loantasks": [
+        "STY construction",
+        "Piglet purchase",
+        "Vet care support : Vaccination",
+        "Feed management"
       ]
     },
     {
@@ -403,6 +425,16 @@
           "principal": 1208,
           "interest": 12
         }
+      ],
+      "loantasks": [
+        "Pre peparation of pond",
+        "Liming",
+        "Cowdung",
+        "Bleaching",
+        "Manure",
+        "Stocking of fingerlings",
+        "Feed management",
+        "Harvesting"
       ]
     },
     {
@@ -502,6 +534,10 @@
           "principal": 1450,
           "interest": 14
         }
+      ],
+      "loantasks": [
+        "Clearing of bushes,layout",
+        "Excavation of mix medium hard soil"
       ]
     },
     {
@@ -601,7 +637,8 @@
           "principal": 1932,
           "interest": 19
         }
-      ]
+      ],
+      "loantasks": ["Honda 5HP"]
     },
     {
       "product_name": "Motor pump",
@@ -670,7 +707,8 @@
           "principal": 616,
           "interest": 6
         }
-      ]
+      ],
+      "loantasks": ["1 HP motor"]
     },
     {
       "product_name": "Maize",
@@ -709,6 +747,13 @@
           "principal": 1025,
           "interest": 10
         }
+      ],
+      "loantasks": [
+        "Land preparation",
+        "Trichoderma application",
+        "Planting materials",
+        "Manure",
+        "Irrigationand fencing"
       ]
     },
     {
@@ -779,7 +824,13 @@
           "interest": 8
         }
       ],
-      "loantasks": ["Vet care support : Vaccination"]
+      "loantasks": [
+        "Purchase of Does",
+        "Sty Construction",
+        "Misc medicine",
+        "Vet care support : Vaccination",
+        "Deworming"
+      ]
     },
     {
       "product_name": "Ginger",
@@ -848,6 +899,13 @@
           "principal": 792,
           "interest": 8
         }
+      ],
+      "loantasks": [
+        "Land preparation",
+        "Trichoderma application",
+        "Planting materials",
+        "Manure",
+        "Fencing"
       ]
     }
   ]

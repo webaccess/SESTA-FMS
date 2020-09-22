@@ -19,6 +19,7 @@ import validateInput from "../../components/Validation/ValidateInput/ValidateInp
 import { ADD_PG_BREADCRUMBS, EDIT_PG_BREADCRUMBS } from "./config";
 import { Link } from "react-router-dom";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
+import Spinner from "../../components/Spinner/Spinner";
 
 class PgPage extends Component {
   constructor(props) {
@@ -41,11 +42,13 @@ class PgPage extends Component {
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
       ],
+      isLoader: "",
     };
   }
 
   async componentDidMount() {
     if (this.state.editPage[0]) {
+      this.setState({ isLoader: true });
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
@@ -65,11 +68,13 @@ class PgPage extends Component {
                 this.setState({
                   isPgPresent: true,
                   addIsActive: res.data[0].is_active,
+                  isLoader: false,
                 });
               } else {
                 this.setState({
                   isPgPresent: false,
                   addIsActive: res.data[0].is_active,
+                  isLoader: false,
                 });
               }
             })
@@ -79,6 +84,7 @@ class PgPage extends Component {
               addPg: res.data[0].name,
               addDescription: res.data[0].description,
             },
+            isLoader: false,
           });
         })
         .catch((error) => {
@@ -209,89 +215,95 @@ class PgPage extends Component {
           this.state.editPage[0] ? EDIT_PG_BREADCRUMBS : ADD_PG_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: "45rem" }}>
-          <form
-            autoComplete="off"
-            noValidate
-            onSubmit={this.handleSubmit}
-            method="post"
-          >
-            <CardHeader
-              title={
-                this.state.editPage[0]
-                  ? "Edit Producer Group"
-                  : "Add Producer Group"
-              }
-              subheader={
-                this.state.editPage[0]
-                  ? "You can edit Producer Group data here!"
-                  : "You can add new Producer Group data here!"
-              }
-            />
-            <Divider />
-            <CardContent>
-              <Grid container spacing={3}>
-                <Grid item md={12} xs={12}>
-                  {this.state.formSubmitted === false ? (
-                    <Snackbar severity="error" Showbutton={false}>
-                      {this.state.errorCode}
-                    </Snackbar>
-                  ) : null}
+        {!this.state.isLoader ? (
+          <Card style={{ maxWidth: "45rem" }}>
+            <form
+              autoComplete="off"
+              noValidate
+              onSubmit={this.handleSubmit}
+              method="post"
+            >
+              <CardHeader
+                title={
+                  this.state.editPage[0]
+                    ? "Edit Producer Group"
+                    : "Add Producer Group"
+                }
+                subheader={
+                  this.state.editPage[0]
+                    ? "You can edit Producer Group data here!"
+                    : "You can add new Producer Group data here!"
+                }
+              />
+              <Divider />
+              <CardContent>
+                <Grid container spacing={3}>
+                  <Grid item md={12} xs={12}>
+                    {this.state.formSubmitted === false ? (
+                      <Snackbar severity="error" Showbutton={false}>
+                        {this.state.errorCode}
+                      </Snackbar>
+                    ) : null}
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Producer Group Name*"
+                      name="addPg"
+                      error={this.hasError("addPg")}
+                      helperText={
+                        this.hasError("addPg")
+                          ? this.state.errors.addPg[0]
+                          : null
+                      }
+                      value={this.state.values.addPg || ""}
+                      onChange={this.handleChange.bind(this)}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={this.state.addIsActive}
+                          onChange={this.handleCheckBox}
+                          name="addIsActive"
+                          color="primary"
+                          disabled={this.state.isPgPresent ? true : false}
+                        />
+                      }
+                      label="Active"
+                    />
+                  </Grid>
+                  <Grid item md={12} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Description"
+                      name="addDescription"
+                      value={this.state.values.addDescription || ""}
+                      onChange={this.handleChange.bind(this)}
+                      variant="outlined"
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Producer Group Name*"
-                    name="addPg"
-                    error={this.hasError("addPg")}
-                    helperText={
-                      this.hasError("addPg") ? this.state.errors.addPg[0] : null
-                    }
-                    value={this.state.values.addPg || ""}
-                    onChange={this.handleChange.bind(this)}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={this.state.addIsActive}
-                        onChange={this.handleCheckBox}
-                        name="addIsActive"
-                        color="primary"
-                        disabled={this.state.isPgPresent ? true : false}
-                      />
-                    }
-                    label="Active"
-                  />
-                </Grid>
-                <Grid item md={12} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Description"
-                    name="addDescription"
-                    value={this.state.values.addDescription || ""}
-                    onChange={this.handleChange.bind(this)}
-                    variant="outlined"
-                  />
-                </Grid>
-              </Grid>
-            </CardContent>
-            <Divider />
-            <CardActions style={{ padding: "15px" }}>
-              <Button type="submit">Save</Button>
-              <Button
-                color="secondary"
-                clicked={this.cancelForm}
-                component={Link}
-                to="/Pgs"
-              >
-                cancel
-              </Button>
-            </CardActions>
-          </form>
-        </Card>
+              </CardContent>
+              <Divider />
+              <CardActions style={{ padding: "15px" }}>
+                <Button type="submit">Save</Button>
+                <Button
+                  color="secondary"
+                  clicked={this.cancelForm}
+                  component={Link}
+                  to="/Pgs"
+                >
+                  cancel
+                </Button>
+              </CardActions>
+            </form>
+          </Card>
+        ) : (
+          <Spinner />
+        )}
       </Layout>
     );
   }

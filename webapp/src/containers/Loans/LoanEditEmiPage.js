@@ -17,6 +17,7 @@ import * as serviceProvider from "../../api/Axios";
 import { map } from "lodash";
 import validateInput from "../../components/Validation/ValidateInput/ValidateInput";
 import auth from "../../components/Auth/Auth.js";
+import Spinner from "../../components/Spinner/Spinner";
 
 class LoanEditEmiPage extends Component {
   constructor(props) {
@@ -30,25 +31,37 @@ class LoanEditEmiPage extends Component {
       values: {},
       validations: {
         actual_payment_date: {
-          required: { value: "true", message: "Payment Date field is required" },
+          required: {
+            value: "true",
+            message: "Payment Date field is required",
+          },
         },
         actual_principal: {
-          required: { value: "true", message: "Principal Paid field is required" },
+          required: {
+            value: "true",
+            message: "Principal Paid field is required",
+          },
         },
         actual_interest: {
-          required: { value: "true", message: "Interest Paid field is required" },
+          required: {
+            value: "true",
+            message: "Interest Paid field is required",
+          },
         },
-        fine: {}
+        fine: {},
       },
       errors: {},
-    }
+      isLoader: true,
+    };
   }
 
   async componentDidMount() {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "loan-application-installments/?id=" + this.state.editPage[1] + "&&_sort=id:ASC"
+          "loan-application-installments/?id=" +
+          this.state.editPage[1] +
+          "&&_sort=id:ASC"
       )
       .then((res) => {
         this.setState({
@@ -58,8 +71,9 @@ class LoanEditEmiPage extends Component {
             actual_interest: res.data[0].actual_interest,
             fine: res.data[0].fine,
             expected_principal: res.data[0].expected_principal,
-            expected_interest: res.data[0].expected_interest
-          }
+            expected_interest: res.data[0].expected_interest,
+          },
+          isLoader: false,
         });
       })
       .catch((error) => {
@@ -119,9 +133,8 @@ class LoanEditEmiPage extends Component {
       actual_payment_date: actual_payment_date,
       actual_principal: actual_principal,
       actual_interest: actual_interest,
-      fine: fine
-    }
-
+      fine: fine,
+    };
     serviceProvider
       .serviceProviderForPutRequest(
         process.env.REACT_APP_SERVER_URL + "loan-application-installments",
@@ -130,16 +143,16 @@ class LoanEditEmiPage extends Component {
       )
       .then((res) => {
         let updateActivityFlag;
-        if (auth.getUserInfo().role.name === 'CSP (Community Service Provider)') {
-
+        if (
+          auth.getUserInfo().role.name === "CSP (Community Service Provider)"
+        ) {
           //get all activities
           serviceProvider
             .serviceProviderForGetRequest(
-              process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
+              process.env.REACT_APP_SERVER_URL + "crm-plugin/activities"
             )
             .then((resp) => {
-              resp.data.map(fdata => {
-
+              resp.data.map((fdata) => {
                 // Updated activity while updating loan emi by csp
                 if (fdata.loan_application_installment != null) {
                   if (fdata.loan_application_installment.id === loanEmiId) {
@@ -149,19 +162,20 @@ class LoanEditEmiPage extends Component {
                     fdata.unit = 1;
                     delete fdata.contacts;
                     fdata.contact = {
-                      id: auth.getUserInfo().contact.id
-                    }
+                      id: auth.getUserInfo().contact.id,
+                    };
 
                     serviceProvider
                       .serviceProviderForPutRequest(
-                        process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
+                        process.env.REACT_APP_SERVER_URL +
+                        "crm-plugin/activities",
                         fdata.id,
                         fdata
                       )
-                      .then((activityRes) => { });
+                      .then(() => {});
                   }
                 }
-              })
+              });
               if (!updateActivityFlag && resp.data.length !== 0) {
                 this.addActivity();
               }
@@ -169,37 +183,59 @@ class LoanEditEmiPage extends Component {
               if (resp.data.length == 0) {
                 this.addActivity();
               }
+            });
+          let loanApp = this.props.location.state.loanAppData;
+          let loanAppId = loanApp.id;
+          let loanStatus;
+          let lastEmi = loanApp.loan_app_installments.length - 1;
+          if (loanApp.loan_app_installments[lastEmi].id == loanEmiData.id && loanApp.loan_app_installments[lastEmi].actual_principal != null) {
+            loanStatus = {
+              status: "Completed"
+            }
+          } else {
+            loanStatus = {
+              status: "InProgress"
+            }
+          }
+
+          serviceProvider
+            .serviceProviderForPutRequest(process.env.REACT_APP_SERVER_URL + "loan-applications", loanAppId, loanStatus)
+            .then(() => { })
+            .catch(error => {
+              console.log('loanApp', error);
             })
         }
         let app_id = res.data.loan_application["id"];
         this.props.history.push("/loans/emi/" + app_id, {
           loanAppData: this.props.location.state.loanAppData,
-          loanEditEmiPage: true
+          loanEditEmiPage: true,
         });
-      })
-  }
+      });
+  };
 
   addActivity() {
     let loanEmiId = this.props.location.state.loanEmiData.id;
     let principalId, interestId;
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes"
       )
       .then((activityTypeResp) => {
-        activityTypeResp.data.map(type => {
+        activityTypeResp.data.map((type) => {
           if (type.name == "Collection of principal amount") {
             principalId = type.id;
           }
           if (type.name == "Interest collection") {
             interestId = type.id;
           }
-        })
+        });
 
         // add activity records while updating loan emi for the first time by csp
         let activities = [
           {
-            title: this.props.location.state.loanAppData.contact.name + ": Prinicipal paid",
+            title:
+              this.props.location.state.loanAppData.contact.name +
+              ": Prinicipal paid",
             start_datetime: this.state.values.actual_payment_date,
             end_datetime: this.state.values.actual_payment_date,
             unit: 1,
@@ -208,11 +244,13 @@ class LoanEditEmiPage extends Component {
               id: principalId,
             },
             loan_application_installment: {
-              id: loanEmiId
-            }
+              id: loanEmiId,
+            },
           },
           {
-            title: this.props.location.state.loanAppData.contact.name + ": Interest paid",
+            title:
+              this.props.location.state.loanAppData.contact.name +
+              ": Interest paid",
             start_datetime: this.state.values.actual_payment_date,
             end_datetime: this.state.values.actual_payment_date,
             unit: 1,
@@ -221,11 +259,11 @@ class LoanEditEmiPage extends Component {
               id: interestId,
             },
             loan_application_installment: {
-              id: loanEmiId
-            }
+              id: loanEmiId,
+            },
           },
         ];
-        activities.map(postdata => {
+        activities.map((postdata) => {
           serviceProvider
             .serviceProviderForPostRequest(
               process.env.REACT_APP_SERVER_URL + "crm-plugin/activities",
@@ -237,21 +275,22 @@ class LoanEditEmiPage extends Component {
               // add activityassingnees
               let activityassignee = {
                 contact: {
-                  id: auth.getUserInfo().contact.id
+                  id: auth.getUserInfo().contact.id,
                 },
                 activity: {
-                  id: cid
-                }
-              }
+                  id: cid,
+                },
+              };
               serviceProvider
                 .serviceProviderForPostRequest(
-                  process.env.REACT_APP_SERVER_URL + "crm-plugin/activityassignees",
+                  process.env.REACT_APP_SERVER_URL +
+                    "crm-plugin/activityassignees",
                   activityassignee
                 )
-                .then((assigneeResp) => { })
-            })
-        })
-      })
+                .then(() => {});
+            });
+        });
+      });
   }
 
   cancelForm = () => {
@@ -261,117 +300,127 @@ class LoanEditEmiPage extends Component {
       isCancel: true,
     });
     this.componentDidMount();
-    this.props.history.push(this.props.history.goBack(), { loanEmiData: this.state.loanEmiData });
+    this.props.history.push(this.props.history.goBack(), {
+      loanEmiData: this.state.loanEmiData,
+    });
     //routing code #route to loan_application_list page
   };
 
   render() {
     const { classes } = this.props;
     return (
-      <Layout
-        breadcrumbs={
-          EDIT_LOAN_EMI_BREADCRUMBS
-        }
-      >
-        <Card>
-          <form
-            autoComplete="off"
-            noValidate
-            onSubmit={this.handleSubmit}
-            method="post">
-            <CardHeader
-              title={"Edit Loan EMI"}
-              subheader={
-                "You can edit loan EMI here!"
-              }
-            />
-            <Divider />
+      <Layout breadcrumbs={EDIT_LOAN_EMI_BREADCRUMBS}>
+        {!this.state.isLoader ? (
+          <Card style={{ maxWidth: "45rem" }}>
+            <form
+              autoComplete="off"
+              noValidate
+              onSubmit={this.handleSubmit}
+              method="post"
+            >
+              <CardHeader
+                title={"Edit Loan EMI"}
+                subheader={"You can edit loan EMI here!"}
+              />
+              <Divider />
 
-            <CardContent>
-              <Grid container spacing={3}>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Principal Paid*"
-                    name="actual_principal"
-                    type="number"
-                    value={this.state.values.actual_principal ? this.state.values.actual_principal : this.state.values.expected_principal || ""}
-                    error={this.hasError("actual_principal")}
-                    helperText={
-                      this.hasError("actual_principal")
-                        ? this.state.errors.actual_principal[0]
-                        : null
-                    }
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
+              <CardContent>
+                <Grid container spacing={3}>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Principal Paid*"
+                      name="actual_principal"
+                      type="number"
+                      value={
+                        this.state.values.actual_principal
+                          ? this.state.values.actual_principal
+                          : this.state.values.expected_principal || ""
+                      }
+                      error={this.hasError("actual_principal")}
+                      helperText={
+                        this.hasError("actual_principal")
+                          ? this.state.errors.actual_principal[0]
+                          : null
+                      }
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Interest Paid*"
+                      name="actual_interest"
+                      type="number"
+                      value={
+                        this.state.values.actual_interest
+                          ? this.state.values.actual_interest
+                          : this.state.values.expected_interest || ""
+                      }
+                      error={this.hasError("actual_interest")}
+                      helperText={
+                        this.hasError("actual_interest")
+                          ? this.state.errors.actual_interest[0]
+                          : null
+                      }
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Datepicker
+                      label="Payment Date*"
+                      name="actual_payment_date"
+                      error={this.hasError("actual_payment_date")}
+                      helperText={
+                        this.hasError("actual_payment_date")
+                          ? this.state.errors.actual_payment_date[0]
+                          : null
+                      }
+                      value={this.state.values.actual_payment_date || ""}
+                      format={"dd MMM yyyy"}
+                      onChange={(value) =>
+                        this.setState({
+                          values: {
+                            ...this.state.values,
+                            actual_payment_date: value,
+                          },
+                        })
+                      }
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Fine"
+                      name="fine"
+                      value={this.state.values.fine || ""}
+                      type="number"
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Interest Paid*"
-                    name="actual_interest"
-                    type="number"
-                    value={this.state.values.actual_interest ? this.state.values.actual_interest : this.state.values.expected_interest || ""}
-                    error={this.hasError("actual_interest")}
-                    helperText={
-                      this.hasError("actual_interest")
-                        ? this.state.errors.actual_interest[0]
-                        : null
-                    }
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Datepicker
-                    label="Payment Date*"
-                    name="actual_payment_date"
-                    error={this.hasError("actual_payment_date")}
-                    helperText={
-                      this.hasError("actual_payment_date")
-                        ? this.state.errors.actual_payment_date[0]
-                        : null
-                    }
-                    value={this.state.values.actual_payment_date || ""}
-                    format={"dd MMM yyyy"}
-                    onChange={(value) =>
-                      this.setState({
-                        values: { ...this.state.values, actual_payment_date: value }
-                      })
-                    }
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Fine"
-                    name="fine"
-                    value={this.state.values.fine || ""}
-                    type="number"
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-
-              </Grid>
-            </CardContent>
-
-            <CardActions>
-              <Button type="submit">Save</Button>
-              <Button
-                color="secondary"
-                clicked={this.cancelForm}
-                component={Link}
-              >
-                cancel
-              </Button>
-            </CardActions>
-          </form>
-        </Card>
-
+              </CardContent>
+              <Divider />
+              <CardActions style={{ padding: "15px" }}>
+                <Button type="submit">Save</Button>
+                <Button
+                  color="secondary"
+                  clicked={this.cancelForm}
+                  component={Link}
+                >
+                  cancel
+                </Button>
+              </CardActions>
+            </form>
+          </Card>
+        ) : (
+          <Spinner />
+        )}
       </Layout>
-    )
+    );
   }
 }
 

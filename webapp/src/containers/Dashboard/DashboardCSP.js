@@ -48,7 +48,7 @@ const useStyles = (theme) => ({
   emiDue: {
     borderWidth: "1px 0px",
     borderStyle: "solid",
-    borderColor : "#ccc",
+    borderColor: "#ccc",
     backgroundColor: "#fff",
     marginTop: "-1px",
   },
@@ -63,6 +63,8 @@ class DashboardCSP extends Component {
       activitiesData: [],
       activitytypeData: [],
       remuneration: "",
+      isLoader: true,
+      isLoaderAct: true,
     };
   }
 
@@ -74,7 +76,7 @@ class DashboardCSP extends Component {
           "loan-application-installments?_sort=id:asc"
       )
       .then((res) => {
-        this.setState({ loanInstallmentData: res.data });
+        this.setState({ loanInstallmentData: res.data, isLoader: false });
       });
 
     serviceProvider
@@ -99,7 +101,7 @@ class DashboardCSP extends Component {
               filteredArray.push(e);
             });
         });
-        this.setState({ activitiesData: filteredArray });
+        this.setState({ activitiesData: filteredArray, isLoaderAct: false });
       })
       .catch((error) => {
         console.log(error);
@@ -116,23 +118,30 @@ class DashboardCSP extends Component {
 
   manageLoanEMIData(loanInstallmentData) {
     this.state.loanInstallmentData.map((ldata) => {
-      if (ldata.loan_application.creator_id == auth.getUserInfo().contact.id) {
-        if (ldata.actual_principal === null && ldata.actual_interest === null) {
-          this.state.loanData.map((ld) => {
-            // calculate pending loan amount
-            let pendingAmount =
-              ldata.expected_principal + ldata.expected_interest;
-            ldata.pendingAmount = pendingAmount;
+      if (ldata.loan_application !== null) {
+        if (
+          ldata.loan_application.creator_id == auth.getUserInfo().contact.id
+        ) {
+          if (
+            ldata.actual_principal === null &&
+            ldata.actual_interest === null
+          ) {
+            this.state.loanData.map((ld) => {
+              // calculate pending loan amount
+              let pendingAmount =
+                ldata.expected_principal + ldata.expected_interest;
+              ldata.pendingAmount = pendingAmount;
 
-            // get Member name and EMI
-            if (ld.id == ldata.loan_application.id) {
-              if (ld.contact) {
-                ldata.loan_application.memName = ld.contact.name;
-                ldata.emi = ld.loan_model.emi;
+              // get Member name and EMI
+              if (ld.id == ldata.loan_application.id) {
+                if (ld.contact) {
+                  ldata.loan_application.memName = ld.contact.name;
+                  ldata.emi = ld.loan_model.emi;
+                }
               }
-            }
-          });
-          loanInstallmentData.push(ldata);
+            });
+            loanInstallmentData.push(ldata);
+          }
         }
       }
     });
@@ -312,7 +321,13 @@ class DashboardCSP extends Component {
     return (
       <div className="App" style={{ paddingTop: "15px" }}>
         <Grid container style={{ border: "1px solid #ccc" }}>
-          <Grid item md={4} xs={12} spacing={3} style={{ backgroundColor: "#e5e9e3" }}>
+          <Grid
+            item
+            md={4}
+            xs={12}
+            spacing={3}
+            style={{ backgroundColor: "#e5e9e3" }}
+          >
             <div className={classes.remun}>
               <AccountBalanceWalletIcon className={classes.Icon} />
               <h3 className={classes.remunText}>REMUNERATION </h3>
@@ -373,6 +388,7 @@ class DashboardCSP extends Component {
                   editData={this.editData}
                   rowsSelected={this.rowsSelect}
                   columnsvalue={columnsvalue}
+                  progressComponent={this.state.isLoader}
                 />
               ) : (
                 <h1>Loading...</h1>
@@ -399,9 +415,9 @@ class DashboardCSP extends Component {
                     "activitytype.remuneration",
                   ]}
                   column={Usercolumns1}
-                  editData={this.editData}
                   rowsSelected={this.rowsSelect}
                   columnsvalue={columnsvalue1}
+                  progressComponent={this.state.isLoaderAct}
                 />
               ) : (
                 <h1>Loading...</h1>

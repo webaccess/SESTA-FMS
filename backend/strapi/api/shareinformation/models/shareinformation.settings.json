@@ -10,13 +10,13 @@
   },
   "attributes": {
     "contact": {
-      "via": "shareinformation",
       "plugin": "crm-plugin",
-      "model": "contact"
+      "model": "contact",
+      "via": "shareinformation"
     },
     "nominee_name": {
       "type": "string",
-      "required": true
+      "required": false
     },
     "no_share": {
       "type": "integer",
@@ -28,7 +28,7 @@
     },
     "certificate_no": {
       "type": "string",
-      "required": true
+      "required": false
     },
     "date": {
       "type": "date",

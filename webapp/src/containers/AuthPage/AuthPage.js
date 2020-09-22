@@ -59,6 +59,9 @@ class AuthPage extends PureComponent {
     ) {
       this.setState({ showSuccessMsg: true });
     }
+
+    if (props.match.params.authType == "verify-otp")
+      this.setState({ showSuccessMsg: true });
   };
 
   /**
@@ -147,6 +150,7 @@ class AuthPage extends PureComponent {
           this.props.history.push({
             pathname: "/verify-otp",
             state: {
+              otp: true,
               contact_number: this.state.value.contact_number,
             },
           });

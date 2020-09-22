@@ -10,6 +10,7 @@ import { VIEW_LOAN_EMI_BREADCRUMBS } from "./config";
 import Button from "../../components/UI/Button/Button";
 import { Link } from "react-router-dom";
 import style from "./Loans.module.css";
+import Spinner from "../../components/Spinner/Spinner";
 
 const useStyles = (theme) => ({
   Icon: {
@@ -52,7 +53,7 @@ const useStyles = (theme) => ({
   loaneeName: {
     margin: "10px 0",
     display: "inline-flex",
-  }
+  },
 });
 
 class LoanEmiViewPage extends Component {
@@ -60,7 +61,9 @@ class LoanEmiViewPage extends Component {
     super(props);
     this.state = {
       data: [],
+      newData: [],
       loanEmiData: [],
+      isLoader: true,
     };
   }
 
@@ -71,12 +74,28 @@ class LoanEmiViewPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "loan-application-installments/?loan_application.id=" +
-        memberData.id +
-        "&&_sort=payment_date:ASC"
+          "loan-application-installments/?loan_application.id=" +
+          memberData.id +
+          "&&_sort=payment_date:ASC"
       )
       .then((res) => {
-        this.setState({ loanEmiData: res.data });
+        this.setState({ loanEmiData: res.data, isLoader: false });
+      });
+  }
+
+  async getVillage(data) {
+    await serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/villages/" + data.village
+      )
+      .then((res) => {
+        this.setState({
+          newData: { ...this.state.newData, village: res.data.name },
+        });
+        this.setState({ data: this.state.newData });
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }
 
@@ -92,8 +111,8 @@ class LoanEmiViewPage extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/individuals/" +
-        memberData.contact.individual
+          "crm-plugin/individuals/" +
+          memberData.contact.individual
       )
       .then((res) => {
         let shgName = res.data.shg.name;
@@ -101,13 +120,13 @@ class LoanEmiViewPage extends Component {
         serviceProvider
           .serviceProviderForGetRequest(
             process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/?organization.id=" +
-            res.data.shg.organization
+              "crm-plugin/contact/?organization.id=" +
+              res.data.shg.organization
           )
           .then((response) => {
-            let villageName = response.data[0].villages[0].name;
+            let villageName = response.data[0].addresses[0].village;
             this.setState({
-              data: {
+              newData: {
                 loanee: loaneeName,
                 shg: shgName,
                 village: villageName,
@@ -120,22 +139,11 @@ class LoanEmiViewPage extends Component {
                   ? Moment(loanEndsOn).format("DD MMM YYYY")
                   : "-",
               },
+              isLoader: false,
             });
+            this.getVillage(this.state.newData);
           });
       });
-  };
-
-  editData = (cellid) => {
-    let loanEmiData;
-    this.state.loanEmiData.map((data) => {
-      if (data.id === cellid) {
-        loanEmiData = data;
-      }
-    });
-    this.props.history.push("/loan/emi/edit/" + cellid, {
-      loanEmiData: loanEmiData,
-      loanAppData: this.props.location.state.loanAppData,
-    });
   };
 
   render() {
@@ -275,135 +283,179 @@ class LoanEmiViewPage extends Component {
 
     return (
       <Layout breadcrumbs={VIEW_LOAN_EMI_BREADCRUMBS}>
-        <Grid>
-          <div className="App">
-            <h5 className={style.loan}>LOANS</h5>
+        {!this.state.isLoader ? (
+          <Grid>
+            <div className="App">
+              <h5 className={style.loan}>LOANS</h5>
 
-            <div className={classes.emiViewWrap}>
-              <h2 className={classes.loaneeName} style={{paddingRight: "4rem",}}>{data.loanee}</h2>
-              <div className={classes.dataRow} style={{paddingRight: "4rem",}}>
-                <p>
-                  SHG GROUP <b>{data.shg}</b>
-                </p>
-              </div>
+              <div className={classes.emiViewWrap}>
+                <h2
+                  className={classes.loaneeName}
+                  style={{ paddingRight: "4rem" }}
+                >
+                  {data.loanee}
+                </h2>
+                <div
+                  className={classes.dataRow}
+                  style={{ paddingRight: "4rem" }}
+                >
+                  <p>
+                    <span className={style.filterLabel}>SHG GROUP </span>
+                    <span className={style.filterValue}>{data.shg}</span>
+                  </p>
+                </div>
 
-              <div className={classes.dataRow}>
-                <p>
-                  VILLAGE <b>{data.village}</b>{" "}
-                </p>
+                <div className={classes.dataRow}>
+                  <p>
+                    <span className={style.filterLabel}>VILLAGE </span>
+                    <span className={style.filterValue}>{data.village}</span>
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <Card className={classes.mainContent}>
-            <Grid
-              container
-              style={{ alignItems: "center" }}
-            >
-              <Grid spacing={1} xs={2} sm={1} style={{maxWidth: "55px"}}>
-                <MoneyIcon className={classes.Icon} />
-              </Grid>
-              <Grid spacing={1} xs={10} sm={11} style={{maxWidth: "calc(100% - 55px)"}}>
-                <Grid container >
-                  <Grid spacing={2} md={2} xs={4}>
-                    <b>
-                      <div className={classes.member}>
-                        PURPOSE
-                        <br />
-                        <span className={classes.fieldValues}>
-                          {data.purpose}
-                        </span>
-                      </div>
-                    </b>
-                  </Grid>
-                  <Grid spacing={2} md={2} xs={4}>
-                    <b>
-                      <div className={classes.member}
-                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
-                        AMOUNT <br />
-                        <span className={classes.fieldValues}>
-                          ₹{data.amount}
-                        </span>
-                      </div>
-                    </b>
-                  </Grid>
-                  <Grid spacing={2} md={2} xs={4}>
-                    <b>
-                      <div className={classes.member}
-                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
-                        PENDING AMOUNT <br />
-                        <span className={classes.fieldValues}>
-                          {pendingAmount}
-                        </span>
-                      </div>
-                    </b>
-                  </Grid>
-                  <Grid spacing={2} md={2} xs={4}>
-                    <b>
-                      <div className={classes.member}
-                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
-                        EMI <br />
-                        <span className={classes.fieldValues}>{data.emi}</span>
-                      </div>
-                    </b>
-                  </Grid>
-                  <Grid spacing={2} md={2} xs={4}>
-                    <b>
-                      <div className={classes.member}
-                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
-                        DURATION <br />
-                        <span className={classes.fieldValues}>
-                          {data.duration}
-                        </span>
-                      </div>
-                    </b>
-                  </Grid>
-                  <Grid spacing={2} md={2} xs={4}>
-                    <b>
-                      <div className={classes.member}
-                        style={{borderLeft: "1px solid #c1c1c1", paddingLeft: "10px",}}>
-                        LOAN ENDS ON <br />
-                        <span className={classes.fieldValues}>
-                          {data.loanEndsOn}
-                        </span>
-                      </div>
-                    </b>
+            <Card className={classes.mainContent}>
+              <Grid container style={{ alignItems: "center" }}>
+                <Grid spacing={1} xs={2} sm={1} style={{ maxWidth: "55px" }}>
+                  <MoneyIcon className={classes.Icon} />
+                </Grid>
+                <Grid
+                  spacing={1}
+                  xs={10}
+                  sm={11}
+                  style={{ maxWidth: "calc(100% - 55px)" }}
+                >
+                  <Grid container>
+                    <Grid spacing={2} md={2} xs={4}>
+                      <b>
+                        <div className={classes.member}>
+                          PURPOSE
+                          <br />
+                          <span className={classes.fieldValues}>
+                            {data.purpose}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
+                    <Grid spacing={2} md={2} xs={4}>
+                      <b>
+                        <div
+                          className={classes.member}
+                          style={{
+                            borderLeft: "1px solid #c1c1c1",
+                            paddingLeft: "10px",
+                          }}
+                        >
+                          AMOUNT <br />
+                          <span className={classes.fieldValues}>
+                            ₹{data.amount}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
+                    <Grid spacing={2} md={2} xs={4}>
+                      <b>
+                        <div
+                          className={classes.member}
+                          style={{
+                            borderLeft: "1px solid #c1c1c1",
+                            paddingLeft: "10px",
+                          }}
+                        >
+                          PENDING AMOUNT <br />
+                          <span className={classes.fieldValues}>
+                            {pendingAmount}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
+                    <Grid spacing={2} md={2} xs={4}>
+                      <b>
+                        <div
+                          className={classes.member}
+                          style={{
+                            borderLeft: "1px solid #c1c1c1",
+                            paddingLeft: "10px",
+                          }}
+                        >
+                          EMI <br />
+                          <span className={classes.fieldValues}>
+                            {data.emi}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
+                    <Grid spacing={2} md={2} xs={4}>
+                      <b>
+                        <div
+                          className={classes.member}
+                          style={{
+                            borderLeft: "1px solid #c1c1c1",
+                            paddingLeft: "10px",
+                          }}
+                        >
+                          DURATION <br />
+                          <span className={classes.fieldValues}>
+                            {data.duration}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
+                    <Grid spacing={2} md={2} xs={4}>
+                      <b>
+                        <div
+                          className={classes.member}
+                          style={{
+                            borderLeft: "1px solid #c1c1c1",
+                            paddingLeft: "10px",
+                          }}
+                        >
+                          LOAN ENDS ON <br />
+                          <span className={classes.fieldValues}>
+                            {data.loanEndsOn}
+                          </span>
+                        </div>
+                      </b>
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
-            </Grid>
-          </Card>
-          {loanEmiData ? (
-            <Table
-              title={"ViewLoanEMI"}
-              data={loanEmiData}
-              showSearch={false}
-              filterData={false}
-              filterBy={[
-                "payment_date",
-                "expected_principal",
-                "expected_interest",
-                "actual_payment_date",
-                "actual_principal",
-                "actual_interest",
-                "fine",
-                "totalPaid",
-                "outstanding",
-              ]}
-              column={Usercolumns}
-              rowsSelected={this.rowsSelect}
-              columnsvalue={columnsvalue}
-                style ={{margin:"0px"}}
-            />
-          ) : (
+            </Card>
+            {loanEmiData ? (
+              <Table
+                title={"Loan EMI Detail"}
+                data={loanEmiData}
+                showSearch={false}
+                filterData={false}
+                filterBy={[
+                  "payment_date",
+                  "expected_principal",
+                  "expected_interest",
+                  "actual_payment_date",
+                  "actual_principal",
+                  "actual_interest",
+                  "fine",
+                  "totalPaid",
+                  "outstanding",
+                ]}
+                column={Usercolumns}
+                rowsSelected={this.rowsSelect}
+                columnsvalue={columnsvalue}
+                style={{ margin: "0px" }}
+                progressComponent={this.state.isLoader}
+              />
+            ) : (
               <h1>Loading...</h1>
             )}
-          <div style={{ padding: "15px" }}>
-            <Button color="primary" component={Link} to="/loans">
-              Done
+            <div className={style.footerLoanBtn}>
+              <Button color="primary" component={Link} to="/loans">
+                Done
               </Button>
-          </div>
-        </Grid>
+            </div>
+          </Grid>
+        ) : (
+          <Spinner />
+        )}
       </Layout>
     );
   }

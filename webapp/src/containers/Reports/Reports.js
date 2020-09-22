@@ -54,8 +54,14 @@ export class Reports extends React.Component {
                     pathname: "/summary-report",
                   }}
                 >
-                  <CardContent>CSP Summary Report</CardContent>
+                  <CardContent style={{ fontWeight: "bold" }}>
+                    CSP Summary Report
+                  </CardContent>
                 </CardActionArea>
+                <CardContent style={{ fontSize: "13px" }}>
+                  Summary of the activities carried out by Community Service
+                  Provider
+                </CardContent>
               </Card>
             </div>
           </Grid>
@@ -68,8 +74,14 @@ export class Reports extends React.Component {
                     pathname: "/activity-report",
                   }}
                 >
-                  <CardContent>CSP Activity Report</CardContent>
+                  <CardContent style={{ fontWeight: "bold" }}>
+                    CSP Activity Report
+                  </CardContent>
                 </CardActionArea>
+                <CardContent style={{ fontSize: "13px" }}>
+                  Detailed report of all activities carried out by Community
+                  Service Provider
+                </CardContent>
               </Card>
             </div>
           </Grid>

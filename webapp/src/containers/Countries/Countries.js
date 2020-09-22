@@ -63,8 +63,6 @@ export class Countries extends React.Component {
       data: [],
       selectedid: 0,
       open: false,
-      isSetActive: false,
-      isSetInActive: false,
       isActiveAllShowing: false,
       columnsvalue: [],
       DeleteData: false,
@@ -73,8 +71,8 @@ export class Countries extends React.Component {
       dataCellId: [],
       singleDelete: "",
       multipleDelete: "",
-      active: {},
       allIsActive: [],
+      isLoader: true,
     };
   }
 
@@ -85,7 +83,7 @@ export class Countries extends React.Component {
           "crm-plugin/countries/?_sort=name:ASC"
       )
       .then((res) => {
-        this.setState({ data: res.data });
+        this.setState({ data: res.data, isLoader: false });
       });
   }
 
@@ -107,6 +105,7 @@ export class Countries extends React.Component {
   }
 
   handleSearch() {
+    this.setState({ isLoader: true });
     let searchData = "";
     if (this.state.values.filterCountry) {
       searchData += "name_contains=" + this.state.values.filterCountry;
@@ -119,7 +118,7 @@ export class Countries extends React.Component {
           "&&_sort=name:ASC"
       )
       .then((res) => {
-        this.setState({ data: this.getData(res.data) });
+        this.setState({ data: this.getData(res.data), isLoader: false });
       })
       .catch((err) => {
         console.log(err);
@@ -137,6 +136,7 @@ export class Countries extends React.Component {
       formSubmitted: "",
       stateSelected: false,
       isCancel: true,
+      isLoader: true,
     });
     this.componentDidMount();
   };
@@ -179,56 +179,6 @@ export class Countries extends React.Component {
             console.log(error);
           });
       }
-    }
-  };
-
-  ActiveAll = (selectedId, selected) => {
-    if (selectedId.length !== 0) {
-      let numberOfIsActive = [];
-      for (let i in selected) {
-        numberOfIsActive.push(selected[i]["is_active"]);
-      }
-      this.setState({ allIsActive: numberOfIsActive });
-      let IsActive = "";
-      numberOfIsActive.forEach((element, index) => {
-        if (numberOfIsActive[index] === true) {
-          IsActive = false;
-        } else {
-          IsActive = true;
-        }
-
-        let setActiveId = selectedId[index];
-        serviceProvider
-          .serviceProviderForPutRequest(
-            process.env.REACT_APP_SERVER_URL + "crm-plugin/countries",
-            setActiveId,
-            {
-              is_active: IsActive,
-            }
-          )
-          .then((res) => {
-            this.setState({ formSubmitted: true });
-            this.componentDidMount({ editData: true });
-            this.props.history.push({ pathname: "/countries", editData: true });
-          })
-          .catch((error) => {
-            this.setState({ formSubmitted: false });
-            if (error.response !== undefined) {
-              this.setState({
-                errorCode:
-                  error.response.data.statusCode +
-                  " Error- " +
-                  error.response.data.error +
-                  " Message- " +
-                  error.response.data.message +
-                  " Please try again!",
-              });
-            } else {
-              this.setState({ errorCode: "Network Error - Please try again!" });
-            }
-            console.log(error);
-          });
-      });
     }
   };
 
@@ -327,8 +277,7 @@ export class Countries extends React.Component {
           <div className="App">
             <h5 className={classes.menuName}>MASTERS</h5>
             <div className={style.headerWrap}>
-	            <h2 className={style.title}>
-	              Manage Countries</h2>
+              <h2 className={style.title}>Manage Countries</h2>
               <div className={classes.buttonRow}>
                 <Button
                   variant="contained"
@@ -371,7 +320,10 @@ export class Countries extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
+            <div
+              className={classes.row}
+              style={{ flexWrap: "wrap", height: "auto" }}
+            >
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
@@ -388,14 +340,19 @@ export class Countries extends React.Component {
                   </Grid>
                 </div>
               </div>
-                <Button
-                  style={{ marginRight: "5px", marginBottom: "8px", }}
-                  onClick={this.handleSearch.bind(this)}>Search</Button>
-                <Button
-                  style={{ marginBottom: "8px", }}
-                  color="secondary" clicked={this.cancelForm}>
-                  Reset
-                </Button>
+              <Button
+                style={{ marginRight: "5px", marginBottom: "8px" }}
+                onClick={this.handleSearch.bind(this)}
+              >
+                Search
+              </Button>
+              <Button
+                style={{ marginBottom: "8px" }}
+                color="secondary"
+                clicked={this.cancelForm}
+              >
+                Reset
+              </Button>
             </div>
             {data ? (
               <Table
@@ -414,11 +371,11 @@ export class Countries extends React.Component {
                 clearSelected={this.clearSelected}
                 DeleteAll={this.DeleteAll}
                 handleActive={this.handleActive}
-                ActiveAll={this.ActiveAll}
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 selectableRows
                 pagination
+                progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
                 ActiveMessage={
                   "Are you Sure you want to Deactivate selected Country"
@@ -442,7 +399,7 @@ export class Countries extends React.Component {
               }}
             >
               {this.state.IsActive
-                ? " Do you want to activate selected country ?"
+                ? "Do you want to activate selected country ?"
                 : "Do you want to deactivate selected country ?"}
             </Modal>
           </div>

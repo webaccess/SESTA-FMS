@@ -23,6 +23,7 @@ import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import IconButton from "@material-ui/core/IconButton";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import Spinner from "../../components/Spinner/Spinner";
 
 class UsersPage extends Component {
   constructor(props) {
@@ -55,9 +56,6 @@ class UsersPage extends Component {
             message: "Please enter valid phone number",
           },
         },
-        // username: {
-        //   required: { value: "true", message: "Username is required" },
-        // },
         password: {
           required: { value: "true", message: "Password is required" },
         },
@@ -73,6 +71,7 @@ class UsersPage extends Component {
         this.props.match.params.id !== undefined ? true : false,
         this.props.match.params.id,
       ],
+      isLoader: "",
     };
   }
 
@@ -117,6 +116,7 @@ class UsersPage extends Component {
 
   getDetails = () => {
     if (this.state.editPage[0]) {
+      this.setState({ isLoader: true });
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL + "users/" + this.state.editPage[1]
@@ -143,6 +143,7 @@ class UsersPage extends Component {
                   role: res.data.role,
                 },
                 editContactId: res.data.contact.id,
+                isLoader: false,
               });
               let tempValues = this.state.values;
               if (res.data.role.name === "FPO Admin") {
@@ -153,6 +154,7 @@ class UsersPage extends Component {
               }
               this.setState({
                 values: tempValues,
+                isLoader: false,
               });
             })
             .catch((error) => {});
@@ -227,6 +229,25 @@ class UsersPage extends Component {
           "crm-plugin/contact/?contact_type=organization&organization.sub_type=VO&_sort=name:ASC";
         if (this.state.loggedInUserRole === "FPO Admin") {
           apiUrl += "&&creator_id=" + auth.getUserInfo().contact.id;
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/individuals/" +
+                auth.getUserInfo().contact.individual
+            )
+            .then((res) => {
+              let voUrl =
+                "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC&&organization.fpo=" +
+                res.data.fpo.id;
+
+              serviceProvider
+                .serviceProviderForGetRequest(
+                  process.env.REACT_APP_SERVER_URL + voUrl
+                )
+                .then((voRes) => {
+                  this.setState({ roleWiseData: voRes.data });
+                });
+            });
         }
       } else if (value.name === "FPO Admin") {
         apiUrl =
@@ -290,8 +311,11 @@ class UsersPage extends Component {
 
     let fName = this.state.values.firstName;
     let lName = this.state.values.lastName;
-    let emailAdd = this.state.values.addEmail;
     let phoneNo = this.state.values.addPhone;
+    let emailAdd = this.state.values.addEmail;
+    if (emailAdd == "" || emailAdd == undefined) {
+      emailAdd = phoneNo + "@example.com";
+    }
     let postData = {
       name: fName + " " + lName,
       phone: phoneNo,
@@ -302,71 +326,19 @@ class UsersPage extends Component {
       first_name: fName,
       last_name: lName,
     };
-
     if (this.state.editPage[0]) {
       /** edit present contact/individual record (update API) */
-      serviceProvider
-        .serviceProviderForPutRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
-          this.state.editContactId,
-          postData
-        )
-        .then((res) => {
-          this.saveUser(res.data);
-          this.setState({ formSubmitted: true });
-        })
-        .catch((error) => {
-          this.setState({ formSubmitted: false });
-          if (error.response !== undefined) {
-            this.setState({
-              errorCode:
-                error.response.data.statusCode +
-                " Error- " +
-                error.response.data.error +
-                " Message- " +
-                error.response.data.message +
-                " Please try again!",
-            });
-          } else {
-            this.setState({ errorCode: "Network Error - Please try again!" });
-          }
-        });
+      this.saveUser(postData);
     } else {
       /** save data in contact & individual table */
       Object.assign(postData, {
         creator_id: auth.getUserInfo().contact.id,
       });
-      serviceProvider
-        .serviceProviderForPostRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",
-          postData
-        )
-        .then((res) => {
-          this.saveUser(res.data);
-          this.setState({
-            formSubmitted: true,
-          });
-        })
-        .catch((error) => {
-          this.setState({ formSubmitted: false });
-          if (error.response !== undefined) {
-            this.setState({
-              errorCode:
-                error.response.data.statusCode +
-                " Error- " +
-                error.response.data.error +
-                " Message- " +
-                error.response.data.message +
-                " Please try again!",
-            });
-          } else {
-            this.setState({ errorCode: "Network Error - Please try again!" });
-          }
-        });
+      this.saveUser(postData);
     }
   };
 
-  saveUser = async (data) => {
+  saveUser = async (postData) => {
     let emailAdd = this.state.values.addEmail;
     let username = this.state.values.addPhone;
     let password = this.state.values.password;
@@ -380,8 +352,11 @@ class UsersPage extends Component {
       password: password,
       role: roleId,
       confirmed: true,
-      contact: data.id,
+      // contact: data.id,
       email: emailAdd,
+      first_name: postData.first_name,
+      last_name: postData.last_name,
+      mobile: postData.phone,
     };
     let postIndividualData = {};
     if (roleId) {
@@ -429,7 +404,6 @@ class UsersPage extends Component {
         fpo: 0,
       };
     }
-
     if (this.state.editPage[0]) {
       /** edit user in Users table */
       serviceProvider
@@ -440,20 +414,41 @@ class UsersPage extends Component {
         )
         .then((res) => {
           /** edit fpo/vo in Individuals table based on selected role */
+          postData.user = res.data.id;
           serviceProvider
             .serviceProviderForPutRequest(
-              process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
-              data.individual.id,
-              postIndividualData
+              process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+              this.state.editContactId,
+              postData
             )
             .then((res) => {
-              this.props.history.push({ pathname: "/users", editData: true });
+              let data = res.data;
+              serviceProvider
+                .serviceProviderForPutRequest(
+                  process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
+                  data.individual.id,
+                  postIndividualData
+                )
+                .then((res) => {
+                  this.props.history.push({
+                    pathname: "/users",
+                    editData: true,
+                  });
+                });
             })
             .catch((error) => {
               console.log(error);
             });
         })
-        .catch((error) => {});
+        .catch((error) => {
+          this.state.errors.addPhone = [];
+          this.state.errors.addPhone.push("");
+          this.setState({
+            formSubmitted: false,
+            errorCode:
+              "Phone number already exists, please use another phone number.",
+          });
+        });
     } else {
       /** add user in Users table */
       serviceProvider
@@ -463,21 +458,28 @@ class UsersPage extends Component {
         )
         .then((res) => {
           /** add fpo/vo in Individuals table based on selected role */
+          postData.user = res.data.id;
           serviceProvider
-            .serviceProviderForPutRequest(
-              process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
-              data.individual.id,
-              postIndividualData
+            .serviceProviderForPostRequest(
+              process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/",
+              postData
             )
             .then((res) => {
-              this.props.history.push({
-                pathname: "/users",
-                addData: true,
-              });
+              let data = res.data;
+              serviceProvider
+                .serviceProviderForPutRequest(
+                  process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
+                  data.individual.id,
+                  postIndividualData
+                )
+                .then((res) => {
+                  this.props.history.push({
+                    pathname: "/users",
+                    addData: true,
+                  });
+                });
             })
-            .catch((error) => {
-              // this.state.errors.addPhone
-            });
+            .catch((error) => {});
         })
         .catch((error) => {
           if (
@@ -485,8 +487,12 @@ class UsersPage extends Component {
             "Auth.form.error.username.taken"
           ) {
             this.state.errors.addPhone = [];
-            this.state.errors.addPhone.push("Duplicate phone number!!");
-            this.setState({ errorCode: "Duplicate phone number!!" });
+            this.state.errors.addPhone.push("");
+            this.setState({
+              formSubmitted: false,
+              errorCode:
+                "Phone number already exists, please use another phone number.",
+            });
           }
           console.log(error);
         });
@@ -523,100 +529,101 @@ class UsersPage extends Component {
             : ADD_USERS_BREADCRUMBS
         }
       >
-        <Card style={{ maxWidth: "45rem" }}>
-          <form
-            autoComplete="off"
-            noValidate
-            onSubmit={this.handleSubmit}
-            method="post"
-          >
-            <CardHeader
-              title={this.state.editPage[0] ? "Edit user" : "Add user"}
-              subheader={
-                this.state.editPage[0]
-                  ? "You can edit user data here!"
-                  : "You can add new user data here!"
-              }
-            />
-            <Divider />
-            <CardContent>
-              <Grid container spacing={3}>
-                <Grid item md={12} xs={12}>
-                  {this.state.formSubmitted === false ? (
-                    <Snackbar severity="error" Showbutton={false}>
-                      {this.state.errorCode}
-                    </Snackbar>
-                  ) : null}
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="First Name*"
-                    name="firstName"
-                    error={this.hasError("firstName")}
-                    helperText={
-                      this.hasError("firstName")
-                        ? this.state.errors.firstName[0]
-                        : null
-                    }
-                    value={this.state.values.firstName || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Last Name*"
-                    name="lastName"
-                    error={this.hasError("lastName")}
-                    helperText={
-                      this.hasError("lastName")
-                        ? this.state.errors.lastName[0]
-                        : null
-                    }
-                    value={this.state.values.lastName || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Email"
-                    type="email"
-                    name="addEmail"
-                    error={this.hasError("addEmail")}
-                    helperText={
-                      this.hasError("addEmail")
-                        ? this.state.errors["addEmail"].map((error) => {
-                            return error + " ";
-                          })
-                        : null
-                    }
-                    value={this.state.values.addEmail || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Input
-                    fullWidth
-                    label="Phone Number*"
-                    type="tel"
-                    name="addPhone"
-                    error={this.hasError("addPhone")}
-                    helperText={
-                      this.hasError("addPhone")
-                        ? this.state.errors.addPhone[0]
-                        : null
-                    }
-                    value={this.state.values.addPhone || ""}
-                    onChange={this.handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-                {/* <Grid item md={6} xs={12}>
+        {!this.state.isLoader ? (
+          <Card style={{ maxWidth: "45rem" }}>
+            <form
+              autoComplete="off"
+              noValidate
+              onSubmit={this.handleSubmit}
+              method="post"
+            >
+              <CardHeader
+                title={this.state.editPage[0] ? "Edit user" : "Add user"}
+                subheader={
+                  this.state.editPage[0]
+                    ? "You can edit user data here!"
+                    : "You can add new user data here!"
+                }
+              />
+              <Divider />
+              <CardContent>
+                <Grid container spacing={3}>
+                  <Grid item md={12} xs={12}>
+                    {this.state.formSubmitted === false ? (
+                      <Snackbar severity="error" Showbutton={false}>
+                        {this.state.errorCode}
+                      </Snackbar>
+                    ) : null}
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="First Name*"
+                      name="firstName"
+                      error={this.hasError("firstName")}
+                      helperText={
+                        this.hasError("firstName")
+                          ? this.state.errors.firstName[0]
+                          : null
+                      }
+                      value={this.state.values.firstName || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Last Name*"
+                      name="lastName"
+                      error={this.hasError("lastName")}
+                      helperText={
+                        this.hasError("lastName")
+                          ? this.state.errors.lastName[0]
+                          : null
+                      }
+                      value={this.state.values.lastName || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Email"
+                      type="email"
+                      name="addEmail"
+                      error={this.hasError("addEmail")}
+                      helperText={
+                        this.hasError("addEmail")
+                          ? this.state.errors["addEmail"].map((error) => {
+                              return error + " ";
+                            })
+                          : null
+                      }
+                      value={this.state.values.addEmail || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Phone Number*"
+                      type="tel"
+                      name="addPhone"
+                      error={this.hasError("addPhone")}
+                      helperText={
+                        this.hasError("addPhone")
+                          ? this.state.errors.addPhone[0]
+                          : null
+                      }
+                      value={this.state.values.addPhone || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  {/* <Grid item md={6} xs={12}>
                   <Input
                     fullWidth
                     label="Username*"
@@ -632,143 +639,148 @@ class UsersPage extends Component {
                     variant="outlined"
                   />
                 </Grid> */}
-                <Grid item md={6} xs={12}>
-                  <Input
-                    variant="outlined"
-                    id="standard-adornment-password"
-                    name="password"
-                    label="Password*"
-                    error={this.hasError("password")}
-                    helperText={
-                      this.hasError("password")
-                        ? this.state.errors.password[0]
-                        : null
-                    }
-                    type={this.state.values.showPassword ? "text" : "password"}
-                    value={this.state.values.password || ""}
-                    onChange={this.handleChange}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={this.handleClickShowPassword}
-                            onMouseDown={this.handleMouseDownPassword}
-                          >
-                            {this.state.values.showPassword ? (
-                              <Visibility />
-                            ) : (
-                              <VisibilityOff />
-                            )}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  {/* </FormControl> */}
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <Autocomplete
-                    id="select-role"
-                    name="role"
-                    value={role}
-                    options={roleFilter}
-                    variant="outlined"
-                    getOptionLabel={(option) => option.name}
-                    placeholder="Select Role*"
-                    onChange={this.handleRoleChange}
-                    renderInput={(params) => (
-                      <Input
-                        {...params}
-                        fullWidth
-                        label="Select Role*"
-                        name="role"
-                        variant="outlined"
-                        error={this.hasError("role")}
-                        helperText={
-                          this.hasError("role")
-                            ? this.state.errors.role[0]
-                            : null
-                        }
-                      />
-                    )}
-                  />
-                </Grid>
-                {((loggedInUserRole === "Sesta Admin" ||
-                  loggedInUserRole === "Superadmin") &&
-                  roleName === "FPO Admin") ||
-                ((loggedInUserRole === "Sesta Admin" ||
-                  loggedInUserRole === "Superadmin") &&
-                  roleName === "CSP (Community Service Provider)") ||
-                (loggedInUserRole === "FPO Admin" &&
-                  roleName === "CSP (Community Service Provider)") ? (
                   <Grid item md={6} xs={12}>
-                    <Autotext
-                      id="select-field"
-                      options={roleWiseData}
+                    <Input
                       variant="outlined"
-                      label={
-                        roleName === "CSP (Community Service Provider)"
-                          ? "Select Village Organization*"
-                          : roleName === "FPO Admin"
-                          ? "Select FPO*"
-                          : null
-                      }
-                      name="selectField"
-                      getOptionLabel={(option) => option.name}
-                      onChange={(event, value) => {
-                        this.handleFieldChange(event, value);
-                      }}
-                      defaultValue={[]}
-                      value={
-                        selectField
-                          ? roleWiseData[
-                              roleWiseData.findIndex(function (item, i) {
-                                return item.id === selectField;
-                              })
-                            ] || null
-                          : null
-                      }
-                      error={this.hasError("selectField")}
+                      id="standard-adornment-password"
+                      name="password"
+                      label="Password*"
+                      error={this.hasError("password")}
                       helperText={
-                        this.hasError("selectField")
-                          ? this.state.errors.selectField[0]
+                        this.hasError("password")
+                          ? this.state.errors.password[0]
                           : null
                       }
+                      type={
+                        this.state.values.showPassword ? "text" : "password"
+                      }
+                      value={this.state.values.password || ""}
+                      onChange={this.handleChange}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={this.handleClickShowPassword}
+                              onMouseDown={this.handleMouseDownPassword}
+                            >
+                              {this.state.values.showPassword ? (
+                                <Visibility />
+                              ) : (
+                                <VisibilityOff />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                    {/* </FormControl> */}
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Autocomplete
+                      id="select-role"
+                      name="role"
+                      value={role}
+                      options={roleFilter}
+                      variant="outlined"
+                      getOptionLabel={(option) => option.name}
+                      placeholder="Select Role*"
+                      onChange={this.handleRoleChange}
                       renderInput={(params) => (
                         <Input
                           {...params}
                           fullWidth
-                          label={
-                            roleName === "CSP (Community Service Provider)"
-                              ? "Select Village Organization*"
-                              : roleName === "FPO Admin"
-                              ? "Select FPO*"
+                          label="Select Role*"
+                          name="role"
+                          variant="outlined"
+                          error={this.hasError("role")}
+                          helperText={
+                            this.hasError("role")
+                              ? this.state.errors.role[0]
                               : null
                           }
-                          name="selectField"
-                          variant="outlined"
                         />
                       )}
                     />
                   </Grid>
-                ) : null}
-              </Grid>
-            </CardContent>
-            <Divider />
-            <CardActions style={{ padding: "15px" }}>
-              <Button type="submit">Save</Button>
-              <Button
-                color="secondary"
-                clicked={this.cancelForm}
-                component={Link}
-                to="/users"
-              >
-                Cancel
-              </Button>
-            </CardActions>
-          </form>
-        </Card>
+                  {((loggedInUserRole === "Sesta Admin" ||
+                    loggedInUserRole === "Superadmin") &&
+                    roleName === "FPO Admin") ||
+                  ((loggedInUserRole === "Sesta Admin" ||
+                    loggedInUserRole === "Superadmin") &&
+                    roleName === "CSP (Community Service Provider)") ||
+                  (loggedInUserRole === "FPO Admin" &&
+                    roleName === "CSP (Community Service Provider)") ? (
+                    <Grid item md={6} xs={12}>
+                      <Autotext
+                        id="select-field"
+                        options={roleWiseData}
+                        variant="outlined"
+                        label={
+                          roleName === "CSP (Community Service Provider)"
+                            ? "Select Village Organization*"
+                            : roleName === "FPO Admin"
+                            ? "Select FPO*"
+                            : null
+                        }
+                        name="selectField"
+                        getOptionLabel={(option) => option.name}
+                        onChange={(event, value) => {
+                          this.handleFieldChange(event, value);
+                        }}
+                        defaultValue={[]}
+                        value={
+                          selectField
+                            ? roleWiseData[
+                                roleWiseData.findIndex(function (item, i) {
+                                  return item.id === selectField;
+                                })
+                              ] || null
+                            : null
+                        }
+                        error={this.hasError("selectField")}
+                        helperText={
+                          this.hasError("selectField")
+                            ? this.state.errors.selectField[0]
+                            : null
+                        }
+                        renderInput={(params) => (
+                          <Input
+                            {...params}
+                            fullWidth
+                            label={
+                              roleName === "CSP (Community Service Provider)"
+                                ? "Select Village Organization*"
+                                : roleName === "FPO Admin"
+                                ? "Select FPO*"
+                                : null
+                            }
+                            name="selectField"
+                            variant="outlined"
+                          />
+                        )}
+                      />
+                    </Grid>
+                  ) : null}
+                </Grid>
+              </CardContent>
+              <Divider />
+              <CardActions style={{ padding: "15px" }}>
+                <Button type="submit">Save</Button>
+                <Button
+                  color="secondary"
+                  clicked={this.cancelForm}
+                  component={Link}
+                  to="/users"
+                >
+                  Cancel
+                </Button>
+              </CardActions>
+            </form>
+          </Card>
+        ) : (
+          <Spinner />
+        )}
       </Layout>
     );
   }
