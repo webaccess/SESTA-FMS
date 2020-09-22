@@ -90,14 +90,23 @@ export class Members extends React.Component {
     let url =
       "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC";
     if (this.state.loggedInUserRole === "FPO Admin") {
-      url += "&creator_id=" + auth.getUserInfo().contact.id;
       serviceProvider
-        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
+        )
         .then((res) => {
-          this.setState({ getShg: res.data });
-        })
-        .catch((error) => {
-          console.log(error);
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/contact/shgs/?id=" +
+                res.data.fpo.id
+            )
+            .then((shgRes) => {
+              this.setState({ getShg: shgRes.data });
+            })
+            .catch((error) => {});
         });
     } else if (
       this.state.loggedInUserRole === "CSP (Community Service Provider)"

@@ -162,12 +162,25 @@ class ShgPage extends Component {
     // get all VOs
     let url =
       "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC";
-    if (
-      this.state.loggedInUserRole === "FPO Admin" ||
-      this.state.loggedInUserRole === "CSP (Community Service Provider)"
-    ) {
-      url += "&&creator_id=" + auth.getUserInfo().contact.id;
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((res) => {
+          let voUrl =
+            "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC&&organization.fpo=" +
+            res.data.fpo.id;
+          this.getVo(voUrl);
+        });
+    } else {
+      this.getVo(url);
     }
+  }
+
+  getVo = (url) => {
     serviceProvider
       .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
       .then((res) => {
@@ -176,7 +189,7 @@ class ShgPage extends Component {
       .catch((error) => {
         console.log(error);
       });
-  }
+  };
 
   handleChange = ({ target }) => {
     this.setState({
