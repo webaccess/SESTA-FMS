@@ -15,3 +15,6 @@ export const REMUNERATION_NOTATION = [
   { id: "Flat", name: "Flat" },
   { id: "Percentage", name: "Percentage" },
 ];
+
+// state id
+export const STATE_ID = 1;

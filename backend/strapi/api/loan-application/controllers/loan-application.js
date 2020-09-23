@@ -126,6 +126,7 @@ module.exports = {
       return ctx.badRequest(null, error.message);
     }
   },
+
   pdfGenFindOne: async (ctx) => {
     const { id } = ctx.params;
 
@@ -183,5 +184,109 @@ module.exports = {
     }
     // }
     return sanitizeEntity(entity, { model: strapi.models["loan-application"] });
+  },
+
+  getLoansCount: async (ctx) => {
+    try {
+      if (ctx.query.status === "UnderReview") {
+        return await strapi.query("loan-application").count({
+          status: "UnderReview",
+        });
+      }
+      if (ctx.query.status === "Approved") {
+        return await strapi.query("loan-application").count({
+          status: "Approved",
+        });
+      }
+    } catch (error) {
+      return ctx.badRequest(null, error.message);
+    }
+  },
+
+  getLoanDetails: async (ctx) => {
+    try {
+      let loanDistributedAmounts = [];
+      let loanDistributedVal = 0;
+      let actualPrincipalPaid = 0;
+      let actualInterestPaid = 0;
+      let actualFinePaid = 0;
+      let outstandingAmount = 0;
+      let loansDetails = [];
+      let purposeList = [];
+      let purposes = [];
+      let purposesValues = [];
+      if (ctx.query.status === "Approved") {
+        const loans = await strapi.query("loan-application").find({
+          status: "Approved",
+        });
+        loans.map((e, i) => {
+          let emiPaid = 0;
+          /** loan amount distributed*/
+          loanDistributedVal += e.loan_model.loan_amount;
+          e.loan_app_installments.map((emi, index) => {
+            if (emi.actual_principal) {
+              actualPrincipalPaid += emi.actual_principal;
+            }
+            if (emi.actual_interest) {
+              actualInterestPaid += emi.actual_interest;
+            }
+            if (emi.fine) {
+              actualFinePaid += emi.fine;
+            }
+            let totalPaid = emi.actual_principal + emi.actual_interest;
+            emiPaid += totalPaid;
+          });
+          /** Loans table */
+          outstandingAmount = e.loan_model.loan_amount - emiPaid;
+          loansDetails.push({
+            memberName: e.contact.name,
+            loanAmount: e.loan_model.loan_amount,
+            outstandingAmount: outstandingAmount,
+            loanDate: e.application_date,
+          });
+        });
+        loanDistributedAmounts.push(
+          loanDistributedVal,
+          actualPrincipalPaid + actualInterestPaid + actualFinePaid
+        );
+        // sort loanDetails with latest date first
+        loansDetails.sort(
+          (a, b) =>
+            new Date(...b.loanDate.split("/").reverse()) -
+            new Date(...a.loanDate.split("/").reverse())
+        );
+        const data = {
+          loanDistributedAmounts: loanDistributedAmounts,
+          totalLoanDistributed:
+            loanDistributedAmounts[0] + loanDistributedAmounts[1],
+          loansTableData: loansDetails.slice(0, 5),
+          loansAllDetails: loansDetails,
+        };
+        return data;
+      } else {
+        const loans = await strapi.query("loan-application").find({
+          status: "Approved",
+        });
+        loans.map((loan, i) => {
+          purposeList.push(loan.loan_model.product_name);
+        });
+
+        var map = purposeList.reduce(function (prev, cur) {
+          prev[cur] = (prev[cur] || 0) + 1;
+          return prev;
+        }, {});
+        Object.keys(map).map((key, i) => {
+          purposes.push(key.toUpperCase());
+          purposesValues.push(map[key]);
+        });
+        const purposeData = {
+          purposes: purposes,
+          purposesValues: purposesValues,
+        };
+        return purposeData;
+      }
+    } catch (error) {
+      return ctx.badRequest(null, error.message);
+    }
   },
 };

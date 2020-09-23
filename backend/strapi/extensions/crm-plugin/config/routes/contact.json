@@ -2,6 +2,21 @@
   "routes": [
     {
       "method": "GET",
+      "path": "/contact/shg/count",
+      "handler": "contact.getShgCount"
+    },
+    {
+      "method": "GET",
+      "path": "/contact/vo/count",
+      "handler": "contact.getVoCount"
+    },
+    {
+      "method": "GET",
+      "path": "/contact/members/count",
+      "handler": "contact.getMemberCount"
+    },
+    {
+      "method": "GET",
       "path": "/contact/shgs",
       "handler": "contact.getShg"
     },

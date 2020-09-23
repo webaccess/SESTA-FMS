@@ -162,7 +162,6 @@ class VoPage extends Component {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
-
     let voName = this.state.values.addVo;
     let addressId = this.state.values.addId;
     let voAddress = this.state.values.addVoAddress;

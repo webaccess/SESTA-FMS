@@ -75,10 +75,13 @@ export class CSPSummaryReport extends React.Component {
       )
       .then((activityRes) => {
         activityRes.data.map((activity) => {
-          if (
-            activity.contacts[0].creator_id.id == auth.getUserInfo().contact.id
-          ) {
-            activityArr.push(activity);
+          if (activity.contacts) {
+            if (
+              activity.contacts[0].creator_id.id ==
+              auth.getUserInfo().contact.id
+            ) {
+              activityArr.push(activity);
+            }
           }
         });
         this.setState({ activitiesData: activityArr, isLoader: false });
