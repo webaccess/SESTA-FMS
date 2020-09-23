@@ -455,7 +455,7 @@ export class Villages extends React.Component {
               </Snackbar>
             ) : null}
             {this.state.villageInUse === true ? (
-              <Snackbar severity="error" Showbutton={false}>
+              <Snackbar severity="info" Showbutton={false}>
                 Village {this.state.deleteVillageName} is in use, it can not be
                 Deactivated!!
               </Snackbar>

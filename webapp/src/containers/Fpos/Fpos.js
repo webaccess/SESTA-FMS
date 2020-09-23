@@ -62,6 +62,9 @@ export class Fpos extends React.Component {
       filterVo: "",
       Result: [],
       data: [],
+      contacts: [],
+      loanpurpose: [],
+      activityTypes: [],
       selectedid: 0,
       open: false,
       columnsvalue: [],
@@ -71,6 +74,9 @@ export class Fpos extends React.Component {
       isCancel: false,
       singleDelete: "",
       multipleDelete: "",
+      fpoInUseSingleDelete: "",
+      fpoInUseDeleteAll: "",
+      deleteFpoName: "",
       isLoader: true,
       stateId: constants.STATE_ID,
     };
@@ -80,7 +86,7 @@ export class Fpos extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&organization.sub_type=FPO&_sort=name:ASC"
+        "crm-plugin/contact/?contact_type=organization&organization.sub_type=FPO&_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ data: res.data, isLoader: false });
@@ -90,8 +96,8 @@ export class Fpos extends React.Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/districts/?_sort=name:ASC&&is_active=true&&state.id=" +
-          this.state.stateId
+        "crm-plugin/districts/?_sort=name:ASC&&is_active=true&&state.id=" +
+        this.state.stateId
       )
       .then((res) => {
         this.setState({ getDistrict: res.data });
@@ -99,6 +105,32 @@ export class Fpos extends React.Component {
       .catch((error) => {
         console.log(error);
       });
+
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/?_sort=id:ASC"
+      )
+      .then((res) => {
+        this.setState({ contacts: res.data });
+      });
+
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "loan-models/"
+      )
+      .then((res) => {
+        this.setState({ loanpurpose: res.data });
+      })
+
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+        "crm-plugin/activitytypes/?_sort=id:ASC"
+      )
+      .then((res) => {
+        this.setState({ activityTypes: res.data });
+      })
+
   }
 
   handleChange = (event, value) => {
@@ -119,33 +151,96 @@ export class Fpos extends React.Component {
     this.props.history.push("/fpos/edit/" + cellid);
   };
 
+  fpoDelete(cellid, fpoInUseSingleDelete) {
+    this.state.contacts.find((cd) => {
+      // check if fpo is present in user's individual
+      if (cd.individual !== null && cd.individual.fpo !== null && cd.individual.fpo === parseInt(cellid)) {
+        fpoInUseSingleDelete = true;
+      }
+      //check if fpo is present in VO
+      if (cd.organization !== null && cd.organization.fpo !== null && cd.organization.fpo === parseInt(cellid)) {
+        fpoInUseSingleDelete = true;
+      }
+    });
+
+    // check if fpo is present in loan model
+    this.state.loanpurpose.map(loanmodel => {
+      if (loanmodel.fpo !== null) {
+        if (loanmodel.fpo.id === parseInt(cellid)) {
+          fpoInUseSingleDelete = true;
+        }
+      }
+    })
+
+    //check if fpo is present in activity types
+    this.state.activityTypes.map(types => {
+      if (types.contact.length > 0) {
+        if (types.contact[0].id === parseInt(cellid)) {
+          fpoInUseSingleDelete = true;
+        }
+      }
+    })
+    return fpoInUseSingleDelete;
+  }
+
   DeleteData = (cellid, selectedId) => {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-      serviceProvider
-        .serviceProviderForDeleteRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
-          cellid
-        )
-        .then((res) => {
-          this.setState({ singleDelete: res.data.name });
-          this.componentDidMount();
+
+      let fpoInUseSingleDelete = false;
+      fpoInUseSingleDelete = this.fpoDelete(cellid, fpoInUseSingleDelete);
+      if (fpoInUseSingleDelete) {
+        this.state.data.map(fpodata => {
+          if (fpodata.id === parseInt(cellid)) {
+            this.setState({
+              fpoInUseSingleDelete: true,
+              deleteFpoName: fpodata.name,
+            });
+          }
         })
-        .catch((error) => {
-          this.setState({ singleDelete: false });
-          console.log(error.response);
-        });
+      }
+      if (!fpoInUseSingleDelete) {
+        serviceProvider
+          .serviceProviderForDeleteRequest(
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+            cellid
+          )
+          .then((res) => {
+            this.setState({ singleDelete: res.data.name });
+            this.componentDidMount();
+          })
+          .catch((error) => {
+            this.setState({ singleDelete: false });
+            console.log(error.response);
+          });
+      }
     }
   };
 
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
+
+      let fpoInUseDeleteAll = false;
+      let shgInUse = [];
       for (let i in selectedId) {
+        fpoInUseDeleteAll = this.fpoDelete(selectedId[i], fpoInUseDeleteAll);
+        let shg = fpoInUseDeleteAll ? shgInUse.push(selectedId[i]) : shgInUse.push()
+      }
+
+      if (fpoInUseDeleteAll) {
+        this.setState({ fpoInUseDeleteAll: true });
+        shgInUse = [...new Set(shgInUse)];
+      }
+      var deleteFpo = selectedId.filter(function (obj) {
+        return shgInUse.indexOf(obj) == -1;
+      });
+
+      for (let i in deleteFpo) {
         serviceProvider
           .serviceProviderForDeleteRequest(
             process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
-            selectedId[i]
+            deleteFpo[i]
           )
           .then((res) => {
             this.setState({ multipleDelete: true });
@@ -260,7 +355,8 @@ export class Fpos extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            {this.state.multipleDelete === true ? (
+            {this.state.multipleDelete === true &&
+            this.state.fpoInUseDeleteAll !== true? (
               <Snackbar severity="success" Showbutton={false}>
                 FPO deleted successfully!
               </Snackbar>
@@ -268,6 +364,17 @@ export class Fpos extends React.Component {
             {this.state.multipleDelete === false ? (
               <Snackbar severity="error" Showbutton={false}>
                 An error occured - Please try again!
+              </Snackbar>
+            ) : null}
+            {this.state.fpoInUseSingleDelete === true ? (
+              <Snackbar severity="info" Showbutton={false}>
+                FPO {this.state.deleteFpoName} is in use, it can not be
+                Deleted.
+              </Snackbar>
+            ) : null}
+            {this.state.fpoInUseDeleteAll === true ? (
+              <Snackbar severity="info" Showbutton={false}>
+                Some FPOs is in use hence it can not be Deleted.
               </Snackbar>
             ) : null}
             <div
