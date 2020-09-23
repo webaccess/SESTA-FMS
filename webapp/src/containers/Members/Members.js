@@ -157,38 +157,19 @@ export class Members extends React.Component {
           serviceProvider
             .serviceProviderForGetRequest(
               process.env.REACT_APP_SERVER_URL +
-                "crm-plugin/contact/" +
+                "crm-plugin/contact/members/?id=" +
                 res.data.vo.id
             )
-            .then((resp) => {
-              let shgList = [];
-              resp.data.org_vos.map((shg, i) => {
-                shgList.push(shg.contact);
-              });
-              let newUrl =
-                "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true&&";
-              shgList.map((shgId) => {
-                newUrl += "individual.shg_in=" + shgId + "&&";
-              });
-              if (param === "search") {
-                newUrl += searchData;
-              }
-              serviceProvider
-                .serviceProviderForGetRequest(
-                  process.env.REACT_APP_SERVER_URL + newUrl
-                )
-                .then((memResp) => {
-                  this.setState({ data: memResp.data, isLoader: false });
-                });
+            .then((memResp) => {
+              this.setState({ data: memResp.data, isLoader: false });
             });
         })
         .catch((error) => {});
     } else {
-      if (param === "search") {
-        url += "&&" + searchData;
-      }
       serviceProvider
-        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/members/"
+        )
         .then((res) => {
           this.setState({ data: res.data, isLoader: false });
         })
@@ -278,6 +259,58 @@ export class Members extends React.Component {
     this.componentDidMount();
   };
 
+  getFilteredmembers = (searchData) => {
+    let url =
+      "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true";
+    if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((res) => {
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/contact/" +
+                res.data.vo.id
+            )
+            .then((resp) => {
+              let shgList = [];
+              resp.data.org_vos.map((shg, i) => {
+                shgList.push(shg.contact);
+              });
+              let newUrl =
+                "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true&&";
+              shgList.map((shgId) => {
+                newUrl += "individual.shg_in=" + shgId + "&&";
+              });
+
+              serviceProvider
+                .serviceProviderForGetRequest(
+                  process.env.REACT_APP_SERVER_URL + newUrl + searchData
+                )
+                .then((memResp) => {
+                  this.setState({ data: memResp.data, isLoader: false });
+                });
+            });
+        })
+        .catch((error) => {});
+    } else {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
+        )
+        .then((res) => {
+          this.setState({ data: res.data, isLoader: false });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  };
+
   handleSearch() {
     this.setState({ isLoader: true });
     let searchData = "";
@@ -298,7 +331,7 @@ export class Members extends React.Component {
       }
     }
 
-    this.getMembers("search", searchData);
+    this.getFilteredmembers(searchData);
   }
 
   editData = (cellId) => {
