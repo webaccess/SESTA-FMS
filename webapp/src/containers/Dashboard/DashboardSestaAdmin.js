@@ -79,85 +79,53 @@ class DashboardForFPO extends Component {
 
   async componentDidMount() {
     /** get members */
-    let newDataArray = [];
-    let url = "crm-plugin/contact/?contact_type=individual&&user_null=true";
-
     serviceProvider
-      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/members/count"
+      )
       .then((res) => {
-        if (res.data.length > 0) {
-          this.setState({
-            memberData: res.data.length,
-            isMemLoading: false,
-          });
-        } else {
-          this.setState({ memberData: 0, isMemLoading: false });
-        }
+        this.setState({ memberData: res.data, isMemLoading: false });
       })
       .catch((error) => {});
 
     /** get SHGs */
-    let shgUrl =
-      "crm-plugin/contact/?contact_type=organization&&organization.sub_type=SHG";
-
     serviceProvider
-      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + shgUrl)
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/shg/count/"
+      )
       .then((res) => {
-        if (res.data.length > 0) {
-          this.setState({ shgData: res.data.length, isShgLoading: false });
-        } else {
-          this.setState({ shgData: 0, isShgLoading: false });
-        }
+        this.setState({ shgData: res.data, isShgLoading: false });
       })
       .catch((error) => {});
 
     /** get VOs */
-    let voUrl =
-      "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO";
-
     serviceProvider
-      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + voUrl)
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/vo/count/"
+      )
       .then((res) => {
-        if (res.data.length > 0) {
-          this.setState({ voData: res.data.length, isVoLoading: false });
-        } else {
-          this.setState({ voData: 0, isVoLoading: false });
-        }
+        this.setState({ voData: res.data, isVoLoading: false });
       });
-
-    let loanAppUrl = "loan-applications/";
 
     /** get pending loan applications */
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + loanAppUrl + "?status=UnderReview"
+        process.env.REACT_APP_SERVER_URL +
+          "loan-applications/loans/count/?status=UnderReview"
       )
       .then((res) => {
-        if (res.data.length > 0) {
-          this.setState({
-            pendingLoans: res.data.length,
-            isLoanLoading: false,
-          });
-        } else {
-          this.setState({ pendingLoans: 0, isLoanLoading: false });
-        }
+        this.setState({ pendingLoans: res.data, isLoanLoading: false });
       })
       .catch((error) => {});
 
     /** get approved loan applications */
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + loanAppUrl + "?status=Approved"
+        process.env.REACT_APP_SERVER_URL +
+          "loan-applications/loans/count/?status=Approved"
       )
       .then((res) => {
-        if (res.data.length > 0) {
-          this.setState({
-            approvedLoans: res.data.length,
-            isLoanLoading: false,
-          });
-        } else {
-          this.setState({ approvedLoans: 0, isLoanLoading: false });
-        }
+        this.setState({ approvedLoans: res.data, isLoanLoading: false });
       })
       .catch((error) => {});
   }

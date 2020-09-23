@@ -65,7 +65,16 @@ const roles = {
       },
       {
         name: "loan-application",
-        action: ["find", "count", "findone", "create", "update", "delete"],
+        action: [
+          "find",
+          "count",
+          "findone",
+          "create",
+          "update",
+          "delete",
+          "getloandetails",
+          "getloanscount",
+        ],
       },
       {
         name: "loan-application-tasks",
@@ -106,7 +115,16 @@ const roles = {
       },
       {
         name: "loan-application",
-        action: ["find", "count", "findone", "create", "update", "delete"],
+        action: [
+          "find",
+          "count",
+          "findone",
+          "create",
+          "update",
+          "delete",
+          "getloandetails",
+          "getloanscount",
+        ],
       },
       {
         name: "loan-application-tasks",
@@ -188,7 +206,16 @@ const roles = {
       },
       {
         name: "loan-application",
-        action: ["find", "count", "findone", "create", "update", "delete"],
+        action: [
+          "find",
+          "count",
+          "findone",
+          "create",
+          "update",
+          "delete",
+          "getloandetails",
+          "getloanscount",
+        ],
       },
       {
         name: "loan-application-tasks",

@@ -6,12 +6,12 @@ import Button from "../../components/UI/Button/Button";
 import { withStyles } from "@material-ui/core/styles";
 import style from "./Fpos.module.css";
 import { Link } from "react-router-dom";
-import auth from "../../components/Auth/Auth.js";
 import Input from "../../components/UI/Input/Input";
 import { map } from "lodash";
 import { Grid } from "@material-ui/core";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autocomplete from "../../components/Autocomplete/Autocomplete.js";
+import * as constants from "../../constants/Constants";
 
 const useStyles = (theme) => ({
   root: {},
@@ -58,9 +58,7 @@ export class Fpos extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      filterState: "",
       filterDistrict: "",
-      filterVillage: "",
       filterVo: "",
       Result: [],
       data: [],
@@ -69,12 +67,12 @@ export class Fpos extends React.Component {
       columnsvalue: [],
       DeleteData: false,
       properties: props,
-      getState: [],
       getDistrict: [],
       isCancel: false,
       singleDelete: "",
       multipleDelete: "",
       isLoader: true,
+      stateId: constants.STATE_ID,
     };
   }
 
@@ -88,47 +86,20 @@ export class Fpos extends React.Component {
         this.setState({ data: res.data, isLoader: false });
       });
 
-    //api call for states filter
+    //api call for districts filter
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true"
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/districts/?_sort=name:ASC&&is_active=true&&state.id=" +
+          this.state.stateId
       )
       .then((res) => {
-        this.setState({ getState: res.data });
+        this.setState({ getDistrict: res.data });
       })
       .catch((error) => {
         console.log(error);
       });
   }
-
-  handleStateChange = async (event, value, method) => {
-    if (value !== null) {
-      this.setState({ filterState: value });
-      this.setState({
-        isCancel: false,
-        filterDistrict: "",
-      });
-
-      let stateId = value.id;
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/?is_active=true&&state.id=" +
-            stateId
-        )
-        .then((res) => {
-          this.setState({ getDistrict: res.data });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else {
-      this.setState({
-        filterState: "",
-        filterDistrict: "",
-      });
-    }
-  };
 
   handleChange = (event, value) => {
     this.setState({ filterFpo: event.target.value });
@@ -140,17 +111,6 @@ export class Fpos extends React.Component {
     } else {
       this.setState({
         filterDistrict: "",
-      });
-    }
-  }
-
-  handleVillageChange(event, value) {
-    if (value !== null) {
-      this.setState({ filterVillage: value });
-      this.setState({ isCancel: false });
-    } else {
-      this.setState({
-        filterVillage: "",
       });
     }
   }
@@ -201,9 +161,7 @@ export class Fpos extends React.Component {
 
   cancelForm = () => {
     this.setState({
-      filterState: "",
       filterDistrict: "",
-      filterVillage: "",
       filterFpo: "",
       isCancel: true,
       isLoader: true,
@@ -215,9 +173,6 @@ export class Fpos extends React.Component {
   handleSearch() {
     this.setState({ isLoader: true });
     let searchData = "";
-    if (this.state.filterState) {
-      searchData += "addresses.state.id=" + this.state.filterState.id + "&&";
-    }
     if (this.state.filterDistrict) {
       searchData +=
         "addresses.district.id=" + this.state.filterDistrict.id + "&&";
@@ -241,14 +196,18 @@ export class Fpos extends React.Component {
 
   render() {
     let data = this.state.data;
-    if (data.length !== 0) {
-    }
-
     const Usercolumns = [
       {
         name: "Name of the  Organization",
         selector: "name",
         sortable: true,
+        cell: (row) => (row.name ? row.name : "-"),
+      },
+      {
+        name: "District",
+        selector: "districtName",
+        sortable: true,
+        cell: (row) => (row.districtName ? row.districtName : "-"),
       },
     ];
 
@@ -259,19 +218,8 @@ export class Fpos extends React.Component {
 
     let columnsvalue = [0];
     const { classes } = this.props;
-    let statesFilter = this.state.getState;
-    let filterState = this.state.filterState;
     let districtsFilter = this.state.getDistrict;
     let filterDistrict = this.state.filterDistrict;
-
-    let addStates = [];
-    map(filterState, (state, key) => {
-      addStates.push(
-        statesFilter.findIndex(function (item, i) {
-          return item.id === state;
-        })
-      );
-    });
     let addDistricts = [];
     map(filterDistrict, (district, key) => {
       addDistricts.push(
@@ -337,38 +285,6 @@ export class Fpos extends React.Component {
                       value={this.state.filterFpo || ""}
                       onChange={this.handleChange.bind(this)}
                       variant="outlined"
-                    />
-                  </Grid>
-                </div>
-              </div>
-              <div className={classes.searchInput}>
-                <div className={style.Districts}>
-                  <Grid item md={12} xs={12}>
-                    <Autocomplete
-                      width="150px"
-                      id="combo-box-demo"
-                      options={statesFilter}
-                      getOptionLabel={(option) => option.name}
-                      onChange={(event, value) => {
-                        this.handleStateChange(event, value);
-                      }}
-                      defaultValue={[]}
-                      value={
-                        filterState
-                          ? this.state.isCancel === true
-                            ? null
-                            : filterState
-                          : null
-                      }
-                      renderInput={(params) => (
-                        <Input
-                          {...params}
-                          fullWidth
-                          label="Select State"
-                          name="addState"
-                          variant="outlined"
-                        />
-                      )}
                     />
                   </Grid>
                 </div>
