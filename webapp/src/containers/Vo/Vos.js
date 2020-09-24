@@ -93,6 +93,14 @@ export class Vos extends React.Component {
           console.log(error);
         });
     }
+
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/?_sort=id:ASC"
+      )
+      .then((res) => {
+        this.setState({ contacts: res.data });
+      });
   }
 
   getVo = (param, searchData) => {
@@ -133,17 +141,14 @@ export class Vos extends React.Component {
   DeleteData = (cellid, selectedId) => {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-
       let voInUseSingleDelete = false;
       this.state.contacts.find((cdata) => {
-        if (cdata.org_vos.length > 0) {
-          if (cdata.id === parseInt(cellid)) {
+        if ((cdata.id === parseInt(cellid) && cdata.org_vos.length > 0 ) || (cdata.individual!== null && cdata.individual.vo === parseInt(cellid))) {
             this.setState({
               voInUseSingleDelete: true,
               deleteVOName: cdata.name,
             });
             voInUseSingleDelete = true;
-          }
         }
       });
       if (!voInUseSingleDelete) {
@@ -170,15 +175,13 @@ export class Vos extends React.Component {
 
       let voInUse = [];
       this.state.contacts.map((cdata) => {
-        if (cdata.org_vos.length > 0) {
           for (let i in selectedId) {
-            if (parseInt(selectedId[i]) === cdata.id) {
+            if ((cdata.id === parseInt(selectedId[i]) && cdata.org_vos.length > 0 ) || (cdata.individual!== null && cdata.individual.vo === parseInt(selectedId[i]))) {
               voInUse.push(selectedId[i]);
               this.setState({ voInUseDeleteAll: true });
             }
             voInUse = [...new Set(voInUse)];
           }
-        }
       });
       var deleteVO = selectedId.filter(function (obj) {
         return voInUse.indexOf(obj) == -1;

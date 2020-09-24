@@ -412,7 +412,7 @@ export class Activitytypes extends React.Component {
               </Snackbar>
             ) : null}
             {this.state.isActTypePresent === true ? (
-              <Snackbar severity="error" Showbutton={false}>
+              <Snackbar severity="info" Showbutton={false}>
                 Activity type {this.state.deleteActtypeName} is in use, it can not be Deactivated!!
               </Snackbar>
             ) : null}

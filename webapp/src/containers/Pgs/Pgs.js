@@ -64,6 +64,7 @@ export class Pgs extends React.Component {
     this.state = {
       values: {},
       data: [],
+      contacts: [],
       DeleteData: false,
       isActiveAllShowing: false,
       isCancel: false,
@@ -71,6 +72,9 @@ export class Pgs extends React.Component {
       multipleDelete: "",
       errorCode: "",
       successCode: "",
+      deletePgName: "",
+      pgInUseSingleDelete: "",
+      pgInUseDeleteAll: "",
       isPgPresent: false,
       isLoader: true,
     };
@@ -87,6 +91,14 @@ export class Pgs extends React.Component {
       .catch((error) => {
         console.log(error);
       });
+
+      serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&pg_null=false"
+      )
+      .then((res) => {
+        this.setState({ contacts: res.data });
+      });
   }
 
   editData = (cellid) => {
@@ -96,31 +108,58 @@ export class Pgs extends React.Component {
   DeleteData = (cellid, selectedId) => {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-      serviceProvider
-        .serviceProviderForDeleteRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/tags",
-          cellid
-        )
-        .then((res) => {
-          this.setState({ singleDelete: res.data.name });
-          this.setState({ dataCellId: "" });
-          this.componentDidMount();
-        })
-        .catch((error) => {
-          this.setState({ singleDelete: false });
-          console.log(error);
-        });
+
+      let pgInUseSingleDelete = false;
+      this.state.contacts.find((cd) => {
+        if (cd.pg.id === parseInt(cellid)) {
+          this.setState({
+            pgInUseSingleDelete: true,
+            deletePgName: cd.pg.name,
+          });
+          pgInUseSingleDelete = true;
+        }
+      });
+      if (!pgInUseSingleDelete) {
+        serviceProvider
+          .serviceProviderForDeleteRequest(
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/tags",
+            cellid
+          )
+          .then((res) => {
+            this.setState({ singleDelete: res.data.name });
+            this.setState({ dataCellId: "" });
+            this.componentDidMount();
+          })
+          .catch((error) => {
+            this.setState({ singleDelete: false });
+            console.log(error);
+          });
+      }
     }
   };
 
   DeleteAll = (selectedId) => {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
-      for (let i in selectedId) {
+
+      let pgInUse = [];
+      this.state.contacts.map((cd) => {
+        for (let i in selectedId) {
+          if (parseInt(selectedId[i]) === cd.pg.id) {
+            pgInUse.push(selectedId[i]);
+            this.setState({ pgInUseDeleteAll: true });
+          }
+          pgInUse = [...new Set(pgInUse)];
+        }
+      });
+      var deletePg = selectedId.filter(function (obj) {
+        return pgInUse.indexOf(obj) == -1;
+      });
+      for (let i in deletePg) {
         serviceProvider
           .serviceProviderForDeleteRequest(
             process.env.REACT_APP_SERVER_URL + "crm-plugin/tags",
-            selectedId[i]
+            deletePg[i]
           )
           .then((res) => {
             this.setState({ multipleDelete: true });
@@ -333,13 +372,13 @@ export class Pgs extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            {this.state.multipleDelete === true ? (
+            {this.state.multipleDelete === true && this.state.pgInUseDeleteAll !== true? (
               <Snackbar severity="success" Showbutton={false}>
                 Producer Groups deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.isPgPresent === true ? (
-              <Snackbar severity="error" Showbutton={false}>
+              <Snackbar severity="info" Showbutton={false}>
                 Producer Group is in use, it can not be Deactivated!!
               </Snackbar>
             ) : null}
@@ -353,6 +392,16 @@ export class Pgs extends React.Component {
                 {this.state.errorCode}
               </Snackbar>
             ) : null}
+            {this.state.pgInUseSingleDelete === true ? (
+            <Snackbar severity="info" Showbutton={false}>
+              Producer Group {this.state.deletePgName} is in use, it can not be Deleted.
+            </Snackbar>
+          ) : null}
+          {this.state.pgInUseDeleteAll === true ? (
+            <Snackbar severity="info" Showbutton={false}>
+              Some Producer Group is in use hence it can not be Deleted.
+            </Snackbar>
+          ) : null}
             <div
               className={classes.row}
               style={{ flexWrap: "wrap", height: "auto" }}

@@ -65,7 +65,7 @@ export class States extends React.Component {
       values: {},
       FilterState: "",
       data: [],
-      contacts: [],
+      villages: [],
       isActiveAllShowing: false,
       stateInUse: "",
       deleteStateName: "",
@@ -95,10 +95,10 @@ export class States extends React.Component {
 
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/?_sort=id:ASC"
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/villages"
       )
       .then((res) => {
-        this.setState({ contacts: res.data });
+        this.setState({ villages: res.data });
       });
   }
 
@@ -160,18 +160,12 @@ export class States extends React.Component {
     if (cellid.length !== null && selectedId < 1) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       let stateInUseSingleDelete = false;
-      this.state.contacts.find((cd) => {
-        if (cd.addresses.length > 0) {
-          if (cd.addresses[0].state === parseInt(cellid)) {
-            this.state.data.map(stdata => {
-              if (cellid === stdata.id) {
-                this.setState({ stateInUseSingleDelete: true, deleteStateName: stdata.name });
-                stateInUseSingleDelete = true;
-              }
-            })
-          }
+      this.state.villages.find((villg) => {
+        if (villg.state.id == parseInt(cellid)) {
+          this.setState({ stateInUseSingleDelete: true, deleteStateName: villg.state.name });
+          stateInUseSingleDelete = true;
         }
-      });
+      })
       if (!stateInUseSingleDelete) {
         serviceProvider
           .serviceProviderForDeleteRequest(
@@ -195,14 +189,13 @@ export class States extends React.Component {
     if (selectedId.length !== 0) {
       this.setState({ singleDelete: "", multipleDelete: "" });
       let stInUse = [];
-      this.state.contacts.map((cd) => {
-        if (cd.addresses.length > 0 && cd.addresses[0].state != null) {
-          for (let i in selectedId) {
-            if (parseInt(selectedId[i]) === cd.addresses[0].state) {
-              stInUse.push(selectedId[i])
-            }
-            stInUse = [...new Set(stInUse)]
+      this.state.villages.find((villg) => {
+        for (let i in selectedId) {
+          if (parseInt(selectedId[i]) === villg.state.id) {
+            stInUse.push(selectedId[i])
+            this.setState({ stateInUseDeleteAll: true });
           }
+          stInUse = [...new Set(stInUse)];
         }
       });
       var deleteState = selectedId.filter(function (obj) {
@@ -215,7 +208,7 @@ export class States extends React.Component {
             deleteState[i]
           )
           .then((res) => {
-            this.setState({ stateInUseDeleteAll: true });
+            this.setState({ multipleDelete: true });
             this.componentDidMount();
           })
           .catch((error) => {
@@ -244,18 +237,11 @@ export class States extends React.Component {
     let setActiveId = this.state.setActiveId;
     let IsActive = this.state.IsActive;
     let stateInUse = false;
-    this.state.contacts.find((cd) => {
-      if (cd.addresses.length > 0) {
-        if (cd.addresses[0].state != null) {
-          if (cd.addresses[0].state === parseInt(setActiveId)) {
-            this.state.data.map(stdata => {
-              if (parseInt(setActiveId) === stdata.id) {
-                this.setState({ stateInUse: true, deleteStateName: stdata.name });
-                stateInUse = true;
-              }
-            })
-          }
-        }
+
+    this.state.villages.find((villg) => {
+      if (villg.state.id == parseInt(setActiveId)) {
+        this.setState({ stateInUse: true, deleteStateName: villg.state.name });
+        stateInUse = true;
       }
     });
     if (!stateInUse) {
@@ -383,7 +369,7 @@ export class States extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            {this.state.multipleDelete === true ? (
+            {this.state.multipleDelete === true && this.state.stateInUseDeleteAll !== true? (
               <Snackbar severity="success" Showbutton={false}>
                 States deleted successfully!
               </Snackbar>
@@ -394,7 +380,7 @@ export class States extends React.Component {
               </Snackbar>
             ) : null}
             {this.state.stateInUse === true ? (
-              <Snackbar severity="error" Showbutton={false}>
+              <Snackbar severity="info" Showbutton={false}>
                 State {this.state.deleteStateName} is in use, it can not be Deactivated!!
               </Snackbar>
             ) : null}
