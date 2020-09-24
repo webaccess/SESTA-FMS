@@ -86,7 +86,6 @@ export class Pgs extends React.Component {
         process.env.REACT_APP_SERVER_URL + "crm-plugin/tags/?_sort=name:ASC"
       )
       .then((res) => {
-        console.log('res data pgs --',res.data);
         this.setState({ data: res.data, isLoader: false });
       })
       .catch((error) => {
@@ -95,10 +94,9 @@ export class Pgs extends React.Component {
 
       serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/?_sort=id:ASC"
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&pg_null=false"
       )
       .then((res) => {
-        console.log('contacts --',res.data);
         this.setState({ contacts: res.data });
       });
   }
@@ -113,14 +111,12 @@ export class Pgs extends React.Component {
 
       let pgInUseSingleDelete = false;
       this.state.contacts.find((cd) => {
-        if (cd.pg !== null) {
-          if (cd.pg.id === parseInt(cellid)) {
-            this.setState({
-              pgInUseSingleDelete: true,
-              deletePgName: cd.pg.name,
-            });
-            pgInUseSingleDelete = true;
-          }
+        if (cd.pg.id === parseInt(cellid)) {
+          this.setState({
+            pgInUseSingleDelete: true,
+            deletePgName: cd.pg.name,
+          });
+          pgInUseSingleDelete = true;
         }
       });
       if (!pgInUseSingleDelete) {
@@ -148,14 +144,12 @@ export class Pgs extends React.Component {
 
       let pgInUse = [];
       this.state.contacts.map((cd) => {
-        if (cd.pg !== null) {
-          for (let i in selectedId) {
-            if (parseInt(selectedId[i]) === cd.pg.id) {
-              pgInUse.push(selectedId[i]);
-              this.setState({ pgInUseDeleteAll: true });
-            }
-            pgInUse = [...new Set(pgInUse)];
+        for (let i in selectedId) {
+          if (parseInt(selectedId[i]) === cd.pg.id) {
+            pgInUse.push(selectedId[i]);
+            this.setState({ pgInUseDeleteAll: true });
           }
+          pgInUse = [...new Set(pgInUse)];
         }
       });
       var deletePg = selectedId.filter(function (obj) {
