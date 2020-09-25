@@ -97,6 +97,10 @@ ClearButton {
   background-color: inherit;
 }
 
+.tableCard > div > div {
+  height: auto !important;
+}
+
 :global(.test) {
   display: none !important;
 }

@@ -9,8 +9,15 @@
  *
  * @description: Contact stores contact details like address, email, phone, etc of an individual or an organization or of a user in the system.
  */
-const { sanitizeEntity } = require("strapi-utils"); // removes private fields and its relations from model
+const {
+  sanitizeEntity,
+  convertRestQueryParams,
+  buildQuery,
+} = require("strapi-utils"); // removes private fields and its relations from model
 const vm = require("vm");
+const utils = require("../../../config/utils.js");
+const _ = require("lodash");
+
 module.exports = {
   /**
    * Method: find
@@ -392,143 +399,77 @@ module.exports = {
 
   /** get Members as per logged in user's role */
   getMembers: async (ctx) => {
+    const { page, query, pageSize } = utils.getRequestParams(ctx.request.query);
+    let filters = convertRestQueryParams(query, { limit: -1 });
+    let sort;
+    if (filters.sort) {
+      sort = filters.sort;
+      filters = _.omit(filters, ["sort"]);
+    }
+
+    // for CSP user
     if (ctx.query.id) {
       const contactPromise = await strapi.query("contact", "crm-plugin").find({
         id: ctx.query.id,
       });
-      let shgList = [];
-      contactPromise[0].org_vos.map((shg, i) => {
-        shgList.push(shg.contact);
-      });
-      const memberPromise = await strapi.query("contact", "crm-plugin").find({
-        contact_type: "individual",
-        user_null: true,
-        "individual.shg_in": shgList,
-      });
-
-      //assign state, district & village name
-      const addressPromise = await Promise.all(
-        await memberPromise.map(async (val, index) => {
-          if (val.addresses) {
-            return await strapi
-              .query("address", "crm-plugin")
-              .find({ id: val.addresses.id, "contact.id": val.id });
-          }
-        })
-      );
-      if (addressPromise.length > 0) {
-        addressPromise.map(async (model, index) => {
-          if (model) {
-            if (model[0].state) {
-              Object.assign(memberPromise[index], {
-                stateName: model[0].state.name,
-              });
-            }
-            if (model[0].district) {
-              Object.assign(memberPromise[index], {
-                districtName: model[0].district.name,
-              });
-            }
-            if (model[0].village) {
-              Object.assign(memberPromise[index], {
-                villageName: model[0].village.name,
-              });
-            }
-          }
-        });
+      const shgIds = contactPromise[0].org_vos.map((r) => r.contact);
+      const shgIdsQuery = [
+        { field: "individual.shg", operator: "in", value: shgIds },
+      ];
+      if (filters.where && filters.where.length > 0) {
+        filters.where = [...filters.where, ...shgIdsQuery];
+      } else {
+        filters.where = [...shgIdsQuery];
       }
 
-      //assign shg name
-      const shgPromise = await Promise.all(
-        await memberPromise.map(async (val, index) => {
-          if (val.individual) {
-            if (val.individual.shg !== "" || val.individual.shg !== null) {
-              return await strapi
-                .query("contact", "crm-plugin")
-                .find({ id: val.individual.shg });
-            }
+      return strapi
+        .query("contact", "crm-plugin")
+        .model.query(
+          buildQuery({
+            model: strapi.plugins["crm-plugin"].models["contact"],
+            filters,
+          })
+        )
+        .fetchAll()
+        .then(async (res) => {
+          let data = res.toJSON();
+          // Sorting ascending or descending on one or multiple fields
+          if (sort && sort.length) {
+            data = utils.sort(data, sort);
           }
-        })
-      );
-      if (shgPromise.length > 0) {
-        shgPromise.map(async (model, index) => {
-          if (model) {
-            Object.assign(memberPromise[index], {
-              shgName: model[0].name,
-            });
-          }
+          const response = utils.paginate(data, page, pageSize);
+          const response1 = await utils.assignData(response);
+
+          return {
+            result: response1.result,
+            ...response.pagination,
+          };
         });
-      }
-      // returns contact obj
-      return memberPromise.map((entity) =>
-        sanitizeEntity(entity, {
-          model: strapi.plugins["crm-plugin"].models["contact"],
-        })
-      );
     } else {
-      const memberPromise = await strapi.query("contact", "crm-plugin").find({
-        contact_type: "individual",
-        user_null: true,
-      });
-      //assign state, district & village name
-      const addressPromise = await Promise.all(
-        await memberPromise.map(async (val, index) => {
-          if (val.addresses) {
-            return await strapi
-              .query("address", "crm-plugin")
-              .find({ id: val.addresses.id, "contact.id": val.id });
+      // for sesta, super and FPO admins
+      return strapi
+        .query("contact", "crm-plugin")
+        .model.query(
+          buildQuery({
+            model: strapi.plugins["crm-plugin"].models["contact"],
+            filters,
+          })
+        )
+        .fetchAll({})
+        .then(async (res) => {
+          let data = res.toJSON();
+          // Sorting ascending or descending on one or multiple fields
+          if (sort && sort.length) {
+            data = utils.sort(data, sort);
           }
-        })
-      );
-      if (addressPromise.length > 0) {
-        addressPromise.map(async (model, index) => {
-          if (model) {
-            if (model[0].state) {
-              Object.assign(memberPromise[index], {
-                stateName: model[0].state.name,
-              });
-            }
-            if (model[0].district) {
-              Object.assign(memberPromise[index], {
-                districtName: model[0].district.name,
-              });
-            }
-            if (model[0].village) {
-              Object.assign(memberPromise[index], {
-                villageName: model[0].village.name,
-              });
-            }
-          }
-        });
-      }
+          const response = utils.paginate(data, page, pageSize);
+          const response1 = await utils.assignData(response);
 
-      //assign shg name
-      const shgPromise = await Promise.all(
-        await memberPromise.map(async (val, index) => {
-          if (val.individual) {
-            if (val.individual.shg !== "" || val.individual.shg !== null) {
-              return await strapi
-                .query("contact", "crm-plugin")
-                .find({ id: val.individual.shg });
-            }
-          }
-        })
-      );
-      if (shgPromise.length > 0) {
-        shgPromise.map(async (model, index) => {
-          if (model) {
-            Object.assign(memberPromise[index], {
-              shgName: model[0].name,
-            });
-          }
+          return {
+            result: response1.result,
+            ...response.pagination,
+          };
         });
-      }
-      // returns contact obj
-      return memberPromise.map((entity) =>
-        sanitizeEntity(entity, {
-          model: strapi.plugins["crm-plugin"].models["contact"],
-        })
-      );
     }
   },
 };

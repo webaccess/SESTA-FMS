@@ -330,7 +330,9 @@ const Table = (props) => {
           <div>
             <div
               onClick={
-                cell.status === "Approved" || cell.status === "InProgress" || cell.status === "Completed"
+                cell.status === "Approved" ||
+                cell.status === "InProgress" ||
+                cell.status === "Completed"
                   ? (event) => viewLoanEmi(cell.id, cell[valueformodal])
                   : null
               }
@@ -339,7 +341,13 @@ const Table = (props) => {
               <Tooltip title="View EMI">
                 <IconButton
                   aria-label="task"
-                  disabled={cell.status === "Approved" || cell.status === "InProgress" || cell.status === "Completed"? false : true}
+                  disabled={
+                    cell.status === "Approved" ||
+                    cell.status === "InProgress" ||
+                    cell.status === "Completed"
+                      ? false
+                      : true
+                  }
                 >
                   <VisibilityIcon className={classes.VisibilityIcon} />
                 </IconButton>
@@ -362,7 +370,9 @@ const Table = (props) => {
             </div>
             <div
               onClick={
-                cell.status === "Approved" || cell.status === "InProgress" || cell.status === "Completed"
+                cell.status === "Approved" ||
+                cell.status === "InProgress" ||
+                cell.status === "Completed"
                   ? (event) => viewEmi(cell.id, cell[valueformodal])
                   : null
               }
@@ -373,7 +383,13 @@ const Table = (props) => {
                 <Tooltip title="EMI">
                   <IconButton
                     aria-label="activity"
-                    disabled={cell.status === "Approved" || cell.status === "InProgress" || cell.status === "Completed" ? false : true}
+                    disabled={
+                      cell.status === "Approved" ||
+                      cell.status === "InProgress" ||
+                      cell.status === "Completed"
+                        ? false
+                        : true
+                    }
                   >
                     <AssignmentIndIcon
                       className={classes.AssignmentTurnedInIcon}
@@ -386,7 +402,9 @@ const Table = (props) => {
             </div>
             <div
               onClick={
-                cell.status === "Approved" || cell.status === "InProgress" || cell.status === "Completed"
+                cell.status === "Approved" ||
+                cell.status === "InProgress" ||
+                cell.status === "Completed"
                   ? (event) => viewTask(cell.id, cell[valueformodal])
                   : null
               }
@@ -397,7 +415,13 @@ const Table = (props) => {
                 <Tooltip title="Task">
                   <IconButton
                     aria-label="task"
-                    disabled={cell.status === "Approved" || cell.status === "InProgress" || cell.status === "Completed" ? false : true}
+                    disabled={
+                      cell.status === "Approved" ||
+                      cell.status === "InProgress" ||
+                      cell.status === "Completed"
+                        ? false
+                        : true
+                    }
                   >
                     <AssignmentTurnedInIcon
                       className={classes.AssignmentTurnedInIcon}
@@ -525,12 +549,24 @@ const Table = (props) => {
         ) : (
           <p></p>
         )}
-        <Card>
+        <Card className={style.tableCard}>
           <DataTable
             data={filteredData}
             title={props.title}
             columns={props.column}
+            /** pagination */
             pagination={props.pagination}
+            paginationServer
+            paginationTotalRows={props.paginationTotalRows}
+            paginationRowsPerPageOptions={props.paginationRowsPerPageOptions}
+            onChangeRowsPerPage={props.onChangeRowsPerPage}
+            onChangePage={props.onChangePage}
+            /** Sort */
+            defaultSortField={props.defaultSortField}
+            defaultSortAsc={props.defaultSortAsc}
+            onSort={props.onSort}
+            sortFunction={props.sortFunction}
+            sortServer={props.sortServer}
             progressComponent
             selectableRowsComponent={Checkbox}
             contextActions={contextActions}
