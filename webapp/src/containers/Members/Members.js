@@ -13,6 +13,7 @@ import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autocomplete from "../../components/Autocomplete/Autocomplete";
 import { map } from "lodash";
 import * as constants from "../../constants/Constants";
+import * as formUtilities from "../../utilities/FormUtilities";
 
 const useStyles = (theme) => ({
   root: {},
@@ -55,6 +56,7 @@ const useStyles = (theme) => ({
     marginRight: theme.spacing(1),
   },
 });
+const SORT_FIELD_KEY = "_sort";
 
 export class Members extends React.Component {
   constructor(props) {
@@ -80,11 +82,19 @@ export class Members extends React.Component {
       singleDeleteName: "",
       isLoader: true,
       stateId: constants.STATE_ID,
+      /** pagination data */
+      pageSize: "",
+      totalRows: "",
+      page: "",
+      pageCount: "",
+      resetPagination: false,
+      /** sorting data */
+      sortAscending: true,
     };
   }
 
   async componentDidMount() {
-    this.getMembers("load", "");
+    await this.getMembers(10, 1);
 
     // get all SHGs
     let url =
@@ -143,9 +153,39 @@ export class Members extends React.Component {
     }
   }
 
-  getMembers = (param, searchData) => {
-    let url =
-      "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true";
+  getMembers = async (pageSize, page, params = null) => {
+    if (params !== null && !formUtilities.checkEmpty(params)) {
+      let defaultParams = {};
+      if (params.hasOwnProperty(SORT_FIELD_KEY)) {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+          contact_type: "individual",
+          user_null: true,
+        };
+      } else {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+          [SORT_FIELD_KEY]: "name:ASC",
+          contact_type: "individual",
+          user_null: true,
+        };
+      }
+      Object.keys(params).map((key) => {
+        defaultParams[key] = params[key];
+      });
+      params = defaultParams;
+    } else {
+      params = {
+        page: page,
+        pageSize: pageSize,
+        [SORT_FIELD_KEY]: "name:ASC",
+        contact_type: "individual",
+        user_null: true,
+      };
+    }
+
     if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
       serviceProvider
         .serviceProviderForGetRequest(
@@ -158,20 +198,36 @@ export class Members extends React.Component {
             .serviceProviderForGetRequest(
               process.env.REACT_APP_SERVER_URL +
                 "crm-plugin/contact/members/?id=" +
-                res.data.vo.id
+                res.data.vo.id,
+              params
             )
             .then((memResp) => {
-              this.setState({ data: memResp.data, isLoader: false });
+              this.setState({
+                data: memResp.data.result,
+                isLoader: false,
+                pageSize: memResp.data.pageSize,
+                totalRows: memResp.data.rowCount,
+                page: memResp.data.page,
+                pageCount: memResp.data.pageCount,
+              });
             });
         })
         .catch((error) => {});
     } else {
-      serviceProvider
+      await serviceProvider
         .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/members/"
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/members/",
+          params
         )
         .then((res) => {
-          this.setState({ data: res.data, isLoader: false });
+          this.setState({
+            data: res.data.result,
+            isLoader: false,
+            pageSize: res.data.pageSize,
+            totalRows: res.data.rowCount,
+            page: res.data.page,
+            pageCount: res.data.pageCount,
+          });
         })
         .catch((error) => {
           console.log(error);
@@ -193,12 +249,68 @@ export class Members extends React.Component {
       });
   };
 
+  /** Pagination to handle row change*/
+  handlePerRowsChange = async (perPage, page) => {
+    console.log("-handlePerRowsChange perpage=>", perPage);
+    console.log("-handlePerRowsChange page=>", page);
+    this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      await this.getMembers(perPage, page);
+    } else {
+      await this.getMembers(perPage, page, this.state.values);
+    }
+  };
+
+  /** Pagination to handle page change */
+  handlePageChange = (page) => {
+    console.log("-handlePageChange page=>", page);
+    console.log("-handlePageChange pageSize=>", this.state.pageSize);
+    this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      this.getMembers(this.state.pageSize, page);
+    } else {
+      this.getMembers(this.state.pageSize, page, this.state.values);
+    }
+  };
+
+  /** Sorting */
+  handleSort = (
+    column,
+    sortDirection,
+    perPage = this.state.pageSize,
+    page = 1
+  ) => {
+    this.setState({ isLoader: true });
+    if (column.selector === "name") {
+      column.selector = "name";
+    }
+    // if (column.selector === "districtName") {
+    //   column.selector = "addresses.district";
+    // }
+    // if (column.selector === "villageName") {
+    //   column.selector = "addresses.village";
+    // }
+    if (column.selector === "shgName") {
+      column.selector = "individual.shg";
+    }
+    this.state.values[SORT_FIELD_KEY] = column.selector + ":" + sortDirection;
+    this.getMembers(perPage, page, this.state.values);
+  };
+
+  handleSearch() {
+    this.setState({ isLoader: true });
+    this.getMembers(this.state.pageSize, this.state.page, this.state.values);
+  }
+
   handleDistrictChange(event, value) {
     if (value !== null) {
       this.setState({
         filterDistrict: value,
         isCancel: false,
         filterVillage: "",
+        values: {
+          ["addresses.district"]: value.id,
+        },
       });
       let distId = value.id;
       serviceProvider
@@ -225,7 +337,23 @@ export class Members extends React.Component {
 
   handleShgChange(event, value) {
     if (value !== null) {
-      this.setState({ filterShg: value, isCancel: false });
+      this.setState({
+        filterShg: value,
+        isCancel: false,
+      });
+      if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
+        this.setState({
+          values: {
+            ["individual.shg"]: value.contact,
+          },
+        });
+      } else {
+        this.setState({
+          values: {
+            ["individual.shg"]: value.id,
+          },
+        });
+      }
     } else {
       this.setState({
         filterShg: "",
@@ -235,9 +363,12 @@ export class Members extends React.Component {
 
   handleVillageChange(event, value) {
     if (value !== null) {
-      this.setState({ filterVillage: value });
       this.setState({
+        filterVillage: value,
         isCancel: false,
+        values: {
+          ["addresses.village"]: value.id,
+        },
       });
     } else {
       this.setState({
@@ -248,91 +379,16 @@ export class Members extends React.Component {
 
   cancelForm = () => {
     this.setState({
-      filterState: "",
       filterDistrict: "",
       filterVillage: "",
       filterShg: "",
       isCancel: true,
       isLoader: true,
+      values: {},
     });
 
     this.componentDidMount();
   };
-
-  getFilteredmembers = (searchData) => {
-    let url =
-      "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true";
-    if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/individuals/" +
-            auth.getUserInfo().contact.individual
-        )
-        .then((res) => {
-          serviceProvider
-            .serviceProviderForGetRequest(
-              process.env.REACT_APP_SERVER_URL +
-                "crm-plugin/contact/" +
-                res.data.vo.id
-            )
-            .then((resp) => {
-              let shgList = [];
-              resp.data.org_vos.map((shg, i) => {
-                shgList.push(shg.contact);
-              });
-              let newUrl =
-                "crm-plugin/contact/?contact_type=individual&&_sort=name:ASC&&user_null=true&&";
-              shgList.map((shgId) => {
-                newUrl += "individual.shg_in=" + shgId + "&&";
-              });
-
-              serviceProvider
-                .serviceProviderForGetRequest(
-                  process.env.REACT_APP_SERVER_URL + newUrl + searchData
-                )
-                .then((memResp) => {
-                  this.setState({ data: memResp.data, isLoader: false });
-                });
-            });
-        })
-        .catch((error) => {});
-    } else {
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
-        )
-        .then((res) => {
-          this.setState({ data: res.data, isLoader: false });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-  };
-
-  handleSearch() {
-    this.setState({ isLoader: true });
-    let searchData = "";
-    if (this.state.filterDistrict) {
-      searchData += searchData ? "&&" : "";
-      searchData += "addresses.district=" + this.state.filterDistrict.id;
-    }
-    if (this.state.filterVillage) {
-      searchData += searchData ? "&&" : "";
-      searchData += "addresses.village=" + this.state.filterVillage.id;
-    }
-    if (this.state.filterShg) {
-      searchData += searchData ? "&&" : "";
-      if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
-        searchData += "individual.shg=" + this.state.filterShg.contact;
-      } else {
-        searchData += "individual.shg=" + this.state.filterShg.id;
-      }
-    }
-
-    this.getFilteredmembers(searchData);
-  }
 
   editData = (cellId) => {
     this.props.history.push("/members/edit/" + cellId);
@@ -511,7 +567,6 @@ export class Members extends React.Component {
       },
       {
         name: "Certificate No.",
-        sortable: true,
         cell: (row) =>
           row.shareinformation
             ? row.shareinformation.certificate_no ||
@@ -523,13 +578,13 @@ export class Members extends React.Component {
       {
         name: "District",
         selector: "districtName",
-        sortable: true,
+        // sortable: true,
         cell: (row) => (row.districtName ? row.districtName : "-"),
       },
       {
         name: "Village",
         selector: "villageName",
-        sortable: true,
+        // sortable: true,
         cell: (row) => (row.villageName ? row.villageName : "-"),
       },
       {
@@ -541,7 +596,6 @@ export class Members extends React.Component {
       {
         name: "Phone",
         selector: "phone",
-        sortable: true,
         cell: (row) => (row.phone ? row.phone : "-"),
       },
     ];
@@ -745,6 +799,16 @@ export class Members extends React.Component {
                   columnsvalue={columnsvalue}
                   selectableRows
                   pagination
+                  paginationServer
+                  paginationDefaultPage={this.state.page}
+                  paginationPerPage={this.state.pageSize}
+                  paginationTotalRows={this.state.totalRows}
+                  paginationRowsPerPageOptions={[10, 15, 20, 25, 30]}
+                  paginationResetDefaultPage={this.state.resetPagination}
+                  onChangeRowsPerPage={this.handlePerRowsChange}
+                  onChangePage={this.handlePageChange}
+                  onSort={this.handleSort}
+                  sortServer={true}
                   progressComponent={this.state.isLoader}
                   DeleteMessage={"Are you Sure you want to Delete"}
                 />
