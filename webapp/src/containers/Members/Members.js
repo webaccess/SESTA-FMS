@@ -88,8 +88,6 @@ export class Members extends React.Component {
       page: "",
       pageCount: "",
       resetPagination: false,
-      /** sorting data */
-      sortAscending: true,
     };
   }
 
@@ -185,9 +183,8 @@ export class Members extends React.Component {
         user_null: true,
       };
     }
-
     if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
-      serviceProvider
+      await serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
             "crm-plugin/individuals/" +
@@ -251,9 +248,7 @@ export class Members extends React.Component {
 
   /** Pagination to handle row change*/
   handlePerRowsChange = async (perPage, page) => {
-    console.log("-handlePerRowsChange perpage=>", perPage);
-    console.log("-handlePerRowsChange page=>", page);
-    this.setState({ isLoader: true });
+    // this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       await this.getMembers(perPage, page);
     } else {
@@ -263,9 +258,7 @@ export class Members extends React.Component {
 
   /** Pagination to handle page change */
   handlePageChange = (page) => {
-    console.log("-handlePageChange page=>", page);
-    console.log("-handlePageChange pageSize=>", this.state.pageSize);
-    this.setState({ isLoader: true });
+    // this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       this.getMembers(this.state.pageSize, page);
     } else {
@@ -280,7 +273,6 @@ export class Members extends React.Component {
     perPage = this.state.pageSize,
     page = 1
   ) => {
-    this.setState({ isLoader: true });
     if (column.selector === "name") {
       column.selector = "name";
     }

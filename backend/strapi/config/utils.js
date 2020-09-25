@@ -97,6 +97,26 @@ async function assignData(data) {
       }
     });
   }
+
+  // assign vos array in the organization object (as we added many-to-many relationship)
+  const orgVoPromise = await Promise.all(
+    await data.result.map(async (val, index) => {
+      if (val.organization) {
+        return await strapi
+          .query("organization", "crm-plugin")
+          .find({ id: val.organization.id, "contact.id": val.id });
+      }
+    })
+  );
+  if (orgVoPromise.length > 0) {
+    orgVoPromise.map(async (model, index) => {
+      if (model) {
+        Object.assign(data.result[index]["organization"], {
+          vos: model[0].vos,
+        });
+      }
+    });
+  }
   const result = data.result;
   return {
     result,
