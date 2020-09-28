@@ -412,6 +412,12 @@ export class Villages extends React.Component {
     this.getVillage(this.state.pageSize, this.state.page, this.state.values);
   }
 
+  handleVillageChange(event, value, target) {
+    this.setState({
+      values: { ...this.state.values, [event.target.name]: event.target.value },
+    });
+  }
+
   render() {
     let data = this.state.data;
     const Usercolumns = [
@@ -546,12 +552,12 @@ export class Villages extends React.Component {
                     <Input
                       fullWidth
                       label="Village Name"
-                      name="addVillage"
+                      name="name"
                       variant="outlined"
                       onChange={(event, value) => {
                         this.handleVillageChange(event, value);
                       }}
-                      value={this.state.values.addVillage || ""}
+                      value={this.state.values.name || ""}
                     />
                   </Grid>
                 </div>
