@@ -17,6 +17,7 @@ const {
 const vm = require("vm");
 const utils = require("../../../config/utils.js");
 const _ = require("lodash");
+var qs = require("qs");
 
 module.exports = {
   /**
@@ -210,107 +211,81 @@ module.exports = {
 
   /** get SHGs of all VOs associated with logged in FPO user */
   getShg: async (ctx) => {
+    const { page, query, pageSize } = utils.getRequestParams(ctx.request.query);
+    let filters = convertRestQueryParams(query, { limit: -1 });
+    let sort;
+    if (filters.sort) {
+      sort = filters.sort;
+      filters = _.omit(filters, ["sort"]);
+    }
     try {
-      let contact;
-      if (ctx.query._q) {
-        // checks if any filter parameter is present
-        contact = await strapi.query("contact", "crm-plugin").search(ctx.query);
-      } else {
-        // returns all data if no filter parameter is passed
-        contact = await strapi.query("contact", "crm-plugin").find(ctx.query);
-      }
-
       if (ctx.query.id) {
-        const orgPromise = await Promise.all(
-          await contact.map(async (val, index) => {
-            return await strapi.query("contact", "crm-plugin").find({
-              contact_type: "organization",
-              "organization.sub_type": "VO",
-              "organization.fpo": ctx.query.id,
-            });
-          })
-        );
+        const orgPromise = await strapi.query("contact", "crm-plugin").find({
+          contact_type: "organization",
+          "organization.sub_type": "VO",
+          "organization.fpo": ctx.query.id,
+        });
         if (orgPromise.length > 0) {
-          let voList = [];
-          orgPromise.map(async (model, index) => {
-            model.map(async (e, i) => {
-              voList.push(e.id);
-            });
-          });
-          const shgPromise = await Promise.all(
-            await contact.map(async (val, index) => {
-              return await strapi.query("contact", "crm-plugin").find({
-                contact_type: "organization",
-                "organization.sub_type": "SHG",
-                "organization.vos.id_in": voList,
-              });
-            })
-          );
-
-          // assign vos array in the organization object (as we added many-to-many relationship)
-          const orgVoPromise = await Promise.all(
-            await shgPromise[0].map(async (val, index) => {
-              if (val.organization) {
-                return await strapi
-                  .query("organization", "crm-plugin")
-                  .find({ id: val.organization.id, "contact.id": val.id });
-              }
-            })
-          );
-          if (orgVoPromise.length > 0) {
-            orgVoPromise.map(async (model, index) => {
-              if (model) {
-                Object.assign(shgPromise[0][index]["organization"], {
-                  vos: model[0].vos,
-                });
-              }
-            });
+          const voIds = orgPromise.map((r) => r.id);
+          const voIdsQuery = [
+            { field: "organization.vos.id", operator: "in", value: voIds },
+          ];
+          if (filters.where && filters.where.length > 0) {
+            filters.where = [...filters.where, ...voIdsQuery];
+          } else {
+            filters.where = [...voIdsQuery];
           }
+          filters.where.shift();
 
-          //assign state, district & village name
-          const addressPromise = await Promise.all(
-            await shgPromise[0].map(async (val, index) => {
-              if (val.addresses) {
-                return await strapi
-                  .query("address", "crm-plugin")
-                  .find({ id: val.addresses.id, "contact.id": val.id });
+          return strapi
+            .query("contact", "crm-plugin")
+            .model.query(
+              buildQuery({
+                model: strapi.plugins["crm-plugin"].models["contact"],
+                filters,
+              })
+            )
+            .fetchAll()
+            .then(async (res) => {
+              let data = res.toJSON();
+              // Sorting ascending or descending on one or multiple fields
+              if (sort && sort.length) {
+                data = utils.sort(data, sort);
               }
-            })
-          );
-          if (addressPromise.length > 0) {
-            addressPromise.map(async (model, index) => {
-              if (model) {
-                if (model[0].state) {
-                  Object.assign(shgPromise[0][index], {
-                    stateName: model[0].state.name,
-                  });
-                }
-                if (model[0].district) {
-                  Object.assign(shgPromise[0][index], {
-                    districtName: model[0].district.name,
-                  });
-                }
-                if (model[0].village) {
-                  Object.assign(shgPromise[0][index], {
-                    villageName: model[0].village.name,
-                  });
-                }
-              }
+              const response = utils.paginate(data, page, pageSize);
+              const response1 = await utils.assignData(response);
+
+              return {
+                result: response1.result,
+                ...response.pagination,
+              };
             });
-          }
-
-          // returns contact obj
-          return shgPromise[0].map((entity) =>
-            sanitizeEntity(entity, {
-              model: strapi.plugins["crm-plugin"].models["contact"],
-            })
-          );
         }
       } else {
-        return await strapi.query("contact", "crm-plugin").count({
-          contact_type: "organization",
-          "organization.sub_type": "SHG",
-        });
+        // for sesta, super and FPO admins
+        return strapi
+          .query("contact", "crm-plugin")
+          .model.query(
+            buildQuery({
+              model: strapi.plugins["crm-plugin"].models["contact"],
+              filters,
+            })
+          )
+          .fetchAll({})
+          .then(async (res) => {
+            let data = res.toJSON();
+            // Sorting ascending or descending on one or multiple fields
+            if (sort && sort.length) {
+              data = utils.sort(data, sort);
+            }
+            const response = utils.paginate(data, page, pageSize);
+            const response1 = await utils.assignData(response);
+
+            return {
+              result: response1.result,
+              ...response.pagination,
+            };
+          });
       }
     } catch (error) {
       return ctx.badRequest(null, error.message);
@@ -421,7 +396,7 @@ module.exports = {
       } else {
         filters.where = [...shgIdsQuery];
       }
-
+      filters.where.shift();
       return strapi
         .query("contact", "crm-plugin")
         .model.query(
