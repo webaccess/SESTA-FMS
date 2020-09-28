@@ -415,19 +415,16 @@ export class Shgs extends React.Component {
       {
         name: "District",
         selector: "districtName",
-        // sortable: true,
         cell: (row) => (row.districtName ? row.districtName : "-"),
       },
       {
         name: "Village",
         selector: "villageName",
-        // sortable: true,
         cell: (row) => (row.villageName ? row.villageName : "-"),
       },
       {
         name: "Village Organization",
         selector: "voName",
-        // sortable: true,
         cell: (row) =>
           row.organization.vos.length > 0 ? row.organization.vos[0].name : "-",
       },
