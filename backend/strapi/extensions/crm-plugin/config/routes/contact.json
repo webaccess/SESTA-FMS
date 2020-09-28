@@ -2,6 +2,11 @@
   "routes": [
     {
       "method": "GET",
+      "path": "/contact/vos",
+      "handler": "contact.getVo"
+    },
+    {
+      "method": "GET",
       "path": "/contact/members",
       "handler": "contact.getMembers"
     },

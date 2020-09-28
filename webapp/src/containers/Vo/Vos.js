@@ -10,6 +10,7 @@ import auth from "../../components/Auth/Auth.js";
 import Input from "../../components/UI/Input/Input";
 import { Grid } from "@material-ui/core";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
+import * as formUtilities from "../../utilities/FormUtilities";
 
 const useStyles = (theme) => ({
   root: {},
@@ -55,6 +56,7 @@ const useStyles = (theme) => ({
     margin: "0px",
   },
 });
+const SORT_FIELD_KEY = "_sort";
 
 export class Vos extends React.Component {
   constructor(props) {
@@ -75,24 +77,18 @@ export class Vos extends React.Component {
       voInUseSingleDelete: "",
       voInUseDeleteAll: "",
       deleteVOName: "",
+      values: {},
+      isFilterSearch: false,
+      /** pagination data */
+      pageSize: "",
+      totalRows: "",
+      page: "",
+      pageCount: "",
     };
   }
 
   async componentDidMount() {
-    let url =
-      "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC";
-    if (this.state.loggedInUserRole === "FPO Admin") {
-      this.getVo("load", "");
-    } else {
-      serviceProvider
-        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
-        .then((res) => {
-          this.setState({ data: res.data, isLoader: false });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
+    this.getVo(10, 1);
 
     serviceProvider
       .serviceProviderForGetRequest(
@@ -100,39 +96,158 @@ export class Vos extends React.Component {
       )
       .then((res) => {
         this.setState({ contacts: res.data });
-      });
+      })
+      .catch((error) => {});
   }
 
-  getVo = (param, searchData) => {
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/individuals/" +
-          auth.getUserInfo().contact.individual
-      )
-      .then((res) => {
-        let voUrl =
-          "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC&&organization.fpo=" +
-          res.data.fpo.id;
-        if (param === "search") {
-          voUrl += "&&" + searchData;
-        }
-        serviceProvider
-          .serviceProviderForGetRequest(
-            process.env.REACT_APP_SERVER_URL + voUrl
-          )
-          .then((res) => {
-            this.setState({ data: res.data, isLoader: false });
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+  getVo = async (pageSize, page, params = null) => {
+    if (params !== null && !formUtilities.checkEmpty(params)) {
+      let defaultParams = {};
+      if (params.hasOwnProperty(SORT_FIELD_KEY)) {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+          contact_type: "organization",
+          "organization.sub_type": "VO",
+        };
+      } else {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+          [SORT_FIELD_KEY]: "name:ASC",
+          contact_type: "organization",
+          "organization.sub_type": "VO",
+        };
+      }
+      Object.keys(params).map((key) => {
+        defaultParams[key] = params[key];
       });
+      params = defaultParams;
+    } else {
+      params = {
+        page: page,
+        pageSize: pageSize,
+        [SORT_FIELD_KEY]: "name:ASC",
+        contact_type: "organization",
+        "organization.sub_type": "VO",
+      };
+    }
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((res) => {
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/contact/vos/?id=" +
+                res.data.fpo.id,
+              params
+            )
+            .then((voRes) => {
+              this.setState({
+                data: voRes.data.result,
+                isLoader: false,
+                pageSize: voRes.data.pageSize,
+                totalRows: voRes.data.rowCount,
+                page: voRes.data.page,
+                pageCount: voRes.data.pageCount,
+              });
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      await serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/vos/",
+          params
+        )
+        .then((res) => {
+          this.setState({
+            data: res.data.result,
+            isLoader: false,
+            pageSize: res.data.pageSize,
+            totalRows: res.data.rowCount,
+            page: res.data.page,
+            pageCount: res.data.pageCount,
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   };
 
   handleChange = (event, value) => {
-    this.setState({ filterVo: event.target.value });
+    this.setState({
+      filterVo: event.target.value,
+      values: {
+        ["name_contains"]: event.target.value,
+      },
+    });
   };
+
+  /** Pagination to handle row change*/
+  handlePerRowsChange = async (perPage, page) => {
+    // this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      await this.getVo(perPage, page);
+    } else {
+      if (this.state.isFilterSearch) {
+        await this.searchFilter(perPage, page);
+      } else {
+        await this.getVo(perPage, page, this.state.values);
+      }
+    }
+  };
+
+  /** Pagination to handle page change */
+  handlePageChange = async (page) => {
+    // this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      this.getVo(this.state.pageSize, page);
+    } else {
+      if (this.state.isFilterSearch) {
+        await this.searchFilter(this.state.pageSize, page);
+      } else {
+        await this.getVo(this.state.pageSize, page, this.state.values);
+      }
+    }
+  };
+
+  /** Pagination Search filter is called when we select filters and click on search button */
+  searchFilter = async (perPage = this.state.pageSize, page = 1) => {
+    if (!formUtilities.checkEmpty(this.state.values)) {
+      this.setState({ isFilterSearch: true });
+      await this.getVo(perPage, page, this.state.values);
+    } else {
+      await this.getVo(perPage, page);
+    }
+  };
+
+  /** Sorting */
+  handleSort = (
+    column,
+    sortDirection,
+    perPage = this.state.pageSize,
+    page = 1
+  ) => {
+    if (column.selector === "name") {
+      column.selector = "name";
+    }
+    this.state.values[SORT_FIELD_KEY] = column.selector + ":" + sortDirection;
+    this.getVo(perPage, page, this.state.values);
+  };
+
+  handleSearch() {
+    this.setState({ isLoader: true });
+    this.getVo(this.state.pageSize, this.state.page, this.state.values);
+  }
 
   editData = (cellid) => {
     this.props.history.push("/village-organizations/edit/" + cellid);
@@ -143,12 +258,16 @@ export class Vos extends React.Component {
       this.setState({ singleDelete: "", multipleDelete: "" });
       let voInUseSingleDelete = false;
       this.state.contacts.find((cdata) => {
-        if ((cdata.id === parseInt(cellid) && cdata.org_vos.length > 0 ) || (cdata.individual!== null && cdata.individual.vo === parseInt(cellid))) {
-            this.setState({
-              voInUseSingleDelete: true,
-              deleteVOName: cdata.name,
-            });
-            voInUseSingleDelete = true;
+        if (
+          (cdata.id === parseInt(cellid) && cdata.org_vos.length > 0) ||
+          (cdata.individual !== null &&
+            cdata.individual.vo === parseInt(cellid))
+        ) {
+          this.setState({
+            voInUseSingleDelete: true,
+            deleteVOName: cdata.name,
+          });
+          voInUseSingleDelete = true;
         }
       });
       if (!voInUseSingleDelete) {
@@ -175,13 +294,18 @@ export class Vos extends React.Component {
 
       let voInUse = [];
       this.state.contacts.map((cdata) => {
-          for (let i in selectedId) {
-            if ((cdata.id === parseInt(selectedId[i]) && cdata.org_vos.length > 0 ) || (cdata.individual!== null && cdata.individual.vo === parseInt(selectedId[i]))) {
-              voInUse.push(selectedId[i]);
-              this.setState({ voInUseDeleteAll: true });
-            }
-            voInUse = [...new Set(voInUse)];
+        for (let i in selectedId) {
+          if (
+            (cdata.id === parseInt(selectedId[i]) &&
+              cdata.org_vos.length > 0) ||
+            (cdata.individual !== null &&
+              cdata.individual.vo === parseInt(selectedId[i]))
+          ) {
+            voInUse.push(selectedId[i]);
+            this.setState({ voInUseDeleteAll: true });
           }
+          voInUse = [...new Set(voInUse)];
+        }
       });
       var deleteVO = selectedId.filter(function (obj) {
         return voInUse.indexOf(obj) == -1;
@@ -212,36 +336,12 @@ export class Vos extends React.Component {
       filterVo: "",
       isCancel: true,
       isLoader: true,
+      values: {},
+      isFilterSearch: false,
     });
 
     this.componentDidMount();
   };
-
-  handleSearch() {
-    this.setState({ isLoader: true });
-    let searchData = "";
-    if (this.state.filterVo) {
-      searchData += "name_contains=" + this.state.filterVo;
-    }
-
-    //api call after search filter
-    let url =
-      "crm-plugin/contact/?contact_type=organization&&organization.sub_type=VO&&_sort=name:ASC";
-    if (this.state.loggedInUserRole === "FPO Admin") {
-      this.getVo("search", searchData);
-    } else {
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
-        )
-        .then((res) => {
-          this.setState({ data: res.data, isLoader: false });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-  }
 
   render() {
     let data = this.state.data;
@@ -249,6 +349,7 @@ export class Vos extends React.Component {
       {
         name: "Village Organization",
         selector: "name",
+        sortable: true,
       },
     ];
 
@@ -373,6 +474,15 @@ export class Vos extends React.Component {
                 columnsvalue={columnsvalue}
                 selectableRows
                 pagination
+                paginationServer
+                paginationDefaultPage={this.state.page}
+                paginationPerPage={this.state.pageSize}
+                paginationTotalRows={this.state.totalRows}
+                paginationRowsPerPageOptions={[10, 15, 20, 25, 30]}
+                onChangeRowsPerPage={this.handlePerRowsChange}
+                onChangePage={this.handlePageChange}
+                onSort={this.handleSort}
+                sortServer={true}
                 progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
               />

@@ -17,7 +17,6 @@ const {
 const vm = require("vm");
 const utils = require("../../../config/utils.js");
 const _ = require("lodash");
-var qs = require("qs");
 
 module.exports = {
   /**
@@ -442,6 +441,75 @@ module.exports = {
 
           return {
             result: response1.result,
+            ...response.pagination,
+          };
+        });
+    }
+  },
+
+  /** get VO as per logged in user role with pagination and filtering  */
+  getVo: async (ctx) => {
+    const { page, query, pageSize } = utils.getRequestParams(ctx.request.query);
+    let filters = convertRestQueryParams(query, { limit: -1 });
+    let sort;
+    if (filters.sort) {
+      sort = filters.sort;
+      filters = _.omit(filters, ["sort"]);
+    }
+    if (ctx.query.id) {
+      const fpoIdQuery = [
+        { field: "organization.fpo", operator: "eq", value: ctx.query.id },
+      ];
+      if (filters.where && filters.where.length > 0) {
+        filters.where = [...filters.where, ...fpoIdQuery];
+      } else {
+        filters.where = [...fpoIdQuery];
+      }
+      filters.where.shift();
+      return strapi
+        .query("contact", "crm-plugin")
+        .model.query(
+          buildQuery({
+            model: strapi.plugins["crm-plugin"].models["contact"],
+            filters,
+          })
+        )
+        .fetchAll()
+        .then(async (res) => {
+          let data = res.toJSON();
+          // Sorting ascending or descending on one or multiple fields
+          if (sort && sort.length) {
+            data = utils.sort(data, sort);
+          }
+          const response = utils.paginate(data, page, pageSize);
+          const response1 = await utils.assignData(response);
+
+          return {
+            result: response1.result,
+            ...response.pagination,
+          };
+        });
+    } else {
+      // for sesta, super admins
+      return strapi
+        .query("contact", "crm-plugin")
+        .model.query(
+          buildQuery({
+            model: strapi.plugins["crm-plugin"].models["contact"],
+            filters,
+          })
+        )
+        .fetchAll({})
+        .then(async (res) => {
+          let data = res.toJSON();
+          // Sorting ascending or descending on one or multiple fields
+          if (sort && sort.length) {
+            data = utils.sort(data, sort);
+          }
+          const response = utils.paginate(data, page, pageSize);
+
+          return {
+            result: response.result,
             ...response.pagination,
           };
         });
