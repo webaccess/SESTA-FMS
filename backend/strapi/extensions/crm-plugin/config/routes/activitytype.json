@@ -2,8 +2,8 @@
   "routes": [
     {
       "method": "GET",
-      "path": "/activitytypes/alldata",
-      "handler": "activitytypes.getActivityTypes"
+      "path": "/activitytypes/get",
+      "handler": "activitytype.getActivityTypes"
     },
     {
       "method": "GET",

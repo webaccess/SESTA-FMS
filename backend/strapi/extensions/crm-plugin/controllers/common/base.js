@@ -198,8 +198,8 @@ function Base(requiredValues = []) {
     }
   };
 
-  /** get Members as per logged in user's role */
-  this.getModules = async (ctx) => {
+  /** get Villages as per logged in user's role */
+  this.getVillages = async (ctx) => {
     const { page, query, pageSize } = utils.getRequestParams(ctx.request.query);
     let filters = convertRestQueryParams(query, { limit: -1 });
     // console.log("filters", filters);
@@ -233,6 +233,44 @@ function Base(requiredValues = []) {
 
           return {
             result: response1.result,
+            ...response.pagination,
+          };
+        });
+    } catch (error) {
+      return ctx.badRequest(null, error.message);
+    }
+  };
+
+  /** get Activity types as per logged in user's role */
+  this.getActivityTypes = async (ctx) => {
+    const { page, query, pageSize } = utils.getRequestParams(ctx.request.query);
+    let filters = convertRestQueryParams(query, { limit: -1 });
+    let table = getTable(ctx.originalUrl);
+    let sort;
+    if (filters.sort) {
+      sort = filters.sort;
+      filters = _.omit(filters, ["sort"]);
+    }
+    try {
+      return strapi
+        .query(table, "crm-plugin")
+        .model.query(
+          buildQuery({
+            model: strapi.plugins["crm-plugin"].models[table],
+            filters,
+          })
+        )
+        .fetchAll({})
+        .then(async (res) => {
+          let data = res.toJSON();
+          // Sorting ascending or descending on one or multiple fields
+          if (sort && sort.length) {
+            data = utils.sort(data, sort);
+          }
+          const response = utils.paginate(data, page, pageSize);
+
+          return {
+            result: response.result,
             ...response.pagination,
           };
         });

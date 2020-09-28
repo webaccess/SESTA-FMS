@@ -117,13 +117,13 @@
     },
     {
       "method": "GET",
-      "path": "/activitytypes",
-      "handler": "activitytype.find"
+      "path": "/activitytypes/get",
+      "handler": "activitytype.getActivityTypes"
     },
     {
       "method": "GET",
-      "path": "/activitytypes/alldata",
-      "handler": "activitytypes.getActivityTypes"
+      "path": "/activitytypes",
+      "handler": "activitytype.find"
     },
     {
       "method": "GET",
@@ -328,7 +328,7 @@
     {
       "method": "GET",
       "path": "/villages/get",
-      "handler": "village.getModules"
+      "handler": "village.getVillages"
     },
     {
       "method": "GET",
