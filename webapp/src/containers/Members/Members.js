@@ -276,12 +276,6 @@ export class Members extends React.Component {
     if (column.selector === "name") {
       column.selector = "name";
     }
-    // if (column.selector === "districtName") {
-    //   column.selector = "addresses.district";
-    // }
-    // if (column.selector === "villageName") {
-    //   column.selector = "addresses.village";
-    // }
     if (column.selector === "shgName") {
       column.selector = "individual.shg";
     }
@@ -570,13 +564,11 @@ export class Members extends React.Component {
       {
         name: "District",
         selector: "districtName",
-        // sortable: true,
         cell: (row) => (row.districtName ? row.districtName : "-"),
       },
       {
         name: "Village",
         selector: "villageName",
-        // sortable: true,
         cell: (row) => (row.villageName ? row.villageName : "-"),
       },
       {
