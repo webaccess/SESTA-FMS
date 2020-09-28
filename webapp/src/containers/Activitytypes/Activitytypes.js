@@ -11,6 +11,7 @@ import Input from "../../components/UI/Input/Input";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Modal from "../../components/UI/Modal/Modal.js";
 import Switch from "../../components/UI/Switch/Switch";
+import * as formUtilities from "../../utilities/FormUtilities";
 
 const useStyles = (theme) => ({
   root: {},
@@ -56,6 +57,7 @@ const useStyles = (theme) => ({
     margin: "0px",
   },
 });
+const SORT_FIELD_KEY = "_sort";
 
 export class Activitytypes extends React.Component {
   constructor(props) {
@@ -78,40 +80,120 @@ export class Activitytypes extends React.Component {
       isActTypePresent: false,
       isLoader: true,
       activities: [],
-      acttypeInUseSingleDelete : "",
-      acttypeInUseDeleteAll : "",
-      deleteActtypeName : ""
+      acttypeInUseSingleDelete: "",
+      acttypeInUseDeleteAll: "",
+      deleteActtypeName: "",
+      /** pagination data */
+      pageSize: "",
+      totalRows: "",
+      page: "",
+      pageCount: "",
+      resetPagination: false,
     };
   }
 
   async componentDidMount() {
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activitytypes/?_sort=name:ASC"
-      )
-      .then((res) => {
-        this.setState({ data: res.data, isLoader: false });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    await this.getActivityTypes(10, 1);
 
-      serviceProvider
+    serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
           "crm-plugin/activities/?_sort=start_datetime:desc"
       )
       .then((activityRes) => {
-        this.setState({activities: activityRes.data});
-      })
+        this.setState({ activities: activityRes.data });
+      });
   }
 
-  activityFilter(event, value, target) {
-    this.setState({
-      values: { ...this.state.values, [event.target.name]: event.target.value },
-    });
-  }
+  getActivityTypes = async (pageSize, page, params = null) => {
+    if (params !== null && !formUtilities.checkEmpty(params)) {
+      let defaultParams = {};
+      if (params.hasOwnProperty(SORT_FIELD_KEY)) {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+        };
+      } else {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+          [SORT_FIELD_KEY]: "name:ASC",
+        };
+      }
+      Object.keys(params).map((key) => {
+        defaultParams[key] = params[key];
+      });
+      params = defaultParams;
+    } else {
+      params = {
+        page: page,
+        pageSize: pageSize,
+        [SORT_FIELD_KEY]: "name:ASC",
+      };
+    }
+
+    await serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes/alldata/",
+        params
+      )
+      .then((res) => {
+        this.setState({
+          data: res.data.result,
+          isLoader: false,
+          pageSize: res.data.pageSize,
+          totalRows: res.data.rowCount,
+          page: res.data.page,
+          pageCount: res.data.pageCount,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  /** Pagination to handle row change*/
+  handlePerRowsChange = async (perPage, page) => {
+    // this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      await this.getActivityTypes(perPage, page);
+    } else {
+      await this.getActivityTypes(perPage, page, this.state.values);
+    }
+  };
+
+  /** Pagination to handle page change */
+  handlePageChange = (page) => {
+    // this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      this.getActivityTypes(this.state.pageSize, page);
+    } else {
+      this.getActivityTypes(this.state.pageSize, page, this.state.values);
+    }
+  };
+
+  /** Sorting */
+  handleSort = (
+    column,
+    sortDirection,
+    perPage = this.state.pageSize,
+    page = 1
+  ) => {
+    if (column.selector === "name") {
+      column.selector = "name";
+    }
+    if (column.selector === "remuneration") {
+      column.selector = "remuneration";
+    }
+    this.state.values[SORT_FIELD_KEY] = column.selector + ":" + sortDirection;
+    this.getActivityTypes(perPage, page, this.state.values);
+  };
+
+  //activityFilter(event, value, target) {
+  //  this.setState({
+  //    values: { ...this.state.values, [event.target.name]: event.target.value },
+  //  });
+  //}
 
   getData(result) {
     for (let i in result) {
@@ -134,23 +216,20 @@ export class Activitytypes extends React.Component {
 
   handleSearch() {
     this.setState({ isLoader: true });
-    let searchData = "";
-    if (this.state.values.filterActivitytype) {
-      searchData += "name_contains=" + this.state.values.filterActivitytype;
-    }
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activitytypes/?" +
-          searchData +
-          "&&_sort=name:ASC"
-      )
-      .then((res) => {
-        this.setState({ data: this.getData(res.data), isLoader: false });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    this.getActivityTypes(
+      this.state.pageSize,
+      this.state.page,
+      this.state.values
+    );
+  }
+
+  handleChange(event) {
+    this.setState({
+      [event.target.name]: event.target.value,
+      values: {
+        ["name_contains"]: event.target.value,
+      },
+    });
   }
 
   editData = (cellid) => {
@@ -176,26 +255,29 @@ export class Activitytypes extends React.Component {
       this.state.activities.find((act) => {
         if (act.activitytype !== null) {
           if (act.activitytype.id === parseInt(cellid)) {
-            this.setState({ acttypeInUseSingleDelete: true, deleteActtypeName: act.activitytype.name });
+            this.setState({
+              acttypeInUseSingleDelete: true,
+              deleteActtypeName: act.activitytype.name,
+            });
             acttypeInUseSingleDelete = true;
           }
         }
       });
       if (!acttypeInUseSingleDelete) {
-      serviceProvider
-        .serviceProviderForDeleteRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
-          cellid
-        )
-        .then((res) => {
-          this.setState({ singleDelete: res.data.name });
-          this.setState({ dataCellId: "" });
-          this.componentDidMount();
-        })
-        .catch((error) => {
-          this.setState({ singleDelete: false });
-          console.log(error);
-        });
+        serviceProvider
+          .serviceProviderForDeleteRequest(
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes",
+            cellid
+          )
+          .then((res) => {
+            this.setState({ singleDelete: res.data.name });
+            this.setState({ dataCellId: "" });
+            this.componentDidMount();
+          })
+          .catch((error) => {
+            this.setState({ singleDelete: false });
+            console.log(error);
+          });
       }
     }
   };
@@ -209,10 +291,10 @@ export class Activitytypes extends React.Component {
         if (act.activitytype !== null) {
           for (let i in selectedId) {
             if (parseInt(selectedId[i]) === act.activitytype.id) {
-              acttypeInUse.push(selectedId[i])
+              acttypeInUse.push(selectedId[i]);
               this.setState({ acttypeInUseDeleteAll: true });
             }
-            acttypeInUse = [...new Set(acttypeInUse)]
+            acttypeInUse = [...new Set(acttypeInUse)];
           }
         }
       });
@@ -238,10 +320,6 @@ export class Activitytypes extends React.Component {
     }
   };
 
-  clearSelected = (selected) => {
-    let clearselected = "";
-  };
-
   confirmActive = (event) => {
     this.setState({ isActiveAllShowing: true });
     this.setState({ setActiveId: event.target.id });
@@ -249,10 +327,6 @@ export class Activitytypes extends React.Component {
     if (this.state.isActTypePresent === true) {
       this.setState({ isActTypePresent: false });
     }
-  };
-
-  handle = () => {
-    this.setState({ open: false });
   };
 
   handleActive = (event) => {
@@ -267,7 +341,10 @@ export class Activitytypes extends React.Component {
       )
       .then((typeRes) => {
         if (typeRes.data.length > 0) {
-          this.setState({ isActTypePresent: true,deleteActtypeName: typeRes.data[0].activitytype.name });
+          this.setState({
+            isActTypePresent: true,
+            deleteActtypeName: typeRes.data[0].activitytype.name,
+          });
         } else {
           this.setState({ isActTypePresent: false });
           serviceProvider
@@ -406,14 +483,16 @@ export class Activitytypes extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            {this.state.multipleDelete === true && this.state.acttypeInUseDeleteAll !== true? (
+            {this.state.multipleDelete === true &&
+            this.state.acttypeInUseDeleteAll !== true ? (
               <Snackbar severity="success" Showbutton={false}>
                 Activity types deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.isActTypePresent === true ? (
               <Snackbar severity="info" Showbutton={false}>
-                Activity type {this.state.deleteActtypeName} is in use, it can not be Deactivated!!
+                Activity type {this.state.deleteActtypeName} is in use, it can
+                not be Deactivated!!
               </Snackbar>
             ) : null}
             {this.state.multipleDelete === false ? (
@@ -423,7 +502,8 @@ export class Activitytypes extends React.Component {
             ) : null}
             {this.state.acttypeInUseSingleDelete === true ? (
               <Snackbar severity="info" Showbutton={false}>
-                Activity type {this.state.deleteActtypeName} is in use, it can not be Deleted.
+                Activity type {this.state.deleteActtypeName} is in use, it can
+                not be Deleted.
               </Snackbar>
             ) : null}
             {this.state.acttypeInUseDeleteAll === true ? (
@@ -443,10 +523,8 @@ export class Activitytypes extends React.Component {
                       label="Activity Type"
                       name="filterActivitytype"
                       variant="outlined"
-                      onChange={(event, value) => {
-                        this.activityFilter(event, value);
-                      }}
-                      value={this.state.values.filterActivitytype || ""}
+                      value={this.state.filterActivitytype || ""}
+                      onChange={this.handleChange.bind(this)}
                     />
                   </Grid>
                 </div>
@@ -479,13 +557,22 @@ export class Activitytypes extends React.Component {
                 column={Usercolumns}
                 editData={this.editData}
                 DeleteData={this.DeleteData}
-                clearSelected={this.clearSelected}
                 DeleteAll={this.DeleteAll}
                 handleActive={this.handleActive}
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 selectableRows
                 pagination
+                paginationServer
+                paginationDefaultPage={this.state.page}
+                paginationPerPage={this.state.pageSize}
+                paginationTotalRows={this.state.totalRows}
+                paginationRowsPerPageOptions={[10, 15, 20, 25, 30]}
+                paginationResetDefaultPage={this.state.resetPagination}
+                onChangeRowsPerPage={this.handlePerRowsChange}
+                onChangePage={this.handlePageChange}
+                onSort={this.handleSort}
+                sortServer={true}
                 progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
