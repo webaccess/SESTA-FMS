@@ -2,31 +2,6 @@
   "routes": [
     {
       "method": "GET",
-      "path": "/contact/members",
-      "handler": "contact.getMembers"
-    },
-    {
-      "method": "GET",
-      "path": "/contact/shg/count",
-      "handler": "contact.getShgCount"
-    },
-    {
-      "method": "GET",
-      "path": "/contact/vo/count",
-      "handler": "contact.getVoCount"
-    },
-    {
-      "method": "GET",
-      "path": "/contact/members/count",
-      "handler": "contact.getMemberCount"
-    },
-    {
-      "method": "GET",
-      "path": "/contact/shgs",
-      "handler": "contact.getShg"
-    },
-    {
-      "method": "GET",
       "path": "/activities",
       "handler": "activity.find"
     },
@@ -168,10 +143,7 @@
     {
       "method": "GET",
       "path": "/countries",
-      "handler": "country.find",
-      "config": {
-        "policies": []
-      }
+      "handler": "country.find"
     },
     {
       "method": "GET",
@@ -290,6 +262,11 @@
     },
     {
       "method": "GET",
+      "path": "/villages/get",
+      "handler": "village.getModules"
+    },
+    {
+      "method": "GET",
       "path": "/villages",
       "handler": "village.find"
     },
@@ -317,36 +294,6 @@
       "method": "DELETE",
       "path": "/villages/:id",
       "handler": "village.delete"
-    },
-    {
-      "method": "GET",
-      "path": "/individuals",
-      "handler": "individual.find"
-    },
-    {
-      "method": "GET",
-      "path": "/individuals/count",
-      "handler": "individual.count"
-    },
-    {
-      "method": "GET",
-      "path": "/individuals/:id",
-      "handler": "individual.findOne"
-    },
-    {
-      "method": "POST",
-      "path": "/individuals",
-      "handler": "individual.create"
-    },
-    {
-      "method": "PUT",
-      "path": "/individuals/:id",
-      "handler": "individual.update"
-    },
-    {
-      "method": "DELETE",
-      "path": "/individuals/:id",
-      "handler": "individual.delete"
     }
   ]
 }

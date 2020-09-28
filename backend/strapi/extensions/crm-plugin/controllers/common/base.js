@@ -9,8 +9,13 @@
  *
  * @description: Parent class for all generic models like country, state, district, village, activitytype, activityassignee, contacttag.
  */
-const { sanitizeEntity } = require("strapi-utils"); // removes private fields and its relations from model
-
+const {
+  sanitizeEntity,
+  convertRestQueryParams,
+  buildQuery,
+} = require("strapi-utils"); // removes private fields and its relations from model
+const utils = require("../../../../config/utils.js");
+const _ = require("lodash");
 // to get the model name
 function getTable(url) {
   let urlArr = url.split("/");
@@ -189,6 +194,49 @@ function Base(requiredValues = []) {
       });
     } catch (error) {
       console.error(error);
+      return ctx.badRequest(null, error.message);
+    }
+  };
+
+  /** get Members as per logged in user's role */
+  this.getModules = async (ctx) => {
+    const { page, query, pageSize } = utils.getRequestParams(ctx.request.query);
+    let filters = convertRestQueryParams(query, { limit: -1 });
+    // console.log("filters", filters);
+    let table = getTable(ctx.originalUrl);
+    console.log("table", table);
+    let sort;
+    if (filters.sort) {
+      sort = filters.sort;
+      filters = _.omit(filters, ["sort"]);
+    }
+
+    try {
+      return strapi
+        .query(table, "crm-plugin")
+        .model.query(
+          buildQuery({
+            model: strapi.plugins["crm-plugin"].models[table],
+            filters,
+          })
+        )
+        .fetchAll({})
+        .then(async (res) => {
+          let data = res.toJSON();
+          console.log("data", data);
+          // Sorting ascending or descending on one or multiple fields
+          if (sort && sort.length) {
+            data = utils.sort(data, sort);
+          }
+          const response = utils.paginate(data, page, pageSize);
+          const response1 = await utils.assignData(response);
+
+          return {
+            result: response1.result,
+            ...response.pagination,
+          };
+        });
+    } catch (error) {
       return ctx.badRequest(null, error.message);
     }
   };

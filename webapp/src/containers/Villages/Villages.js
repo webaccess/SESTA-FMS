@@ -14,6 +14,7 @@ import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Modal from "../../components/UI/Modal/Modal.js";
 import Switch from "../../components/UI/Switch/Switch";
 import * as constants from "../../constants/Constants";
+import * as formUtilities from "../../utilities/FormUtilities";
 
 const useStyles = (theme) => ({
   root: {},
@@ -60,6 +61,7 @@ const useStyles = (theme) => ({
     margin: "0px",
   },
 });
+const SORT_FIELD_KEY = "_sort";
 
 export class Villages extends React.Component {
   constructor(props) {
@@ -89,16 +91,17 @@ export class Villages extends React.Component {
       allIsActive: [],
       isLoader: true,
       stateId: constants.STATE_ID,
+      /** pagination data */
+      pageSize: "",
+      totalRows: "",
+      page: "",
+      pageCount: "",
+      resetPagination: false,
+      values: {},
     };
   }
   async componentDidMount() {
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/villages/?_sort=name:ASC"
-      )
-      .then((res) => {
-        this.setState({ data: this.getData(res.data), isLoader: false });
-      });
+    await this.getVillage(10, 1);
 
     //api call for districts filter
     serviceProvider
@@ -122,6 +125,50 @@ export class Villages extends React.Component {
         this.setState({ contacts: res.data });
       });
   }
+
+  getVillage = async (pageSize, page, params = null) => {
+    if (params !== null && !formUtilities.checkEmpty(params)) {
+      let defaultParams = {};
+      if (params.hasOwnProperty(SORT_FIELD_KEY)) {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+        };
+      } else {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+          [SORT_FIELD_KEY]: "name:ASC",
+        };
+      }
+      Object.keys(params).map((key) => {
+        defaultParams[key] = params[key];
+      });
+      params = defaultParams;
+    } else {
+      params = {
+        page: page,
+        pageSize: pageSize,
+        [SORT_FIELD_KEY]: "name:ASC",
+      };
+    }
+    console.log("params", params);
+    await serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/villages/get",
+        params
+      )
+      .then((res) => {
+        this.setState({
+          data: res.data.result,
+          isLoader: false,
+          pageSize: res.data.pageSize,
+          totalRows: res.data.rowCount,
+          page: res.data.page,
+          pageCount: res.data.pageCount,
+        });
+      });
+  };
 
   getData(result) {
     for (let i in result) {
@@ -238,6 +285,40 @@ export class Villages extends React.Component {
     this.setState({ open: false });
   };
 
+  /** Pagination to handle row change*/
+  handlePerRowsChange = async (perPage, page) => {
+    // this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      await this.getVillage(perPage, page);
+    } else {
+      await this.getVillage(perPage, page, this.state.values);
+    }
+  };
+
+  /** Pagination to handle page change */
+  handlePageChange = (page) => {
+    // this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      this.getVillage(this.state.pageSize, page);
+    } else {
+      this.getVillage(this.state.pageSize, page, this.state.values);
+    }
+  };
+
+  /** Sorting */
+  handleSort = (
+    column,
+    sortDirection,
+    perPage = this.state.pageSize,
+    page = 1
+  ) => {
+    if (column.selector === "name") {
+      column.selector = "name";
+    }
+    this.state.values[SORT_FIELD_KEY] = column.selector + ":" + sortDirection;
+    this.getVillage(perPage, page, this.state.values);
+  };
+
   handleActive = (event) => {
     this.setState({ isActiveAllShowing: false });
     let setActiveId = this.state.setActiveId;
@@ -328,23 +409,7 @@ export class Villages extends React.Component {
 
   handleSearch() {
     this.setState({ isLoader: true });
-    let searchData = "";
-    if (this.state.filterDistrict) {
-      searchData += "district.id=" + this.state.filterDistrict.id + "&&";
-    }
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/villages/?" +
-          searchData +
-          "&&_sort=name:ASC"
-      )
-      .then((res) => {
-        this.setState({ data: this.getData(res.data), isLoader: false });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    this.getVillage(this.state.pageSize, this.state.page, this.state.values);
   }
 
   render() {
@@ -555,6 +620,16 @@ export class Villages extends React.Component {
                 columnsvalue={columnsvalue}
                 selectableRows
                 pagination
+                paginationServer
+                paginationDefaultPage={this.state.page}
+                paginationPerPage={this.state.pageSize}
+                paginationTotalRows={this.state.totalRows}
+                paginationRowsPerPageOptions={[10, 15, 20, 25, 30]}
+                paginationResetDefaultPage={this.state.resetPagination}
+                onChangeRowsPerPage={this.handlePerRowsChange}
+                onChangePage={this.handlePageChange}
+                onSort={this.handleSort}
+                sortServer={true}
                 progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
