@@ -87,6 +87,11 @@
     },
     {
       "method": "GET",
+      "path": "/activitytypes/alldata",
+      "handler": "activitytypes.getActivityTypes"
+    },
+    {
+      "method": "GET",
       "path": "/activitytypes/count",
       "handler": "activitytype.count"
     },
