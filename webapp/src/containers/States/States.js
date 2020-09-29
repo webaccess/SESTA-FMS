@@ -11,6 +11,7 @@ import Input from "../../components/UI/Input/Input";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Modal from "../../components/UI/Modal/Modal.js";
 import Switch from "../../components/UI/Switch/Switch";
+import * as formUtilities from "../../utilities/FormUtilities";
 
 const useStyles = (theme) => ({
   root: {},
@@ -57,7 +58,7 @@ const useStyles = (theme) => ({
     margin: "0px",
   },
 });
-
+const SORT_FIELD_KEY = "_sort";
 export class States extends React.Component {
   constructor(props) {
     super(props);
@@ -80,18 +81,19 @@ export class States extends React.Component {
       active: {},
       allIsActive: [],
       isLoader: true,
+      /** pagination data */
+      pageSize: "",
+      totalRows: "",
+      page: "",
+      pageCount: "",
+      resetPagination: false,
+      values: {},
     };
     this.snackbar = React.createRef();
   }
 
   async componentDidMount() {
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?_sort=name:ASC"
-      )
-      .then((res) => {
-        this.setState({ data: res.data, isLoader: false });
-      });
+    await this.getState(10, 1);
 
     serviceProvider
       .serviceProviderForGetRequest(
@@ -107,6 +109,84 @@ export class States extends React.Component {
       values: { ...this.state.values, [event.target.name]: event.target.value },
     });
   }
+
+  getState = async (pageSize, page, params = null) => {
+    if (params !== null && !formUtilities.checkEmpty(params)) {
+      let defaultParams = {};
+      if (params.hasOwnProperty(SORT_FIELD_KEY)) {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+        };
+      } else {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+          [SORT_FIELD_KEY]: "name:ASC",
+        };
+      }
+      Object.keys(params).map((key) => {
+        defaultParams[key] = params[key];
+      });
+      params = defaultParams;
+    } else {
+      params = {
+        page: page,
+        pageSize: pageSize,
+        [SORT_FIELD_KEY]: "name:ASC",
+      };
+    }
+    console.log("params", params);
+    await serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/get",
+        params
+      )
+      .then((res) => {
+        this.setState({
+          data: res.data.result,
+          isLoader: false,
+          pageSize: res.data.pageSize,
+          totalRows: res.data.rowCount,
+          page: res.data.page,
+          pageCount: res.data.pageCount,
+        });
+      });
+  };
+
+  /** Pagination to handle row change*/
+  handlePerRowsChange = async (perPage, page) => {
+    // this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      await this.getState(perPage, page);
+    } else {
+      await this.getState(perPage, page, this.state.values);
+    }
+  };
+
+  /** Pagination to handle page change */
+  handlePageChange = (page) => {
+    // this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      this.getState(this.state.pageSize, page);
+    } else {
+      this.getState(this.state.pageSize, page, this.state.values);
+    }
+  };
+
+  /** Sorting */
+  handleSort = (
+    column,
+    sortDirection,
+    perPage = this.state.pageSize,
+    page = 1
+  ) => {
+    if (column.selector === "name") {
+      column.selector = "name";
+    }
+    this.state.values[SORT_FIELD_KEY] = column.selector + ":" + sortDirection;
+    this.getState(perPage, page, this.state.values);
+  };
 
   getData(result) {
     for (let i in result) {
@@ -162,10 +242,13 @@ export class States extends React.Component {
       let stateInUseSingleDelete = false;
       this.state.villages.find((villg) => {
         if (villg.state.id == parseInt(cellid)) {
-          this.setState({ stateInUseSingleDelete: true, deleteStateName: villg.state.name });
+          this.setState({
+            stateInUseSingleDelete: true,
+            deleteStateName: villg.state.name,
+          });
           stateInUseSingleDelete = true;
         }
-      })
+      });
       if (!stateInUseSingleDelete) {
         serviceProvider
           .serviceProviderForDeleteRequest(
@@ -192,7 +275,7 @@ export class States extends React.Component {
       this.state.villages.find((villg) => {
         for (let i in selectedId) {
           if (parseInt(selectedId[i]) === villg.state.id) {
-            stInUse.push(selectedId[i])
+            stInUse.push(selectedId[i]);
             this.setState({ stateInUseDeleteAll: true });
           }
           stInUse = [...new Set(stInUse)];
@@ -369,7 +452,8 @@ export class States extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            {this.state.multipleDelete === true && this.state.stateInUseDeleteAll !== true? (
+            {this.state.multipleDelete === true &&
+            this.state.stateInUseDeleteAll !== true ? (
               <Snackbar severity="success" Showbutton={false}>
                 States deleted successfully!
               </Snackbar>
@@ -381,12 +465,14 @@ export class States extends React.Component {
             ) : null}
             {this.state.stateInUse === true ? (
               <Snackbar severity="info" Showbutton={false}>
-                State {this.state.deleteStateName} is in use, it can not be Deactivated!!
+                State {this.state.deleteStateName} is in use, it can not be
+                Deactivated!!
               </Snackbar>
             ) : null}
             {this.state.stateInUseSingleDelete === true ? (
               <Snackbar severity="info" Showbutton={false}>
-                State {this.state.deleteStateName} is in use, it can not be Deleted.
+                State {this.state.deleteStateName} is in use, it can not be
+                Deleted.
               </Snackbar>
             ) : null}
             {this.state.stateInUseDeleteAll === true ? (
@@ -447,6 +533,15 @@ export class States extends React.Component {
                 columnsvalue={columnsvalue}
                 selectableRows
                 pagination
+                paginationServer
+                paginationDefaultPage={this.state.page}
+                paginationPerPage={this.state.pageSize}
+                paginationTotalRows={this.state.totalRows}
+                paginationRowsPerPageOptions={[10, 15, 20, 25, 30]}
+                paginationResetDefaultPage={this.state.resetPagination}
+                onChangeRowsPerPage={this.handlePerRowsChange}
+                onChangePage={this.handlePageChange}
+                onSort={this.handleSort}
                 progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
                 ActiveMessage={

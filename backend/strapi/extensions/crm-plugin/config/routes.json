@@ -277,6 +277,11 @@
     },
     {
       "method": "GET",
+      "path": "/states/get",
+      "handler": "state.getModules"
+    },
+    {
+      "method": "GET",
       "path": "/states",
       "handler": "state.find"
     },
