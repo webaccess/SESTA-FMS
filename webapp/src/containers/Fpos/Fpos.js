@@ -12,6 +12,7 @@ import { Grid } from "@material-ui/core";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autocomplete from "../../components/Autocomplete/Autocomplete.js";
 import * as constants from "../../constants/Constants";
+import * as formUtilities from "../../utilities/FormUtilities";
 
 const useStyles = (theme) => ({
   root: {},
@@ -53,6 +54,7 @@ const useStyles = (theme) => ({
     margin: "0px",
   },
 });
+const SORT_FIELD_KEY = "_sort";
 
 export class Fpos extends React.Component {
   constructor(props) {
@@ -79,25 +81,25 @@ export class Fpos extends React.Component {
       deleteFpoName: "",
       isLoader: true,
       stateId: constants.STATE_ID,
+      values: {},
+      /** pagination data */
+      pageSize: "",
+      totalRows: "",
+      page: "",
+      pageCount: "",
+      resetPagination: false,
     };
   }
 
   async componentDidMount() {
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/contact/?contact_type=organization&organization.sub_type=FPO&_sort=name:ASC"
-      )
-      .then((res) => {
-        this.setState({ data: res.data, isLoader: false });
-      });
+    await this.getFpo(10, 1);
 
     //api call for districts filter
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/districts/?_sort=name:ASC&&is_active=true&&state.id=" +
-        this.state.stateId
+          "crm-plugin/districts/?_sort=name:ASC&&is_active=true&&state.id=" +
+          this.state.stateId
       )
       .then((res) => {
         this.setState({ getDistrict: res.data });
@@ -120,26 +122,124 @@ export class Fpos extends React.Component {
       )
       .then((res) => {
         this.setState({ loanpurpose: res.data });
-      })
+      });
 
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-        "crm-plugin/activitytypes/?_sort=id:ASC"
+          "crm-plugin/activitytypes/?_sort=id:ASC"
       )
       .then((res) => {
         this.setState({ activityTypes: res.data });
-      })
+      });
+  }
 
+  getFpo = async (pageSize, page, params = null) => {
+    if (params !== null && !formUtilities.checkEmpty(params)) {
+      let defaultParams = {};
+      if (params.hasOwnProperty(SORT_FIELD_KEY)) {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+          contact_type: "organization",
+          "organization.sub_type": "FPO",
+        };
+      } else {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+          [SORT_FIELD_KEY]: "name:ASC",
+          contact_type: "organization",
+          "organization.sub_type": "FPO",
+        };
+      }
+      Object.keys(params).map((key) => {
+        defaultParams[key] = params[key];
+      });
+      params = defaultParams;
+    } else {
+      params = {
+        page: page,
+        pageSize: pageSize,
+        [SORT_FIELD_KEY]: "name:ASC",
+        contact_type: "organization",
+        "organization.sub_type": "FPO",
+      };
+    }
+    await serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/fpos/",
+        params
+      )
+      .then((res) => {
+        this.setState({
+          data: res.data.result,
+          isLoader: false,
+          pageSize: res.data.pageSize,
+          totalRows: res.data.rowCount,
+          page: res.data.page,
+          pageCount: res.data.pageCount,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  /** Pagination to handle row change*/
+  handlePerRowsChange = async (perPage, page) => {
+    if (formUtilities.checkEmpty(this.state.values)) {
+      await this.getFpo(perPage, page);
+    } else {
+      await this.getFpo(perPage, page, this.state.values);
+    }
+  };
+
+  /** Pagination to handle page change */
+  handlePageChange = (page) => {
+    if (formUtilities.checkEmpty(this.state.values)) {
+      this.getFpo(this.state.pageSize, page);
+    } else {
+      this.getFpo(this.state.pageSize, page, this.state.values);
+    }
+  };
+
+  /** Sorting */
+  handleSort = (
+    column,
+    sortDirection,
+    perPage = this.state.pageSize,
+    page = 1
+  ) => {
+    if (column.selector === "name") {
+      column.selector = "name";
+    }
+    this.state.values[SORT_FIELD_KEY] = column.selector + ":" + sortDirection;
+    this.getFpo(perPage, page, this.state.values);
+  };
+
+  handleSearch() {
+    this.setState({ isLoader: true });
+    this.getFpo(this.state.pageSize, this.state.page, this.state.values);
   }
 
   handleChange = (event, value) => {
-    this.setState({ filterFpo: event.target.value });
+    this.setState({
+      filterFpo: event.target.value,
+      values: {
+        ["name_contains"]: event.target.value,
+      },
+    });
   };
 
   handleDistrictChange(event, value) {
     if (value !== null) {
-      this.setState({ filterDistrict: value });
+      this.setState({
+        filterDistrict: value,
+        values: {
+          ["addresses.district"]: value.id,
+        },
+      });
     } else {
       this.setState({
         filterDistrict: "",
@@ -154,32 +254,40 @@ export class Fpos extends React.Component {
   fpoDelete(cellid, fpoInUseSingleDelete) {
     this.state.contacts.find((cd) => {
       // check if fpo is present in user's individual
-      if (cd.individual !== null && cd.individual.fpo !== null && cd.individual.fpo === parseInt(cellid)) {
+      if (
+        cd.individual !== null &&
+        cd.individual.fpo !== null &&
+        cd.individual.fpo === parseInt(cellid)
+      ) {
         fpoInUseSingleDelete = true;
       }
       //check if fpo is present in VO
-      if (cd.organization !== null && cd.organization.fpo !== null && cd.organization.fpo === parseInt(cellid)) {
+      if (
+        cd.organization !== null &&
+        cd.organization.fpo !== null &&
+        cd.organization.fpo === parseInt(cellid)
+      ) {
         fpoInUseSingleDelete = true;
       }
     });
 
     // check if fpo is present in loan model
-    this.state.loanpurpose.map(loanmodel => {
+    this.state.loanpurpose.map((loanmodel) => {
       if (loanmodel.fpo !== null) {
         if (loanmodel.fpo.id === parseInt(cellid)) {
           fpoInUseSingleDelete = true;
         }
       }
-    })
+    });
 
     //check if fpo is present in activity types
-    this.state.activityTypes.map(types => {
+    this.state.activityTypes.map((types) => {
       if (types.contact.length > 0) {
         if (types.contact[0].id === parseInt(cellid)) {
           fpoInUseSingleDelete = true;
         }
       }
-    })
+    });
     return fpoInUseSingleDelete;
   }
 
@@ -190,14 +298,14 @@ export class Fpos extends React.Component {
       let fpoInUseSingleDelete = false;
       fpoInUseSingleDelete = this.fpoDelete(cellid, fpoInUseSingleDelete);
       if (fpoInUseSingleDelete) {
-        this.state.data.map(fpodata => {
+        this.state.data.map((fpodata) => {
           if (fpodata.id === parseInt(cellid)) {
             this.setState({
               fpoInUseSingleDelete: true,
               deleteFpoName: fpodata.name,
             });
           }
-        })
+        });
       }
       if (!fpoInUseSingleDelete) {
         serviceProvider
@@ -225,7 +333,9 @@ export class Fpos extends React.Component {
       let shgInUse = [];
       for (let i in selectedId) {
         fpoInUseDeleteAll = this.fpoDelete(selectedId[i], fpoInUseDeleteAll);
-        let shg = fpoInUseDeleteAll ? shgInUse.push(selectedId[i]) : shgInUse.push()
+        let shg = fpoInUseDeleteAll
+          ? shgInUse.push(selectedId[i])
+          : shgInUse.push();
       }
 
       if (fpoInUseDeleteAll) {
@@ -260,34 +370,11 @@ export class Fpos extends React.Component {
       filterFpo: "",
       isCancel: true,
       isLoader: true,
+      values: {},
     });
 
     this.componentDidMount();
   };
-
-  handleSearch() {
-    this.setState({ isLoader: true });
-    let searchData = "";
-    if (this.state.filterDistrict) {
-      searchData +=
-        "addresses.district.id=" + this.state.filterDistrict.id + "&&";
-    }
-    if (this.state.filterFpo) {
-      searchData += "name_contains=" + this.state.filterFpo;
-    }
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?contact_type=organization&organization.sub_type=FPO&&_sort=name:ASC&&" +
-          searchData
-      )
-      .then((res) => {
-        this.setState({ data: res.data, isLoader: false });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
 
   render() {
     let data = this.state.data;
@@ -301,7 +388,6 @@ export class Fpos extends React.Component {
       {
         name: "District",
         selector: "districtName",
-        sortable: true,
         cell: (row) => (row.districtName ? row.districtName : "-"),
       },
     ];
@@ -356,7 +442,7 @@ export class Fpos extends React.Component {
               </Snackbar>
             ) : null}
             {this.state.multipleDelete === true &&
-            this.state.fpoInUseDeleteAll !== true? (
+            this.state.fpoInUseDeleteAll !== true ? (
               <Snackbar severity="success" Showbutton={false}>
                 FPO deleted successfully!
               </Snackbar>
@@ -368,8 +454,7 @@ export class Fpos extends React.Component {
             ) : null}
             {this.state.fpoInUseSingleDelete === true ? (
               <Snackbar severity="info" Showbutton={false}>
-                FPO {this.state.deleteFpoName} is in use, it can not be
-                Deleted.
+                FPO {this.state.deleteFpoName} is in use, it can not be Deleted.
               </Snackbar>
             ) : null}
             {this.state.fpoInUseDeleteAll === true ? (
@@ -462,6 +547,16 @@ export class Fpos extends React.Component {
                 columnsvalue={columnsvalue}
                 selectableRows
                 pagination
+                paginationServer
+                paginationDefaultPage={this.state.page}
+                paginationPerPage={this.state.pageSize}
+                paginationTotalRows={this.state.totalRows}
+                paginationRowsPerPageOptions={[10, 15, 20, 25, 30]}
+                paginationResetDefaultPage={this.state.resetPagination}
+                onChangeRowsPerPage={this.handlePerRowsChange}
+                onChangePage={this.handlePageChange}
+                onSort={this.handleSort}
+                sortServer={true}
                 progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
                 style={{}}
