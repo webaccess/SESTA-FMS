@@ -2,11 +2,6 @@
   "routes": [
     {
       "method": "GET",
-      "path": "/activities/get",
-      "handler": "activity.getActivities"
-    },
-    {
-      "method": "GET",
       "path": "/contact/vos",
       "handler": "contact.getVo"
     },
@@ -64,6 +59,11 @@
       "method": "DELETE",
       "path": "/individuals/:id",
       "handler": "individual.delete"
+    },
+    {
+      "method": "GET",
+      "path": "/activities/get",
+      "handler": "activity.getActivities"
     },
     {
       "method": "GET",
@@ -338,7 +338,7 @@
     {
       "method": "GET",
       "path": "/villages/get",
-      "handler": "village.getVillages"
+      "handler": "village.getModules"
     },
     {
       "method": "GET",

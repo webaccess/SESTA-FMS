@@ -154,7 +154,6 @@ export class Activitytypes extends React.Component {
 
   /** Pagination to handle row change*/
   handlePerRowsChange = async (perPage, page) => {
-    // this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       await this.getActivityTypes(perPage, page);
     } else {
@@ -164,7 +163,6 @@ export class Activitytypes extends React.Component {
 
   /** Pagination to handle page change */
   handlePageChange = (page) => {
-    // this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       this.getActivityTypes(this.state.pageSize, page);
     } else {
@@ -188,12 +186,6 @@ export class Activitytypes extends React.Component {
     this.state.values[SORT_FIELD_KEY] = column.selector + ":" + sortDirection;
     this.getActivityTypes(perPage, page, this.state.values);
   };
-
-  //activityFilter(event, value, target) {
-  //  this.setState({
-  //    values: { ...this.state.values, [event.target.name]: event.target.value },
-  //  });
-  //}
 
   getData(result) {
     for (let i in result) {

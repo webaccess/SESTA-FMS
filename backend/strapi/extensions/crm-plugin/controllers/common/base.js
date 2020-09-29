@@ -199,12 +199,10 @@ function Base(requiredValues = []) {
   };
 
   /** get Villages as per logged in user's role */
-  this.getVillages = async (ctx) => {
+  this.getModules = async (ctx) => {
     const { page, query, pageSize } = utils.getRequestParams(ctx.request.query);
     let filters = convertRestQueryParams(query, { limit: -1 });
-    // console.log("filters", filters);
     let table = getTable(ctx.originalUrl);
-    console.log("table", table);
     let sort;
     if (filters.sort) {
       sort = filters.sort;
