@@ -3,7 +3,7 @@
     {
       "method": "GET",
       "path": "/villages/get",
-      "handler": "village.getModules"
+      "handler": "village.getVillages"
     },
     {
       "method": "GET",

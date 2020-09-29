@@ -134,7 +134,7 @@ export class Activitytypes extends React.Component {
 
     await serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes/alldata/",
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes/get",
         params
       )
       .then((res) => {
