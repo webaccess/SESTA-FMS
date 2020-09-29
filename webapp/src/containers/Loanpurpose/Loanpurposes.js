@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { Grid } from "@material-ui/core";
 import Input from "../../components/UI/Input/Input";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
+import * as formUtilities from "../../utilities/FormUtilities";
 
 const useStyles = (theme) => ({
   root: {},
@@ -54,6 +55,7 @@ const useStyles = (theme) => ({
     margin: "0px",
   },
 });
+const SORT_FIELD_KEY = "_sort";
 
 export class Loanpurposes extends React.Component {
   constructor(props) {
@@ -72,30 +74,26 @@ export class Loanpurposes extends React.Component {
       multipleDelete: "",
       isLoader: true,
       loanApp: [],
-      purposeInUseSingleDelete : "",
-      purposeInUseDeleteAll : "",
-      deletePurposeName : ""
+      values: {},
+      purposeInUseSingleDelete: "",
+      purposeInUseDeleteAll: "",
+      deletePurposeName: "",
+      /** pagination data */
+      pageSize: "",
+      totalRows: "",
+      page: "",
+      pageCount: "",
+      resetPagination: false,
     };
 
-    let history = props;
+    //let history = props;
   }
   async componentDidMount() {
-    //api call for loanpurpose filter
+    await this.getLoanModels(10, 1);
+
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "loan-models/"
-      )
-      .then((res) => {
-        this.setState({ data: res.data, isLoader: false });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
-      serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "loan-applications/?_sort=id:ASC"
+        process.env.REACT_APP_SERVER_URL + "loan-applications/?_sort=id:ASC"
       )
       .then((res) => {
         this.setState({ loanApp: res.data });
@@ -103,12 +101,104 @@ export class Loanpurposes extends React.Component {
       .catch((error) => {
         console.log(error);
       });
-
   }
 
-  handleChange = (event, value) => {
-    this.setState({ filterProduct: event.target.value });
+  getLoanModels = async (pageSize, page, params = null) => {
+    if (params !== null && !formUtilities.checkEmpty(params)) {
+      let defaultParams = {};
+      if (params.hasOwnProperty(SORT_FIELD_KEY)) {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+        };
+      } else {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+          [SORT_FIELD_KEY]: "name:ASC",
+        };
+      }
+      Object.keys(params).map((key) => {
+        defaultParams[key] = params[key];
+      });
+      params = defaultParams;
+    } else {
+      params = {
+        page: page,
+        pageSize: pageSize,
+        [SORT_FIELD_KEY]: "name:ASC",
+      };
+    }
+
+    await serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "loan-models/get",
+        params
+      )
+      .then((res) => {
+        this.setState({
+          data: res.data.result,
+          isLoader: false,
+          pageSize: res.data.pageSize,
+          totalRows: res.data.rowCount,
+          page: res.data.page,
+          pageCount: res.data.pageCount,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
+
+  /** Pagination to handle row change*/
+  handlePerRowsChange = async (perPage, page) => {
+    if (formUtilities.checkEmpty(this.state.values)) {
+      await this.getLoanModels(perPage, page);
+    } else {
+      await this.getLoanModels(perPage, page, this.state.values);
+    }
+  };
+
+  /** Pagination to handle page change */
+  handlePageChange = (page) => {
+    if (formUtilities.checkEmpty(this.state.values)) {
+      this.getLoanModels(this.state.pageSize, page);
+    } else {
+      this.getLoanModels(this.state.pageSize, page, this.state.values);
+    }
+  };
+
+  /** Sorting */
+  handleSort = (
+    column,
+    sortDirection,
+    perPage = this.state.pageSize,
+    page = 1
+  ) => {
+    if (column.selector === "product_name") {
+      column.selector = "product_name";
+    }
+    if (column.selector === "fpo.name") {
+      column.selector = "fpo.name";
+    }
+    if (column.selector === "duration") {
+      column.selector = "duration";
+    }
+    if (column.selector === "emi") {
+      column.selector = "emi";
+    }
+    this.state.values[SORT_FIELD_KEY] = column.selector + ":" + sortDirection;
+    this.getLoanModels(perPage, page, this.state.values);
+  };
+
+  handleChange(event) {
+    this.setState({
+      [event.target.name]: event.target.value,
+      values: {
+        ["product_name_contains"]: event.target.value,
+      },
+    });
+  }
 
   editData = (cellid) => {
     this.props.history.push("/loanpurpose/edit/" + cellid);
@@ -122,7 +212,10 @@ export class Loanpurposes extends React.Component {
       this.state.loanApp.find((loandata) => {
         if (loandata.loan_model !== null) {
           if (loandata.loan_model.id === parseInt(cellid)) {
-            this.setState({ purposeInUseSingleDelete: true, deletePurposeName: loandata.purpose });
+            this.setState({
+              purposeInUseSingleDelete: true,
+              deletePurposeName: loandata.purpose,
+            });
             purposeInUseSingleDelete = true;
           }
         }
@@ -186,10 +279,10 @@ export class Loanpurposes extends React.Component {
         if (loandata.loan_model !== null) {
           for (let i in selectedId) {
             if (parseInt(selectedId[i]) === loandata.loan_model.id) {
-              purposeInUse.push(selectedId[i])
+              purposeInUse.push(selectedId[i]);
               this.setState({ purposeInUseDeleteAll: true });
             }
-            purposeInUse = [...new Set(purposeInUse)]
+            purposeInUse = [...new Set(purposeInUse)];
           }
         }
       });
@@ -233,21 +326,7 @@ export class Loanpurposes extends React.Component {
 
   handleSearch() {
     this.setState({ isLoader: true });
-    if (this.state.filterProduct) {
-      //call api for searching product name
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-            "loan-models?product_name_contains=" +
-            this.state.filterProduct
-        )
-        .then((res) => {
-          this.setState({ data: res.data, isLoader: false });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
+    this.getLoanModels(this.state.pageSize, this.state.page, this.state.values);
   }
 
   render() {
@@ -322,7 +401,8 @@ export class Loanpurposes extends React.Component {
                 An error occured - Please try again!
               </Snackbar>
             ) : null}
-            {this.state.multipleDelete === true && this.state.purposeInUseDeleteAll !== true? (
+            {this.state.multipleDelete === true &&
+            this.state.purposeInUseDeleteAll !== true ? (
               <Snackbar severity="success" Showbutton={false}>
                 Loan Purposes deleted successfully!
               </Snackbar>
@@ -334,7 +414,8 @@ export class Loanpurposes extends React.Component {
             ) : null}
             {this.state.purposeInUseSingleDelete === true ? (
               <Snackbar severity="info" Showbutton={false}>
-                Loan Purpose {this.state.deletePurposeName} is in use, it can not be Deleted.
+                Loan Purpose {this.state.deletePurposeName} is in use, it can
+                not be Deleted.
               </Snackbar>
             ) : null}
             {this.state.purposeInUseDeleteAll === true ? (
@@ -394,6 +475,16 @@ export class Loanpurposes extends React.Component {
                 columnsvalue={columnsvalue}
                 selectableRows
                 pagination
+                paginationServer
+                paginationDefaultPage={this.state.page}
+                paginationPerPage={this.state.pageSize}
+                paginationTotalRows={this.state.totalRows}
+                paginationRowsPerPageOptions={[10, 15, 20, 25, 30]}
+                paginationResetDefaultPage={this.state.resetPagination}
+                onChangeRowsPerPage={this.handlePerRowsChange}
+                onChangePage={this.handlePageChange}
+                onSort={this.handleSort}
+                sortServer={true}
                 progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
               />

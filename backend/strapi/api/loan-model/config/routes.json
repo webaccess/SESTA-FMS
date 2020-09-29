@@ -2,6 +2,14 @@
   "routes": [
     {
       "method": "GET",
+      "path": "/loan-models/get",
+      "handler": "loan-model.getLoanModels",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
       "path": "/loan-models",
       "handler": "loan-model.find",
       "config": {
