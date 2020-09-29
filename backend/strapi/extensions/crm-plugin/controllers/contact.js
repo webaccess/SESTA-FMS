@@ -515,4 +515,71 @@ module.exports = {
         });
     }
   },
+
+  /** get all users as per logged in user role */
+  getAllUsers: async (ctx) => {
+    const { page, query, pageSize } = utils.getRequestParams(ctx.request.query);
+    let filters = convertRestQueryParams(query, { limit: -1 });
+    let sort;
+    if (filters.sort) {
+      sort = filters.sort;
+      filters = _.omit(filters, ["sort"]);
+    }
+    if (ctx.query.id) {
+      // For FPO admin
+      const query = [
+        { field: "creator_id.id", operator: "eq", value: ctx.query.id },
+      ];
+      if (filters.where && filters.where.length > 0) {
+        filters.where = [...filters.where, ...query];
+      } else {
+        filters.where = [...query];
+      }
+      filters.where.shift();
+    }
+    // if user role filter is selected
+    if ("user.role" in query) {
+      const roles = await strapi
+        .query("role", "users-permissions")
+        .findOne({ name: query["user.role"] }, []);
+      let newArray = [];
+      filters.where.map((e) => {
+        if (e.field !== "user.role") {
+          newArray.push(e);
+        }
+      });
+      filters.where = newArray;
+      const roleQuery = [
+        { field: "user.role", operator: "eq", value: roles.id },
+      ];
+      if (filters.where && filters.where.length > 0) {
+        filters.where = [...filters.where, ...roleQuery];
+      } else {
+        filters.where = [...roleQuery];
+      }
+    }
+    // for sesta, super admin
+    return strapi
+      .query("contact", "crm-plugin")
+      .model.query(
+        buildQuery({
+          model: strapi.plugins["crm-plugin"].models["contact"],
+          filters,
+        })
+      )
+      .fetchAll({})
+      .then(async (res) => {
+        let data = res.toJSON();
+        // Sorting ascending or descending on one or multiple fields
+        if (sort && sort.length) {
+          data = utils.sort(data, sort);
+        }
+        const response = utils.paginate(data, page, pageSize);
+        const response1 = await utils.assignUserRoleData(response);
+        return {
+          result: response1.result,
+          ...response.pagination,
+        };
+      });
+  },
 };

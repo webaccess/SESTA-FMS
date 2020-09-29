@@ -142,9 +142,34 @@ function sort(data, sort) {
   return result;
 }
 
+async function assignUserRoleData(data) {
+  //assign role name
+  const userPromise = await Promise.all(
+    await data.result.map(async (val, index) => {
+      return await strapi
+        .query("role", "users-permissions")
+        .find({ id: val.user.role });
+    })
+  );
+  if (userPromise.length > 0) {
+    userPromise.map(async (model, index) => {
+      if (model) {
+        Object.assign(data.result[index], {
+          roleName: model[0].name,
+        });
+      }
+    });
+  }
+  const result = data.result;
+  return {
+    result,
+  };
+}
+
 module.exports = {
   getRequestParams,
   paginate,
   assignData,
   sort,
+  assignUserRoleData,
 };
