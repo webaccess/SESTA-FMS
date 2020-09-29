@@ -235,30 +235,6 @@ module.exports = {
             filters.where = [...voIdsQuery];
           }
           filters.where.shift();
-
-          return strapi
-            .query("contact", "crm-plugin")
-            .model.query(
-              buildQuery({
-                model: strapi.plugins["crm-plugin"].models["contact"],
-                filters,
-              })
-            )
-            .fetchAll()
-            .then(async (res) => {
-              let data = res.toJSON();
-              // Sorting ascending or descending on one or multiple fields
-              if (sort && sort.length) {
-                data = utils.sort(data, sort);
-              }
-              const response = utils.paginate(data, page, pageSize);
-              const response1 = await utils.assignData(response);
-
-              return {
-                result: response1.result,
-                ...response.pagination,
-              };
-            });
         }
       } else {
         // for sesta, super and FPO admins
@@ -396,55 +372,32 @@ module.exports = {
         filters.where = [...shgIdsQuery];
       }
       filters.where.shift();
-      return strapi
-        .query("contact", "crm-plugin")
-        .model.query(
-          buildQuery({
-            model: strapi.plugins["crm-plugin"].models["contact"],
-            filters,
-          })
-        )
-        .fetchAll()
-        .then(async (res) => {
-          let data = res.toJSON();
-          // Sorting ascending or descending on one or multiple fields
-          if (sort && sort.length) {
-            data = utils.sort(data, sort);
-          }
-          const response = utils.paginate(data, page, pageSize);
-          const response1 = await utils.assignData(response);
-
-          return {
-            result: response1.result,
-            ...response.pagination,
-          };
-        });
-    } else {
-      // for sesta, super and FPO admins
-      return strapi
-        .query("contact", "crm-plugin")
-        .model.query(
-          buildQuery({
-            model: strapi.plugins["crm-plugin"].models["contact"],
-            filters,
-          })
-        )
-        .fetchAll({})
-        .then(async (res) => {
-          let data = res.toJSON();
-          // Sorting ascending or descending on one or multiple fields
-          if (sort && sort.length) {
-            data = utils.sort(data, sort);
-          }
-          const response = utils.paginate(data, page, pageSize);
-          const response1 = await utils.assignData(response);
-
-          return {
-            result: response1.result,
-            ...response.pagination,
-          };
-        });
     }
+
+    // for sesta, super and FPO admins
+    return strapi
+      .query("contact", "crm-plugin")
+      .model.query(
+        buildQuery({
+          model: strapi.plugins["crm-plugin"].models["contact"],
+          filters,
+        })
+      )
+      .fetchAll({})
+      .then(async (res) => {
+        let data = res.toJSON();
+        // Sorting ascending or descending on one or multiple fields
+        if (sort && sort.length) {
+          data = utils.sort(data, sort);
+        }
+        const response = utils.paginate(data, page, pageSize);
+        const response1 = await utils.assignData(response);
+
+        return {
+          result: response1.result,
+          ...response.pagination,
+        };
+      });
   },
 
   /** get VO as per logged in user role with pagination and filtering  */
@@ -466,29 +419,6 @@ module.exports = {
         filters.where = [...fpoIdQuery];
       }
       filters.where.shift();
-      return strapi
-        .query("contact", "crm-plugin")
-        .model.query(
-          buildQuery({
-            model: strapi.plugins["crm-plugin"].models["contact"],
-            filters,
-          })
-        )
-        .fetchAll()
-        .then(async (res) => {
-          let data = res.toJSON();
-          // Sorting ascending or descending on one or multiple fields
-          if (sort && sort.length) {
-            data = utils.sort(data, sort);
-          }
-          const response = utils.paginate(data, page, pageSize);
-          const response1 = await utils.assignData(response);
-
-          return {
-            result: response1.result,
-            ...response.pagination,
-          };
-        });
     } else {
       // for sesta, super admins
       return strapi
@@ -576,6 +506,39 @@ module.exports = {
         }
         const response = utils.paginate(data, page, pageSize);
         const response1 = await utils.assignUserRoleData(response);
+        return {
+          result: response1.result,
+          ...response.pagination,
+        };
+      });
+  },
+
+  /** get all FPOs as per logged in user's role */
+  getFpo: async (ctx) => {
+    const { page, query, pageSize } = utils.getRequestParams(ctx.request.query);
+    let filters = convertRestQueryParams(query, { limit: -1 });
+    let sort;
+    if (filters.sort) {
+      sort = filters.sort;
+      filters = _.omit(filters, ["sort"]);
+    }
+    return strapi
+      .query("contact", "crm-plugin")
+      .model.query(
+        buildQuery({
+          model: strapi.plugins["crm-plugin"].models["contact"],
+          filters,
+        })
+      )
+      .fetchAll({})
+      .then(async (res) => {
+        let data = res.toJSON();
+        // Sorting ascending or descending on one or multiple fields
+        if (sort && sort.length) {
+          data = utils.sort(data, sort);
+        }
+        const response = utils.paginate(data, page, pageSize);
+        const response1 = await utils.assignData(response);
         return {
           result: response1.result,
           ...response.pagination,

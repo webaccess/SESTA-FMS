@@ -2,6 +2,11 @@
   "routes": [
     {
       "method": "GET",
+      "path": "/contact/fpos",
+      "handler": "contact.getFpo"
+    },
+    {
+      "method": "GET",
       "path": "/contact/users",
       "handler": "contact.getAllUsers"
     },
