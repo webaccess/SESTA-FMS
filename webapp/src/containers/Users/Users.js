@@ -11,7 +11,7 @@ import Input from "../../components/UI/Input/Input";
 import auth from "../../components/Auth/Auth.js";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import Autocomplete from "../../components/Autocomplete/Autocomplete";
-import { map } from "lodash";
+import * as formUtilities from "../../utilities/FormUtilities";
 
 const useStyles = (theme) => ({
   root: {},
@@ -54,6 +54,7 @@ const useStyles = (theme) => ({
     marginRight: theme.spacing(1),
   },
 });
+const SORT_FIELD_KEY = "_sort";
 
 export class Users extends React.Component {
   constructor(props) {
@@ -69,26 +70,17 @@ export class Users extends React.Component {
       getRoles: [],
       loggedInUserRole: auth.getUserInfo().role.name,
       isLoader: true,
+      /** pagination data */
+      pageSize: "",
+      totalRows: "",
+      page: "",
+      pageCount: "",
+      resetPagination: false,
     };
   }
 
   async componentDidMount() {
-    /** get all users */
-    let url = "users/?_sort=username:ASC";
-    if (
-      this.state.loggedInUserRole === "FPO Admin" ||
-      this.state.loggedInUserRole === "CSP (Community Service Provider)"
-    ) {
-      url += "&&contact.creator_id=" + auth.getUserInfo().contact.id;
-    }
-    serviceProvider
-      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
-      .then((res) => {
-        this.setState({ data: res.data, isLoader: false });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    await this.getUsers(10, 1);
 
     let roleArray = [];
     if (
@@ -108,6 +100,107 @@ export class Users extends React.Component {
       ];
     }
     this.setState({ getRoles: roleArray });
+  }
+
+  getUsers = async (pageSize, page, params = null) => {
+    if (params !== null && !formUtilities.checkEmpty(params)) {
+      let defaultParams = {};
+      if (params.hasOwnProperty(SORT_FIELD_KEY)) {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+          contact_type: "individual",
+          user_null: false,
+        };
+      } else {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+          [SORT_FIELD_KEY]: "name:ASC",
+          contact_type: "individual",
+          user_null: false,
+        };
+      }
+      Object.keys(params).map((key) => {
+        defaultParams[key] = params[key];
+      });
+      params = defaultParams;
+    } else {
+      params = {
+        page: page,
+        pageSize: pageSize,
+        [SORT_FIELD_KEY]: "name:ASC",
+        contact_type: "individual",
+        user_null: false,
+      };
+    }
+    let url = "crm-plugin/contact/users/";
+    if (
+      this.state.loggedInUserRole === "FPO Admin" ||
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      url = "crm-plugin/contact/users/?id=" + auth.getUserInfo().contact.id;
+    }
+    await serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + url,
+        params
+      )
+      .then((res) => {
+        this.setState({
+          data: res.data.result,
+          isLoader: false,
+          pageSize: res.data.pageSize,
+          totalRows: res.data.rowCount,
+          page: res.data.page,
+          pageCount: res.data.pageCount,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  /** Pagination to handle row change*/
+  handlePerRowsChange = async (perPage, page) => {
+    // this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      await this.getUsers(perPage, page);
+    } else {
+      await this.getUsers(perPage, page, this.state.values);
+    }
+  };
+
+  /** Pagination to handle page change */
+  handlePageChange = (page) => {
+    // this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      this.getUsers(this.state.pageSize, page);
+    } else {
+      this.getUsers(this.state.pageSize, page, this.state.values);
+    }
+  };
+
+  /** Sorting */
+  handleSort = (
+    column,
+    sortDirection,
+    perPage = this.state.pageSize,
+    page = 1
+  ) => {
+    if (column.selector === "user.username") {
+      column.selector = "user.username";
+    }
+    if (column.selector === "user.email") {
+      column.selector = "user.email";
+    }
+    this.state.values[SORT_FIELD_KEY] = column.selector + ":" + sortDirection;
+    this.getUsers(perPage, page, this.state.values);
+  };
+
+  handleSearch() {
+    this.setState({ isLoader: true });
+    this.getUsers(this.state.pageSize, this.state.page, this.state.values);
   }
 
   editData = (cellid) => {
@@ -172,47 +265,26 @@ export class Users extends React.Component {
 
   handleUserChange(event, value) {
     this.setState({
-      values: { ...this.state.values, [event.target.name]: event.target.value },
+      [event.target.name]: event.target.value,
+      values: {
+        ["user.username_contains"]: event.target.value,
+      },
     });
   }
 
   handleRoleChange = async (event, value) => {
     if (value !== null) {
-      this.setState({ roleStatus: value, isCancel: false });
+      this.setState({
+        roleStatus: value,
+        isCancel: false,
+        values: {
+          ["user.role"]: value.name,
+        },
+      });
     } else {
       this.setState({ roleStatus: "" });
     }
   };
-
-  handleSearch() {
-    this.setState({ isLoader: true });
-    let searchData = "";
-    if (this.state.values.addUser) {
-      searchData += "username_contains=" + this.state.values.addUser;
-    }
-    if (this.state.roleStatus) {
-      searchData += searchData ? "&&" : "";
-      searchData += "role.name=" + this.state.roleStatus.name;
-    }
-    /** api call after search filter */
-    let url = "users/?_sort=username:ASC";
-    if (
-      this.state.loggedInUserRole === "FPO Admin" ||
-      this.state.loggedInUserRole === "CSP (Community Service Provider)"
-    ) {
-      url += "&&contact.creator_id=" + auth.getUserInfo().contact.id;
-    }
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
-      )
-      .then((res) => {
-        this.setState({ data: res.data, isLoader: false });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
 
   cancelForm = () => {
     this.setState({
@@ -220,6 +292,8 @@ export class Users extends React.Component {
       formSubmitted: "",
       isCancel: true,
       isLoader: true,
+      addUser: "",
+      roleStatus: "",
     });
     this.componentDidMount();
     //routing code #route to users page
@@ -234,18 +308,18 @@ export class Users extends React.Component {
     const Usercolumns = [
       {
         name: "Username",
-        selector: "username",
+        selector: "user.username",
         sortable: true,
       },
       {
         name: "Email",
-        selector: "email",
+        selector: "user.email",
         sortable: true,
+        cell: (row) => (row.user.email ? row.user.email : "-"),
       },
       {
         name: "Role",
-        selector: "role.name",
-        sortable: true,
+        selector: "roleName",
       },
     ];
     let selectors = [];
@@ -306,7 +380,7 @@ export class Users extends React.Component {
                       onChange={(event, value) => {
                         this.handleUserChange(event, value);
                       }}
-                      value={this.state.values.addUser || ""}
+                      value={this.state.addUser || ""}
                     />
                   </Grid>
                 </div>
@@ -369,6 +443,16 @@ export class Users extends React.Component {
                 DeleteAll={this.DeleteAll}
                 columnsvalue={columnsvalue}
                 pagination
+                paginationServer
+                paginationDefaultPage={this.state.page}
+                paginationPerPage={this.state.pageSize}
+                paginationTotalRows={this.state.totalRows}
+                paginationRowsPerPageOptions={[10, 15, 20, 25, 30]}
+                paginationResetDefaultPage={this.state.resetPagination}
+                onChangeRowsPerPage={this.handlePerRowsChange}
+                onChangePage={this.handlePageChange}
+                onSort={this.handleSort}
+                sortServer={true}
                 progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
               />
