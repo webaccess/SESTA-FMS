@@ -2,6 +2,11 @@
   "routes": [
     {
       "method": "GET",
+      "path": "/activities/get",
+      "handler": "activity.getActivities"
+    },
+    {
+      "method": "GET",
       "path": "/contact/vos",
       "handler": "contact.getVo"
     },

@@ -12,6 +12,7 @@ import Button from "../../components/UI/Button/Button";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import auth from "../../components/Auth/Auth";
 import Moment from "moment";
+import * as formUtilities from "../../utilities/FormUtilities";
 
 const useStyles = (theme) => ({
   root: {},
@@ -49,6 +50,7 @@ const useStyles = (theme) => ({
     marginRight: theme.spacing(1),
   },
 });
+const SORT_FIELD_KEY = "_sort";
 
 export class Activity extends React.Component {
   constructor(props) {
@@ -58,30 +60,19 @@ export class Activity extends React.Component {
       data: [],
       getActivitytype: [],
       isLoader: true,
+      /** pagination data */
+      pageSize: "",
+      totalRows: "",
+      page: "",
+      pageCount: "",
+      resetPagination: false,
     };
   }
 
   async componentDidMount() {
-    let filteredArray = [];
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activities/?_sort=start_datetime:desc"
-      )
-      .then((res) => {
-        res.data.map((e, i) => {
-          e.activityassignees.map((item) => {});
-          e.activityassignees
-            .filter((item) => item.contact === auth.getUserInfo().contact.id)
-            .map((filteredData) => {
-              filteredArray.push(e);
-            });
-        });
-        this.setState({ data: filteredArray, isLoader: false });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    await this.getActivities(10, 1);
+
+    // "crm-plugin/activities/?_sort=start_datetime:desc&&activityassignees.contact=10"
 
     serviceProvider
       .serviceProviderForGetRequest(
@@ -96,9 +87,105 @@ export class Activity extends React.Component {
       });
   }
 
+  getActivities = async (pageSize, page, params = null) => {
+    if (params !== null && !formUtilities.checkEmpty(params)) {
+      let defaultParams = {};
+      if (params.hasOwnProperty(SORT_FIELD_KEY)) {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+          "activityassignees.contact": auth.getUserInfo().contact.id,
+        };
+      } else {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+          [SORT_FIELD_KEY]: "start_datetime:DESC",
+          "activityassignees.contact": auth.getUserInfo().contact.id,
+        };
+      }
+      Object.keys(params).map((key) => {
+        defaultParams[key] = params[key];
+      });
+      params = defaultParams;
+    } else {
+      params = {
+        page: page,
+        pageSize: pageSize,
+        [SORT_FIELD_KEY]: "start_datetime:DESC",
+        "activityassignees.contact": auth.getUserInfo().contact.id,
+      };
+    }
+    await serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activities/get/",
+        params
+      )
+      .then((res) => {
+        this.setState({
+          data: res.data.result,
+          isLoader: false,
+          pageSize: res.data.pageSize,
+          totalRows: res.data.rowCount,
+          page: res.data.page,
+          pageCount: res.data.pageCount,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  /** Pagination to handle row change*/
+  handlePerRowsChange = async (perPage, page) => {
+    // this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      await this.getActivities(perPage, page);
+    } else {
+      await this.getActivities(perPage, page, this.state.values);
+    }
+  };
+
+  /** Pagination to handle page change */
+  handlePageChange = (page) => {
+    // this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      this.getActivities(this.state.pageSize, page);
+    } else {
+      this.getActivities(this.state.pageSize, page, this.state.values);
+    }
+  };
+
+  /** Sorting */
+  handleSort = (
+    column,
+    sortDirection,
+    perPage = this.state.pageSize,
+    page = 1
+  ) => {
+    if (column.selector === "title") {
+      column.selector = "title";
+    }
+    if (column.selector === "activitytype.name") {
+      column.selector = "activitytype.name";
+    }
+    this.state.values[SORT_FIELD_KEY] = column.selector + ":" + sortDirection;
+    this.getActivities(perPage, page, this.state.values);
+  };
+
+  handleSearch() {
+    this.setState({ isLoader: true });
+    this.getActivities(this.state.pageSize, this.state.page, this.state.values);
+  }
+
   handleActivitytype = async (event, value) => {
     if (value !== null) {
-      this.setState({ filterActivitytype: value.id });
+      this.setState({
+        filterActivitytype: value.id,
+        values: {
+          ["activitytype.id"]: value.id,
+        },
+      });
     } else {
       this.setState({
         filterActivitytype: "",
@@ -106,9 +193,12 @@ export class Activity extends React.Component {
     }
   };
 
-  handleActiveChange(event, value, target) {
+  handleActivityChange(event, value, target) {
     this.setState({
-      values: { ...this.state.values, [event.target.name]: event.target.value },
+      [event.target.name]: event.target.value,
+      values: {
+        ["title_contains"]: event.target.value,
+      },
     });
   }
 
@@ -157,42 +247,10 @@ export class Activity extends React.Component {
     }
   };
 
-  handleSearch() {
-    this.setState({ isLoader: true });
-    let searchData = "";
-    if (this.state.values.FilterActivity) {
-      searchData += "title_contains=" + this.state.values.FilterActivity + "&&";
-    }
-    if (this.state.filterActivitytype) {
-      searchData += "activitytype.id=" + this.state.filterActivitytype;
-    }
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activities/?" +
-          searchData +
-          "&&_sort=start_datetime:desc"
-      )
-      .then((res) => {
-        let filteredArray = [];
-        res.data.map((e, i) => {
-          e.activityassignees.map((item) => {});
-          e.activityassignees
-            .filter((item) => item.contact === auth.getUserInfo().contact.id)
-            .map((filteredData) => {
-              filteredArray.push(e);
-            });
-        });
-        this.setState({ data: filteredArray, isLoader: false });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
   cancelForm = () => {
     this.setState({
       filterActivitytype: null,
+      FilterActivity: "",
       values: {},
       isLoader: true,
     });
@@ -298,9 +356,9 @@ export class Activity extends React.Component {
                       name="FilterActivity"
                       variant="outlined"
                       onChange={(event, value) => {
-                        this.handleActiveChange(event, value);
+                        this.handleActivityChange(event, value);
                       }}
-                      value={this.state.values.FilterActivity || ""}
+                      value={this.state.FilterActivity || ""}
                     />
                   </Grid>
                 </div>
@@ -369,6 +427,16 @@ export class Activity extends React.Component {
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 pagination
+                paginationServer
+                paginationDefaultPage={this.state.page}
+                paginationPerPage={this.state.pageSize}
+                paginationTotalRows={this.state.totalRows}
+                paginationRowsPerPageOptions={[10, 15, 20, 25, 30]}
+                paginationResetDefaultPage={this.state.resetPagination}
+                onChangeRowsPerPage={this.handlePerRowsChange}
+                onChangePage={this.handlePageChange}
+                onSort={this.handleSort}
+                sortServer={true}
                 selectableRows
                 progressComponent={this.state.isLoader}
                 DeleteMessage={"Are you Sure you want to Delete"}
