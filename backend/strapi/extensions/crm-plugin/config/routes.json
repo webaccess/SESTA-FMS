@@ -2,6 +2,11 @@
   "routes": [
     {
       "method": "GET",
+      "path": "/activities/get",
+      "handler": "activity.getActivities"
+    },
+    {
+      "method": "GET",
       "path": "/contact/vos",
       "handler": "contact.getVo"
     },
@@ -119,6 +124,11 @@
       "method": "GET",
       "path": "/activitytypes",
       "handler": "activitytype.find"
+    },
+    {
+      "method": "GET",
+      "path": "/activitytypes/alldata",
+      "handler": "activitytypes.getActivityTypes"
     },
     {
       "method": "GET",

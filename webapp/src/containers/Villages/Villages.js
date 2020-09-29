@@ -152,7 +152,6 @@ export class Villages extends React.Component {
         [SORT_FIELD_KEY]: "name:ASC",
       };
     }
-    console.log("params", params);
     await serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL + "crm-plugin/villages/get",
@@ -170,26 +169,129 @@ export class Villages extends React.Component {
       });
   };
 
-  getData(result) {
-    for (let i in result) {
-      let villages = [];
-      for (let j in result[i].villages) {
-        villages.push(result[i].villages[j].name + " ");
-      }
-      result[i]["villages"] = villages;
-    }
-    return result;
+  handleVillageChange(event, value) {
+    this.setState({
+      [event.target.name]: event.target.value,
+      values: {
+        ["name_contains"]: event.target.value,
+      },
+    });
   }
 
   handleDistrictChange(event, value) {
     if (value !== null) {
-      this.setState({ filterDistrict: value });
+      this.setState({
+        filterDistrict: value,
+        values: {
+          ["district.id"]: value.id,
+        },
+      });
     } else {
       this.setState({
         filterDistrict: "",
       });
     }
   }
+
+  /** Pagination to handle row change*/
+  handlePerRowsChange = async (perPage, page) => {
+    // this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      await this.getVillage(perPage, page);
+    } else {
+      await this.getVillage(perPage, page, this.state.values);
+    }
+  };
+
+  /** Pagination to handle page change */
+  handlePageChange = (page) => {
+    // this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      this.getVillage(this.state.pageSize, page);
+    } else {
+      this.getVillage(this.state.pageSize, page, this.state.values);
+    }
+  };
+
+  /** Sorting */
+  handleSort = (
+    column,
+    sortDirection,
+    perPage = this.state.pageSize,
+    page = 1
+  ) => {
+    if (column.selector === "name") {
+      column.selector = "name";
+    }
+    this.state.values[SORT_FIELD_KEY] = column.selector + ":" + sortDirection;
+    this.getVillage(perPage, page, this.state.values);
+  };
+
+  handleSearch() {
+    this.setState({ isLoader: true });
+    this.getVillage(this.state.pageSize, this.state.page, this.state.values);
+  }
+
+  handleActive = (event) => {
+    this.setState({ isActiveAllShowing: false });
+    let setActiveId = this.state.setActiveId;
+    let IsActive = this.state.IsActive;
+    let villageInUse = false;
+    this.state.contacts.find((cd) => {
+      if (cd.addresses.length > 0) {
+        if (cd.addresses[0].village === parseInt(setActiveId)) {
+          this.state.data.map((villgdata) => {
+            if (parseInt(setActiveId) === villgdata.id) {
+              this.setState({
+                villageInUse: true,
+                deleteVillageName: villgdata.name,
+              });
+              villageInUse = true;
+            }
+          });
+        }
+      }
+    });
+    if (!villageInUse) {
+      serviceProvider
+        .serviceProviderForPutRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/villages",
+          setActiveId,
+          {
+            is_active: IsActive,
+          }
+        )
+        .then((res) => {
+          this.setState({ formSubmitted: true });
+          this.setState({ open: true });
+          this.componentDidMount({ updateData: true });
+          this.props.history.push({ pathname: "/villages", updateData: true });
+          if (
+            this.props.location.updateData &&
+            this.snackbar.current !== null
+          ) {
+            this.snackbar.current.handleClick();
+          }
+        })
+        .catch((error) => {
+          this.setState({ formSubmitted: false });
+          if (error.response !== undefined) {
+            this.setState({
+              errorCode:
+                error.response.data.statusCode +
+                " Error- " +
+                error.response.data.error +
+                " Message- " +
+                error.response.data.message +
+                " Please try again!",
+            });
+          } else {
+            this.setState({ errorCode: "Network Error - Please try again!" });
+          }
+          console.log(error);
+        });
+    }
+  };
 
   editData = (cellid) => {
     this.props.history.push("/villages/edit/" + cellid);
@@ -285,101 +387,6 @@ export class Villages extends React.Component {
     this.setState({ open: false });
   };
 
-  /** Pagination to handle row change*/
-  handlePerRowsChange = async (perPage, page) => {
-    // this.setState({ isLoader: true });
-    if (formUtilities.checkEmpty(this.state.values)) {
-      await this.getVillage(perPage, page);
-    } else {
-      await this.getVillage(perPage, page, this.state.values);
-    }
-  };
-
-  /** Pagination to handle page change */
-  handlePageChange = (page) => {
-    // this.setState({ isLoader: true });
-    if (formUtilities.checkEmpty(this.state.values)) {
-      this.getVillage(this.state.pageSize, page);
-    } else {
-      this.getVillage(this.state.pageSize, page, this.state.values);
-    }
-  };
-
-  /** Sorting */
-  handleSort = (
-    column,
-    sortDirection,
-    perPage = this.state.pageSize,
-    page = 1
-  ) => {
-    if (column.selector === "name") {
-      column.selector = "name";
-    }
-    this.state.values[SORT_FIELD_KEY] = column.selector + ":" + sortDirection;
-    this.getVillage(perPage, page, this.state.values);
-  };
-
-  handleActive = (event) => {
-    this.setState({ isActiveAllShowing: false });
-    let setActiveId = this.state.setActiveId;
-    let IsActive = this.state.IsActive;
-    let villageInUse = false;
-    this.state.contacts.find((cd) => {
-      if (cd.addresses.length > 0) {
-        if (cd.addresses[0].village === parseInt(setActiveId)) {
-          this.state.data.map((villgdata) => {
-            if (parseInt(setActiveId) === villgdata.id) {
-              this.setState({
-                villageInUse: true,
-                deleteVillageName: villgdata.name,
-              });
-              villageInUse = true;
-            }
-          });
-        }
-      }
-    });
-    if (!villageInUse) {
-      serviceProvider
-        .serviceProviderForPutRequest(
-          process.env.REACT_APP_SERVER_URL + "crm-plugin/villages",
-          setActiveId,
-          {
-            is_active: IsActive,
-          }
-        )
-        .then((res) => {
-          this.setState({ formSubmitted: true });
-          this.setState({ open: true });
-          this.componentDidMount({ updateData: true });
-          this.props.history.push({ pathname: "/villages", updateData: true });
-          if (
-            this.props.location.updateData &&
-            this.snackbar.current !== null
-          ) {
-            this.snackbar.current.handleClick();
-          }
-        })
-        .catch((error) => {
-          this.setState({ formSubmitted: false });
-          if (error.response !== undefined) {
-            this.setState({
-              errorCode:
-                error.response.data.statusCode +
-                " Error- " +
-                error.response.data.error +
-                " Message- " +
-                error.response.data.message +
-                " Please try again!",
-            });
-          } else {
-            this.setState({ errorCode: "Network Error - Please try again!" });
-          }
-          console.log(error);
-        });
-    }
-  };
-
   closeActiveAllModalHandler = (event) => {
     this.setState({ isActiveAllShowing: false });
   };
@@ -392,31 +399,14 @@ export class Villages extends React.Component {
   cancelForm = () => {
     this.setState({
       filterDistrict: "",
+      name: "",
       values: {},
       formSubmitted: "",
-      stateSelected: false,
       isCancel: true,
       isLoader: true,
     });
     this.componentDidMount();
   };
-
-  handleChange = ({ target }) => {
-    this.setState({
-      values: { ...this.state.values, [target.name]: target.value },
-    });
-  };
-
-  handleSearch() {
-    this.setState({ isLoader: true });
-    this.getVillage(this.state.pageSize, this.state.page, this.state.values);
-  }
-
-  handleVillageChange(event, value, target) {
-    this.setState({
-      values: { ...this.state.values, [event.target.name]: event.target.value },
-    });
-  }
 
   render() {
     let data = this.state.data;
@@ -557,7 +547,7 @@ export class Villages extends React.Component {
                       onChange={(event, value) => {
                         this.handleVillageChange(event, value);
                       }}
-                      value={this.state.values.name || ""}
+                      value={this.state.name || ""}
                     />
                   </Grid>
                 </div>
