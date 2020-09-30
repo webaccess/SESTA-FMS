@@ -219,7 +219,6 @@ export class Fpos extends React.Component {
   };
 
   handleSearch() {
-    console.log("--state values--", this.state.values);
     this.setState({ isLoader: true });
     this.getFpo(this.state.pageSize, this.state.page, this.state.values);
   }
