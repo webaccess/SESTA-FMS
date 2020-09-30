@@ -322,6 +322,11 @@
     },
     {
       "method": "GET",
+      "path": "/tags/get",
+      "handler": "tag.getTag"
+    },
+    {
+      "method": "GET",
       "path": "/tags",
       "handler": "tag.find"
     },
