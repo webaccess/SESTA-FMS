@@ -201,23 +201,7 @@ export class States extends React.Component {
 
   handleSearch() {
     this.setState({ isLoader: true });
-    let searchData = "";
-    if (this.state.values.FilterState) {
-      searchData += "name_contains=" + this.state.values.FilterState;
-    }
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/states/?" +
-          searchData +
-          "&&_sort=name:ASC"
-      )
-      .then((res) => {
-        this.setState({ data: this.getData(res.data), isLoader: false });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    this.getState(this.state.pageSize, this.state.page, this.state.values);
   }
 
   editData = (cellid) => {
