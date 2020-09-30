@@ -236,32 +236,75 @@ module.exports = {
           }
           filters.where.shift();
         }
-      } else {
-        // for sesta, super and FPO admins
-        return strapi
-          .query("contact", "crm-plugin")
-          .model.query(
-            buildQuery({
-              model: strapi.plugins["crm-plugin"].models["contact"],
-              filters,
-            })
-          )
-          .fetchAll({})
-          .then(async (res) => {
-            let data = res.toJSON();
-            // Sorting ascending or descending on one or multiple fields
-            if (sort && sort.length) {
-              data = utils.sort(data, sort);
-            }
-            const response = utils.paginate(data, page, pageSize);
-            const response1 = await utils.assignData(response);
-
-            return {
-              result: response1.result,
-              ...response.pagination,
-            };
-          });
       }
+      // for sesta, super and FPO admins
+      return strapi
+        .query("contact", "crm-plugin")
+        .model.query(
+          buildQuery({
+            model: strapi.plugins["crm-plugin"].models["contact"],
+            filters,
+          })
+        )
+        .fetchAll({})
+        .then(async (res) => {
+          let data = res.toJSON();
+          // Sorting ascending or descending on one or multiple fields
+          if (sort && sort.length) {
+            data = utils.sort(data, sort);
+          }
+          const response = utils.paginate(data, page, pageSize);
+          const response1 = await utils.assignData(response);
+
+          return {
+            result: response1.result,
+            ...response.pagination,
+          };
+        });
+    } catch (error) {
+      return ctx.badRequest(null, error.message);
+    }
+  },
+
+  /** shg list for FPO user on members listing page  */
+  getShgList: async (ctx) => {
+    const { page, query, pageSize } = utils.getRequestParams(ctx.request.query);
+    let filters = convertRestQueryParams(query, { limit: -1 });
+    try {
+      if (ctx.query.id) {
+        const orgPromise = await strapi.query("contact", "crm-plugin").find({
+          contact_type: "organization",
+          "organization.sub_type": "VO",
+          "organization.fpo": ctx.query.id,
+        });
+        if (orgPromise.length > 0) {
+          const voIds = orgPromise.map((r) => r.id);
+          const voIdsQuery = [
+            { field: "organization.vos.id", operator: "in", value: voIds },
+          ];
+          if (filters.where && filters.where.length > 0) {
+            filters.where = [...filters.where, ...voIdsQuery];
+          } else {
+            filters.where = [...voIdsQuery];
+          }
+          filters.where.shift();
+        }
+      }
+      return strapi
+        .query("contact", "crm-plugin")
+        .model.query(
+          buildQuery({
+            model: strapi.plugins["crm-plugin"].models["contact"],
+            filters,
+          })
+        )
+        .fetchAll({})
+        .then(async (res) => {
+          let data = res.toJSON();
+          return {
+            result: data,
+          };
+        });
     } catch (error) {
       return ctx.badRequest(null, error.message);
     }
@@ -419,31 +462,30 @@ module.exports = {
         filters.where = [...fpoIdQuery];
       }
       filters.where.shift();
-    } else {
-      // for sesta, super admins
-      return strapi
-        .query("contact", "crm-plugin")
-        .model.query(
-          buildQuery({
-            model: strapi.plugins["crm-plugin"].models["contact"],
-            filters,
-          })
-        )
-        .fetchAll({})
-        .then(async (res) => {
-          let data = res.toJSON();
-          // Sorting ascending or descending on one or multiple fields
-          if (sort && sort.length) {
-            data = utils.sort(data, sort);
-          }
-          const response = utils.paginate(data, page, pageSize);
-
-          return {
-            result: response.result,
-            ...response.pagination,
-          };
-        });
     }
+    // for sesta, super admins
+    return strapi
+      .query("contact", "crm-plugin")
+      .model.query(
+        buildQuery({
+          model: strapi.plugins["crm-plugin"].models["contact"],
+          filters,
+        })
+      )
+      .fetchAll({})
+      .then(async (res) => {
+        let data = res.toJSON();
+        // Sorting ascending or descending on one or multiple fields
+        if (sort && sort.length) {
+          data = utils.sort(data, sort);
+        }
+        const response = utils.paginate(data, page, pageSize);
+
+        return {
+          result: response.result,
+          ...response.pagination,
+        };
+      });
   },
 
   /** get all users as per logged in user role */

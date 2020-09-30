@@ -221,7 +221,6 @@ function Base(requiredValues = []) {
         .fetchAll({})
         .then(async (res) => {
           let data = res.toJSON();
-          console.log("data", data);
           // Sorting ascending or descending on one or multiple fields
           if (sort && sort.length) {
             data = utils.sort(data, sort);

@@ -108,11 +108,11 @@ export class Members extends React.Component {
           serviceProvider
             .serviceProviderForGetRequest(
               process.env.REACT_APP_SERVER_URL +
-                "crm-plugin/contact/shgs/?id=" +
+                "crm-plugin/contact/shglist/?id=" +
                 res.data.fpo.id
             )
             .then((shgRes) => {
-              this.setState({ getShg: shgRes.data });
+              this.setState({ getShg: shgRes.data.result });
             })
             .catch((error) => {});
         });

@@ -2,6 +2,11 @@
   "routes": [
     {
       "method": "GET",
+      "path": "/contact/shglist",
+      "handler": "contact.getShgList"
+    },
+    {
+      "method": "GET",
       "path": "/contact/fpos",
       "handler": "contact.getFpo"
     },
