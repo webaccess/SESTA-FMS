@@ -90,16 +90,6 @@ export class Pgs extends React.Component {
   }
   async componentDidMount() {
     await this.getTag(10, 1);
-    // serviceProvider
-    //   .serviceProviderForGetRequest(
-    //     process.env.REACT_APP_SERVER_URL + "crm-plugin/tags/?_sort=name:ASC"
-    //   )
-    //   .then((res) => {
-    //     this.setState({ data: res.data, isLoader: false });
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
 
     serviceProvider
       .serviceProviderForGetRequest(
