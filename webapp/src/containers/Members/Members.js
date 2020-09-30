@@ -292,9 +292,7 @@ export class Members extends React.Component {
         filterDistrict: value,
         isCancel: false,
         filterVillage: "",
-        values: {
-          ["addresses.district"]: value.id,
-        },
+        values: { ...this.state.values, ["addresses.district"]: value.id },
       });
       let distId = value.id;
       serviceProvider
@@ -310,10 +308,13 @@ export class Members extends React.Component {
           console.log(error);
         });
     } else {
+      delete this.state.values["addresses.district"];
+      delete this.state.values["addresses.village"];
       this.setState({
         filterDistrict: "",
         filterVillage: "",
         getVillage: [],
+        ...this.state.values,
       });
       this.componentDidMount();
     }
@@ -327,20 +328,18 @@ export class Members extends React.Component {
       });
       if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
         this.setState({
-          values: {
-            ["individual.shg"]: value.contact,
-          },
+          values: { ...this.state.values, ["individual.shg"]: value.contact },
         });
       } else {
         this.setState({
-          values: {
-            ["individual.shg"]: value.id,
-          },
+          values: { ...this.state.values, ["individual.shg"]: value.id },
         });
       }
     } else {
+      delete this.state.values["individual.shg"];
       this.setState({
         filterShg: "",
+        ...this.state.values,
       });
     }
   }
@@ -350,13 +349,13 @@ export class Members extends React.Component {
       this.setState({
         filterVillage: value,
         isCancel: false,
-        values: {
-          ["addresses.village"]: value.id,
-        },
+        values: { ...this.state.values, ["addresses.village"]: value.id },
       });
     } else {
+      delete this.state.values["addresses.village"];
       this.setState({
         filterVillage: "",
+        ...this.state.values,
       });
     }
   }

@@ -72,8 +72,6 @@ export class Activity extends React.Component {
   async componentDidMount() {
     await this.getActivities(10, 1);
 
-    // "crm-plugin/activities/?_sort=start_datetime:desc&&activityassignees.contact=10"
-
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
@@ -182,13 +180,13 @@ export class Activity extends React.Component {
     if (value !== null) {
       this.setState({
         filterActivitytype: value.id,
-        values: {
-          ["activitytype.id"]: value.id,
-        },
+        values: { ...this.state.values, ["activitytype.id"]: value.id },
       });
     } else {
+      delete this.state.values["activitytype.id"];
       this.setState({
         filterActivitytype: "",
+        ...this.state.values,
       });
     }
   };
@@ -196,9 +194,7 @@ export class Activity extends React.Component {
   handleActivityChange(event, value, target) {
     this.setState({
       [event.target.name]: event.target.value,
-      values: {
-        ["title_contains"]: event.target.value,
-      },
+      values: { ...this.state.values, ["title_contains"]: event.target.value },
     });
   }
 

@@ -267,6 +267,7 @@ export class Users extends React.Component {
     this.setState({
       [event.target.name]: event.target.value,
       values: {
+        ...this.state.values,
         ["user.username_contains"]: event.target.value,
       },
     });
@@ -277,12 +278,11 @@ export class Users extends React.Component {
       this.setState({
         roleStatus: value,
         isCancel: false,
-        values: {
-          ["user.role"]: value.name,
-        },
+        values: { ...this.state.values, ["user.role"]: value.name },
       });
     } else {
-      this.setState({ roleStatus: "" });
+      delete this.state.values["user.role"];
+      this.setState({ roleStatus: "", ...this.state.values });
     }
   };
 
