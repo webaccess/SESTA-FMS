@@ -238,9 +238,7 @@ export class Shgs extends React.Component {
   handleChange(event) {
     this.setState({
       [event.target.name]: event.target.value,
-      values: {
-        ["name_contains"]: event.target.value,
-      },
+      values: { ...this.state.values, ["name_contains"]: event.target.value },
     });
   }
 
@@ -250,9 +248,7 @@ export class Shgs extends React.Component {
         filterDistrict: value,
         isCancel: false,
         filterVillage: "",
-        values: {
-          ["addresses.district"]: value.id,
-        },
+        values: { ...this.state.values, ["addresses.district"]: value.id },
       });
       let distId = value.id;
       serviceProvider
@@ -268,10 +264,13 @@ export class Shgs extends React.Component {
           console.log(error);
         });
     } else {
+      delete this.state.values["addresses.district"];
+      delete this.state.values["addresses.village"];
       this.setState({
         filterDistrict: "",
         filterVillage: "",
         getVillage: [],
+        ...this.state.values,
       });
       this.componentDidMount();
     }
@@ -282,13 +281,13 @@ export class Shgs extends React.Component {
       this.setState({
         filterVillage: value,
         isCancel: false,
-        values: {
-          ["addresses.village"]: value.id,
-        },
+        values: { ...this.state.values, ["addresses.village"]: value.id },
       });
     } else {
+      delete this.state.values["addresses.village"];
       this.setState({
         filterVillage: "",
+        ...this.state.values,
       });
     }
   }

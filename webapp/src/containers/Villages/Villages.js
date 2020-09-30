@@ -172,9 +172,7 @@ export class Villages extends React.Component {
   handleVillageChange(event, value) {
     this.setState({
       [event.target.name]: event.target.value,
-      values: {
-        ["name_contains"]: event.target.value,
-      },
+      values: { ...this.state.values, ["name_contains"]: event.target.value },
     });
   }
 
@@ -182,13 +180,13 @@ export class Villages extends React.Component {
     if (value !== null) {
       this.setState({
         filterDistrict: value,
-        values: {
-          ["district.id"]: value.id,
-        },
+        values: { ...this.state.values, ["district.id"]: value.id },
       });
     } else {
+      delete this.state.values["district.id"];
       this.setState({
         filterDistrict: "",
+        ...this.state.values,
       });
     }
   }
