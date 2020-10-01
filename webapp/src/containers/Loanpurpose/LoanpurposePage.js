@@ -61,36 +61,36 @@ class LoanpurposePage extends Component {
           required: { value: "true", message: "Loan purpose is required" },
         },
         addDuration: {
-          required: { value: "true", message: "Duration field is required" },
+          required: { value: "true", message: "Duration is  required" },
         },
         addSpecification: {
           required: {
             value: "true",
-            message: "Specification field is required",
+            message: "Specification is  required",
           },
         },
         addAmount: {
           required: {
             value: "true",
-            message: "Total Amount field is required",
+            message: "Total Amount is  required",
           },
         },
         addFPO: {
           required: {
             value: "true",
-            message: "FPO field is required",
+            message: "FPO is  required",
           },
         },
         addEMI: {
           required: {
             value: "true",
-            message: "EMI field is required",
+            message: "EMI is  required",
           },
         },
         task: {
           required: {
             value: "true",
-            message: "Task name field is required",
+            message: "Task name is  required",
           },
         },
       },
@@ -791,7 +791,7 @@ class LoanpurposePage extends Component {
                         id="combo-box-demo"
                         options={fpoFilters}
                         variant="outlined"
-                        label="FPO"
+                        label="FPO*"
                         getOptionLabel={(option) => option.name}
                         onChange={(event, value) => {
                           this.handleFpoChange(event, value);
@@ -816,7 +816,7 @@ class LoanpurposePage extends Component {
                         renderInput={(params) => (
                           <Input
                             fullWidth
-                            label="FPO"
+                            label="FPO*"
                             name="addFPO"
                             variant="outlined"
                           />
@@ -827,7 +827,7 @@ class LoanpurposePage extends Component {
                   <Grid item md={6} xs={12}>
                     <Input
                       fullWidth
-                      label="EMI"
+                      label="EMI*"
                       type="number"
                       name="addEMI"
                       error={this.hasError("addEMI")}

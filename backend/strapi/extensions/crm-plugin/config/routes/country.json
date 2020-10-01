@@ -2,6 +2,11 @@
   "routes": [
     {
       "method": "GET",
+      "path": "/countries/get",
+      "handler": "country.getModules"
+    },
+    {
+      "method": "GET",
       "path": "/countries",
       "handler": "country.find"
     },

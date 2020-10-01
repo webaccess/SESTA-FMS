@@ -28,24 +28,25 @@ class AddLoanTask extends Component {
       values: {},
       validations: {
         addTask: {
-          required: { value: "true", message: "Task field is required" },
+          required: { value: "true", message: "Task is  required" },
         },
         addStatus: {
-          required: { value: "true", message: "Status field is required" },
+          required: { value: "true", message: "Status is  required" },
         },
         addDate: {
-          required: { value: "true", message: "Date field is required" },
-        }
+          required: { value: "true", message: "Date is  required" },
+        },
       },
       errors: {},
       formSubmitted: "",
-    }
+    };
   }
 
   async componentDidMount() {
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes/?_sort=name:asc"
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/activitytypes/?_sort=name:asc"
       )
       .then((res) => {
         this.setState({ activitytypes: res.data });
@@ -65,7 +66,7 @@ class AddLoanTask extends Component {
         values: {
           ...this.state.values,
           addTask: "",
-        }
+        },
       });
     }
   }
@@ -114,8 +115,8 @@ class AddLoanTask extends Component {
       status: this.state.values.addStatus,
       date: this.state.values.addDate,
       comments: this.state.values.comments,
-      loan_application: loanAppliactionId
-    }
+      loan_application: loanAppliactionId,
+    };
     serviceProvider
       .serviceProviderForPostRequest(
         process.env.REACT_APP_SERVER_URL + "loan-application-tasks",
@@ -125,7 +126,10 @@ class AddLoanTask extends Component {
         // add activity
         let loanAppId = res.data.id;
         let activitiyData = {
-          title: this.props.location.state.loanAppData.contact.name + ": " + this.state.values.addTask,
+          title:
+            this.props.location.state.loanAppData.contact.name +
+            ": " +
+            this.state.values.addTask,
           start_datetime: this.state.values.addDate,
           end_datetime: this.state.values.addDate,
           unit: 1,
@@ -134,9 +138,9 @@ class AddLoanTask extends Component {
             id: this.state.values.typeId,
           },
           loan_application_task: {
-            id: loanAppId
-          }
-        }
+            id: loanAppId,
+          },
+        };
 
         serviceProvider
           .serviceProviderForPostRequest(
@@ -148,15 +152,16 @@ class AddLoanTask extends Component {
             // add activityassingnees
             let activityassignee = {
               contact: {
-                id: auth.getUserInfo().contact.id
+                id: auth.getUserInfo().contact.id,
               },
               activity: {
-                id: cid
-              }
-            }
+                id: cid,
+              },
+            };
             serviceProvider
               .serviceProviderForPostRequest(
-                process.env.REACT_APP_SERVER_URL + "crm-plugin/activityassignees",
+                process.env.REACT_APP_SERVER_URL +
+                  "crm-plugin/activityassignees",
                 activityassignee
               )
               .then((assigneeResp) => {
@@ -164,15 +169,15 @@ class AddLoanTask extends Component {
                 let app_id = res.data.loan_application["id"];
                 this.props.history.push("/loan/update/" + app_id, {
                   loanAppData: this.props.location.state.loanAppData,
-                  loanTaskAddPage: true
+                  loanTaskAddPage: true,
                 });
-              })
-          })
+              });
+          });
       })
       .catch((error) => {
         console.log(error);
-      })
-  }
+      });
+  };
 
   validate = () => {
     const values = this.state.values;
@@ -209,12 +214,11 @@ class AddLoanTask extends Component {
             autoComplete="off"
             noValidate
             onSubmit={this.handleSubmit}
-            method="POST">
+            method="POST"
+          >
             <CardHeader
               title={"Add Loan task"}
-              subheader={
-                "You can add loan task here!"
-              }
+              subheader={"You can add loan task here!"}
             />
             <Divider />
 
@@ -287,7 +291,7 @@ class AddLoanTask extends Component {
                     format={"dd MMM yyyy"}
                     onChange={(value) =>
                       this.setState({
-                        values: { ...this.state.values, addDate: value }
+                        values: { ...this.state.values, addDate: value },
                       })
                     }
                   />
@@ -303,24 +307,20 @@ class AddLoanTask extends Component {
                     variant="outlined"
                   />
                 </Grid>
-
               </Grid>
             </CardContent>
             <Divider />
 
             <CardActions style={{ padding: "15px" }}>
               <Button type="submit">Save</Button>
-              <Button
-                color="secondary"
-                clicked={this.cancelForm}
-              >
+              <Button color="secondary" clicked={this.cancelForm}>
                 cancel
               </Button>
             </CardActions>
           </form>
         </Card>
       </Layout>
-    )
+    );
   }
 }
 export default AddLoanTask;

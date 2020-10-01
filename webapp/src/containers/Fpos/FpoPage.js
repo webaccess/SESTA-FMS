@@ -31,28 +31,28 @@ class FpoPage extends Component {
         addFpo: {
           required: {
             value: "true",
-            message: "Farmer Producer Organization field required",
+            message: "Farmer Producer Organization is required",
           },
         },
         addDistrict: {
-          required: { value: "true", message: "District field required" },
+          required: { value: "true", message: "District is required" },
         },
         addState: {
           required: {
             value: "true",
-            message: "State field required",
+            message: "State is required",
           },
         },
         addEmail: {
           email: {
             value: "true",
-            message: "Please enter valid email id",
+            message: "Please enter valid email address.",
           },
         },
         addPhone: {
           phone: {
             value: "true",
-            message: "Please enter valid phone number",
+            message: "Please enter valid phone number.",
           },
         },
       },
@@ -131,7 +131,7 @@ class FpoPage extends Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/districts/?is_active=true&&state.id=" +
+            "crm-plugin/districts/?is_active=true&&_sort=name:ASC&&state.id=" +
             newVal
         )
         .then((res) => {

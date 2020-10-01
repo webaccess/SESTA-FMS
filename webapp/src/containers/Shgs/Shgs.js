@@ -509,7 +509,7 @@ export class Shgs extends React.Component {
           ) : null}
           {this.state.shgInUseDeleteAll === true ? (
             <Snackbar severity="info" Showbutton={false}>
-              Some Village is in use hence it can not be Deleted.
+              Some Villages are in use hence it can not be Deleted.
             </Snackbar>
           ) : null}
           <div

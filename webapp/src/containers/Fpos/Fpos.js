@@ -457,7 +457,7 @@ export class Fpos extends React.Component {
             ) : null}
             {this.state.fpoInUseDeleteAll === true ? (
               <Snackbar severity="info" Showbutton={false}>
-                Some FPOs is in use hence it can not be Deleted.
+                Some FPOs are in use hence it can not be Deleted.
               </Snackbar>
             ) : null}
             <div

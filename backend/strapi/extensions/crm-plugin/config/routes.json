@@ -142,6 +142,11 @@
     },
     {
       "method": "GET",
+      "path": "/activities/recent/activities",
+      "handler": "activity.getRecentActivities"
+    },
+    {
+      "method": "GET",
       "path": "/activitytypes",
       "handler": "activitytype.find"
     },
@@ -224,6 +229,11 @@
       "method": "DELETE",
       "path": "/contacttags/:id",
       "handler": "contacttag.delete"
+    },
+    {
+      "method": "GET",
+      "path": "/countries/get",
+      "handler": "country.getModules"
     },
     {
       "method": "GET",

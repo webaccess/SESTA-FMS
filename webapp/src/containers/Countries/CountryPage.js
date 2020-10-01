@@ -34,7 +34,7 @@ class CountryPage extends Component {
         addAbbreviation: {
           required: {
             value: "true",
-            message: "Abbreviation field is required",
+            message: "Abbreviation is required",
           },
         },
         addIdentifier: {},
