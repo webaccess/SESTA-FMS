@@ -333,7 +333,7 @@ class DashboardViewMoreDetailsCSP extends Component {
         this.setState({
           filterStartDate: event, isCancel: false,
           values: {
-            ["payment_date_lte"]: event.toISOString(),
+            ["payment_date_gte"]: event.toISOString(),
           },
         });
       }
@@ -341,7 +341,7 @@ class DashboardViewMoreDetailsCSP extends Component {
         this.setState({
           filterStartDate: event, isCancel: false,
           values: {
-            ["start_datetime_lte"]: event.toISOString(),
+            ["start_datetime_gte"]: event.toISOString(),
           },
         });
       }
