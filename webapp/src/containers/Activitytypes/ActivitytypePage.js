@@ -464,7 +464,7 @@ class ActivitytypePage extends Component {
                         id="combo-box-demo"
                         options={fposFilter}
                         variant="outlined"
-                        label="FPO"
+                        label="FPO*"
                         getOptionLabel={(option) => option.name}
                         onChange={(event, value) => {
                           this.handleFpoChange(event, value);

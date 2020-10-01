@@ -31,10 +31,10 @@ class LoanEditTask extends Component {
       values: {},
       validations: {
         editStatus: {
-          required: { value: "true", message: "Status field is required" },
+          required: { value: "true", message: "Status is  required" },
         },
         editDate: {
-          required: { value: "true", message: "Date field is required" },
+          required: { value: "true", message: "Date is  required" },
         },
       },
       errors: {},
