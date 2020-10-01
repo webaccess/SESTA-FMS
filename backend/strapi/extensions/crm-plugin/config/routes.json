@@ -142,6 +142,11 @@
     },
     {
       "method": "GET",
+      "path": "/activities/recent/activities",
+      "handler": "activity.getRecentActivities"
+    },
+    {
+      "method": "GET",
       "path": "/activitytypes",
       "handler": "activitytype.find"
     },

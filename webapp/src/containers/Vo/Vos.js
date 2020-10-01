@@ -419,7 +419,7 @@ export class Vos extends React.Component {
             ) : null}
             {this.state.voInUseDeleteAll === true ? (
               <Snackbar severity="info" Showbutton={false}>
-                Some Village Organization is in use hence it can not be Deleted.
+                Some Village Organizations are in use hence it can not be Deleted.
               </Snackbar>
             ) : null}
             <div

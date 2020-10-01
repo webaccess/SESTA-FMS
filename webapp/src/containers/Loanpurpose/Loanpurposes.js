@@ -420,7 +420,7 @@ export class Loanpurposes extends React.Component {
             ) : null}
             {this.state.purposeInUseDeleteAll === true ? (
               <Snackbar severity="info" Showbutton={false}>
-                Some Loan purpose is in use hence it can not be Deleted.
+                Some Loan purposes are in use hence it can not be Deleted.
               </Snackbar>
             ) : null}
             <div

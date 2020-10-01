@@ -467,7 +467,7 @@ export class Pgs extends React.Component {
             ) : null}
             {this.state.pgInUseDeleteAll === true ? (
               <Snackbar severity="info" Showbutton={false}>
-                Some Producer Group is in use hence it can not be Deleted.
+                Some Producer Groups are in use hence it can not be Deleted.
               </Snackbar>
             ) : null}
             <div

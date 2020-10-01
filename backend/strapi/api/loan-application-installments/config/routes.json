@@ -2,6 +2,14 @@
   "routes": [
     {
       "method": "GET",
+      "path": "/loan-application-installments/emidue/details",
+      "handler": "loan-application-installments.emiDueDetails",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
       "path": "/loan-application-installments",
       "handler": "loan-application-installments.find",
       "config": {

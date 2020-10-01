@@ -461,7 +461,7 @@ export class States extends React.Component {
             ) : null}
             {this.state.stateInUseDeleteAll === true ? (
               <Snackbar severity="info" Showbutton={false}>
-                Some State is in use hence it can not be Deleted.
+                Some States are in use hence it can not be Deleted.
               </Snackbar>
             ) : null}
             <div
