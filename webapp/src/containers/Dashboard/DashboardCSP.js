@@ -213,7 +213,6 @@ class DashboardCSP extends Component {
       selectors1.push(Usercolumns1[i]["selector"]);
     }
     let columnsvalue1 = selectors1[0];
-    console.log('hyyyyyyyy::::: ', activitiesData);
     return (
       <div className="App" style={{ paddingTop: "15px" }}>
         <Grid container style={{ border: "1px solid #ccc" }}>
