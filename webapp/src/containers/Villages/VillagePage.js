@@ -32,13 +32,13 @@ class VillagePage extends Component {
       getDistrict: [],
       validations: {
         addVillage: {
-          required: { value: "true", message: "Village field is required" },
+          required: { value: "true", message: "Village is  required" },
         },
         addState: {
-          required: { value: "true", message: "State field is required" },
+          required: { value: "true", message: "State is  required" },
         },
         addDistrict: {
-          required: { value: "true", message: "District field is required" },
+          required: { value: "true", message: "District is  required" },
         },
       },
       errors: {
@@ -115,7 +115,8 @@ class VillagePage extends Component {
     }
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true&&_sort=name:ASC"
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/states/?is_active=true&&_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ getState: res.data });

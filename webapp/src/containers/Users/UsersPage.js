@@ -206,7 +206,7 @@ class UsersPage extends Component {
     ) {
       Object.assign(this.state.validations, {
         selectField: {
-          required: { value: "true", message: "Field is required" },
+          required: { value: "true", message: "is  required" },
         },
       });
     } else {

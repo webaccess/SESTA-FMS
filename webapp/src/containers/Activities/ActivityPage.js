@@ -36,18 +36,18 @@ class ActivityPage extends Component {
       getActivitytype: [],
       validations: {
         addTitle: {
-          required: { value: "true", message: "Action name field is required" },
+          required: { value: "true", message: "Action name is required" },
         },
         addStartDate: {
           required: {
             value: "true",
-            message: "Start Date/Time field is required",
+            message: "Start Date/Time is required",
           },
         },
         addActivitytype: {
           required: {
             value: "true",
-            message: "Activity type field is required",
+            message: "Activity type is required",
           },
         },
       },

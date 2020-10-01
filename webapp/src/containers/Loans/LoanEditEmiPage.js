@@ -33,19 +33,19 @@ class LoanEditEmiPage extends Component {
         actual_payment_date: {
           required: {
             value: "true",
-            message: "Payment Date field is required",
+            message: "Payment Date is  required",
           },
         },
         actual_principal: {
           required: {
             value: "true",
-            message: "Principal Paid field is required",
+            message: "Principal Paid is  required",
           },
         },
         actual_interest: {
           required: {
             value: "true",
-            message: "Interest Paid field is required",
+            message: "Interest Paid is  required",
           },
         },
         fine: {},
@@ -168,7 +168,7 @@ class LoanEditEmiPage extends Component {
                     serviceProvider
                       .serviceProviderForPutRequest(
                         process.env.REACT_APP_SERVER_URL +
-                        "crm-plugin/activities",
+                          "crm-plugin/activities",
                         fdata.id,
                         fdata
                       )
@@ -188,22 +188,29 @@ class LoanEditEmiPage extends Component {
           let loanAppId = loanApp.id;
           let loanStatus;
           let lastEmi = loanApp.loan_app_installments.length - 1;
-          if (loanApp.loan_app_installments[lastEmi].id == loanEmiData.id && loanApp.loan_app_installments[lastEmi].actual_principal != null) {
+          if (
+            loanApp.loan_app_installments[lastEmi].id == loanEmiData.id &&
+            loanApp.loan_app_installments[lastEmi].actual_principal != null
+          ) {
             loanStatus = {
-              status: "Completed"
-            }
+              status: "Completed",
+            };
           } else {
             loanStatus = {
-              status: "InProgress"
-            }
+              status: "InProgress",
+            };
           }
 
           serviceProvider
-            .serviceProviderForPutRequest(process.env.REACT_APP_SERVER_URL + "loan-applications", loanAppId, loanStatus)
-            .then(() => { })
-            .catch(error => {
-              console.log('loanApp', error);
-            })
+            .serviceProviderForPutRequest(
+              process.env.REACT_APP_SERVER_URL + "loan-applications",
+              loanAppId,
+              loanStatus
+            )
+            .then(() => {})
+            .catch((error) => {
+              console.log("loanApp", error);
+            });
         }
         let app_id = res.data.loan_application["id"];
         this.props.history.push("/loans/emi/" + app_id, {
