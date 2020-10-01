@@ -13,6 +13,7 @@ import Button from "../../components/UI/Button/Button";
 import { Link } from "react-router-dom";
 import { CSVLink, CSVDownload } from "react-csv";
 import style from "./Dashboard.module.css";
+import * as formUtilities from "../../utilities/FormUtilities";
 
 const useStyles = (theme) => ({
   root: {},
@@ -42,10 +43,13 @@ const useStyles = (theme) => ({
     marginTop: theme.spacing(1),
   },
 });
+const SORT_FIELD_KEY = "_sort";
+
 class DashboardViewMoreDetailsCSP extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      values: {},
       loanData: [],
       activitiesData: [],
       loanInstallmentData: [],
@@ -56,42 +60,23 @@ class DashboardViewMoreDetailsCSP extends Component {
       filterActType: "",
       filterStartDate: "",
       filterEndDate: "",
-      remuneration: "",
+      remunTotal: "",
       isCancel: false,
       filename: [],
+      csvActivityData: [],
       isLoader: true,
+      /** pagination data */
+      pageSize: "",
+      totalRows: "",
+      page: "",
+      pageCount: "",
+      resetPagination: false,
     };
   }
 
   async componentDidMount() {
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "loan-application-installments?_sort=id:asc"
-      )
-      .then((res) => {
-        this.setState({ loanInstallmentData: res.data });
-      });
-
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "loan-applications?_sort=id:asc"
-      )
-      .then((res) => {
-        this.setState({ loanData: res.data });
-      });
-
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activities?_sort=start_datetime:desc"
-      )
-      .then((activityRes) => {
-        this.getCspActivties(activityRes);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    await this.getLoanModels(10, 1);
+    await this.getActivityModels(10, 1);
 
     serviceProvider
       .serviceProviderForGetRequest(
@@ -113,28 +98,213 @@ class DashboardViewMoreDetailsCSP extends Component {
       });
   }
 
+  getLoanModels = async (pageSize, page, params = null) => {
+    if (params !== null && !formUtilities.checkEmpty(params)) {
+      let defaultParams = {};
+      if (params.hasOwnProperty(SORT_FIELD_KEY)) {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+        };
+      } else {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+          [SORT_FIELD_KEY]: "payment_date:ASC",
+        };
+      }
+      Object.keys(params).map((key) => {
+        defaultParams[key] = params[key];
+      });
+      params = defaultParams;
+    } else {
+      params = {
+        page: page,
+        pageSize: pageSize,
+        [SORT_FIELD_KEY]: "payment_date:ASC",
+      };
+    }
+
+    await serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "loan-application-installments/emidue/details/?loan_application.creator_id=" + auth.getUserInfo().contact.id,
+        params
+      )
+      .then((res) => {
+        this.setState({
+          loanInstallmentData: res.data.result,
+          isLoader: false,
+          pageSize: res.data.pageSize,
+          totalRows: res.data.rowCount,
+          page: res.data.page,
+          pageCount: res.data.pageCount,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  getActivityModels = async (pageSize, page, params = null) => {
+    if (params !== null && !formUtilities.checkEmpty(params)) {
+      let defaultParams = {};
+      if (params.hasOwnProperty(SORT_FIELD_KEY)) {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+        };
+      } else {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+          [SORT_FIELD_KEY]: "start_datetime:ASC",
+        };
+      }
+      Object.keys(params).map((key) => {
+        defaultParams[key] = params[key];
+      });
+      params = defaultParams;
+    } else {
+      params = {
+        page: page,
+        pageSize: pageSize,
+        [SORT_FIELD_KEY]: "start_datetime:ASC",
+      };
+    }
+
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activities/recent/activities",
+        params
+      )
+      .then((activityRes) => {
+        this.getCspActivties(activityRes);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  /** Pagination to handle row change*/
+  handlePerRowsChange = async (perPage, page) => {
+    if (formUtilities.checkEmpty(this.state.values)) {
+      await this.getLoanModels(perPage, page);
+    } else {
+      await this.getLoanModels(perPage, page, this.state.values);
+    }
+  };
+
+  /** Pagination to handle page change */
+  handlePageChange = (page) => {
+    if (formUtilities.checkEmpty(this.state.values)) {
+      this.getLoanModels(this.state.pageSize, page);
+    } else {
+      this.getLoanModels(this.state.pageSize, page, this.state.values);
+    }
+  };
+
+  /** Sorting */
+  handleSort = (
+    column,
+    sortDirection,
+    perPage = this.state.pageSize,
+    page = 1
+  ) => {
+    if (column.selector === "loan_application.memName") {
+      column.selector = "loan_application.memName";
+    }
+    if (column.selector === "loan_application.purpose") {
+      column.selector = "loan_application.purpose";
+    }
+    if (column.selector === "pendingAmount") {
+      column.selector = "pendingAmount";
+    }
+    if (column.selector === "payment_date") {
+      column.selector = "payment_date";
+    }
+    if (column.selector === "emi") {
+      column.selector = "emi";
+    }
+    this.state.values[SORT_FIELD_KEY] = column.selector + ":" + sortDirection;
+    this.getLoanModels(perPage, page, this.state.values);
+  };
+
+  /** Pagination to handle row change*/
+  handlePerRowsChangeAct = async (perPage, page) => {
+    if (formUtilities.checkEmpty(this.state.values)) {
+      await this.getActivityModels(perPage, page);
+    } else {
+      await this.getActivityModels(perPage, page, this.state.values);
+    }
+  };
+
+  /** Pagination to handle page change */
+  handlePageChangeAct = (page) => {
+    if (formUtilities.checkEmpty(this.state.values)) {
+      this.getActivityModels(this.state.pageSize, page);
+    } else {
+      this.getActivityModels(this.state.pageSize, page, this.state.values);
+    }
+  };
+  /** Sorting */
+  handleSortAct = (
+    column,
+    sortDirection,
+    perPage = this.state.pageSize,
+    page = 1
+  ) => {
+    if (column.selector === "title") {
+      column.selector = "title";
+    }
+    if (column.selector === "start_datetime") {
+      column.selector = "start_datetime";
+    }
+    if (column.selector === "activitytype.remuneration") {
+      column.selector = "activitytype.remuneration";
+    }
+    this.state.values[SORT_FIELD_KEY] = column.selector + ":" + sortDirection;
+    this.getActivityModels(perPage, page, this.state.values);
+  };
+
   getCspActivties(activityRes) {
     let filteredArray = [];
-    activityRes.data.map((e, i) => {
-      e.activityassignees.map((item) => {});
+    activityRes.data.result.map((e, i) => {
+      e.activityassignees.map((item) => { });
       e.activityassignees
         .filter((item) => item.contact === auth.getUserInfo().contact.id)
         .map((filteredData) => {
           filteredArray.push(e);
         });
+
     });
-    this.setState({ activitiesData: filteredArray, isLoader: false });
+    this.setState({
+      activitiesData: filteredArray,
+      csvActivityData: activityRes.data.csvActivityData,
+      remunTotal: activityRes.data.viewMoreRemunTotal,
+      isLoader: false,
+      pageSize: activityRes.data.pageSize,
+      totalRows: activityRes.data.rowCount,
+      page: activityRes.data.page,
+      pageCount: activityRes.data.pageCount,
+    });
   }
 
   handleNameChange(event, value) {
     this.setState({
       filterLoaneeName: event.target.value,
+      values: {
+        ["loan_application.contact.name_contains"]: event.target.value,
+      },
     });
   }
 
   handlePurposeChange(event, value) {
     if (value !== null) {
-      this.setState({ filterPurpose: value, isCancel: false });
+      this.setState({
+        filterPurpose: value, isCancel: false,
+        values: {
+          ["loan_application.purpose"]: value.product_name,
+        },
+      });
     } else {
       this.setState({
         filterPurpose: "",
@@ -144,7 +314,12 @@ class DashboardViewMoreDetailsCSP extends Component {
 
   handleActivityTypeChange(event, value) {
     if (value !== null) {
-      this.setState({ filterActType: value, isCancel: false });
+      this.setState({
+        filterActType: value, isCancel: false,
+        values: {
+          ["activitytype.name"]: value.name,
+        },
+      });
     } else {
       this.setState({
         filterActType: "",
@@ -154,7 +329,22 @@ class DashboardViewMoreDetailsCSP extends Component {
 
   handleStartDateChange(event, value) {
     if (event !== null) {
-      this.setState({ filterStartDate: event, isCancel: false });
+      if (this.props.location.state.loanEMIData) {
+        this.setState({
+          filterStartDate: event, isCancel: false,
+          values: {
+            ["payment_date_lte"]: event.toISOString(),
+          },
+        });
+      }
+      if (this.props.location.state.activitiesData) {
+        this.setState({
+          filterStartDate: event, isCancel: false,
+          values: {
+            ["start_datetime_lte"]: event.toISOString(),
+          },
+        });
+      }
     } else {
       this.setState({
         filterStartDate: "",
@@ -164,7 +354,22 @@ class DashboardViewMoreDetailsCSP extends Component {
 
   handleEndDateChange(event, value) {
     if (event !== null) {
-      this.setState({ filterEndDate: event, isCancel: false });
+      if (this.props.location.state.loanEMIData) {
+        this.setState({
+          filterEndDate: event, isCancel: false,
+          values: {
+            ["payment_date_lte"]: event.toISOString(),
+          },
+        });
+      }
+      if (this.props.location.state.activitiesData) {
+        this.setState({
+          filterEndDate: event, isCancel: false,
+          values: {
+            ["start_datetime_lte"]: event.toISOString(),
+          },
+        });
+      }
     } else {
       this.setState({
         filterEndDate: "",
@@ -174,88 +379,17 @@ class DashboardViewMoreDetailsCSP extends Component {
 
   handleActivitySearch() {
     this.setState({ isLoader: true });
-    let searchData = "";
-    if (this.state.filterActType) {
-      searchData += searchData ? "&&" : "";
-      searchData += "activitytype.name=" + this.state.filterActType.name;
-    }
-    if (this.state.filterStartDate) {
-      searchData += searchData ? "&&" : "";
-      searchData +=
-        "start_datetime_gte=" + this.state.filterStartDate.toISOString();
-    }
-    if (this.state.filterEndDate) {
-      searchData += searchData ? "&&" : "";
-      searchData +=
-        "start_datetime_lte=" + this.state.filterEndDate.toISOString();
-    }
-
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activities/?" +
-          searchData
-      )
-      .then((res) => {
-        this.getCspActivties(res);
-      });
+    this.getActivityModels(this.state.pageSize, this.state.page, this.state.values);
   }
 
   handleLoanEMISearch() {
     this.setState({ isLoader: true });
-    let searchData = "";
-    let memberId = 0;
-    if (this.state.filterLoaneeName) {
-      let searchName = "";
-      searchName += searchName ? "&&" : "";
-      searchName += "contact.name_contains=" + this.state.filterLoaneeName;
-
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL + "loan-applications?" + searchName
-        )
-        .then((res) => {
-          if (res.data.length) {
-            memberId = res.data[0].id;
-          }
-          searchData += searchData ? "&&" : "";
-          searchData += "loan_application.id=" + memberId;
-          this.searchEmiAPI(searchData);
-        });
-    }
-
-    if (this.state.filterPurpose) {
-      searchData += searchData ? "&&" : "";
-      searchData +=
-        "loan_application.purpose=" + this.state.filterPurpose.product_name;
-    }
-    if (this.state.filterStartDate) {
-      searchData += searchData ? "&&" : "";
-      searchData +=
-        "payment_date_gte=" + this.state.filterStartDate.toISOString();
-    }
-    if (this.state.filterEndDate) {
-      searchData += searchData ? "&&" : "";
-      searchData +=
-        "payment_date_lte=" + this.state.filterEndDate.toISOString();
-    }
-    this.searchEmiAPI(searchData);
-  }
-
-  searchEmiAPI(searchData) {
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "loan-application-installments?" +
-          searchData
-      )
-      .then((res) => {
-        this.setState({ loanInstallmentData: res.data, isLoader: false });
-      });
+    this.getLoanModels(this.state.pageSize, this.state.page, this.state.values);
   }
 
   cancelForm = () => {
     this.setState({
+      filterLoaneeName: "",
       filterActType: "",
       filterStartDate: "",
       filterEndDate: "",
@@ -264,41 +398,6 @@ class DashboardViewMoreDetailsCSP extends Component {
     });
     this.componentDidMount();
   };
-
-  manageLoanEMIData(loanInstallmentData) {
-    this.state.loanInstallmentData.map((ldata) => {
-      if (ldata.loan_application !== null) {
-        if (
-          ldata.loan_application.creator_id == auth.getUserInfo().contact.id
-        ) {
-          if (
-            ldata.actual_principal === null &&
-            ldata.actual_interest === null
-          ) {
-            this.state.loanData.map((ld) => {
-              // calculate pending loan amount
-              let pendingAmount =
-                ldata.expected_principal + ldata.expected_interest;
-              ldata.pendingAmount = pendingAmount;
-
-              // get Member name and EMI
-              if (ld.id == ldata.loan_application.id) {
-                ldata.loan_application.memName = ld.contact.name;
-                ldata.emi = ld.loan_model.emi;
-              }
-            });
-            loanInstallmentData.push(ldata);
-          }
-        }
-      }
-    });
-    // sort loan application installments by payment date
-    loanInstallmentData.sort(
-      (a, b) =>
-        new Date(...a.payment_date.split("/").reverse()) -
-        new Date(...b.payment_date.split("/").reverse())
-    );
-  }
 
   formatCSVFilename() {
     let filename = "";
@@ -330,30 +429,10 @@ class DashboardViewMoreDetailsCSP extends Component {
 
     const userInfo = auth.getUserInfo();
     let loanModelData = this.state.loanModelData;
-
-    let loanInstallmentData = [];
-    this.manageLoanEMIData(loanInstallmentData);
-
+    let loanInstallmentData = this.state.loanInstallmentData;
     let activitiesData = this.state.activitiesData;
-    let activityName, date, remuneration;
-    let csvActivityData = [];
-    let remunTotal = 0;
-    activitiesData.map((activity) => {
-      remunTotal = remunTotal + activity.activitytype.remuneration;
-      activityName = activity.title;
-      date = Moment(activity.start_datetime).format("DD MMM YYYY");
-      remuneration = activity.activitytype.remuneration;
-      csvActivityData.push({
-        "Activity Name": activityName,
-        Date: date,
-        Remuneration: remuneration,
-      });
-    });
-    remunTotal = "₹" + remunTotal.toLocaleString();
-    if (csvActivityData.length <= 0) {
-      csvActivityData = "There are no records to display";
-    }
-
+    let csvActivityData = this.state.csvActivityData;
+    let remunTotal = this.state.remunTotal;
     const Usercolumns = [
       {
         name: "Name",
@@ -553,6 +632,16 @@ class DashboardViewMoreDetailsCSP extends Component {
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
                 pagination
+                paginationServer
+                paginationDefaultPage={this.state.page}
+                paginationPerPage={this.state.pageSize}
+                paginationTotalRows={this.state.totalRows}
+                paginationRowsPerPageOptions={[10, 15, 20, 25, 30]}
+                paginationResetDefaultPage={this.state.resetPagination}
+                onChangeRowsPerPage={this.handlePerRowsChange}
+                onChangePage={this.handlePageChange}
+                onSort={this.handleSort}
+                sortServer={true}
                 progressComponent={this.state.isLoader}
               />
             ) : null}
@@ -654,6 +743,16 @@ class DashboardViewMoreDetailsCSP extends Component {
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue1}
                 pagination
+                paginationServer
+                paginationDefaultPage={this.state.page}
+                paginationPerPage={this.state.pageSize}
+                paginationTotalRows={this.state.totalRows}
+                paginationRowsPerPageOptions={[10, 15, 20, 25, 30]}
+                paginationResetDefaultPage={this.state.resetPagination}
+                onChangeRowsPerPage={this.handlePerRowsChangeAct}
+                onChangePage={this.handlePageChangeAct}
+                onSort={this.handleSortAct}
+                sortServer={true}
                 progressComponent={this.state.isLoader}
               />
             ) : null}

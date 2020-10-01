@@ -62,6 +62,8 @@ class DashboardCSP extends Component {
       loanInstallmentData: [],
       activitiesData: [],
       activitytypeData: [],
+      activityname: [],
+      activityvalue: [],
       remuneration: "",
       isLoader: true,
       isLoaderAct: true,
@@ -70,120 +72,56 @@ class DashboardCSP extends Component {
 
   async componentDidMount() {
     let filteredArray = [];
+
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "loan-application-installments?_sort=id:asc"
+        process.env.REACT_APP_SERVER_URL + "loan-application-installments/emidue/details/?_limit=5&&loan_application.creator_id=" + auth.getUserInfo().contact.id
       )
       .then((res) => {
-        this.setState({ loanInstallmentData: res.data, isLoader: false });
+        this.setState({ loanInstallmentData: res.data.result, isLoader: false });
       });
 
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "loan-applications"
-      )
-      .then((res) => {
-        this.setState({ loanData: res.data });
-      });
-
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activities?_sort=end_datetime:desc"
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activities/recent/activities?_sort=end_datetime:desc"
       )
       .then((activityRes) => {
-        activityRes.data.map((e, i) => {
-          e.activityassignees.map((item) => {});
+        activityRes.data.result.map((e, i) => {
+          e.activityassignees.map((item) => { });
           e.activityassignees
             .filter((item) => item.contact === auth.getUserInfo().contact.id)
             .map((filteredData) => {
               filteredArray.push(e);
             });
         });
-        this.setState({ activitiesData: filteredArray, isLoaderAct: false });
+        this.setState({
+          activitiesData: filteredArray,
+          isLoaderAct: false,
+          pageSize: activityRes.data.pageSize,
+          totalRows: activityRes.data.rowCount,
+          page: activityRes.data.page,
+          pageCount: activityRes.data.pageCount
+        },
+          function () {
+            this.actOtherDetail(activityRes.data)
+          });
       })
       .catch((error) => {
         console.log(error);
       });
-
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/activitytypes"
-      )
-      .then((typeRes) => {
-        this.setState({ activitytypeData: typeRes.data });
-      });
   }
 
-  manageLoanEMIData(loanInstallmentData) {
-    this.state.loanInstallmentData.map((ldata) => {
-      if (ldata.loan_application !== null) {
-        if (
-          ldata.loan_application.creator_id == auth.getUserInfo().contact.id
-        ) {
-          if (
-            ldata.actual_principal === null &&
-            ldata.actual_interest === null
-          ) {
-            this.state.loanData.map((ld) => {
-              // calculate pending loan amount
-              let pendingAmount =
-                ldata.expected_principal + ldata.expected_interest;
-              ldata.pendingAmount = pendingAmount;
-
-              // get Member name and EMI
-              if (ld.id == ldata.loan_application.id) {
-                if (ld.contact) {
-                  ldata.loan_application.memName = ld.contact.name;
-                  ldata.emi = ld.loan_model.emi;
-                }
-              }
-            });
-            loanInstallmentData.push(ldata);
-          }
-        }
-      }
-    });
-    // sort loan application installments by payment date
-    loanInstallmentData.sort(
-      (a, b) =>
-        new Date(...a.payment_date.split("/").reverse()) -
-        new Date(...b.payment_date.split("/").reverse())
-    );
-  }
-
-  manageActivityData(activitytypeRes, activitiesData, today, activtiesArr) {
-    activitytypeRes.map((type) => {
-      let activityTypeName,
-        activityTypeCount = 0;
-      activitiesData.map((activity) => {
-        // Pie chart calculation for current month
-        let stdate = new Date(activity.end_datetime);
-        stdate = stdate.getFullYear() + "-" + (stdate.getMonth() + 1);
-        if (stdate == today) {
-          if (activity.activitytype.name == type.name) {
-            activityTypeName = activity.activitytype.name;
-            activityTypeCount = activityTypeCount + 1;
-          }
-        }
-      });
-      if (activityTypeName) {
-        activtiesArr.push({
-          activityName: activityTypeName,
-          activityCount: activityTypeCount,
-        });
-      }
-    });
+  actOtherDetail(data) {
+    this.setState({ remuneration: data.dashRemuneration })
+    this.setState({ activityname: data.pieChartCal.activityname })
+    this.setState({ activityvalue: data.pieChartCal.activityvalue })
   }
 
   render() {
     const { classes } = this.props;
     const userInfo = auth.getUserInfo();
 
-    let loanInstallmentData = [];
-    this.manageLoanEMIData(loanInstallmentData);
-
+    let loanInstallmentData = this.state.loanInstallmentData;
     let activitiesData = this.state.activitiesData;
 
     // Today's date
@@ -192,48 +130,9 @@ class DashboardCSP extends Component {
 
     // Date format for Remuneration
     let remun_date = Moment(today).format("MMMM YYYY").toUpperCase();
-
-    // Calculate Remuneration for current month
-    let remunaration = 0;
-    activitiesData.map((cspActivity) => {
-      let stdate = new Date(cspActivity.start_datetime);
-      stdate = stdate.getFullYear() + "-" + (stdate.getMonth() + 1);
-      if (stdate == today) {
-        let remun = cspActivity.activitytype.remuneration;
-        let unit = cspActivity.unit;
-        let cal = remun * unit;
-        remunaration = remunaration + cal;
-      }
-    });
-
-    let activitytypeRes = this.state.activitytypeData;
-    let activtiesArr = [];
-    this.manageActivityData(
-      activitytypeRes,
-      activitiesData,
-      today,
-      activtiesArr
-    );
-
-    // Pie chart array for label, values and colors to display
-    let activityname = [];
-    let activityvalue = [];
-    let activitycolor = [];
-    activtiesArr.map((act) => {
-      activityname.push(act.activityName);
-      activityvalue.push(act.activityCount);
-
-      let color;
-      let entries = 10 + Math.floor(Math.random() * 8);
-      for (let i = 0; i < entries; i++) {
-        let r = Math.floor(Math.random() * 200);
-        let g = Math.floor(Math.random() * 200);
-        let b = Math.floor(Math.random() * 200);
-        color = "rgb(" + r + ", " + g + ", " + b + ")";
-        activitycolor.push(color);
-      }
-    });
-
+    let remuneration = this.state.remuneration;
+    let activityname = this.state.activityname;
+    let activityvalue = this.state.activityvalue;
     let loanEmiRedirect = {
       pathname: "/view/more",
       state: { loanEMIData: loanInstallmentData },
@@ -244,10 +143,6 @@ class DashboardCSP extends Component {
     };
 
     // Top 5 records of Loan EMI Data and Activties
-    loanInstallmentData =
-      loanInstallmentData.length > 5
-        ? loanInstallmentData.slice(1, 6)
-        : loanInstallmentData;
     activitiesData =
       activitiesData.length > 5 ? activitiesData.slice(1, 6) : activitiesData;
     const Usercolumns = [
@@ -318,6 +213,7 @@ class DashboardCSP extends Component {
       selectors1.push(Usercolumns1[i]["selector"]);
     }
     let columnsvalue1 = selectors1[0];
+    console.log('hyyyyyyyy::::: ', activitiesData);
     return (
       <div className="App" style={{ paddingTop: "15px" }}>
         <Grid container style={{ border: "1px solid #ccc" }}>
@@ -332,7 +228,7 @@ class DashboardCSP extends Component {
               <AccountBalanceWalletIcon className={classes.Icon} />
               <h3 className={classes.remunText}>REMUNERATION </h3>
               <p className={classes.remunDate}>FOR {remun_date} </p>
-              <h2 style={{ color: "green" }}>₹ {remunaration}</h2>
+              <h2 style={{ color: "green" }}>₹ {remuneration}</h2>
             </div>
             <h3 align="center">ACTIVITIES</h3>
             {activityname.length > 0 && activityvalue.length > 0 ? (
@@ -365,8 +261,8 @@ class DashboardCSP extends Component {
                 ]}
               />
             ) : (
-              <h3 align="center">No records present for this month</h3>
-            )}
+                <h3 align="center">No records present for this month</h3>
+              )}
           </Grid>
           <Grid item md={8} xs={12} spacing={3}>
             <div className={classes.emiDue}>
@@ -391,8 +287,8 @@ class DashboardCSP extends Component {
                   progressComponent={this.state.isLoader}
                 />
               ) : (
-                <h1>Loading...</h1>
-              )}
+                  <h1>Loading...</h1>
+                )}
               <div align="right">
                 <Tooltip title="View More">
                   <IconButton component={Link} to={loanEmiRedirect}>
@@ -411,7 +307,7 @@ class DashboardCSP extends Component {
                   filterData={false}
                   filterBy={[
                     "title",
-                    "end_datetime",
+                    "start_datetime",
                     "activitytype.remuneration",
                   ]}
                   column={Usercolumns1}
@@ -420,8 +316,8 @@ class DashboardCSP extends Component {
                   progressComponent={this.state.isLoaderAct}
                 />
               ) : (
-                <h1>Loading...</h1>
-              )}
+                  <h1>Loading...</h1>
+                )}
 
               <div align="right">
                 <Tooltip title="View More">

@@ -173,7 +173,9 @@ const roles = {
       },
       {
         name: "loan-application-installments",
-        action: [],
+        action: [
+          "emiDueDetails"
+        ],
       },
     ],
     grantAllPermissions: false,
