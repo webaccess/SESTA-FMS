@@ -87,22 +87,8 @@ class LoanpurposePage extends Component {
             message: "EMI is  required",
           },
         },
-        task: {
-          required: {
-            value: "true",
-            message: "Task name is  required",
-          },
-        },
       },
-      errors: {
-        addPurpose: [],
-        addDuration: [],
-        addSpecification: [],
-        addAmount: [],
-        addFPO: [],
-        addEMI: [],
-        task: [],
-      },
+      errors: {},
       formSubmitted: "",
       stateSelected: false,
       editPage: [
@@ -583,6 +569,7 @@ class LoanpurposePage extends Component {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
+
     if (Object.keys(this.state.errors).length > 0) return;
 
     let productName = this.state.values.addPurpose;
