@@ -46,6 +46,19 @@ const useStyles = (theme) => ({
 class LoanpurposePage extends Component {
   constructor(props) {
     super(props);
+    let userInfo = auth.getUserInfo();
+    let validateFpo;
+    if (
+      userInfo.role.name == "Sesta Admin" ||
+      userInfo.role.name == "Superadmin"
+    ) {
+      validateFpo = {
+        required: {
+          value: true,
+          message: "FPO is required",
+        },
+      };
+    }
     this.state = {
       addPrincipal: [],
       emidetails: {},
@@ -75,12 +88,7 @@ class LoanpurposePage extends Component {
             message: "Total Amount is  required",
           },
         },
-        addFPO: {
-          required: {
-            value: "true",
-            message: "FPO is  required",
-          },
-        },
+        addFPO: validateFpo,
         addEMI: {
           required: {
             value: "true",
