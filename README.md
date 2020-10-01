@@ -36,7 +36,7 @@ Sesta uses a technology solution to track the following:
 
     `yarn install`
 
-  - Configure Database settings in backend/strapi/config/database.js, backend/strapi/config/config.js, backend/ strapi/config/bookshelf.js
+  - Configure Database settings in backend/strapi/config/database.js, backend/strapi/config/config.js, backend/strapi/config/bookshelf.js
   - Take a clone of crmplatform plugin https://github.com/webaccess/crmplatform.git and place it in backend/strapi/plugins
   - In terminal use commands below:
 
