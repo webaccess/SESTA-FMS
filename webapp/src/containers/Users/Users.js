@@ -213,11 +213,11 @@ export class Users extends React.Component {
 
       serviceProvider
         .serviceProviderForDeleteRequest(
-          process.env.REACT_APP_SERVER_URL + "users",
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
           cellid
         )
         .then((res) => {
-          this.deleteContact(res.data.contact.id);
+          this.deleteUser(res.data.user.id, "single");
         })
         .catch((error) => {
           this.setState({ singleDelete: false });
@@ -226,14 +226,19 @@ export class Users extends React.Component {
     }
   };
 
-  deleteContact = async (id) => {
+  deleteUser = async (id, type) => {
     serviceProvider
       .serviceProviderForDeleteRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+        process.env.REACT_APP_SERVER_URL + "users",
         id
       )
       .then((res) => {
-        this.setState({ singleDelete: res.data.username, dataCellId: "" });
+        if (type === "single") {
+          this.setState({ singleDelete: res.data.username, dataCellId: "" });
+        }
+        if (type === "multiple") {
+          this.setState({ multipleDelete: true, dataCellId: "" });
+        }
         this.componentDidMount();
       })
       .catch((error) => {
@@ -248,12 +253,11 @@ export class Users extends React.Component {
       for (let i in selectedId) {
         serviceProvider
           .serviceProviderForDeleteRequest(
-            process.env.REACT_APP_SERVER_URL + "users",
+            process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
             selectedId[i]
           )
           .then((res) => {
-            this.deleteContact(res.data.contact.id);
-            this.setState({ multipleDelete: true });
+            this.deleteUser(res.data.user.id, "multiple");
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
@@ -342,9 +346,13 @@ export class Users extends React.Component {
               </div>
             </div>
             {this.props.location.addData ? (
-              <Snackbar severity="success">User added successfully.</Snackbar>
+              <Snackbar severity="success" Showbutton={false}>
+                User added successfully.
+              </Snackbar>
             ) : this.props.location.editData ? (
-              <Snackbar severity="success">User edited successfully.</Snackbar>
+              <Snackbar severity="success" Showbutton={false}>
+                User edited successfully.
+              </Snackbar>
             ) : null}
             {this.state.singleDelete !== false &&
             this.state.singleDelete !== "" &&

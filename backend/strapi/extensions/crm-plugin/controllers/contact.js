@@ -301,9 +301,7 @@ module.exports = {
         .fetchAll({})
         .then(async (res) => {
           let data = res.toJSON();
-          return {
-            result: data,
-          };
+          return data;
         });
     } catch (error) {
       return ctx.badRequest(null, error.message);

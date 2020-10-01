@@ -167,7 +167,8 @@ class ActivityPage extends Component {
     // get all states
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/states/?is_active=true&&_sort=name:ASC"
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/states/?is_active=true&&_sort=name:ASC"
       )
       .then((res) => {
         this.setState({ getState: res.data });
@@ -203,7 +204,7 @@ class ActivityPage extends Component {
           serviceProvider
             .serviceProviderForGetRequest(
               process.env.REACT_APP_SERVER_URL +
-                "crm-plugin/contact/shgs/?id=" +
+                "crm-plugin/contact/shglist/?id=" +
                 res.data.fpo.id
             )
             .then((shgRes) => {
@@ -383,9 +384,22 @@ class ActivityPage extends Component {
   }
 
   handleOnCheck = (event, type) => {
-    this.setState({
-      isShareholder: !this.state.isShareholder,
-    });
+    this.setState(
+      {
+        isShareholder: !this.state.isShareholder,
+      },
+      function () {
+        this.shareholderCheck(this.state.isShareholder);
+      }
+    );
+  };
+
+  shareholderCheck = (value) => {
+    if (value === false) {
+      delete this.state.errors.noOfShares;
+      delete this.state.errors.selectedDate;
+      delete this.state.errors.shareAmt;
+    }
   };
 
   handleShgChange(event, value) {
