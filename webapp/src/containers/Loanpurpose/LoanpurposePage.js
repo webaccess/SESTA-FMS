@@ -583,6 +583,7 @@ class LoanpurposePage extends Component {
     e.preventDefault();
     this.validate();
     this.setState({ formSubmitted: "" });
+    if (Object.keys(this.state.errors).length > 0) return;
 
     let productName = this.state.values.addPurpose;
     let addDuration = this.state.values.addDuration;
