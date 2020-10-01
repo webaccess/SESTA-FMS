@@ -72,6 +72,7 @@ class UsersPage extends Component {
         this.props.match.params.id,
       ],
       isLoader: "",
+      userId: ""
     };
   }
 
@@ -112,6 +113,18 @@ class UsersPage extends Component {
       .catch((error) => {
         console.log(error);
       });
+
+    await serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "users"
+      )
+      .then((res) => {
+        res.data.map(userdata => {
+          if (userdata.contact.id === parseInt(this.state.editPage[1])) {
+            this.setState({ userId: userdata.id })
+          }
+        })
+      })
   }
 
   getDetails = () => {
@@ -414,7 +427,7 @@ class UsersPage extends Component {
       serviceProvider
         .serviceProviderForPutRequest(
           process.env.REACT_APP_SERVER_URL + "users",
-          this.state.editPage[1],
+          this.state.userId,
           postUserData
         )
         .then((res) => {
