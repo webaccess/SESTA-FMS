@@ -467,7 +467,22 @@ class UsersPage extends Component {
                 "Phone number already exists, please use another phone number.",
             });
           }
-        });
+        })
+        .catch((error) => {
+          if (
+            error.response.data.message[0]["messages"][0]["id"] ===
+            "Auth.form.error.username.taken"
+          ) {
+            this.state.errors.addPhone = [];
+            this.state.errors.addPhone.push("");
+            this.setState({
+              formSubmitted: false,
+              errorCode:
+                "Phone number already exists, please use another phone number.",
+            });
+          }
+          console.log(error);
+        })
     } else {
       /** add user in Users table */
       serviceProvider
