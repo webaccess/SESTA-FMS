@@ -233,7 +233,10 @@ export class Loanpurposes extends React.Component {
             if (res.data.loantasks) {
               this.deleteTaskDet(res.data.loantasks[0].id);
             }
-            this.setState({ singleDelete: res.data.product_name });
+            this.setState({
+              singleDelete: res.data.product_name,
+              purposeInUseSingleDelete: res.data.product_name,
+            });
 
             this.componentDidMount();
           })
@@ -309,7 +312,7 @@ export class Loanpurposes extends React.Component {
           })
           .catch((error) => {
             this.setState({ multipleDelete: false });
-            console.log("err", error);
+            console.log(error);
           });
       }
     }
