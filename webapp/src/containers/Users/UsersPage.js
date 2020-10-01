@@ -119,38 +119,43 @@ class UsersPage extends Component {
       this.setState({ isLoader: true });
       serviceProvider
         .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL + "users/" + this.state.editPage[1]
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/contact/" +
+            this.state.editPage[1]
         )
         .then((res) => {
           delete this.state.validations["password"]; // remove password validation while editing the user
           delete this.state.errors["password"];
-          this.handleRoleChange("", res.data.role);
+
           serviceProvider
             .serviceProviderForGetRequest(
               process.env.REACT_APP_SERVER_URL +
-                "crm-plugin/individuals/" +
-                res.data.contact.individual
+                "users-permissions/roles/" +
+                res.data.user.role
             )
-            .then((indRes) => {
+            .then((roleRes) => {
+              this.handleRoleChange("", roleRes.data.role);
               this.setState({
                 values: {
-                  firstName: indRes.data.first_name,
-                  lastName: indRes.data.last_name,
-                  addPhone: res.data.contact.phone,
-                  addEmail: res.data.email,
-                  username: res.data.username,
+                  firstName: res.data.individual.first_name,
+                  lastName: res.data.individual.last_name,
+                  addPhone: res.data.phone,
+                  addEmail: res.data.user.email,
+                  username: res.data.user.username,
                   password: undefined,
-                  role: res.data.role,
+                  role: roleRes.data.role,
                 },
-                editContactId: res.data.contact.id,
+                editContactId: res.data.id,
                 isLoader: false,
               });
               let tempValues = this.state.values;
-              if (res.data.role.name === "FPO Admin") {
-                tempValues["selectField"] = indRes.data.fpo.id;
+              if (roleRes.data.role.name === "FPO Admin") {
+                tempValues["selectField"] = res.data.individual.fpo;
               }
-              if (res.data.role.name === "CSP (Community Service Provider)") {
-                tempValues["selectField"] = indRes.data.vo.id;
+              if (
+                roleRes.data.role.name === "CSP (Community Service Provider)"
+              ) {
+                tempValues["selectField"] = res.data.individual.vo;
               }
               this.setState({
                 values: tempValues,
@@ -414,40 +419,41 @@ class UsersPage extends Component {
         )
         .then((res) => {
           /** edit fpo/vo in Individuals table based on selected role */
-          postData.user = res.data.id;
-          serviceProvider
-            .serviceProviderForPutRequest(
-              process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
-              this.state.editContactId,
-              postData
-            )
-            .then((res) => {
-              let data = res.data;
-              serviceProvider
-                .serviceProviderForPutRequest(
-                  process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
-                  data.individual.id,
-                  postIndividualData
-                )
-                .then((res) => {
-                  this.props.history.push({
-                    pathname: "/users",
-                    editData: true,
+          if (postData.phone === this.state.values.addPhone) {
+            postData.user = res.data.id;
+            serviceProvider
+              .serviceProviderForPutRequest(
+                process.env.REACT_APP_SERVER_URL + "crm-plugin/contact",
+                this.state.editContactId,
+                postData
+              )
+              .then((res) => {
+                let data = res.data;
+                serviceProvider
+                  .serviceProviderForPutRequest(
+                    process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals",
+                    data.individual.id,
+                    postIndividualData
+                  )
+                  .then((res) => {
+                    this.props.history.push({
+                      pathname: "/users",
+                      editData: true,
+                    });
                   });
-                });
-            })
-            .catch((error) => {
-              console.log(error);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          } else {
+            this.state.errors.addPhone = [];
+            this.state.errors.addPhone.push("");
+            this.setState({
+              formSubmitted: false,
+              errorCode:
+                "Phone number already exists, please use another phone number.",
             });
-        })
-        .catch((error) => {
-          this.state.errors.addPhone = [];
-          this.state.errors.addPhone.push("");
-          this.setState({
-            formSubmitted: false,
-            errorCode:
-              "Phone number already exists, please use another phone number.",
-          });
+          }
         });
     } else {
       /** add user in Users table */

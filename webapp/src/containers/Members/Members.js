@@ -112,7 +112,7 @@ export class Members extends React.Component {
                 res.data.fpo.id
             )
             .then((shgRes) => {
-              this.setState({ getShg: shgRes.data.result });
+              this.setState({ getShg: shgRes.data });
             })
             .catch((error) => {});
         });
