@@ -233,7 +233,8 @@ export class Loanpurposes extends React.Component {
             if (res.data.loantasks) {
               this.deleteTaskDet(res.data.loantasks[0].id);
             }
-            this.setState({ purposeInUseSingleDelete: res.data.name });
+            this.setState({ singleDelete: res.data.product_name });
+
             this.componentDidMount();
           })
           .catch((error) => {
@@ -402,6 +403,7 @@ export class Loanpurposes extends React.Component {
               </Snackbar>
             ) : null}
             {this.state.multipleDelete === true &&
+            //? (
             this.state.purposeInUseDeleteAll !== true ? (
               <Snackbar severity="success" Showbutton={false}>
                 Loan Purposes deleted successfully!
