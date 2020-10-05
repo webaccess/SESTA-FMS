@@ -211,7 +211,8 @@ export class Activity extends React.Component {
           cellid
         )
         .then((res) => {
-          this.setState({ singleDelete: res.data.name });
+          this.setState({ singleDelete: true });
+          this.setState({ deleteActivityName: res.data.title });
           this.setState({ dataCellId: "" });
           this.componentDidMount();
         })
@@ -321,7 +322,7 @@ export class Activity extends React.Component {
             this.state.singleDelete !== "" &&
             this.state.singleDelete ? (
               <Snackbar severity="success" Showbutton={false}>
-                Activity {this.state.singleDelete} deleted successfully!
+                Activity {this.state.deleteActivityName} deleted successfully!
               </Snackbar>
             ) : null}
             {this.state.singleDelete === false ? (
