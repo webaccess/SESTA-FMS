@@ -288,6 +288,13 @@ export class Members extends React.Component {
     this.getMembers(this.state.pageSize, this.state.page, this.state.values);
   }
 
+  handleMemberChange(event, value) {
+    this.setState({
+      [event.target.name]: event.target.value,
+      values: { ...this.state.values, ["name_contains"]: event.target.value },
+    });
+  }
+
   handleDistrictChange(event, value) {
     if (value !== null) {
       this.setState({
@@ -367,6 +374,7 @@ export class Members extends React.Component {
       filterDistrict: "",
       filterVillage: "",
       filterShg: "",
+      name: "",
       isCancel: true,
       isLoader: true,
       values: {},
@@ -650,6 +658,22 @@ export class Members extends React.Component {
               className={classes.row}
               style={{ flexWrap: "wrap", height: "auto" }}
             >
+              <div className={classes.searchInput}>
+                <div className={style.Districts}>
+                  <Grid item md={12} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Member Name"
+                      name="name"
+                      variant="outlined"
+                      onChange={(event, value) => {
+                        this.handleMemberChange(event, value);
+                      }}
+                      value={this.state.name || ""}
+                    />
+                  </Grid>
+                </div>
+              </div>
               <div className={classes.searchInput}>
                 <div className={style.Districts}>
                   <Grid item md={12} xs={12}>
