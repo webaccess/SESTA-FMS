@@ -165,7 +165,7 @@ class LoanEmiPage extends Component {
     let loanEmiData = this.state.loanEmiData;
     let loanAppData = this.props.location.state.loanAppData;
 
-    let paid = 0;
+    let paid = 0, loanfine;
     loanEmiData.map((emidata) => {
       if (emidata.fine !== null || emidata.fine !== 0) {
         emidata.totalPaid = (
@@ -187,6 +187,8 @@ class LoanEmiPage extends Component {
 
       emidata.totalPaid = parseInt(emidata.totalPaid.replace(/,/g, ""));
       paid = paid + emidata.totalPaid;
+
+      emidata.loanfine = (emidata.fine !== null) ? emidata.fine.toLocaleString() : (emidata.actual_principal !== null && emidata.fine == null) ? emidata.loanfine = "-": emidata.loanfine = null;
     });
 
     // Pending Amount = Actual amount + Fine - Total installment paid
@@ -269,9 +271,8 @@ class LoanEmiPage extends Component {
       },
       {
         name: "Fine",
-        selector: "fine",
+        selector: "loanfine",
         sortable: true,
-        cell: (row) => (row.fine ? "₹" + row.fine.toLocaleString() : null),
       },
       {
         name: "Total Paid",

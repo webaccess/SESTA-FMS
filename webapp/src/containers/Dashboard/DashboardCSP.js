@@ -75,7 +75,7 @@ class DashboardCSP extends Component {
 
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "loan-application-installments/emidue/details/?_limit=5&&loan_application.creator_id=" + auth.getUserInfo().contact.id
+        process.env.REACT_APP_SERVER_URL + "loan-application-installments/emidue/details/?_limit=5&&loan_application.creator_id=" + auth.getUserInfo().contact.id+"&_sort=payment_date:ASC"
       )
       .then((res) => {
         this.setState({ loanInstallmentData: res.data.result, isLoader: false });
