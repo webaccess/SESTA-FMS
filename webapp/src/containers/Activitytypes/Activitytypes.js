@@ -154,6 +154,7 @@ export class Activitytypes extends React.Component {
 
   /** Pagination to handle row change*/
   handlePerRowsChange = async (perPage, page) => {
+    this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       await this.getActivityTypes(perPage, page);
     } else {
@@ -163,6 +164,7 @@ export class Activitytypes extends React.Component {
 
   /** Pagination to handle page change */
   handlePageChange = (page) => {
+    this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       this.getActivityTypes(this.state.pageSize, page);
     } else {

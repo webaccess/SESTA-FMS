@@ -58,7 +58,6 @@ export class Countries extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      values: {},
       filterCountry: "",
       Result: [],
       data: [],
@@ -151,7 +150,7 @@ export class Countries extends React.Component {
 
   /** Pagination to handle row change*/
   handlePerRowsChange = async (perPage, page) => {
-    // this.setState({ isLoader: true });
+    this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       await this.getCountry(perPage, page);
     } else {
@@ -161,7 +160,7 @@ export class Countries extends React.Component {
 
   /** Pagination to handle page change */
   handlePageChange = (page) => {
-    // this.setState({ isLoader: true });
+    this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       this.getCountry(this.state.pageSize, page);
     } else {

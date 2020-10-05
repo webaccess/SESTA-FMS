@@ -188,6 +188,7 @@ export class Fpos extends React.Component {
 
   /** Pagination to handle row change*/
   handlePerRowsChange = async (perPage, page) => {
+    this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       await this.getFpo(perPage, page);
     } else {
@@ -197,6 +198,7 @@ export class Fpos extends React.Component {
 
   /** Pagination to handle page change */
   handlePageChange = (page) => {
+    this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       this.getFpo(this.state.pageSize, page);
     } else {

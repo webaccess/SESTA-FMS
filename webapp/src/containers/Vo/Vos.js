@@ -194,7 +194,7 @@ export class Vos extends React.Component {
 
   /** Pagination to handle row change*/
   handlePerRowsChange = async (perPage, page) => {
-    // this.setState({ isLoader: true });
+    this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       await this.getVo(perPage, page);
     } else {
@@ -208,7 +208,7 @@ export class Vos extends React.Component {
 
   /** Pagination to handle page change */
   handlePageChange = async (page) => {
-    // this.setState({ isLoader: true });
+    this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       this.getVo(this.state.pageSize, page);
     } else {
@@ -419,7 +419,8 @@ export class Vos extends React.Component {
             ) : null}
             {this.state.voInUseDeleteAll === true ? (
               <Snackbar severity="info" Showbutton={false}>
-                Some Village Organizations are in use hence it can not be Deleted.
+                Some Village Organizations are in use hence it can not be
+                Deleted.
               </Snackbar>
             ) : null}
             <div
