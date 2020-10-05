@@ -91,13 +91,12 @@ export class Villages extends React.Component {
       allIsActive: [],
       isLoader: true,
       stateId: constants.STATE_ID,
-      /** pagination data */
+      /** pagination and sorting data */
       pageSize: "",
       totalRows: "",
       page: "",
       pageCount: "",
       resetPagination: false,
-      values: {},
     };
   }
   async componentDidMount() {
@@ -160,11 +159,11 @@ export class Villages extends React.Component {
       .then((res) => {
         this.setState({
           data: res.data.result,
-          isLoader: false,
           pageSize: res.data.pageSize,
           totalRows: res.data.rowCount,
           page: res.data.page,
           pageCount: res.data.pageCount,
+          isLoader: false,
         });
       });
   };
@@ -193,7 +192,7 @@ export class Villages extends React.Component {
 
   /** Pagination to handle row change*/
   handlePerRowsChange = async (perPage, page) => {
-    // this.setState({ isLoader: true });
+    this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       await this.getVillage(perPage, page);
     } else {
@@ -203,7 +202,7 @@ export class Villages extends React.Component {
 
   /** Pagination to handle page change */
   handlePageChange = (page) => {
-    // this.setState({ isLoader: true });
+    this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       this.getVillage(this.state.pageSize, page);
     } else {
@@ -220,6 +219,9 @@ export class Villages extends React.Component {
   ) => {
     if (column.selector === "name") {
       column.selector = "name";
+    }
+    if (column.selector === "district.name") {
+      column.selector = "district.name";
     }
     this.state.values[SORT_FIELD_KEY] = column.selector + ":" + sortDirection;
     this.getVillage(perPage, page, this.state.values);
@@ -445,7 +447,6 @@ export class Villages extends React.Component {
 
     let columnsvalue = selectors[0];
     const { classes } = this.props;
-    let statesFilter = this.state.getState;
     let districtsFilter = this.state.getDistrict;
     let filterDistrict = this.state.filterDistrict;
     let filters = this.state.values;

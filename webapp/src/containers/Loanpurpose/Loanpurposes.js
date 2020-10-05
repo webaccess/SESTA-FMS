@@ -152,6 +152,7 @@ export class Loanpurposes extends React.Component {
 
   /** Pagination to handle row change*/
   handlePerRowsChange = async (perPage, page) => {
+    this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       await this.getLoanModels(perPage, page);
     } else {
@@ -161,6 +162,7 @@ export class Loanpurposes extends React.Component {
 
   /** Pagination to handle page change */
   handlePageChange = (page) => {
+    this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       this.getLoanModels(this.state.pageSize, page);
     } else {

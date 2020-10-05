@@ -557,16 +557,16 @@ const Table = (props) => {
             /** pagination */
             pagination={props.pagination}
             paginationServer
+            paginationDefaultPage={props.paginationDefaultPage}
+            paginationPerPage={props.paginationPerPage}
             paginationTotalRows={props.paginationTotalRows}
             paginationRowsPerPageOptions={props.paginationRowsPerPageOptions}
             onChangeRowsPerPage={props.onChangeRowsPerPage}
             onChangePage={props.onChangePage}
             /** Sort */
-            defaultSortField={props.defaultSortField}
-            defaultSortAsc={props.defaultSortAsc}
             onSort={props.onSort}
-            sortFunction={props.sortFunction}
             sortServer={props.sortServer}
+            /** progress spinner */
             progressComponent
             selectableRowsComponent={Checkbox}
             contextActions={contextActions}

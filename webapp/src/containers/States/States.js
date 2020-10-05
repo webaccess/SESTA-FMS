@@ -63,7 +63,6 @@ export class States extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      values: {},
       FilterState: "",
       data: [],
       villages: [],
@@ -136,7 +135,6 @@ export class States extends React.Component {
         [SORT_FIELD_KEY]: "name:ASC",
       };
     }
-    console.log("params", params);
     await serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL + "crm-plugin/states/get",
@@ -156,7 +154,7 @@ export class States extends React.Component {
 
   /** Pagination to handle row change*/
   handlePerRowsChange = async (perPage, page) => {
-    // this.setState({ isLoader: true });
+    this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       await this.getState(perPage, page);
     } else {
@@ -166,7 +164,7 @@ export class States extends React.Component {
 
   /** Pagination to handle page change */
   handlePageChange = (page) => {
-    // this.setState({ isLoader: true });
+    this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       this.getState(this.state.pageSize, page);
     } else {

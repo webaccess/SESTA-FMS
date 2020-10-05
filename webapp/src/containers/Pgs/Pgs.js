@@ -149,6 +149,7 @@ export class Pgs extends React.Component {
 
   /** Pagination to handle row change*/
   handlePerRowsChange = async (perPage, page) => {
+    this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       await this.getTag(perPage, page);
     } else {
@@ -158,6 +159,7 @@ export class Pgs extends React.Component {
 
   /** Pagination to handle page change */
   handlePageChange = (page) => {
+    this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       this.getTag(this.state.pageSize, page);
     } else {
