@@ -297,7 +297,7 @@ class DashboardViewMoreDetailsCSP extends Component {
     this.setState({
       filterLoaneeName: event.target.value,
       values: {
-        ["loan_application.contact.name_contains"]: event.target.value,
+        ...this.state.values, ["loan_application.contact.name_contains"]: event.target.value,
       },
     });
   }
@@ -307,12 +307,14 @@ class DashboardViewMoreDetailsCSP extends Component {
       this.setState({
         filterPurpose: value, isCancel: false,
         values: {
-          ["loan_application.purpose"]: value.product_name,
+          ...this.state.values, ["loan_application.purpose"]: value.product_name,
         },
       });
     } else {
+      delete this.state.values["loan_application.purpose"];
       this.setState({
         filterPurpose: "",
+        ...this.state.values
       });
     }
   }
@@ -322,12 +324,14 @@ class DashboardViewMoreDetailsCSP extends Component {
       this.setState({
         filterActType: value, isCancel: false,
         values: {
-          ["activitytype.name"]: value.name,
+          ...this.state.values, ["activitytype.name"]: value.name,
         },
       });
     } else {
+      delete this.state.values["activitytype.name"];
       this.setState({
         filterActType: "",
+        ...this.state.values,
       });
     }
   }
@@ -338,7 +342,7 @@ class DashboardViewMoreDetailsCSP extends Component {
         this.setState({
           filterStartDate: event, isCancel: false,
           values: {
-            ["payment_date_gte"]: event.toISOString(),
+            ...this.state.values, ["payment_date_gte"]: event.toISOString(),
           },
         });
       }
@@ -346,13 +350,16 @@ class DashboardViewMoreDetailsCSP extends Component {
         this.setState({
           filterStartDate: event, isCancel: false,
           values: {
-            ["start_datetime_gte"]: event.toISOString(),
+            ...this.state.values, ["start_datetime_gte"]: event.toISOString(),
           },
         });
       }
     } else {
+      delete this.state.values["payment_date_gte"];
+      delete this.state.values["start_datetime_gte"];
       this.setState({
         filterStartDate: "",
+        ...this.state.values
       });
     }
   }
@@ -363,7 +370,7 @@ class DashboardViewMoreDetailsCSP extends Component {
         this.setState({
           filterEndDate: event, isCancel: false,
           values: {
-            ["payment_date_lte"]: event.toISOString(),
+            ...this.state.values, ["payment_date_lte"]: event.toISOString(),
           },
         });
       }
@@ -371,13 +378,16 @@ class DashboardViewMoreDetailsCSP extends Component {
         this.setState({
           filterEndDate: event, isCancel: false,
           values: {
-            ["start_datetime_lte"]: event.toISOString(),
+            ...this.state.values, ["start_datetime_lte"]: event.toISOString(),
           },
         });
       }
     } else {
+      delete this.state.values["payment_date_lte"];
+      delete this.state.values["start_datetime_lte"];
       this.setState({
         filterEndDate: "",
+        ...this.state.values
       });
     }
   }
