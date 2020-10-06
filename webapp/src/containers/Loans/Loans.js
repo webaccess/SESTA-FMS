@@ -406,6 +406,7 @@ export class Loans extends React.Component {
         values: { ...this.state.values, ["status"]: value.id },
       });
     } else {
+      delete this.state.values["status"];
       this.setState({ filterStatus: "", values: { ...this.state.values } });
     }
   };
