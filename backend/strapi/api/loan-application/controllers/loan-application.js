@@ -307,13 +307,15 @@ module.exports = {
     if (ctx.query.id) {
       const individual = await strapi.query("individual", "crm-plugin").find({
         shg_null: false,
-        "shg.id": ctx.query.id
+        "shg.id": ctx.query.id,
       });
       let shgIds = [];
       if (individual.length > 0) {
-        individual.map(ind => {
-          shgIds.push(ind.contact.id);
-        })
+        individual.map((ind) => {
+          if (ind.contact !== null) {
+            shgIds.push(ind.contact.id);
+          }
+        });
         const shgQuery = [
           { field: "contact.id", operator: "in", value: shgIds },
         ];
