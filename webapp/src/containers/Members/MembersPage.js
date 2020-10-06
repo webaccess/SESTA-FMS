@@ -191,8 +191,6 @@ class ActivityPage extends Component {
       });
 
     // get all shgs
-    let url =
-      "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC";
     if (this.state.loggedInUserRole === "FPO Admin") {
       serviceProvider
         .serviceProviderForGetRequest(
@@ -238,7 +236,9 @@ class ActivityPage extends Component {
         });
     } else {
       serviceProvider
-        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/shglist/"
+        )
         .then((res) => {
           this.setState({ getShgs: res.data });
         })
