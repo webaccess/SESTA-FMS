@@ -14,6 +14,7 @@ import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import { Link } from "react-router-dom";
 import Auth from "../../components/Auth/Auth.js";
 import * as constants from "../../constants/Constants";
+import * as formUtilities from "../../utilities/FormUtilities";
 
 const useStyles = (theme) => ({
   root: {},
@@ -92,6 +93,7 @@ const conditionalRowStyles = [
     },
   },
 ];
+const SORT_FIELD_KEY = "_sort";
 export class Loans extends React.Component {
   constructor(props) {
     super(props);
@@ -99,33 +101,22 @@ export class Loans extends React.Component {
       data: [],
       getShg: [],
       getStatus: constants.LOAN_STATUS,
-      loanStatus: [],
       isCancel: false,
       values: {},
       filterStatus: "",
       filterShg: "",
       loggedInUserRole: auth.getUserInfo().role.name,
       isLoader: true,
+      myArray: []
     };
   }
 
   async componentDidMount() {
-    let url = "loan-applications/";
-    if (
-      // this.state.loggedInUserRole === "FPO Admin" ||
-      this.state.loggedInUserRole === "CSP (Community Service Provider)"
-    ) {
-      url += "?creator_id=" + auth.getUserInfo().contact.id;
-    }
-    serviceProvider
-      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
-      .then((res) => {
-        this.getFormattedData(res.data);
-      });
+    await this.getLoanAppDetails(10, 1);
 
     // get all SHGs
     let getShgurl =
-      "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC";
+      "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&_sort=name:ASC";
     if (this.state.loggedInUserRole === "FPO Admin") {
       getShgurl += "&creator_id=" + auth.getUserInfo().contact.id;
       serviceProvider
@@ -144,15 +135,15 @@ export class Loans extends React.Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/contact/?individual=" +
-            auth.getUserInfo().contact.individual
+          "crm-plugin/contact/?individual=" +
+          auth.getUserInfo().contact.individual
         )
         .then((res) => {
           serviceProvider
             .serviceProviderForGetRequest(
               process.env.REACT_APP_SERVER_URL +
-                "crm-plugin/contact/?id=" +
-                res.data[0].individual.vo
+              "crm-plugin/contact/?id=" +
+              res.data[0].individual.vo
             )
             .then((response) => {
               this.setState({ getShg: response.data[0].org_vos });
@@ -175,6 +166,64 @@ export class Loans extends React.Component {
     }
   }
 
+  getLoanAppDetails = async (pageSize, page, params = null, type) => {
+    if (params !== null && !formUtilities.checkEmpty(params)) {
+      let defaultParams = {};
+      if (params.hasOwnProperty(SORT_FIELD_KEY)) {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+        };
+      } else {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+          [SORT_FIELD_KEY]: "status:DESC",
+        };
+      }
+      let str = "";
+      Object.keys(params).map((key) => {
+        defaultParams[key] = params[key];
+      });
+      params = defaultParams;
+    } else {
+      params = {
+        page: page,
+        pageSize: pageSize,
+        [SORT_FIELD_KEY]: "status:DESC",
+      };
+    }
+
+    if (params.hasOwnProperty("addMember")) {
+      delete params.addMember;
+    }
+    let url = "loan-applications/get";
+    if (
+      // this.state.loggedInUserRole === "FPO Admin" ||
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      url += "?creator_id=" + auth.getUserInfo().contact.id;
+      if (type === "search" && this.state.filterShg) {
+        url += "&id=" + this.state.filterShg.contact;
+      }
+    } else {
+      if (type === "search" && this.state.filterShg) {
+        url += "/?id=" + this.state.filterShg.id;
+      }
+    }
+    serviceProvider
+      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url, params)
+      .then((res) => {
+        this.setState({
+          pageSize: res.data.pageSize,
+          totalRows: res.data.rowCount,
+          page: res.data.page,
+          pageCount: res.data.pageCount,
+        });
+        this.getFormattedData(res.data.result);
+      });
+  }
+
   getFormattedData = (data) => {
     data.map((loandata) => {
       loandata.application_date = Moment(loandata.application_date).format(
@@ -193,7 +242,7 @@ export class Loans extends React.Component {
 
       if (
         loandata.loan_app_installments.length > 0 &&
-        loandata.status == "Approved" || loandata.status == "InProgress"|| loandata.status == "Completed"
+        loandata.status == "Approved" || loandata.status == "InProgress" || loandata.status == "Completed"
       ) {
         let loanDueId = loandata.loan_app_installments.length - 1;
         let loanDueData = loandata.loan_app_installments[loanDueId];
@@ -237,80 +286,63 @@ export class Loans extends React.Component {
     this.setState({ data: data, isLoader: false });
   };
 
-  handleSearch() {
-    let searchData = "";
-    if (this.state.values.addMember) {
-      searchData += searchData ? "&&" : "";
-      searchData += "contact.name_contains=" + this.state.values.addMember;
-    }
-    if (this.state.filterStatus) {
-      searchData += searchData ? "&&" : "";
-      searchData += "status=" + this.state.filterStatus.id;
-    }
-    this.searchData(searchData);
-    if (this.state.filterShg) {
-      let shgId;
-      if(auth.getUserInfo().role.name === "CSP (Community Service Provider)") {
-        shgId = this.state.filterShg.contact;
-      } else {
-        shgId = this.state.filterShg.id;
-      }
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL +
-            "crm-plugin/individuals/?shg.id=" +
-            shgId
-        )
-        .then((res) => {
-          if (res.data.length > 0) {
-            res.data.map((shgcontact) => {
-              if (
-                shgcontact.shg.id &&
-                shgId === shgcontact.shg.id
-              ) {
-                searchData += searchData ? "&&" : "";
-                searchData += "contact.id=" + shgcontact.contact.id;
-                this.searchData(searchData);
-              }
-            });
-          } else {
-            searchData += searchData ? "&&" : "";
-            searchData += "contact.id=" + 0;
-            this.searchData(searchData);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-  }
-
-  searchData(searchData) {
-    let url = "loan-applications/";
-    if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
-      url += "?creator_id=" + auth.getUserInfo().contact.id;
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL + url + "&&" + searchData
-        )
-        .then((res) => {
-          this.getFormattedData(res.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+  /** Pagination to handle row change*/
+  handlePerRowsChange = async (perPage, page) => {
+    this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      await this.getLoanAppDetails(perPage, page);
     } else {
-      serviceProvider
-        .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL + url + "?" + searchData
-        )
-        .then((res) => {
-          this.getFormattedData(res.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      await this.getLoanAppDetails(perPage, page, this.state.values);
     }
+  };
+
+  /** Pagination to handle page change */
+  handlePageChange = (page) => {
+    this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      this.getLoanAppDetails(this.state.pageSize, page);
+    } else {
+      this.getLoanAppDetails(this.state.pageSize, page, this.state.values);
+    }
+  };
+
+  /** Sorting */
+  handleSort = (
+    column,
+    sortDirection,
+    perPage = this.state.pageSize,
+    page = 1
+  ) => {
+    if (column.selector === "contact.name") {
+      column.selector = "contact.name";
+    }
+    if (column.selector === "purpose") {
+      column.selector = "purpose";
+    }
+    if (column.selector === "application_date") {
+      column.selector = "application_date";
+    }
+    if (column.selector === "loan_model.loan_amount") {
+      column.selector = "loan_model.loan_amount";
+    }
+    if (column.selector === "status") {
+      column.selector = "status";
+    }
+    if (column.selector === "outstandingAmount") {
+      column.selector = "outstandingAmount";
+    }
+    if (column.selector === "amount_due") {
+      column.selector = "amount_due";
+    }
+    if (column.selector === "payment_date") {
+      column.selector = "payment_date";
+    }
+    this.state.values[SORT_FIELD_KEY] = column.selector + ":" + sortDirection;
+    this.getLoanAppDetails(perPage, page, this.state.values);
+  };
+
+  handleSearch() {
+    this.getLoanAppDetails(this.state.pageSize, this.state.page, this.state.values, "search");
   }
 
   cancelForm = () => {
@@ -328,15 +360,35 @@ export class Loans extends React.Component {
 
   handleMemberChange(event, value) {
     this.setState({
-      values: { ...this.state.values, [event.target.name]: event.target.value },
+      values: {
+        ...this.state.values,
+        [event.target.name]: event.target.value,
+        ["contact.name_contains"]: event.target.value
+      }
     });
+  }
+
+  handleShgChange(event, value) {
+    if (value !== null) {
+      this.setState({
+        filterShg: value, isCancel: false,
+      });
+    } else {
+      this.setState({
+        filterShg: "",
+        values: { ...this.state.values }
+      });
+    }
   }
 
   handleStatusChange = async (event, value) => {
     if (value !== null) {
-      this.setState({ filterStatus: value, isCancel: false });
+      this.setState({
+        filterStatus: value, isCancel: false,
+        values: { ...this.state.values, ["status"]: value.id },
+      });
     } else {
-      this.setState({ filterStatus: "" });
+      this.setState({ filterStatus: "", values: { ...this.state.values } });
     }
   };
 
@@ -386,16 +438,6 @@ export class Loans extends React.Component {
     this.props.history.push("/loans/approve/" + cellid, loanAppData);
   };
 
-  handleShgChange(event, value) {
-    if (value !== null) {
-      this.setState({ filterShg: value, isCancel: false });
-    } else {
-      this.setState({
-        filterShg: "",
-      });
-    }
-  }
-
   customAction = (cellid) => {
     let memberData;
     let token = Auth.getToken();
@@ -403,7 +445,7 @@ export class Loans extends React.Component {
       .serviceProviderForGetRequestDownloadPDFFile(
         process.env.REACT_APP_SERVER_URL + "loan-applications-print/" + cellid
       )
-      .then((res) => {})
+      .then((res) => { })
       .catch((error) => {
         console.log(error);
       });
@@ -417,14 +459,6 @@ export class Loans extends React.Component {
     let statusFilter = this.state.getStatus;
     let filterStatus = this.state.filterStatus;
     let filters = this.state.values;
-    data.map(stdata=>{
-      statusFilter.map(status=>{
-        if(stdata.status === status.id ) {
-          stdata.loanStatus = status.name;
-        }
-      })
-    })
-    console.log('loanndata ',data);
     const Usercolumns = [
       {
         name: "Member Name",
@@ -449,8 +483,13 @@ export class Loans extends React.Component {
       },
       {
         name: "Status",
-        selector: "loanStatus",
+        selector: "status",
         sortable: true,
+        cell: (row) => this.state.getStatus.map(status => {
+          if (status.id === row.status) {
+            return status.name;
+          }
+        })
       },
       {
         name: "Outstanding amount",
@@ -640,12 +679,22 @@ export class Loans extends React.Component {
               columnsvalue={columnsvalue}
               conditionalRowStyles={conditionalRowStyles}
               pagination
+              paginationServer
+              paginationDefaultPage={this.state.page}
+              paginationPerPage={this.state.pageSize}
+              paginationTotalRows={this.state.totalRows}
+              paginationRowsPerPageOptions={[10, 15, 20, 25, 30]}
+              paginationResetDefaultPage={this.state.resetPagination}
+              onChangeRowsPerPage={this.handlePerRowsChange}
+              onChangePage={this.handlePageChange}
+              onSort={this.handleSort}
+              sortServer={true}
               progressComponent={this.state.isLoader}
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (
-            <h1>Loading...</h1>
-          )}
+              <h1>Loading...</h1>
+            )}
         </Grid>
       </Layout>
     );

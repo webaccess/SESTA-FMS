@@ -8,7 +8,13 @@ const fs = require("fs");
 var path = require("path");
 const puppeteer = require("puppeteer");
 const moment = require("moment");
-const { sanitizeEntity } = require("strapi-utils"); // removes private fields and its relations from model
+const utils = require("../../../config/utils.js");
+const {
+  sanitizeEntity,
+  convertRestQueryParams,
+  buildQuery,
+} = require("strapi-utils"); // removes private fields and its relations from model
+const _ = require("lodash");
 
 module.exports = {
   printPDF: async (ctx) => {
@@ -285,6 +291,69 @@ module.exports = {
         };
         return purposeData;
       }
+    } catch (error) {
+      return ctx.badRequest(null, error.message);
+    }
+  },
+  getLoanApplicationModels: async (ctx) => {
+    const { page, query, pageSize } = utils.getRequestParams(ctx.request.query);
+    let filters = convertRestQueryParams(query, { limit: -1 });
+    let sort;
+    if (filters.sort) {
+      sort = filters.sort;
+      filters = _.omit(filters, ["sort"]);
+    }
+
+    if (ctx.query.id) {
+      const individual = await strapi.query("individual", "crm-plugin").find({
+        shg_null: false,
+        "shg.id": ctx.query.id
+      });
+      let shgIds = [];
+      if (individual.length > 0) {
+        individual.map(ind => {
+          shgIds.push(ind.contact.id);
+        })
+        const shgQuery = [
+          { field: "contact.id", operator: "in", value: shgIds },
+        ];
+
+        if (filters.where && filters.where.length > 0) {
+          filters.where = [...filters.where, ...shgQuery];
+        } else {
+          filters.where = [...shgQuery];
+        }
+        if (ctx.query.creator_id) {
+          filters.where.splice(1, 1);
+        } else {
+          filters.where.shift();
+        }
+      }
+    }
+    try {
+      return strapi
+        .query("loan-application")
+        .model.query(
+          buildQuery({
+            model: strapi.models["loan-application"],
+            filters,
+          })
+        )
+        .fetchAll({})
+        .then(async (res) => {
+          let data = res.toJSON();
+
+          // Sorting ascending or descending on one or multiple fields
+          if (sort && sort.length) {
+            data = utils.sort(data, sort);
+          }
+          const response = utils.paginate(data, page, pageSize);
+
+          return {
+            result: response.result,
+            ...response.pagination,
+          };
+        });
     } catch (error) {
       return ctx.badRequest(null, error.message);
     }

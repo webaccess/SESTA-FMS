@@ -217,7 +217,7 @@ class LoansApplyPage extends Component {
 
     if (postData.loan_applications && postData.loan_applications.length > 0) {
       postData.loan_applications.map((loanapp) => {
-        if (loanapp.status == "UnderReview" || loanapp.status == "Approved") {
+        if (loanapp.status == "UnderReview" || loanapp.status == "Approved" || loanapp.status == "InProgress") {
           if (loanapp.loan_model == assignLoanAppValues.id) {
             loanAlreadyApplied = true;
             activeLoanPresent = false;
