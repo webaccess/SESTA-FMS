@@ -18,6 +18,14 @@
     },
     {
       "method": "GET",
+      "path": "/loan-applications/get",
+      "handler": "loan-application.getLoanApplicationModels",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
       "path": "/loan-applications",
       "handler": "loan-application.find",
       "config": {
