@@ -65,6 +65,7 @@ class DashboardViewMoreDetailsCSP extends Component {
       filename: [],
       csvActivityData: [],
       isLoader: true,
+      isLoaderAct: true,
       /** pagination data */
       pageSize: "",
       totalRows: "",
@@ -186,6 +187,7 @@ class DashboardViewMoreDetailsCSP extends Component {
 
   /** Pagination to handle row change*/
   handlePerRowsChange = async (perPage, page) => {
+    this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       await this.getLoanModels(perPage, page);
     } else {
@@ -195,6 +197,7 @@ class DashboardViewMoreDetailsCSP extends Component {
 
   /** Pagination to handle page change */
   handlePageChange = (page) => {
+    this.setState({ isLoader: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       this.getLoanModels(this.state.pageSize, page);
     } else {
@@ -230,6 +233,7 @@ class DashboardViewMoreDetailsCSP extends Component {
 
   /** Pagination to handle row change*/
   handlePerRowsChangeAct = async (perPage, page) => {
+    this.setState({ isLoaderAct: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       await this.getActivityModels(perPage, page);
     } else {
@@ -239,6 +243,7 @@ class DashboardViewMoreDetailsCSP extends Component {
 
   /** Pagination to handle page change */
   handlePageChangeAct = (page) => {
+    this.setState({ isLoaderAct: true });
     if (formUtilities.checkEmpty(this.state.values)) {
       this.getActivityModels(this.state.pageSize, page);
     } else {
@@ -280,7 +285,7 @@ class DashboardViewMoreDetailsCSP extends Component {
       activitiesData: filteredArray,
       csvActivityData: activityRes.data.csvActivityData,
       remunTotal: activityRes.data.viewMoreRemunTotal,
-      isLoader: false,
+      isLoaderAct: false,
       pageSize: activityRes.data.pageSize,
       totalRows: activityRes.data.rowCount,
       page: activityRes.data.page,
@@ -378,7 +383,7 @@ class DashboardViewMoreDetailsCSP extends Component {
   }
 
   handleActivitySearch() {
-    this.setState({ isLoader: true });
+    this.setState({ isLoaderAct: true });
     this.getActivityModels(this.state.pageSize, this.state.page, this.state.values);
   }
 
@@ -395,6 +400,7 @@ class DashboardViewMoreDetailsCSP extends Component {
       filterEndDate: "",
       isCancel: true,
       isLoader: true,
+      isLoaderAct: true,
     });
     this.componentDidMount();
   };
@@ -753,7 +759,7 @@ class DashboardViewMoreDetailsCSP extends Component {
                 onChangePage={this.handlePageChangeAct}
                 onSort={this.handleSortAct}
                 sortServer={true}
-                progressComponent={this.state.isLoader}
+                progressComponent={this.state.isLoaderAct}
               />
             ) : null}
           </Grid>
