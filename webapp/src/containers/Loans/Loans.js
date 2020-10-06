@@ -107,7 +107,7 @@ export class Loans extends React.Component {
       filterShg: "",
       loggedInUserRole: auth.getUserInfo().role.name,
       isLoader: true,
-      myArray: []
+      myArray: [],
     };
   }
 
@@ -115,19 +115,24 @@ export class Loans extends React.Component {
     await this.getLoanAppDetails(10, 1);
 
     // get all SHGs
-    let getShgurl =
-      "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&_sort=name:ASC";
     if (this.state.loggedInUserRole === "FPO Admin") {
-      getShgurl += "&creator_id=" + auth.getUserInfo().contact.id;
       serviceProvider
         .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL + getShgurl
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
         )
         .then((res) => {
-          this.setState({ getShg: res.data });
-        })
-        .catch((error) => {
-          console.log(error);
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/contact/shglist/?id=" +
+                res.data.fpo.id
+            )
+            .then((shgRes) => {
+              this.setState({ getShg: shgRes.data });
+            })
+            .catch((error) => {});
         });
     } else if (
       this.state.loggedInUserRole === "CSP (Community Service Provider)"
@@ -135,15 +140,15 @@ export class Loans extends React.Component {
       serviceProvider
         .serviceProviderForGetRequest(
           process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/contact/?individual=" +
-          auth.getUserInfo().contact.individual
+            "crm-plugin/contact/?individual=" +
+            auth.getUserInfo().contact.individual
         )
         .then((res) => {
           serviceProvider
             .serviceProviderForGetRequest(
               process.env.REACT_APP_SERVER_URL +
-              "crm-plugin/contact/?id=" +
-              res.data[0].individual.vo
+                "crm-plugin/contact/?id=" +
+                res.data[0].individual.vo
             )
             .then((response) => {
               this.setState({ getShg: response.data[0].org_vos });
@@ -155,7 +160,7 @@ export class Loans extends React.Component {
     } else {
       serviceProvider
         .serviceProviderForGetRequest(
-          process.env.REACT_APP_SERVER_URL + getShgurl
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/shglist/"
         )
         .then((res) => {
           this.setState({ getShg: res.data });
@@ -212,7 +217,10 @@ export class Loans extends React.Component {
       }
     }
     serviceProvider
-      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url, params)
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + url,
+        params
+      )
       .then((res) => {
         this.setState({
           pageSize: res.data.pageSize,
@@ -222,7 +230,7 @@ export class Loans extends React.Component {
         });
         this.getFormattedData(res.data.result);
       });
-  }
+  };
 
   getFormattedData = (data) => {
     data.map((loandata) => {
@@ -241,8 +249,10 @@ export class Loans extends React.Component {
       }
 
       if (
-        loandata.loan_app_installments.length > 0 &&
-        loandata.status == "Approved" || loandata.status == "InProgress" || loandata.status == "Completed"
+        (loandata.loan_app_installments.length > 0 &&
+          loandata.status == "Approved") ||
+        loandata.status == "InProgress" ||
+        loandata.status == "Completed"
       ) {
         let loanDueId = loandata.loan_app_installments.length - 1;
         let loanDueData = loandata.loan_app_installments[loanDueId];
@@ -342,7 +352,13 @@ export class Loans extends React.Component {
   };
 
   handleSearch() {
-    this.getLoanAppDetails(this.state.pageSize, this.state.page, this.state.values, "search");
+    this.setState({ isLoader: true });
+    this.getLoanAppDetails(
+      this.state.pageSize,
+      this.state.page,
+      this.state.values,
+      "search"
+    );
   }
 
   cancelForm = () => {
@@ -363,20 +379,21 @@ export class Loans extends React.Component {
       values: {
         ...this.state.values,
         [event.target.name]: event.target.value,
-        ["contact.name_contains"]: event.target.value
-      }
+        ["contact.name_contains"]: event.target.value,
+      },
     });
   }
 
   handleShgChange(event, value) {
     if (value !== null) {
       this.setState({
-        filterShg: value, isCancel: false,
+        filterShg: value,
+        isCancel: false,
       });
     } else {
       this.setState({
         filterShg: "",
-        values: { ...this.state.values }
+        values: { ...this.state.values },
       });
     }
   }
@@ -384,7 +401,8 @@ export class Loans extends React.Component {
   handleStatusChange = async (event, value) => {
     if (value !== null) {
       this.setState({
-        filterStatus: value, isCancel: false,
+        filterStatus: value,
+        isCancel: false,
         values: { ...this.state.values, ["status"]: value.id },
       });
     } else {
@@ -445,7 +463,7 @@ export class Loans extends React.Component {
       .serviceProviderForGetRequestDownloadPDFFile(
         process.env.REACT_APP_SERVER_URL + "loan-applications-print/" + cellid
       )
-      .then((res) => { })
+      .then((res) => {})
       .catch((error) => {
         console.log(error);
       });
@@ -485,11 +503,12 @@ export class Loans extends React.Component {
         name: "Status",
         selector: "status",
         sortable: true,
-        cell: (row) => this.state.getStatus.map(status => {
-          if (status.id === row.status) {
-            return status.name;
-          }
-        })
+        cell: (row) =>
+          this.state.getStatus.map((status) => {
+            if (status.id === row.status) {
+              return status.name;
+            }
+          }),
       },
       {
         name: "Outstanding amount",
@@ -693,8 +712,8 @@ export class Loans extends React.Component {
               DeleteMessage={"Are you Sure you want to Delete"}
             />
           ) : (
-              <h1>Loading...</h1>
-            )}
+            <h1>Loading...</h1>
+          )}
         </Grid>
       </Layout>
     );

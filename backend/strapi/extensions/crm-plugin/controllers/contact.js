@@ -289,6 +289,17 @@ module.exports = {
           }
           filters.where.shift();
         }
+      } else {
+        // for sesta and super user
+        const queryParam = [
+          { field: "contact_type", operator: "eq", value: "organization" },
+          { field: "organization.sub_type", operator: "eq", value: "SHG" },
+        ];
+        if (filters.where && filters.where.length > 0) {
+          filters.where = [...filters.where, ...queryParam];
+        } else {
+          filters.where = [...queryParam];
+        }
       }
       return strapi
         .query("contact", "crm-plugin")

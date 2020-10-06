@@ -95,8 +95,6 @@ export class Members extends React.Component {
     await this.getMembers(10, 1);
 
     // get all SHGs
-    let url =
-      "crm-plugin/contact/?contact_type=organization&organization.sub_type=SHG&&_sort=name:ASC";
     if (this.state.loggedInUserRole === "FPO Admin") {
       serviceProvider
         .serviceProviderForGetRequest(
@@ -141,7 +139,9 @@ export class Members extends React.Component {
         });
     } else {
       serviceProvider
-        .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/shglist/"
+        )
         .then((res) => {
           this.setState({ getShg: res.data });
         })
