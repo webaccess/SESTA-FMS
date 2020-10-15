@@ -83,7 +83,7 @@ class DashboardCSP extends Component {
 
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL + "crm-plugin/activities/recent/activities?_sort=end_datetime:desc"
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activities/recent/activities?_sort=end_datetime:desc&activityassignees.contact="+auth.getUserInfo().contact.id
       )
       .then((activityRes) => {
         activityRes.data.result.map((e, i) => {

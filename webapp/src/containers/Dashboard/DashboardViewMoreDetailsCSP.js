@@ -152,12 +152,14 @@ class DashboardViewMoreDetailsCSP extends Component {
         defaultParams = {
           page: page,
           pageSize: pageSize,
+          "activityassignees.contact": auth.getUserInfo().contact.id
         };
       } else {
         defaultParams = {
           page: page,
           pageSize: pageSize,
           [SORT_FIELD_KEY]: "start_datetime:ASC",
+          "activityassignees.contact": auth.getUserInfo().contact.id
         };
       }
       Object.keys(params).map((key) => {
@@ -169,6 +171,7 @@ class DashboardViewMoreDetailsCSP extends Component {
         page: page,
         pageSize: pageSize,
         [SORT_FIELD_KEY]: "start_datetime:ASC",
+        "activityassignees.contact": auth.getUserInfo().contact.id
       };
     }
 

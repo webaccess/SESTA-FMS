@@ -12,6 +12,7 @@ import { CSP_ACTIVITY_REPORT_BREADCRUMBS } from "./config";
 import Moment from "moment";
 import Table from "../../components/Datatable/Datatable.js";
 import { CSVLink, CSVDownload } from "react-csv";
+import * as formUtilities from "../../utilities/FormUtilities";
 
 const useStyles = (theme) => ({
   row: {
@@ -32,11 +33,12 @@ const useStyles = (theme) => ({
     textDecoration: "none",
   },
 });
-
+const SORT_FIELD_KEY = "_sort";
 export class CSPSummaryReport extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      values: {},
       filterStartDate: "",
       filterEndDate: "",
       filterCspName: "",
@@ -45,121 +47,164 @@ export class CSPSummaryReport extends React.Component {
       activitiesData: [],
       filename: [],
       isLoader: true,
+      /** pagination data */
+      pageSize: "",
+      totalRows: "",
+      page: "",
+      pageCount: "",
+      resetPagination: false,
     };
   }
 
   async componentDidMount() {
-    /** get all CSPs */
-    let url =
-      "users/?contact.creator_id=" +
-      auth.getUserInfo().contact.id +
-      "&&role.name=CSP (Community Service Provider)&&_sort=username:ASC";
-    serviceProvider
-      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + url)
-      .then((res) => {
-        let cspContact = [];
-        res.data.map((e) => {
-          e.name = e.contact.name;
-          this.setState({ cspList: res.data });
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    await this.getCspActivities(10, 1);
+  }
 
-    let activityArr = [];
+  getCspActivities = async (pageSize, page, params = null) => {
+    if (params !== null && !formUtilities.checkEmpty(params)) {
+      let defaultParams = {};
+      if (params.hasOwnProperty(SORT_FIELD_KEY)) {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+        };
+      } else {
+        defaultParams = {
+          page: page,
+          pageSize: pageSize,
+          [SORT_FIELD_KEY]: "start_datetime:desc",
+        };
+      }
+      Object.keys(params).map((key) => {
+        defaultParams[key] = params[key];
+      });
+      params = defaultParams;
+    } else {
+      params = {
+        page: page,
+        pageSize: pageSize,
+        [SORT_FIELD_KEY]: "start_datetime:desc",
+      };
+    }
+
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activities/?_sort=start_datetime:desc"
+        process.env.REACT_APP_SERVER_URL + "crm-plugin/activities/get/?id=" + auth.getUserInfo().contact.id,
+        params
       )
-      .then((activityRes) => {
-        activityRes.data.map((activity) => {
-          if (activity.contacts) {
-            if (
-              activity.contacts[0].creator_id.id ==
-              auth.getUserInfo().contact.id
-            ) {
-              activityArr.push(activity);
-            }
-          }
+      .then((res) => {
+        this.setState({
+          activitiesData: res.data.result,
+          cspList: res.data.cspList,
+          isLoader: false,
+          pageSize: res.data.pageSize,
+          totalRows: res.data.rowCount,
+          page: res.data.page,
+          pageCount: res.data.pageCount,
         });
-        this.setState({ activitiesData: activityArr, isLoader: false });
       })
-      .catch((error) => {
-        console.log(error);
-      });
   }
+
+  /** Pagination to handle row change*/
+  handlePerRowsChange = async (perPage, page) => {
+    this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      await this.getCspActivities(perPage, page);
+    } else {
+      await this.getCspActivities(perPage, page, this.state.values);
+    }
+  };
+
+  /** Pagination to handle page change */
+  handlePageChange = (page) => {
+    this.setState({ isLoader: true });
+    if (formUtilities.checkEmpty(this.state.values)) {
+      this.getCspActivities(this.state.pageSize, page);
+    } else {
+      this.getCspActivities(this.state.pageSize, page, this.state.values);
+    }
+  };
+
+  /** Sorting */
+  handleSort = (
+    column,
+    sortDirection,
+    perPage = this.state.pageSize,
+    page = 1
+  ) => {
+    if (column.selector === "start_datetime") {
+      column.selector = "start_datetime";
+    }
+    if (column.selector === "activitytype.name") {
+      column.selector = "activitytype.name";
+    }
+    if (column.selector === "title") {
+      column.selector = "title";
+    }
+    if (column.selector === "memberName") {
+      column.selector = "memberName";
+    }
+    this.state.values[SORT_FIELD_KEY] = column.selector + ":" + sortDirection;
+    this.getCspActivities(perPage, page, this.state.values);
+  };
 
   handleStartDateChange(event, value) {
     if (event !== null) {
-      this.setState({ filterStartDate: event, isCancel: false });
+      this.setState({
+        filterStartDate: event,
+        isCancel: false,
+        values: {
+          ...this.state.values, ["start_datetime_gte"]: event.toISOString(),
+        },
+      });
     } else {
+      delete this.state.values["start_datetime_gte"];
       this.setState({
         filterStartDate: "",
+        ...this.state.values
       });
     }
   }
 
   handleEndDateChange(event, value) {
     if (event !== null) {
-      this.setState({ filterEndDate: event, isCancel: false });
+      this.setState({
+        filterEndDate: event,
+        isCancel: false,
+        values: {
+          ...this.state.values, ["start_datetime_lte"]: event.toISOString(),
+        },
+      });
     } else {
+      delete this.state.values["start_datetime_lte"];
       this.setState({
         filterEndDate: "",
+        ...this.state.values
       });
     }
   }
 
   handleCSPChange(event, value) {
     if (value !== null) {
-      this.setState({ filterCspName: value, isCancel: false });
+      this.setState({
+        filterCspName: value,
+        isCancel: false,
+        values: {
+          ...this.state.values, ["activityassignees.contact"]: value.contact.id,
+        },
+      });
     } else {
+      delete this.state.values["activityassignees.contact"];
       this.setState({
         filterCspName: "",
+        ...this.state.values
       });
     }
   }
 
   handleSearch() {
     this.setState({ isLoader: true });
-    let searchData = "";
-    if (this.state.filterCspName) {
-      searchData += searchData ? "&&" : "";
-      searchData +=
-        "activityassignees.contact=" + this.state.filterCspName.contact.id;
-    }
-    if (this.state.filterStartDate) {
-      searchData += searchData ? "&&" : "";
-      searchData +=
-        "start_datetime_gte=" + this.state.filterStartDate.toISOString();
-    }
-    if (this.state.filterEndDate) {
-      searchData += searchData ? "&&" : "";
-      searchData +=
-        "start_datetime_lte=" + this.state.filterEndDate.toISOString();
-    }
-    let activityArr = [];
-    serviceProvider
-      .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "crm-plugin/activities?" +
-          searchData +
-          "&&_sort=start_datetime:desc"
-      )
-      .then((activityRes) => {
-        activityRes.data.map((activity) => {
-          if (
-            activity.contacts[0].creator_id.id == auth.getUserInfo().contact.id
-          ) {
-            activityArr.push(activity);
-          }
-        });
-        this.setState({ activitiesData: activityArr, isLoader: false });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    this.getCspActivities(this.state.pageSize, this.state.page, this.state.values);
   }
 
   formatCSVFilename(csvActivityData) {
@@ -208,8 +253,14 @@ export class CSPSummaryReport extends React.Component {
           ? activity.title.split(":")
           : "-";
         activity.memberName = splitTitle[0];
+        activity.contact = {
+          name: splitTitle[0]
+        };
       } else {
         activity.memberName = "-";
+        activity.contact = {
+          name: "-"
+        };
       }
 
       date = Moment(activity.start_datetime).format("DD MMM YYYY");
@@ -382,11 +433,21 @@ export class CSPSummaryReport extends React.Component {
                   rowsSelected={this.rowsSelect}
                   columnsvalue={columnsvalue}
                   pagination
+                  paginationServer
+                  paginationDefaultPage={this.state.page}
+                  paginationPerPage={this.state.pageSize}
+                  paginationTotalRows={this.state.totalRows}
+                  paginationRowsPerPageOptions={[10, 15, 20, 25, 30]}
+                  paginationResetDefaultPage={this.state.resetPagination}
+                  onChangeRowsPerPage={this.handlePerRowsChange}
+                  onChangePage={this.handlePageChange}
+                  onSort={this.handleSort}
+                  sortServer={true}
                   progressComponent={this.state.isLoader}
                 />
               ) : (
-                <h1>Loading...</h1>
-              )}
+                  <h1>Loading...</h1>
+                )}
             </div>
             <br />
             <Button>

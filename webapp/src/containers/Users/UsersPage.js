@@ -120,8 +120,10 @@ class UsersPage extends Component {
       )
       .then((res) => {
         res.data.map(userdata => {
-          if (userdata.contact.id === parseInt(this.state.editPage[1])) {
-            this.setState({ userId: userdata.id })
+          if(userdata.contact != null) {
+            if (userdata.contact.id === parseInt(this.state.editPage[1])) {
+              this.setState({ userId: userdata.id })
+            }
           }
         })
       })
