@@ -20,28 +20,82 @@ module.exports = {
       sort = filters.sort;
       filters = _.omit(filters, ["sort"]);
     }
-    return strapi
-      .query("activity", "crm-plugin")
-      .model.query(
-        buildQuery({
-          model: strapi.plugins["crm-plugin"].models["activity"],
-          filters,
-        })
-      )
-      .fetchAll({})
-      .then(async (res) => {
-        let data = res.toJSON();
-        // Sorting ascending or descending on one or multiple fields
-        if (sort && sort.length) {
-          data = utils.sort(data, sort);
-        }
-        const response = utils.paginate(data, page, pageSize);
 
-        return {
-          result: response.result,
-          ...response.pagination,
-        };
-      });
+    if (ctx.query.id) {
+      /** CSP Activity report in FPO */
+      let cspIds = [];
+      try {
+        const cspuser = await strapi.query("user", "users-permissions").find({
+          "contact.creator_id": ctx.query.id,
+          "role.name": "CSP (Community Service Provider)"
+        });
+        if (cspuser.length > 0) {
+          cspuser.map(e => {
+            e.name = e.contact.name;
+            cspIds.push(e.contact.id);
+          })
+        }
+        const query = [
+          { field: "activityassignees.contact", operator: "in", value: cspIds },
+        ];
+        if (filters.where && filters.where.length > 0) {
+          filters.where = [...filters.where, ...query];
+        } else {
+          filters.where = [...query];
+        }
+        filters.where.shift();
+
+        return strapi
+          .query("activity", "crm-plugin")
+          .model.query(
+            buildQuery({
+              model: strapi.plugins["crm-plugin"].models["activity"],
+              filters,
+            })
+          )
+          .fetchAll({})
+          .then(async (res) => {
+            let data = res.toJSON();
+            if (sort && sort.length) {
+              data = utils.sort(data, sort);
+            }
+            const response = utils.paginate(data, page, pageSize);
+            return {
+              result: response.result,
+              cspList: cspuser,
+              ...response.pagination,
+            };
+          })
+
+      } catch (error) {
+        return ctx.badRequest(null, error.message);
+      }
+    } else {
+      /** Activities in CSP */
+      return strapi
+        .query("activity", "crm-plugin")
+        .model.query(
+          buildQuery({
+            model: strapi.plugins["crm-plugin"].models["activity"],
+            filters,
+          })
+        )
+        .fetchAll({})
+        .then(async (res) => {
+          let data = res.toJSON();
+
+          // Sorting ascending or descending on one or multiple fields
+          if (sort && sort.length) {
+            data = utils.sort(data, sort);
+          }
+          const response = utils.paginate(data, page, pageSize);
+
+          return {
+            result: response.result,
+            ...response.pagination,
+          };
+        });
+    }
   },
 
   /** get recent activities - CSP dashboard */

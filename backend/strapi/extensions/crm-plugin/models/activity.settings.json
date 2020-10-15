@@ -15,10 +15,10 @@
       "required": true
     },
     "start_datetime": {
-      "type": "datetime"
+      "type": "date"
     },
     "end_datetime": {
-      "type": "datetime"
+      "type": "date"
     },
     "description": {
       "type": "richtext"
