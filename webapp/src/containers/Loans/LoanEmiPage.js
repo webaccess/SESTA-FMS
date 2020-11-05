@@ -196,8 +196,15 @@ class LoanEmiPage extends Component {
           ? (emidata.loanfine = "-")
           : (emidata.loanfine = null);
     });
-
-    let pendingAmount = "₹" + loanAppData.outstanding_amount.toLocaleString();
+    let pendingAmount;
+    if (
+      loanAppData.outstanding_amount !== null ||
+      loanAppData.outstanding_amount !== ""
+    ) {
+      pendingAmount = "₹" + loanAppData.outstanding_amount.toLocaleString();
+    } else {
+      pendingAmount = "-";
+    }
 
     // get Loan Ends On Date
     if (loanAppData.loan_app_installments.length > 0) {

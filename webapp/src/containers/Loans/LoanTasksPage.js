@@ -167,8 +167,15 @@ class LoanTasksPage extends Component {
     let data = this.state.data;
     let loantasks = this.state.loantasks;
     let loanAppData = this.props.location.state.loanAppData;
-    let pendingAmount = "₹" + loanAppData.outstanding_amount.toLocaleString();
-
+    let pendingAmount;
+    if (
+      loanAppData.outstanding_amount !== null ||
+      loanAppData.outstanding_amount !== ""
+    ) {
+      pendingAmount = "₹" + loanAppData.outstanding_amount.toLocaleString();
+    } else {
+      pendingAmount = "-";
+    }
     // get Loan Ends On Date
     if (loanAppData.loan_app_installments.length > 0) {
       let sortedPaymentDate = loanAppData.loan_app_installments.sort(
