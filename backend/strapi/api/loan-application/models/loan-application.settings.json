@@ -41,14 +41,14 @@
       "type": "string"
     },
     "contact": {
-      "via": "loan_applications",
       "plugin": "crm-plugin",
-      "model": "contact"
+      "model": "contact",
+      "via": "loan_applications"
     },
     "approved_by": {
-      "via": "loan_app_approvedby",
       "plugin": "crm-plugin",
-      "model": "contact"
+      "model": "contact",
+      "via": "loan_app_approvedby"
     },
     "loan_model": {
       "model": "loan-model",
@@ -57,7 +57,11 @@
     "document": {
       "collection": "file",
       "via": "related",
-      "allowedTypes": ["files", "images", "videos"],
+      "allowedTypes": [
+        "files",
+        "images",
+        "videos"
+      ],
       "plugin": "upload",
       "required": false
     },
@@ -72,6 +76,23 @@
     "creator_id": {
       "plugin": "crm-plugin",
       "model": "contact"
+    },
+    "beneficiary_status": {
+      "type": "string"
+    },
+    "assigned_vo": {
+      "plugin": "crm-plugin",
+      "model": "contact"
+    },
+    "assigned_shg": {
+      "plugin": "crm-plugin",
+      "model": "contact"
+    },
+    "outstanding_amount": {
+      "type": "decimal"
+    },
+    "paid_amount": {
+      "type": "decimal"
     }
   }
 }

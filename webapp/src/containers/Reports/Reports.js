@@ -85,6 +85,26 @@ export class Reports extends React.Component {
               </Card>
             </div>
           </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <div>
+              <Card className={classes.root}>
+                <CardActionArea
+                  component={Link}
+                  to={{
+                    pathname: "/loan-report",
+                  }}
+                >
+                  <CardContent style={{ fontWeight: "bold" }}>
+                    Loan Report
+                  </CardContent>
+                </CardActionArea>
+                <CardContent style={{ fontSize: "13px" }}>
+                  Summary of total amount of loan distributed, repayment amount
+                  and interest
+                </CardContent>
+              </Card>
+            </div>
+          </Grid>
         </Grid>
       </Layout>
     );

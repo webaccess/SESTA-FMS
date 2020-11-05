@@ -2,6 +2,14 @@
   "routes": [
     {
       "method": "GET",
+      "path": "/loan-applications/loans-report",
+      "handler": "loan-application.getLoanReportDetails",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
       "path": "/loan-applications/loans/details",
       "handler": "loan-application.getLoanDetails",
       "config": {

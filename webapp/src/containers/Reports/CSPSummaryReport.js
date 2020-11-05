@@ -142,7 +142,7 @@ export class CSPSummaryReport extends React.Component {
   };
 
   getSanctionedLonas = () => {
-    let loanUrl = "loan-applications/?status=Approved";
+    let loanUrl = "loan-applications/?status=Approved&status=InProgress";
     if (this.state.filterCspName || this.state.filterCspName !== "") {
       loanUrl += "&&creator_id.id=" + this.state.filterCspName.id;
     }
@@ -370,7 +370,10 @@ export class CSPSummaryReport extends React.Component {
           <Grid>
             <div className="App">
               <h3>CSP Summary Report</h3>
-              <div className={classes.row} style={{flexWrap: "wrap", height: "auto",}}>
+              <div
+                className={classes.row}
+                style={{ flexWrap: "wrap", height: "auto" }}
+              >
                 <div className={classes.searchInput}>
                   <div className={classes.Districts}>
                     <Grid item md={12} xs={12}>
@@ -428,12 +431,17 @@ export class CSPSummaryReport extends React.Component {
                   </Grid>
                 </div>
                 <Button
-                  style={{ marginRight: "5px", marginBottom: "8px", }}
-                  onClick={this.handleSearch.bind(this)}>Search</Button>
+                  style={{ marginRight: "5px", marginBottom: "8px" }}
+                  onClick={this.handleSearch.bind(this)}
+                >
+                  Search
+                </Button>
                 &nbsp;&nbsp;&nbsp;
                 <Button
-                  style={{ marginBottom: "8px", }}
-                  color="secondary" clicked={this.cancelForm}>
+                  style={{ marginBottom: "8px" }}
+                  color="secondary"
+                  clicked={this.cancelForm}
+                >
                   reset
                 </Button>
               </div>
@@ -443,10 +451,13 @@ export class CSPSummaryReport extends React.Component {
               <Card style={{ maxHeight: "max-content" }}>
                 <List>
                   <ListItem>
-                  <ListItemText primary={
-                    <Typography style={{ fontWeight: '500' }}>
-                      No of livelihood activites
-                    </Typography>}/>
+                    <ListItemText
+                      primary={
+                        <Typography style={{ fontWeight: "500" }}>
+                          No of livelihood activites
+                        </Typography>
+                      }
+                    />
                     <ListItemSecondaryAction style={{ paddingRight: "100px" }}>
                       {this.state.completedActivities.length}
                     </ListItemSecondaryAction>
@@ -463,7 +474,7 @@ export class CSPSummaryReport extends React.Component {
                   >
                     Type of activities
                   </Typography>
-                  <div style={{paddingLeft:"15px"}}>
+                  <div style={{ paddingLeft: "15px" }}>
                     {elements.length > 0 ? (
                       <List>{elements}</List>
                     ) : (
@@ -477,10 +488,13 @@ export class CSPSummaryReport extends React.Component {
 
                 <List>
                   <ListItem>
-                  <ListItemText primary={
-                    <Typography style={{ fontWeight: '500' }}>
-                      No of loans sanctioned
-                    </Typography>}/>
+                    <ListItemText
+                      primary={
+                        <Typography style={{ fontWeight: "500" }}>
+                          No of loans sanctioned
+                        </Typography>
+                      }
+                    />
                     <ListItemSecondaryAction style={{ paddingRight: "100px" }}>
                       {this.state.sanctionedLoans.length}
                     </ListItemSecondaryAction>
@@ -490,10 +504,13 @@ export class CSPSummaryReport extends React.Component {
 
                 <List>
                   <ListItem>
-                  <ListItemText primary={
-                    <Typography style={{ fontWeight: '500' }}>
-                      No of loan defaulters
-                    </Typography>}/>
+                    <ListItemText
+                      primary={
+                        <Typography style={{ fontWeight: "500" }}>
+                          No of loan defaulters
+                        </Typography>
+                      }
+                    />
                     <ListItemSecondaryAction style={{ paddingRight: "100px" }}>
                       {this.state.loanDefaulters.length}
                     </ListItemSecondaryAction>
@@ -503,10 +520,13 @@ export class CSPSummaryReport extends React.Component {
 
                 <List>
                   <ListItem>
-                  <ListItemText primary={
-                    <Typography style={{ fontWeight: '500' }}>
-                      Amount of principal collected
-                    </Typography>}/>
+                    <ListItemText
+                      primary={
+                        <Typography style={{ fontWeight: "500" }}>
+                          Amount of principal collected
+                        </Typography>
+                      }
+                    />
                     <ListItemSecondaryAction style={{ paddingRight: "100px" }}>
                       ₹{this.state.principalCollected.toLocaleString()}
                     </ListItemSecondaryAction>
@@ -516,10 +536,13 @@ export class CSPSummaryReport extends React.Component {
 
                 <List>
                   <ListItem>
-                  <ListItemText primary={
-                    <Typography style={{ fontWeight: '500' }}>
-                      Amount of interest collected
-                    </Typography>}/>
+                    <ListItemText
+                      primary={
+                        <Typography style={{ fontWeight: "500" }}>
+                          Amount of interest collected
+                        </Typography>
+                      }
+                    />
                     <ListItemSecondaryAction style={{ paddingRight: "100px" }}>
                       ₹{this.state.interestCollected.toLocaleString()}
                     </ListItemSecondaryAction>

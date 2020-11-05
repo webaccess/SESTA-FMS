@@ -152,40 +152,7 @@ class LoanEmiViewPage extends Component {
     let loanEmiData = this.state.loanEmiData;
     let loanAppData = this.props.location.state.loanAppData;
 
-    let paid = 0;
-    loanEmiData.map((emidata) => {
-      if (emidata.fine !== null || emidata.fine !== 0) {
-        emidata.totalPaid = (
-          emidata.fine +
-          emidata.actual_principal +
-          emidata.actual_interest
-        ).toLocaleString();
-      } else {
-        emidata.totalPaid = (
-          emidata.actual_principal + emidata.actual_interest
-        ).toLocaleString();
-      }
-      let totalLoanAmnt =
-        emidata.expected_principal + emidata.expected_interest;
-      emidata.outstanding = (
-        totalLoanAmnt -
-        (emidata.actual_principal + emidata.actual_interest)
-      ).toLocaleString();
-
-      emidata.totalPaid = parseInt(emidata.totalPaid.replace(/,/g, ""));
-      paid = paid + emidata.totalPaid;
-    });
-
-    // Pending Amount = Actual amount + Fine - Total installment paid
-    let pendingAmount;
-    if (data.amount) {
-      let totalamount = parseInt(data.amount.replace(/,/g, ""));
-      pendingAmount = totalamount - paid;
-      if (pendingAmount < 0) {
-        pendingAmount = 0;
-      }
-      pendingAmount = "₹" + pendingAmount.toLocaleString();
-    }
+    let pendingAmount = "₹" + loanAppData.outstanding_amount.toLocaleString();
 
     // get Loan Ends On Date
     if (loanAppData.loan_app_installments.length > 0) {

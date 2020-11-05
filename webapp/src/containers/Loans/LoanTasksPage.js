@@ -167,31 +167,7 @@ class LoanTasksPage extends Component {
     let data = this.state.data;
     let loantasks = this.state.loantasks;
     let loanAppData = this.props.location.state.loanAppData;
-
-    let paid = 0;
-    loanAppData.loan_app_installments.map((emidata) => {
-      if (emidata.actual_principal) {
-        if (emidata.fine !== null || emidata.fine !== 0) {
-          emidata.totalPaid =
-            emidata.fine + emidata.actual_principal + emidata.actual_interest;
-        } else {
-          emidata.totalPaid =
-            emidata.actual_principal + emidata.actual_interest;
-        }
-        paid = paid + emidata.totalPaid;
-      }
-    });
-
-    // Pending Amount = Actual amount + Fine - Total installment paid
-    let pendingAmount;
-    let loanAmount = parseInt(
-      loanAppData.loan_model.loan_amount.replace(/,/g, "")
-    );
-    pendingAmount = loanAmount - paid;
-    if (pendingAmount < 0) {
-      pendingAmount = 0;
-    }
-    pendingAmount = "₹" + pendingAmount.toLocaleString();
+    let pendingAmount = "₹" + loanAppData.outstanding_amount.toLocaleString();
 
     // get Loan Ends On Date
     if (loanAppData.loan_app_installments.length > 0) {
@@ -440,7 +416,6 @@ class LoanTasksPage extends Component {
                 editData={this.editData}
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
-                pagination
               />
             ) : (
               <h1>Loading...</h1>

@@ -53,7 +53,7 @@ class DashboardFPOViewMoreDetails extends Component {
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
           "loan-applications" +
-          "?status=Approved"
+          "?status=Approved&status=InProgress"
       )
       .then((res) => {
         this.getAllDetails(res.data);
@@ -138,7 +138,7 @@ class DashboardFPOViewMoreDetails extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "loan-applications/?status=Approved&&" +
+          "loan-applications/?status=Approved&status=InProgress&&" +
           searchData
       )
       .then((res) => {

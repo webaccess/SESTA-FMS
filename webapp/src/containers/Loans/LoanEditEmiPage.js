@@ -33,25 +33,27 @@ class LoanEditEmiPage extends Component {
         actual_payment_date: {
           required: {
             value: "true",
-            message: "Payment Date is  required",
+            message: "Payment Date is required",
           },
         },
         actual_principal: {
           required: {
             value: "true",
-            message: "Principal Paid is  required",
+            message: "Principal Paid is required",
           },
         },
         actual_interest: {
           required: {
             value: "true",
-            message: "Interest Paid is  required",
+            message: "Interest Paid is required",
           },
         },
         fine: {},
       },
       errors: {},
       isLoader: true,
+      totalAmount: this.props.location.state.loanAppData.loan_model.loan_amount,
+      loanId: this.props.location.state.loanAppData.id,
     };
   }
 
@@ -200,7 +202,6 @@ class LoanEditEmiPage extends Component {
               status: "InProgress",
             };
           }
-
           serviceProvider
             .serviceProviderForPutRequest(
               process.env.REACT_APP_SERVER_URL + "loan-applications",
@@ -209,7 +210,64 @@ class LoanEditEmiPage extends Component {
             )
             .then(() => {})
             .catch((error) => {
-              console.log("loanApp", error);
+              console.log(error);
+            });
+
+          // save outstanding amount and paid amount
+          let loanAmounts;
+          loanAmounts = {
+            outstanding_amount: this.state.totalAmount,
+            paid_amount: 0,
+          };
+          if (loanEmiData.month === 1) {
+            // for 1st installment
+            if (fine !== null || fine !== 0) {
+              loanAmounts = {
+                outstanding_amount:
+                  parseFloat(this.state.totalAmount.replace(/,/g, "")) -
+                  (actual_principal + actual_interest + fine),
+                paid_amount: actual_principal + actual_interest + fine,
+              };
+            } else {
+              loanAmounts = {
+                outstanding_amount:
+                  parseFloat(this.state.totalAmount.replace(/,/g, "")) -
+                  (actual_principal + actual_interest),
+                paid_amount: actual_principal + actual_interest,
+              };
+            }
+          } else {
+            // for all other installments except 1st
+            if (fine !== null || fine !== 0) {
+              loanAmounts = {
+                outstanding_amount:
+                  loanApp.outstanding_amount -
+                  (actual_principal + actual_interest + fine),
+                paid_amount:
+                  loanApp.paid_amount +
+                  actual_principal +
+                  actual_interest +
+                  fine,
+              };
+            } else {
+              loanAmounts = {
+                outstanding_amount:
+                  loanApp.outstanding_amount -
+                  (actual_principal + actual_interest),
+                paid_amount:
+                  loanApp.paid_amount + actual_principal + actual_interest,
+              };
+            }
+          }
+          serviceProvider
+            .serviceProviderForPutRequest(
+              process.env.REACT_APP_SERVER_URL + "loan-applications",
+              loanAppId,
+              loanAmounts
+            )
+            .then(() => {})
+            .catch((error) => {
+              console.log(error);
             });
         }
         let app_id = res.data.loan_application["id"];

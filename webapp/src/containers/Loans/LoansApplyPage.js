@@ -4,27 +4,16 @@ import Layout from "../../hoc/Layout/Layout";
 import { withStyles } from "@material-ui/core/styles";
 import * as serviceProvider from "../../api/Axios";
 import auth from "../../components/Auth/Auth";
-import Table from "../../components/Datatable/Datatable.js";
 import Autocomplete from "../../components/Autocomplete/Autocomplete";
 import Input from "../../components/UI/Input/Input";
-import {
-  Card,
-  CardHeader,
-  CardContent,
-  CardActions,
-  Divider,
-  Grid,
-} from "@material-ui/core";
+import { Card, Divider, Grid } from "@material-ui/core";
 import IconButton from "@material-ui/core/IconButton";
 import PersonIcon from "@material-ui/icons/Person";
 import PeopleIcon from "@material-ui/icons/People";
 import HomeIcon from "@material-ui/icons/Home";
-import MoneyIcon from "@material-ui/icons/Money";
 import NaturePeopleIcon from "@material-ui/icons/NaturePeople";
-import TextField from "@material-ui/core/TextField";
 import Button from "../../components/UI/Button/Button";
 import Moment from "moment";
-import Snackbar from "../../components/UI/Snackbar/Snackbar";
 import { Link } from "react-router-dom";
 
 const useStyles = (theme) => ({
@@ -126,6 +115,8 @@ class LoansApplyPage extends Component {
       isCancel: false,
       loan_model: [],
       memberData: [],
+      assignedVo: {},
+      assignedShg: {},
     };
   }
 
@@ -145,7 +136,9 @@ class LoansApplyPage extends Component {
         // get VO assigned to selected SHG member
         res.data.map((e, i) => {
           e.organization.vos.map((item) => {
-            this.setState({ shgUnderVo: item.name });
+            if (item) {
+              this.setState({ assignedVo: item, shgUnderVo: item.name });
+            }
           });
         });
       })
@@ -165,6 +158,9 @@ class LoansApplyPage extends Component {
         process.env.REACT_APP_SERVER_URL + "crm-plugin/individuals/" + url
       )
       .then((res) => {
+        res.data.map((i) => {
+          this.setState({ assignedShg: i.shg });
+        });
         this.setState({ getShgVo: res.data });
       });
 
@@ -213,11 +209,19 @@ class LoansApplyPage extends Component {
       purpose: assignLoanAppValues.product_name,
       status: "UnderReview",
       creator_id: auth.getUserInfo().contact.id,
+      assigned_vo: this.state.assignedVo,
+      assigned_shg: this.state.assignedShg,
+      outstanding_amount: assignLoanAppValues.loan_amount,
+      paid_amount: 0,
     };
 
     if (postData.loan_applications && postData.loan_applications.length > 0) {
       postData.loan_applications.map((loanapp) => {
-        if (loanapp.status == "UnderReview" || loanapp.status == "Approved" || loanapp.status == "InProgress") {
+        if (
+          loanapp.status == "UnderReview" ||
+          loanapp.status == "Approved" ||
+          loanapp.status == "InProgress"
+        ) {
           if (loanapp.loan_model == assignLoanAppValues.id) {
             loanAlreadyApplied = true;
             activeLoanPresent = false;
@@ -244,6 +248,9 @@ class LoansApplyPage extends Component {
           loanapp.status == "Completed"
         ) {
           if (!loanApplied && !activeLoanPresent && !loanAlreadyApplied) {
+            Object.assign(loan_application_data, {
+              beneficiary_status: "Repeat",
+            });
             this.saveApplyLoan(
               loan_application_data,
               postData.id,
@@ -256,6 +263,7 @@ class LoansApplyPage extends Component {
         }
       });
     } else {
+      Object.assign(loan_application_data, { beneficiary_status: "New" });
       this.saveApplyLoan(
         loan_application_data,
         postData.id,

@@ -147,7 +147,8 @@ const Table = (props) => {
     dtPageTitle !== "Loan EMI Detail" &&
     dtPageTitle !== "EMI Due" &&
     dtPageTitle !== "Recent Activities" &&
-    dtPageTitle !== "CSP Report"
+    dtPageTitle !== "CSP Report" &&
+    dtPageTitle !== "Loan Report"
   ) {
     column = [
       {
@@ -565,7 +566,7 @@ const Table = (props) => {
             onChangePage={props.onChangePage}
             /** Sort */
             onSort={props.onSort}
-            sortServer={props.sortServer}
+            sortServer
             /** progress spinner */
             progressComponent
             selectableRowsComponent={Checkbox}
