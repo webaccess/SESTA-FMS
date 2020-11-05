@@ -442,7 +442,6 @@ module.exports = {
         }
       }
     }
-    console.log("--filters--", filters);
     try {
       return strapi
         .query("loan-application")
