@@ -195,7 +195,7 @@ class LoansApplyPage extends Component {
     ) {
       postData = this.state.memberData[0];
     }
-
+    // console.log("--postdata--", postData, postData.addresses[0].village);
     if (this.state.handlePurposeChange) {
       assignLoanAppValues = this.state.handlePurposeChange;
     } else {
@@ -213,6 +213,7 @@ class LoansApplyPage extends Component {
       assigned_shg: this.state.assignedShg,
       outstanding_amount: assignLoanAppValues.loan_amount,
       paid_amount: 0,
+      village: postData.addresses[0],
     };
 
     if (postData.loan_applications && postData.loan_applications.length > 0) {

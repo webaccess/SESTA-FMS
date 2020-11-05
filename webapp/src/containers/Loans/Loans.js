@@ -106,10 +106,12 @@ export class Loans extends React.Component {
       filterStatus: "",
       filterShg: "",
       filterVo: "",
+      filterVillage: "",
       loggedInUserRole: auth.getUserInfo().role.name,
       isLoader: true,
       getPurpose: [],
       getVo: [],
+      getVillages: [],
       minOutstanding: "",
       maxOutstanding: "",
       minPaid: "",
@@ -238,6 +240,19 @@ export class Loans extends React.Component {
         })
         .catch((error) => {});
     }
+
+    // get all villages
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/villages/?_sort=name:ASC&&is_active=true"
+      )
+      .then((res) => {
+        this.setState({
+          getVillages: res.data,
+        });
+      })
+      .catch((error) => {});
   }
 
   getLoanAppDetails = async (pageSize, page, params = null, type) => {
@@ -383,6 +398,9 @@ export class Loans extends React.Component {
     if (column.selector === "outstandingAmount") {
       column.selector = "outstandingAmount";
     }
+    if (column.selector === "paidAmount") {
+      column.selector = "paidAmount";
+    }
     if (column.selector === "amount_due") {
       column.selector = "amount_due";
     }
@@ -411,6 +429,7 @@ export class Loans extends React.Component {
       formSubmitted: "",
       filterShg: "",
       filterVo: "",
+      filterVillage: "",
       filterAppDate: "",
       minOutstanding: "",
       maxOutstanding: "",
@@ -571,6 +590,19 @@ export class Loans extends React.Component {
     }
   };
 
+  handleVillageChange = async (event, value) => {
+    if (value !== null) {
+      this.setState({
+        filterVillage: value,
+        isCancel: false,
+        values: { ...this.state.values, ["village.village"]: value.id },
+      });
+    } else {
+      delete this.state.values["village.village"];
+      this.setState({ filterVillage: "", values: { ...this.state.values } });
+    }
+  };
+
   handleAppDateChange(event, value) {
     if (event !== null) {
       this.setState({
@@ -660,6 +692,8 @@ export class Loans extends React.Component {
     let filterStatus = this.state.filterStatus;
     let purposeFilter = this.state.getPurpose;
     let filterPurpose = this.state.filterPurpose;
+    let villageFilter = this.state.getVillages;
+    let filterVillage = this.state.filterVillage;
     let filters = this.state.values;
     const Usercolumns = [
       {
@@ -704,6 +738,13 @@ export class Loans extends React.Component {
             : "-",
       },
       {
+        name: "Paid amount",
+        selector: "paidAmount",
+        sortable: true,
+        cell: (row) =>
+          row.paid_amount ? "₹" + row.paid_amount.toLocaleString() : "-",
+      },
+      {
         name: "Amount Due",
         selector: "amount_due",
         sortable: true,
@@ -716,7 +757,7 @@ export class Loans extends React.Component {
         cell: (row) => (row.payment_date ? row.payment_date : "-"),
       },
       {
-        name: "Application Status",
+        name: "Beneficiary Status",
         selector: "beneficiary_status",
         sortable: true,
         cell: (row) => (row.beneficiary_status ? row.beneficiary_status : "-"),
@@ -790,6 +831,36 @@ export class Loans extends React.Component {
                 <Grid item md={12} xs={12}>
                   <Autocomplete
                     id="combo-box-demo"
+                    options={villageFilter}
+                    getOptionLabel={(option) => option.name}
+                    onChange={(event, value) => {
+                      this.handleVillageChange(event, value);
+                    }}
+                    value={
+                      filterVillage
+                        ? this.state.isCancel === true
+                          ? null
+                          : filterVillage
+                        : null
+                    }
+                    renderInput={(params) => (
+                      <Input
+                        {...params}
+                        fullWidth
+                        label="Select Village"
+                        name="filterVillage"
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                </Grid>
+              </div>
+            </div>
+            <div className={classes.searchInput}>
+              <div className={style.Districts}>
+                <Grid item md={12} xs={12}>
+                  <Autocomplete
+                    id="combo-box-demo"
                     options={voFilter}
                     getOptionLabel={(option) => option.name}
                     onChange={(event, value) => {
@@ -806,7 +877,7 @@ export class Loans extends React.Component {
                       <Input
                         {...params}
                         fullWidth
-                        label="VO Name"
+                        label="Select VO"
                         name="filterVo"
                         variant="outlined"
                       />
@@ -836,7 +907,7 @@ export class Loans extends React.Component {
                       <Input
                         {...params}
                         fullWidth
-                        label="SHG Name"
+                        label="Select SHG"
                         name="filterShg"
                         variant="outlined"
                       />

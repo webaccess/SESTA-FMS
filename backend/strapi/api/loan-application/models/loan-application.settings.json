@@ -93,6 +93,10 @@
     },
     "paid_amount": {
       "type": "decimal"
+    },
+    "village": {
+      "plugin": "crm-plugin",
+      "model": "address"
     }
   }
 }
