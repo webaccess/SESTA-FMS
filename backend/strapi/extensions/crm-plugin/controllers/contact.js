@@ -497,6 +497,48 @@ module.exports = {
       });
   },
 
+  /** get VO list as per logged in user for loan listing page filters */
+  getVoList: async (ctx) => {
+    const { page, query, pageSize } = utils.getRequestParams(ctx.request.query);
+    let filters = convertRestQueryParams(query, { limit: -1 });
+    const mainQuery = [
+      { field: "contact_type", operator: "eq", value: "organization" },
+      { field: "organization.sub_type", operator: "eq", value: "VO" },
+    ];
+    if (filters.where && filters.where.length > 0) {
+      filters.where = [...filters.where, ...mainQuery];
+    } else {
+      filters.where = [...mainQuery];
+    }
+
+    // for FPO admin
+    if (ctx.query.id) {
+      const fpoIdQuery = [
+        { field: "organization.fpo", operator: "eq", value: ctx.query.id },
+      ];
+      if (filters.where && filters.where.length > 0) {
+        filters.where = [...filters.where, ...fpoIdQuery];
+      } else {
+        filters.where = [...fpoIdQuery];
+      }
+      filters.where.shift();
+    }
+    // for sesta, super admins
+    return strapi
+      .query("contact", "crm-plugin")
+      .model.query(
+        buildQuery({
+          model: strapi.plugins["crm-plugin"].models["contact"],
+          filters,
+        })
+      )
+      .fetchAll({})
+      .then(async (res) => {
+        let data = res.toJSON();
+        return data;
+      });
+  },
+
   /** get all users as per logged in user role */
   getAllUsers: async (ctx) => {
     const { page, query, pageSize } = utils.getRequestParams(ctx.request.query);

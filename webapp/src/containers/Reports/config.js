@@ -9,3 +9,9 @@ export const CSP_ACTIVITY_REPORT_BREADCRUMBS = {
   list_reports: "Reports",
   activity_report: "CSP Activity Report",
 };
+
+export const LOAN_REPORT_BREADCRUMBS = {
+  home: "Home",
+  list_reports: "Reports",
+  loan_report: "Loan Report",
+};

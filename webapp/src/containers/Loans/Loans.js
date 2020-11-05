@@ -11,10 +11,10 @@ import Table from "../../components/Datatable/Datatable.js";
 import auth from "../../components/Auth/Auth.js";
 import Moment from "moment";
 import Snackbar from "../../components/UI/Snackbar/Snackbar";
-import { Link } from "react-router-dom";
 import Auth from "../../components/Auth/Auth.js";
 import * as constants from "../../constants/Constants";
 import * as formUtilities from "../../utilities/FormUtilities";
+import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 
 const useStyles = (theme) => ({
   root: {},
@@ -105,14 +105,34 @@ export class Loans extends React.Component {
       values: {},
       filterStatus: "",
       filterShg: "",
+      filterVo: "",
+      filterVillage: "",
       loggedInUserRole: auth.getUserInfo().role.name,
       isLoader: true,
-      myArray: [],
+      getPurpose: [],
+      getVo: [],
+      getVillages: [],
+      minOutstanding: "",
+      maxOutstanding: "",
+      minPaid: "",
+      maxPaid: "",
     };
   }
 
   async componentDidMount() {
     await this.getLoanAppDetails(10, 1);
+
+    // get all purposes
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL + "loan-models/?_sort=product_name:ASC"
+      )
+      .then((res) => {
+        this.setState({ getPurpose: res.data });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
     // get all SHGs
     if (this.state.loggedInUserRole === "FPO Admin") {
@@ -169,6 +189,70 @@ export class Loans extends React.Component {
           console.log(error);
         });
     }
+
+    //get all VOs
+    if (this.state.loggedInUserRole === "FPO Admin") {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((res) => {
+          serviceProvider
+            .serviceProviderForGetRequest(
+              process.env.REACT_APP_SERVER_URL +
+                "crm-plugin/contact/volist/?id=" +
+                res.data.fpo.id
+            )
+            .then((voRes) => {
+              this.setState({
+                getVo: voRes.data,
+              });
+            })
+            .catch((error) => {});
+        })
+        .catch((error) => {});
+    } else if (
+      this.state.loggedInUserRole === "CSP (Community Service Provider)"
+    ) {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL +
+            "crm-plugin/individuals/?id=" +
+            auth.getUserInfo().contact.individual
+        )
+        .then((resp) => {
+          this.setState({
+            getVo: [resp.data[0].vo],
+          });
+        })
+        .catch((error) => {});
+    } else {
+      serviceProvider
+        .serviceProviderForGetRequest(
+          process.env.REACT_APP_SERVER_URL + "crm-plugin/contact/volist/"
+        )
+        .then((voRes) => {
+          this.setState({
+            getVo: voRes.data,
+          });
+        })
+        .catch((error) => {});
+    }
+
+    // get all villages
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/villages/?_sort=name:ASC&&is_active=true"
+      )
+      .then((res) => {
+        this.setState({
+          getVillages: res.data,
+        });
+      })
+      .catch((error) => {});
   }
 
   getLoanAppDetails = async (pageSize, page, params = null, type) => {
@@ -203,18 +287,9 @@ export class Loans extends React.Component {
       delete params.addMember;
     }
     let url = "loan-applications/get";
-    if (
-      // this.state.loggedInUserRole === "FPO Admin" ||
-      this.state.loggedInUserRole === "CSP (Community Service Provider)"
-    ) {
-      url += "?creator_id=" + auth.getUserInfo().contact.id;
-      if (type === "search" && this.state.filterShg) {
-        url += "&id=" + this.state.filterShg.contact;
-      }
-    } else {
-      if (type === "search" && this.state.filterShg) {
-        url += "/?id=" + this.state.filterShg.id;
-      }
+    if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
+      url =
+        "loan-applications/get/?creator_id.id=" + auth.getUserInfo().contact.id;
     }
     serviceProvider
       .serviceProviderForGetRequest(
@@ -254,43 +329,25 @@ export class Loans extends React.Component {
         loandata.status == "InProgress" ||
         loandata.status == "Completed"
       ) {
+        let notPaidEmis = [];
+        loandata.loan_app_installments.map((inst) => {
+          if (inst.actual_interest === null && inst.actual_principal === null) {
+            notPaidEmis.push(inst);
+          }
+        });
+
         let loanDueId = loandata.loan_app_installments.length - 1;
         let loanDueData = loandata.loan_app_installments[loanDueId];
         loandata.amount_due = (
           loanDueData.expected_interest + loanDueData.expected_principal
         ).toLocaleString();
-        loandata.payment_date = Moment(loanDueData.payment_date).format(
-          "DD MMM YYYY"
-        );
 
-        let paid = 0;
-        loandata.loan_app_installments.map((emidata) => {
-          if (emidata.fine !== null || emidata.fine !== 0) {
-            emidata.totalPaid =
-              emidata.fine + emidata.actual_principal + emidata.actual_interest;
-          } else {
-            emidata.totalPaid =
-              emidata.actual_principal + emidata.actual_interest;
-          }
-          let totalLoanAmnt =
-            emidata.expected_principal + emidata.expected_interest;
-          emidata.outstanding = (
-            totalLoanAmnt -
-            (emidata.actual_principal + emidata.actual_interest)
-          ).toLocaleString();
-
-          paid = paid + emidata.totalPaid;
-        });
-
-        let totalamount = parseInt(
-          loandata.loan_model.loan_amount.replace(/,/g, "")
-        );
-        let outstandingAmount = totalamount - paid;
-
-        if (outstandingAmount < 0) {
-          loandata.outstandingAmount = 0;
+        // payment date of upcoming EMI
+        if (notPaidEmis.length > 0) {
+          loandata.payment_date = Moment(notPaidEmis[0].payment_date).format(
+            "DD MMM YYYY"
+          );
         }
-        loandata.outstandingAmount = outstandingAmount.toLocaleString();
       }
     });
     this.setState({ data: data, isLoader: false });
@@ -341,6 +398,9 @@ export class Loans extends React.Component {
     if (column.selector === "outstandingAmount") {
       column.selector = "outstandingAmount";
     }
+    if (column.selector === "paidAmount") {
+      column.selector = "paidAmount";
+    }
     if (column.selector === "amount_due") {
       column.selector = "amount_due";
     }
@@ -365,8 +425,16 @@ export class Loans extends React.Component {
     this.setState({
       values: {},
       filterStatus: "",
+      filterPurpose: "",
       formSubmitted: "",
       filterShg: "",
+      filterVo: "",
+      filterVillage: "",
+      filterAppDate: "",
+      minOutstanding: "",
+      maxOutstanding: "",
+      minPaid: "",
+      maxPaid: "",
       isCancel: true,
       isLoader: true,
     });
@@ -384,15 +452,113 @@ export class Loans extends React.Component {
     });
   }
 
+  handleMinOutstandingChange(event, value) {
+    if (event.target.value !== "") {
+      this.setState({
+        minOutstanding: event.target.value,
+        values: {
+          ...this.state.values,
+          ["outstanding_amount_gte"]: event.target.value,
+        },
+      });
+    } else {
+      delete this.state.values["outstanding_amount_gte"];
+      this.setState({
+        minOutstanding: "",
+        values: { ...this.state.values },
+      });
+    }
+  }
+
+  handleMaxOutstandingChange(event, value) {
+    if (event.target.value !== "") {
+      this.setState({
+        maxOutstanding: event.target.value,
+        values: {
+          ...this.state.values,
+          ["outstanding_amount_lte"]: event.target.value,
+        },
+      });
+    } else {
+      delete this.state.values["outstanding_amount_lte"];
+      this.setState({
+        maxOutstanding: "",
+        values: { ...this.state.values },
+      });
+    }
+  }
+
+  handleMinPaidChange(event, value) {
+    if (event.target.value !== "") {
+      this.setState({
+        minPaid: event.target.value,
+        values: {
+          ...this.state.values,
+          ["paid_amount_gte"]: event.target.value,
+        },
+      });
+    } else {
+      delete this.state.values["paid_amount_gte"];
+      this.setState({
+        minPaid: "",
+        values: { ...this.state.values },
+      });
+    }
+  }
+
+  handleMaxPaidChange(event, value) {
+    if (event.target.value !== "") {
+      this.setState({
+        maxPaid: event.target.value,
+        values: {
+          ...this.state.values,
+          ["paid_amount_lte"]: event.target.value,
+        },
+      });
+    } else {
+      delete this.state.values["paid_amount_lte"];
+      this.setState({
+        maxPaid: "",
+        values: { ...this.state.values },
+      });
+    }
+  }
+
   handleShgChange(event, value) {
     if (value !== null) {
       this.setState({
         filterShg: value,
         isCancel: false,
       });
+      if (this.state.loggedInUserRole === "CSP (Community Service Provider)") {
+        this.setState({
+          values: { ...this.state.values, ["assigned_shg"]: value.contact },
+        });
+      } else {
+        this.setState({
+          values: { ...this.state.values, ["assigned_shg"]: value.id },
+        });
+      }
     } else {
+      delete this.state.values["assigned_shg"];
       this.setState({
         filterShg: "",
+        values: { ...this.state.values },
+      });
+    }
+  }
+
+  handleVoChange(event, value) {
+    if (value !== null) {
+      this.setState({
+        filterVo: value,
+        isCancel: false,
+        values: { ...this.state.values, ["assigned_vo"]: value.id },
+      });
+    } else {
+      delete this.state.values["assigned_vo"];
+      this.setState({
+        filterVo: "",
         values: { ...this.state.values },
       });
     }
@@ -410,6 +576,51 @@ export class Loans extends React.Component {
       this.setState({ filterStatus: "", values: { ...this.state.values } });
     }
   };
+
+  handlePurposeChange = async (event, value) => {
+    if (value !== null) {
+      this.setState({
+        filterPurpose: value,
+        isCancel: false,
+        values: { ...this.state.values, ["loan_model.id"]: value.id },
+      });
+    } else {
+      delete this.state.values["loan_model.id"];
+      this.setState({ filterPurpose: "", values: { ...this.state.values } });
+    }
+  };
+
+  handleVillageChange = async (event, value) => {
+    if (value !== null) {
+      this.setState({
+        filterVillage: value,
+        isCancel: false,
+        values: { ...this.state.values, ["village.village"]: value.id },
+      });
+    } else {
+      delete this.state.values["village.village"];
+      this.setState({ filterVillage: "", values: { ...this.state.values } });
+    }
+  };
+
+  handleAppDateChange(event, value) {
+    if (event !== null) {
+      this.setState({
+        filterAppDate: event,
+        isCancel: false,
+        values: {
+          ...this.state.values,
+          ["application_date"]: event.toISOString(),
+        },
+      });
+    } else {
+      delete this.state.values["application_date"];
+      this.setState({
+        filterAppDate: "",
+        ...this.state.values,
+      });
+    }
+  }
 
   viewTask = (cellid) => {
     let loanAppData;
@@ -475,8 +686,14 @@ export class Loans extends React.Component {
     let data = this.state.data;
     let shgFilter = this.state.getShg;
     let filterShg = this.state.filterShg;
+    let voFilter = this.state.getVo;
+    let filterVo = this.state.filterVo;
     let statusFilter = this.state.getStatus;
     let filterStatus = this.state.filterStatus;
+    let purposeFilter = this.state.getPurpose;
+    let filterPurpose = this.state.filterPurpose;
+    let villageFilter = this.state.getVillages;
+    let filterVillage = this.state.filterVillage;
     let filters = this.state.values;
     const Usercolumns = [
       {
@@ -516,7 +733,16 @@ export class Loans extends React.Component {
         selector: "outstandingAmount",
         sortable: true,
         cell: (row) =>
-          row.outstandingAmount ? "₹" + row.outstandingAmount : "-",
+          row.outstanding_amount
+            ? "₹" + row.outstanding_amount.toLocaleString()
+            : "-",
+      },
+      {
+        name: "Paid amount",
+        selector: "paidAmount",
+        sortable: true,
+        cell: (row) =>
+          row.paid_amount ? "₹" + row.paid_amount.toLocaleString() : "-",
       },
       {
         name: "Amount Due",
@@ -529,6 +755,12 @@ export class Loans extends React.Component {
         selector: "payment_date",
         sortable: true,
         cell: (row) => (row.payment_date ? row.payment_date : "-"),
+      },
+      {
+        name: "Beneficiary Status",
+        selector: "beneficiary_status",
+        sortable: true,
+        cell: (row) => (row.beneficiary_status ? row.beneficiary_status : "-"),
       },
     ];
     let selectors = [];
@@ -599,6 +831,66 @@ export class Loans extends React.Component {
                 <Grid item md={12} xs={12}>
                   <Autocomplete
                     id="combo-box-demo"
+                    options={villageFilter}
+                    getOptionLabel={(option) => option.name}
+                    onChange={(event, value) => {
+                      this.handleVillageChange(event, value);
+                    }}
+                    value={
+                      filterVillage
+                        ? this.state.isCancel === true
+                          ? null
+                          : filterVillage
+                        : null
+                    }
+                    renderInput={(params) => (
+                      <Input
+                        {...params}
+                        fullWidth
+                        label="Select Village"
+                        name="filterVillage"
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                </Grid>
+              </div>
+            </div>
+            <div className={classes.searchInput}>
+              <div className={style.Districts}>
+                <Grid item md={12} xs={12}>
+                  <Autocomplete
+                    id="combo-box-demo"
+                    options={voFilter}
+                    getOptionLabel={(option) => option.name}
+                    onChange={(event, value) => {
+                      this.handleVoChange(event, value);
+                    }}
+                    value={
+                      filterVo
+                        ? this.state.isCancel === true
+                          ? null
+                          : filterVo
+                        : null
+                    }
+                    renderInput={(params) => (
+                      <Input
+                        {...params}
+                        fullWidth
+                        label="Select VO"
+                        name="filterVo"
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                </Grid>
+              </div>
+            </div>
+            <div className={classes.searchInput}>
+              <div className={style.Districts}>
+                <Grid item md={12} xs={12}>
+                  <Autocomplete
+                    id="combo-box-demo"
                     options={shgFilter}
                     getOptionLabel={(option) => option.name}
                     onChange={(event, value) => {
@@ -615,7 +907,7 @@ export class Loans extends React.Component {
                       <Input
                         {...params}
                         fullWidth
-                        label="SHG Name"
+                        label="Select SHG"
                         name="filterShg"
                         variant="outlined"
                       />
@@ -654,6 +946,116 @@ export class Loans extends React.Component {
                 </Grid>
               </div>
             </div>
+            <div className={classes.searchInput}>
+              <div className={style.Districts}>
+                <Grid item md={12} xs={12}>
+                  <Autocomplete
+                    id="combo-box-demo"
+                    options={purposeFilter}
+                    getOptionLabel={(option) => option.product_name}
+                    onChange={(event, value) => {
+                      this.handlePurposeChange(event, value);
+                    }}
+                    value={
+                      filterPurpose
+                        ? this.state.isCancel === true
+                          ? null
+                          : filterPurpose
+                        : null
+                    }
+                    renderInput={(params) => (
+                      <Input
+                        {...params}
+                        fullWidth
+                        label="Select Loan Purpose"
+                        name="selectPurpose"
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                </Grid>
+              </div>
+            </div>
+            <div className={classes.searchInput}>
+              <div className={style.Districts}>
+                <Grid item md={12} xs={12}>
+                  <Datepicker
+                    label="Application Date"
+                    name="applicationDate"
+                    value={this.state.filterAppDate || ""}
+                    format={"dd MMM yyyy"}
+                    onChange={(event, value) =>
+                      this.handleAppDateChange(event, value)
+                    }
+                  />
+                </Grid>
+              </div>
+            </div>
+            <div className={classes.searchInput}>
+              <div className={style.Districts}>
+                <Grid item md={12} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Min Outstanding Amount"
+                    name="minOutstanding"
+                    variant="outlined"
+                    onChange={(event, value) => {
+                      this.handleMinOutstandingChange(event, value);
+                    }}
+                    value={this.state.minOutstanding || ""}
+                  />
+                </Grid>
+              </div>
+            </div>
+            <div className={classes.searchInput}>
+              <div className={style.Districts}>
+                <Grid item md={12} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Max Outstanding Amount"
+                    name="maxOutstanding"
+                    variant="outlined"
+                    onChange={(event, value) => {
+                      this.handleMaxOutstandingChange(event, value);
+                    }}
+                    value={this.state.maxOutstanding || ""}
+                  />
+                </Grid>
+              </div>
+            </div>
+            <div className={classes.searchInput}>
+              <div className={style.Districts}>
+                <Grid item md={12} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Min Paid Amount"
+                    name="minPaid"
+                    variant="outlined"
+                    onChange={(event, value) => {
+                      this.handleMinPaidChange(event, value);
+                    }}
+                    value={this.state.minPaid || ""}
+                  />
+                </Grid>
+              </div>
+            </div>
+            <div className={classes.searchInput}>
+              <div className={style.Districts}>
+                <Grid item md={12} xs={12}>
+                  <Input
+                    fullWidth
+                    label="Max Paid Amount"
+                    name="maxPaid"
+                    variant="outlined"
+                    onChange={(event, value) => {
+                      this.handleMaxPaidChange(event, value);
+                    }}
+                    value={this.state.maxPaid || ""}
+                  />
+                </Grid>
+              </div>
+            </div>
+
             <Button
               onClick={this.handleSearch.bind(this)}
               style={{ marginRight: "5px", marginBottom: "8px" }}

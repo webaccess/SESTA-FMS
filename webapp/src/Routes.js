@@ -46,6 +46,7 @@ import DashboardFPOViewMoreDetails from "./containers/Dashboard/DashboardFPOView
 import Reports from "./containers/Reports/Reports";
 import CSPSummaryReport from "./containers/Reports/CSPSummaryReport";
 import CSPActivityReport from "./containers/Reports/CSPActivityReport.js";
+import LoanReport from "./containers/Reports/LoanReport.js";
 
 function Routes() {
   return (
@@ -141,17 +142,17 @@ function Routes() {
               exact
             />
             <PrivateRoute path="/loans" component={Loans} exact />
-            <PrivateRoute path="/loans/apply/:id" component={LoansApplyPage} exact />
+            <PrivateRoute
+              path="/loans/apply/:id"
+              component={LoansApplyPage}
+              exact
+            />
             <PrivateRoute
               path="/loan/update/:id"
               component={LoanTasksPage}
               exact
             />
-            <PrivateRoute
-              path="/loan/task/add"
-              component={AddLoanTask}
-              exact
-            />
+            <PrivateRoute path="/loan/task/add" component={AddLoanTask} exact />
             <PrivateRoute
               path="/loan/task/edit/:id"
               component={LoanEditTask}
@@ -198,6 +199,7 @@ function Routes() {
               component={CSPActivityReport}
               exact
             />
+            <PrivateRoute path="/loan-report" component={LoanReport} exact />
             <Route path="/404" component={NotFoundPage} />
             <AuthRoute path="/:authType/:id?" component={AuthPage} />
           </Switch>

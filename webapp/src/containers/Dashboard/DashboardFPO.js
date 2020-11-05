@@ -165,8 +165,7 @@ class DashboardForFPO extends Component {
     /** get approved loan applications */
     serviceProvider
       .serviceProviderForGetRequest(
-        process.env.REACT_APP_SERVER_URL +
-          "loan-applications/loans/count/?status=Approved"
+        process.env.REACT_APP_SERVER_URL + "loan-applications/loans/count/"
       )
       .then((res) => {
         this.setState({ approvedLoans: res.data, isLoanLoading: false });
@@ -177,7 +176,7 @@ class DashboardForFPO extends Component {
     serviceProvider
       .serviceProviderForGetRequest(
         process.env.REACT_APP_SERVER_URL +
-          "loan-applications/loans/details/?status=Approved"
+          "loan-applications/loans/details/?status=Approved&status=InProgress"
       )
       .then((res) => {
         this.setState({

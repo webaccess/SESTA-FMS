@@ -193,16 +193,36 @@ module.exports = {
   },
 
   getLoansCount: async (ctx) => {
+    const { query } = utils.getRequestParams(ctx.request.query);
+    let filters = convertRestQueryParams(query, { limit: -1 });
+    const statusQuery = [
+      { field: "status", operator: "in", value: ["Approved", "InProgress"] },
+    ];
+
+    if (filters.where && filters.where.length > 0) {
+      filters.where = [...filters.where, ...statusQuery];
+    } else {
+      filters.where = [...statusQuery];
+    }
     try {
       if (ctx.query.status === "UnderReview") {
         return await strapi.query("loan-application").count({
           status: "UnderReview",
         });
-      }
-      if (ctx.query.status === "Approved") {
-        return await strapi.query("loan-application").count({
-          status: "Approved",
-        });
+      } else {
+        return strapi
+          .query("loan-application")
+          .model.query(
+            buildQuery({
+              model: strapi.models["loan-application"],
+              filters,
+            })
+          )
+          .fetchAll({})
+          .then(async (res) => {
+            let loans = res.toJSON();
+            return loans.length;
+          });
       }
     } catch (error) {
       return ctx.badRequest(null, error.message);
@@ -221,80 +241,171 @@ module.exports = {
       let purposeList = [];
       let purposes = [];
       let purposesValues = [];
-      if (ctx.query.status === "Approved") {
-        const loans = await strapi.query("loan-application").find({
-          status: "Approved",
-        });
-        loans.map((e, i) => {
-          let emiPaid = 0;
-          /** loan amount distributed*/
-          loanDistributedVal += e.loan_model.loan_amount;
-          e.loan_app_installments.map((emi, index) => {
-            if (emi.actual_principal) {
-              actualPrincipalPaid += emi.actual_principal;
-            }
-            if (emi.actual_interest) {
-              actualInterestPaid += emi.actual_interest;
-            }
-            if (emi.fine) {
-              actualFinePaid += emi.fine;
-            }
-            let totalPaid = emi.actual_principal + emi.actual_interest;
-            emiPaid += totalPaid;
-          });
-          /** Loans table */
-          outstandingAmount = e.loan_model.loan_amount - emiPaid;
-          loansDetails.push({
-            memberName: e.contact.name,
-            loanAmount: e.loan_model.loan_amount,
-            outstandingAmount: outstandingAmount,
-            loanDate: e.application_date,
-          });
-        });
-        loanDistributedAmounts.push(
-          loanDistributedVal,
-          actualPrincipalPaid + actualInterestPaid + actualFinePaid
-        );
-        // sort loanDetails with latest date first
-        loansDetails.sort(
-          (a, b) =>
-            new Date(...b.loanDate.split("/").reverse()) -
-            new Date(...a.loanDate.split("/").reverse())
-        );
-        const data = {
-          loanDistributedAmounts: loanDistributedAmounts,
-          totalLoanDistributed:
-            loanDistributedAmounts[0] + loanDistributedAmounts[1],
-          loansTableData: loansDetails.slice(0, 5),
-          loansAllDetails: loansDetails,
-        };
-        return data;
-      } else {
-        const loans = await strapi.query("loan-application").find({
-          status: "Approved",
-        });
-        loans.map((loan, i) => {
-          purposeList.push(loan.loan_model.product_name);
-        });
+      const { query } = utils.getRequestParams(ctx.request.query);
+      let filters = convertRestQueryParams(query, { limit: -1 });
+      const statusQuery = [
+        { field: "status", operator: "in", value: ["Approved", "InProgress"] },
+      ];
 
-        var map = purposeList.reduce(function (prev, cur) {
-          prev[cur] = (prev[cur] || 0) + 1;
-          return prev;
-        }, {});
-        Object.keys(map).map((key, i) => {
-          purposes.push(key.toUpperCase());
-          purposesValues.push(map[key]);
-        });
-        const purposeData = {
-          purposes: purposes,
-          purposesValues: purposesValues,
-        };
-        return purposeData;
+      if (filters.where && filters.where.length > 0) {
+        filters.where = [...filters.where, ...statusQuery];
+      } else {
+        filters.where = [...statusQuery];
+      }
+      if (ctx.query.status) {
+        return strapi
+          .query("loan-application")
+          .model.query(
+            buildQuery({
+              model: strapi.models["loan-application"],
+              filters,
+            })
+          )
+          .fetchAll({})
+          .then(async (res) => {
+            let loans = res.toJSON();
+            loans.map((e, i) => {
+              let emiPaid = 0;
+              /** loan amount distributed*/
+              loanDistributedVal += e.loan_model.loan_amount;
+              e.loan_app_installments.map((emi, index) => {
+                if (emi.actual_principal) {
+                  actualPrincipalPaid += emi.actual_principal;
+                }
+                if (emi.actual_interest) {
+                  actualInterestPaid += emi.actual_interest;
+                }
+                if (emi.fine) {
+                  actualFinePaid += emi.fine;
+                }
+                let totalPaid = emi.actual_principal + emi.actual_interest;
+                emiPaid += totalPaid;
+              });
+              /** Loans table */
+              outstandingAmount = e.loan_model.loan_amount - emiPaid;
+              loansDetails.push({
+                memberName: e.contact.name,
+                loanAmount: e.loan_model.loan_amount,
+                outstandingAmount: outstandingAmount,
+                loanDate: e.application_date,
+              });
+            });
+            loanDistributedAmounts.push(
+              loanDistributedVal,
+              actualPrincipalPaid + actualInterestPaid + actualFinePaid
+            );
+            // sort loanDetails with latest date first
+            loansDetails.sort(
+              (a, b) =>
+                new Date(...b.loanDate.split("/").reverse()) -
+                new Date(...a.loanDate.split("/").reverse())
+            );
+            const data = {
+              loanDistributedAmounts: loanDistributedAmounts,
+              totalLoanDistributed:
+                loanDistributedAmounts[0] + loanDistributedAmounts[1],
+              loansTableData: loansDetails.slice(0, 5),
+              loansAllDetails: loansDetails,
+            };
+            return data;
+          });
+      } else {
+        return strapi
+          .query("loan-application")
+          .model.query(
+            buildQuery({
+              model: strapi.models["loan-application"],
+              filters,
+            })
+          )
+          .fetchAll({})
+          .then(async (res) => {
+            let loans = res.toJSON();
+            loans.map((loan, i) => {
+              purposeList.push(loan.loan_model.product_name);
+            });
+
+            var map = purposeList.reduce(function (prev, cur) {
+              prev[cur] = (prev[cur] || 0) + 1;
+              return prev;
+            }, {});
+            Object.keys(map).map((key, i) => {
+              purposes.push(key.toUpperCase());
+              purposesValues.push(map[key]);
+            });
+            const purposeData = {
+              purposes: purposes,
+              purposesValues: purposesValues,
+            };
+            return purposeData;
+          });
       }
     } catch (error) {
       return ctx.badRequest(null, error.message);
     }
   },
+
+  getLoanReportDetails: async (ctx) => {
+    const { page, query, pageSize } = utils.getRequestParams(ctx.request.query);
+    let filters = convertRestQueryParams(query, { limit: -1 });
+
+    try {
+      let loanDistributedVal = 0;
+      let actualPrincipalPaid = 0;
+      let actualInterestPaid = 0;
+      const query = [
+        { field: "status", operator: "in", value: ["Approved", "InProgress"] },
+      ];
+
+      if (filters.where && filters.where.length > 0) {
+        filters.where = [...filters.where, ...query];
+      } else {
+        filters.where = [...query];
+      }
+
+      return strapi
+        .query("loan-application")
+        .model.query(
+          buildQuery({
+            model: strapi.models["loan-application"],
+            filters,
+          })
+        )
+        .fetchAll({})
+        .then(async (res) => {
+          let loans = res.toJSON();
+          loans.map((e, i) => {
+            /** loan amount distributed*/
+            loanDistributedVal += e.loan_model.loan_amount;
+            e.loan_app_installments.map((emi, index) => {
+              if (emi.actual_principal) {
+                actualPrincipalPaid += emi.actual_principal;
+              }
+              if (emi.actual_interest) {
+                actualInterestPaid += emi.actual_interest;
+              }
+            });
+          });
+
+          const data = [
+            {
+              data: {
+                loanDistributedAmount: loanDistributedVal,
+                repaymentAmount: actualPrincipalPaid,
+                interestAmount: actualInterestPaid,
+              },
+            },
+            { loanDistributedAmount: loanDistributedVal },
+            { repaymentAmount: actualPrincipalPaid },
+            { interestAmount: actualInterestPaid },
+          ];
+          return data;
+        });
+    } catch (error) {
+      return ctx.badRequest(null, error.message);
+    }
+  },
+
   getLoanApplicationModels: async (ctx) => {
     const { page, query, pageSize } = utils.getRequestParams(ctx.request.query);
     let filters = convertRestQueryParams(query, { limit: -1 });
@@ -303,7 +414,6 @@ module.exports = {
       sort = filters.sort;
       filters = _.omit(filters, ["sort"]);
     }
-
     if (ctx.query.id) {
       const individual = await strapi.query("individual", "crm-plugin").find({
         shg_null: false,

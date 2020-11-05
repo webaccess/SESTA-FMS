@@ -165,7 +165,8 @@ class LoanEmiPage extends Component {
     let loanEmiData = this.state.loanEmiData;
     let loanAppData = this.props.location.state.loanAppData;
 
-    let paid = 0, loanfine;
+    let paid = 0,
+      loanfine;
     loanEmiData.map((emidata) => {
       if (emidata.fine !== null || emidata.fine !== 0) {
         emidata.totalPaid = (
@@ -188,19 +189,15 @@ class LoanEmiPage extends Component {
       emidata.totalPaid = parseInt(emidata.totalPaid.replace(/,/g, ""));
       paid = paid + emidata.totalPaid;
 
-      emidata.loanfine = (emidata.fine !== null) ? emidata.fine.toLocaleString() : (emidata.actual_principal !== null && emidata.fine == null) ? emidata.loanfine = "-": emidata.loanfine = null;
+      emidata.loanfine =
+        emidata.fine !== null
+          ? emidata.fine.toLocaleString()
+          : emidata.actual_principal !== null && emidata.fine == null
+          ? (emidata.loanfine = "-")
+          : (emidata.loanfine = null);
     });
 
-    // Pending Amount = Actual amount + Fine - Total installment paid
-    let pendingAmount;
-    if (data.amount) {
-      let totalamount = parseInt(data.amount.replace(/,/g, ""));
-      pendingAmount = totalamount - paid;
-      if (pendingAmount < 0) {
-        pendingAmount = 0;
-      }
-      pendingAmount = "₹" + pendingAmount.toLocaleString();
-    }
+    let pendingAmount = "₹" + loanAppData.outstanding_amount.toLocaleString();
 
     // get Loan Ends On Date
     if (loanAppData.loan_app_installments.length > 0) {
@@ -473,7 +470,6 @@ class LoanEmiPage extends Component {
                 editData={this.editData}
                 rowsSelected={this.rowsSelect}
                 columnsvalue={columnsvalue}
-                pagination
                 progressComponent={this.state.isLoader}
               />
             ) : (

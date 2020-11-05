@@ -173,9 +173,7 @@ const roles = {
       },
       {
         name: "loan-application-installments",
-        action: [
-          "emiDueDetails"
-        ],
+        action: ["emiDueDetails"],
       },
     ],
     grantAllPermissions: false,
@@ -778,6 +776,16 @@ const modules = {
     icon_class: "",
     url: "/reports/activity-report",
     slug: "activity_report",
+    displayNavigation: false,
+    module: "", //slug
+    order: 29,
+    roles: ["FPO Admin"],
+  },
+  "Loan Report": {
+    is_active: true,
+    icon_class: "",
+    url: "/reports/loan-report",
+    slug: "loan_report",
     displayNavigation: false,
     module: "", //slug
     order: 29,
