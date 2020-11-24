@@ -82,7 +82,7 @@ export class CSPSummaryReport extends React.Component {
       });
 
     this.getCompletedActivities();
-    this.getSanctionedLonas();
+    this.getSanctionedLoans();
     this.getEMICollection();
   }
 
@@ -141,7 +141,7 @@ export class CSPSummaryReport extends React.Component {
       });
   };
 
-  getSanctionedLonas = () => {
+  getSanctionedLoans = () => {
     let loanUrl = "loan-applications/?status=Approved&status=InProgress";
     if (this.state.filterCspName || this.state.filterCspName !== "") {
       loanUrl += "&&creator_id.id=" + this.state.filterCspName.id;
@@ -250,7 +250,7 @@ export class CSPSummaryReport extends React.Component {
 
   handleSearch() {
     this.getCompletedActivities();
-    this.getSanctionedLonas();
+    this.getSanctionedLoans();
     this.getEMICollection();
   }
 

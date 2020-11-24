@@ -172,8 +172,13 @@ module.exports = {
           });
       }
       if (entity.loan_model.fpo) {
+        var temp_fpo = await strapi
+          .query("organization", "crm-plugin")
+          .findOne({
+            id: entity.assigned_vo.organization,
+          });
         entity.fpo = await strapi.query("contact", "crm-plugin").findOne({
-          id: entity.loan_model.fpo,
+          id: temp_fpo.fpo.id,
         });
       }
       if (entity.fpo.addresses.length > 0) {

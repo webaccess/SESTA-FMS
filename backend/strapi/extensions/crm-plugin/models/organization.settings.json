@@ -15,9 +15,9 @@
       "required": true
     },
     "contact": {
+      "via": "organization",
       "plugin": "crm-plugin",
-      "model": "contact",
-      "via": "organization"
+      "model": "contact"
     },
     "person_incharge": {
       "type": "string"
@@ -36,9 +36,9 @@
       "via": "organization"
     },
     "vos": {
+      "via": "org_vos",
       "plugin": "crm-plugin",
       "collection": "contact",
-      "via": "org_vos",
       "dominant": true
     },
     "fpo": {

@@ -15,6 +15,12 @@ export const REMUNERATION_NOTATION = [
   { id: "Flat", name: "Flat" },
   { id: "Percentage", name: "Percentage" },
 ];
+export const APPLYLOANCOUNT = [
+  { id: 1, value: "One" },
+  { id: 2, value: "Two" },
+  { id: 3, value: "Three" },
+  { id: 4, value: "Four or more" },
+];
 
 // state id
 export const STATE_ID = 1;
