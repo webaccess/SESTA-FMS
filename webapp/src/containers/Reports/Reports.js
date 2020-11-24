@@ -99,8 +99,9 @@ export class Reports extends React.Component {
                   </CardContent>
                 </CardActionArea>
                 <CardContent style={{ fontSize: "13px" }}>
-                  Summary of total amount of loan distributed, repayment amount
-                  and interest
+                  Summary of total amount of loan distributed, repayment amount,
+                  interest, velocity of lenting, loan repayment ratio and number
+                  of members who availed the loan
                 </CardContent>
               </Card>
             </div>

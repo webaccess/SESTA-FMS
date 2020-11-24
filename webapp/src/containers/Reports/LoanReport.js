@@ -10,6 +10,10 @@ import Datepicker from "../../components/UI/Datepicker/Datepicker.js";
 import Button from "../../components/UI/Button/Button";
 import { CSVLink } from "react-csv";
 import * as formUtilities from "../../utilities/FormUtilities";
+import auth from "../../components/Auth/Auth";
+import * as constants from "../../constants/Constants";
+import Input from "../../components/UI/Input/Input";
+import Autocomplete from "../../components/Autocomplete/Autocomplete";
 
 const useStyles = (theme) => ({
   row: {
@@ -42,9 +46,13 @@ export class LoanReport extends React.Component {
       loanDistributed: "",
       repayment: "",
       interest: "",
+      totalCapital: 0,
       isLoader: true,
       filename: [],
       values: {},
+      AvailedLoanCount: constants.APPLYLOANCOUNT,
+      noOfMemberAvailedLoanFilter: "",
+      filterAvailedLoans: "",
     };
   }
 
@@ -69,13 +77,87 @@ export class LoanReport extends React.Component {
         params
       )
       .then((res) => {
-        this.setState({
-          loanTableData: [res.data[0].data],
-          loanDistributed: res.data[1].loanDistributedAmount,
-          repayment: res.data[2].repaymentAmount,
-          interest: res.data[3].interestAmount,
-          isLoader: false,
+        this.setState(
+          {
+            loanTableData: [res.data[0].data],
+            loanDistributed: res.data[1].loanDistributedAmount,
+            repayment: res.data[2].repaymentAmount,
+            interest: res.data[3].interestAmount,
+            isLoader: false,
+          },
+          function () {
+            this.getVelocityOfLenting();
+            this.getMembersAvailedLoans();
+          }
+        );
+      })
+      .catch((error) => {});
+  };
+
+  getVelocityOfLenting = async () => {
+    serviceProvider
+      .serviceProviderForGetRequest(
+        process.env.REACT_APP_SERVER_URL +
+          "crm-plugin/individuals/" +
+          auth.getUserInfo().contact.individual
+      )
+      .then((indRes) => {
+        this.setState({ totalCapital: parseInt(indRes.data.fpo.totalcapital) });
+      })
+      .catch((error) => {});
+  };
+
+  getMembersAvailedLoans = () => {
+    let loanUrl =
+      "loan-applications/?status=Approved&status=InProgress&status=Completed";
+
+    if (this.state.filterStartDate) {
+      loanUrl +=
+        "&application_date_gte=" + this.state.filterStartDate.toISOString();
+    }
+    if (this.state.filterEndDate) {
+      loanUrl +=
+        "&application_date_gte=" + this.state.filterEndDate.toISOString();
+    }
+
+    let memberAvailedLoan = [];
+    serviceProvider
+      .serviceProviderForGetRequest(process.env.REACT_APP_SERVER_URL + loanUrl)
+      .then((loanRes) => {
+        loanRes.data.map((i) => {
+          memberAvailedLoan.push(i.contact.id);
         });
+        var result = {};
+        memberAvailedLoan.forEach(function (x) {
+          result[x] = (result[x] || 0) + 1;
+        });
+
+        let exists = [];
+        Object.entries(result).map((entry) => {
+          let key = entry[0];
+          let value = entry[1];
+          exists.push(value);
+        });
+        var result1 = {};
+        exists.forEach(function (x) {
+          result1[x] = (result1[x] || 0) + 1;
+        });
+        if (this.state.filterAvailedLoans) {
+          if (result1.hasOwnProperty(this.state.filterAvailedLoans.id)) {
+            this.setState({
+              noOfMemberAvailedLoanFilter:
+                result1[this.state.filterAvailedLoans.id],
+            });
+          } else {
+            this.setState({
+              noOfMemberAvailedLoanFilter: 0,
+            });
+          }
+        } else {
+          this.setState({
+            noOfMemberAvailedLoanFilter: [...new Set(memberAvailedLoan)].length,
+          });
+        }
       })
       .catch((error) => {});
   };
@@ -118,6 +200,16 @@ export class LoanReport extends React.Component {
     }
   }
 
+  handleLoanCountChange(event, value) {
+    if (value !== null) {
+      this.setState({ filterAvailedLoans: value, isCancel: false });
+    } else {
+      this.setState({
+        filterAvailedLoans: "",
+      });
+    }
+  }
+
   handleSearch() {
     this.setState({ isLoader: true });
     this.getLoanDetails(this.state.values);
@@ -140,6 +232,7 @@ export class LoanReport extends React.Component {
     this.setState({
       filterStartDate: "",
       filterEndDate: "",
+      filterAvailedLoans: "",
       isCancel: true,
       isLoader: true,
     });
@@ -165,6 +258,21 @@ export class LoanReport extends React.Component {
         selector: "interestAmount",
         cell: (row) => "₹" + row.interestAmount.toLocaleString(),
       },
+      {
+        name: "Velocity of lenting",
+        selector: "velocityOfLenting",
+        cell: (row) => row.loanDistributedAmount / this.state.totalCapital,
+      },
+      {
+        name: "Loan Repayment Ratio",
+        selector: "loanRepaymentRatio",
+        cell: (row) => (row.repaymentAmount / 100).toLocaleString(),
+      },
+      {
+        name: "No. of members availed loan",
+        selector: "membersAvailedLoan",
+        cell: (row) => this.state.noOfMemberAvailedLoanFilter,
+      },
     ];
 
     let selectors = [];
@@ -187,12 +295,28 @@ export class LoanReport extends React.Component {
         id: "Interest",
         displayName: "Interest",
       },
+      {
+        id: "Velocity of lenting",
+        displayName: "Velocity of lenting",
+      },
+      {
+        id: "Loan Repayment Ratio",
+        displayName: "Loan Repayment Ratio",
+      },
+      {
+        id: "No. of members availed loan",
+        displayName: "No. of members availed loan",
+      },
     ];
     const datas = [
       {
         "Total amount of Loan Distributed": "₹" + this.state.loanDistributed,
         "Repayment Amount": "₹" + this.state.repayment,
         Interest: "₹" + this.state.interest,
+        "Velocity of lenting":
+          this.state.loanDistributed / this.state.totalCapital,
+        "Loan Repayment Ratio": this.state.repayment / 100,
+        "No. of members availed loan": this.state.noOfMemberAvailedLoanFilter,
       },
     ];
 
@@ -233,6 +357,36 @@ export class LoanReport extends React.Component {
                       onChange={(event, value) =>
                         this.handleEndDateChange(event, value)
                       }
+                    />
+                  </Grid>
+                </div>
+              </div>
+              <div className={classes.searchInput}>
+                <div className={classes.Districts}>
+                  <Grid item md={12} xs={12}>
+                    <Autocomplete
+                      id="combo-box-demo"
+                      options={this.state.AvailedLoanCount}
+                      getOptionLabel={(option) => option.value}
+                      onChange={(event, value) => {
+                        this.handleLoanCountChange(event, value);
+                      }}
+                      value={
+                        this.state.filterAvailedLoans
+                          ? this.state.isCancel === true
+                            ? null
+                            : this.state.filterAvailedLoans
+                          : null
+                      }
+                      renderInput={(params) => (
+                        <Input
+                          {...params}
+                          fullWidth
+                          label="Availed Loans"
+                          name="availedLoans"
+                          variant="outlined"
+                        />
+                      )}
                     />
                   </Grid>
                 </div>

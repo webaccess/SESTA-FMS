@@ -55,8 +55,8 @@
       "via": "contact"
     },
     "shareinformation": {
-      "via": "contact",
-      "model": "shareinformation"
+      "model": "shareinformation",
+      "via": "contact"
     },
     "user": {
       "plugin": "users-permissions",
@@ -64,22 +64,22 @@
       "via": "contact"
     },
     "loan_app_approvedby": {
-      "via": "approved_by",
-      "model": "loan-application"
+      "model": "loan-application",
+      "via": "approved_by"
     },
     "organization": {
-      "via": "contact",
       "plugin": "crm-plugin",
-      "model": "organization"
+      "model": "organization",
+      "via": "contact"
     },
     "org_vos": {
-      "via": "vos",
       "plugin": "crm-plugin",
-      "collection": "organization"
+      "collection": "organization",
+      "via": "vos"
     },
     "loan_applications": {
-      "via": "contact",
-      "collection": "loan-application"
+      "collection": "loan-application",
+      "via": "contact"
     },
     "creator_id": {
       "plugin": "crm-plugin",
@@ -93,6 +93,9 @@
     "pg": {
       "plugin": "crm-plugin",
       "model": "tag"
+    },
+    "totalcapital": {
+      "type": "biginteger"
     }
   }
 }

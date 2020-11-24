@@ -55,6 +55,12 @@ class FpoPage extends Component {
             message: "Please enter valid phone number.",
           },
         },
+        totalCapital: {
+          required: {
+            value: "true",
+            message: "Total Capital is required.",
+          },
+        },
       },
       errors: {},
       formSubmitted: "",
@@ -90,6 +96,7 @@ class FpoPage extends Component {
               addBlock: res.data.addresses[0].block,
               addEmail: res.data.email,
               addPhone: res.data.phone,
+              totalCapital: res.data.totalcapital,
             },
             isLoader: false,
           });
@@ -207,6 +214,7 @@ class FpoPage extends Component {
     let fpoPersonInCharge = this.state.values.addPointOfContact;
     let fpoEmail = this.state.values.addEmail;
     let fpoPhone = this.state.values.addPhone;
+    let totalCapital = this.state.values.totalCapital;
     let postAddressData = {
       address_line_1: fpoAddress,
       state: fpoState,
@@ -223,6 +231,7 @@ class FpoPage extends Component {
       addresses: [postAddressData],
       email: fpoEmail,
       phone: fpoPhone,
+      totalcapital: totalCapital,
     };
     if (Object.keys(this.state.errors).length > 0) return;
     if (this.state.editPage[0]) {
@@ -505,6 +514,23 @@ class FpoPage extends Component {
                           : null
                       }
                       value={this.state.values.addPointOfContact || ""}
+                      onChange={this.handleChange}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Input
+                      fullWidth
+                      label="Total Capital*"
+                      name="totalCapital"
+                      type="number"
+                      error={this.hasError("totalCapital")}
+                      helperText={
+                        this.hasError("totalCapital")
+                          ? this.state.errors.totalCapital[0]
+                          : null
+                      }
+                      value={this.state.values.totalCapital || ""}
                       onChange={this.handleChange}
                       variant="outlined"
                     />

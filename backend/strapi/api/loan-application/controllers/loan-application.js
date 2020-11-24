@@ -111,7 +111,10 @@ module.exports = {
       contentVal = contentVal.replace(/{LOAN_PURPOSE}/g, loan_purpose);
       contentVal = contentVal.replace(/{LOAN_AMOUNT}/g, loant_amt);
       contentVal = contentVal.replace(/{VO_NAME}/g, vo_name);
-      const browser = await puppeteer.launch({ headless: true });
+      // const browser = await puppeteer.launch({ headless: true });
+      const browser = await puppeteer.launch({
+        ignoreDefaultArgs: ["--disable-extensions"],
+      });
       const page = await browser.newPage();
       await page.setContent(contentVal);
       const buffer = await page.pdf({
@@ -172,8 +175,13 @@ module.exports = {
           });
       }
       if (entity.loan_model.fpo) {
+        var temp_fpo = await strapi
+          .query("organization", "crm-plugin")
+          .findOne({
+            id: entity.assigned_vo.organization,
+          });
         entity.fpo = await strapi.query("contact", "crm-plugin").findOne({
-          id: entity.loan_model.fpo,
+          id: temp_fpo.fpo.id,
         });
       }
       if (entity.fpo.addresses.length > 0) {
