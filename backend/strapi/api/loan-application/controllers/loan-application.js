@@ -111,10 +111,7 @@ module.exports = {
       contentVal = contentVal.replace(/{LOAN_PURPOSE}/g, loan_purpose);
       contentVal = contentVal.replace(/{LOAN_AMOUNT}/g, loant_amt);
       contentVal = contentVal.replace(/{VO_NAME}/g, vo_name);
-      // const browser = await puppeteer.launch({ headless: true });
-      const browser = await puppeteer.launch({
-        ignoreDefaultArgs: ["--disable-extensions"],
-      });
+      const browser = await puppeteer.launch({ headless: true });
       const page = await browser.newPage();
       await page.setContent(contentVal);
       const buffer = await page.pdf({
